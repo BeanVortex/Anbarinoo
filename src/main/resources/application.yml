@@ -5,7 +5,6 @@ jwt:
   secretkey: RandomSecret
 jasypt:
   encryptor:
-    password: ChangeMe
     algorithm: PBEWithMD5AndDES
     iv-generator-classname: org.jasypt.iv.NoIvGenerator
 spring:
@@ -22,6 +21,8 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         #format_sql: true
     #show-sql: true
+  config:
+    use-legacy-processing: true
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/anbarinoo

@@ -1,0 +1,5 @@
+{"properties": [{
+  "name": "jwt.secretkey",
+  "type": "java.lang.String",
+  "description": "start application with '-Djasypt.encryptor.password=ChangeMe' option"
+}]}
