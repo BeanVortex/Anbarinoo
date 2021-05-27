@@ -8,6 +8,6 @@ public class MainController {
     
     @GetMapping("/")
     public String landingPage(){
-        return "/static/index";
+        return "index.html";
     }
 }

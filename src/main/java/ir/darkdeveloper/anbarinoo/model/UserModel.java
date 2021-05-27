@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -24,8 +26,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
-import ir.darkdeveloper.anbarinoo.util.ImageUtil;
 
+import ir.darkdeveloper.anbarinoo.util.ImageUtil;
 import lombok.Data;
 
 @Data
@@ -71,6 +73,19 @@ public class UserModel implements UserDetails, ImageUtil {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    private String shopName;
+
+    private String shopImage;
+
+
+    private String address;
+
+    private String description;
+
+    //mappedBy is read-only. can't add product while creating user
+    @OneToMany(mappedBy = "user")
+    private List<ProductModel> products;
 
     @Override
     public String getPassword() {

@@ -15,6 +15,10 @@ configurations {
 	}
 }
 
+jar.into('static') {
+    from('src/main')
+}
+
 repositories {
 	mavenCentral()
 }

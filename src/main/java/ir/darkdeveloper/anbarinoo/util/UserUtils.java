@@ -26,7 +26,6 @@ import ir.darkdeveloper.anbarinoo.security.Crud.RefreshModel;
 import ir.darkdeveloper.anbarinoo.security.Crud.RefreshService;
 import ir.darkdeveloper.anbarinoo.service.UserRolesService;
 
-
 @Component
 public class UserUtils {
 
@@ -62,30 +61,38 @@ public class UserUtils {
     public void authenticateUser(JwtAuth model, Long userId, String rawPass, HttpServletResponse response) {
         String username = model.getUsername();
         String password = model.getPassword();
+
         if (rawPass != null) {
             authManager.authenticate(new UsernamePasswordAuthenticationToken(username, rawPass));
         } else {
             authManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         }
+
         RefreshModel rModel = new RefreshModel();
-        String accessToken = jwtUtils.generateAccessToken(username);
-        String refreshToken = jwtUtils.generateRefreshToken(username);
-        rModel.setRefreshToken(refreshToken);
-        rModel.setAccessToken(accessToken);
         if (model.getUsername().equals(getAdminUsername())) {
             rModel.setUserId(getAdminId());
-            rModel.setId(refreshService.getIdByUserId(getAdminId()));                
-            response.addHeader("user_id", "" + getAdminId());
+            rModel.setId(refreshService.getIdByUserId(getAdminId()));
         } else {
             rModel.setId(refreshService.getIdByUserId(userId));
             rModel.setUserId(getUserIdByUsernameOrEmail(username));
         }
+
+        String accessToken = jwtUtils.generateAccessToken(username);
+        String refreshToken = jwtUtils.generateRefreshToken(username, rModel.getUserId());
+
+        rModel.setRefreshToken(refreshToken);
+        rModel.setAccessToken(accessToken);
+
         refreshService.saveToken(rModel);
+
         response.addHeader("access_token", accessToken);
         response.addHeader("refresh_token", refreshToken);
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("EE MMM dd yyyy HH:mm:ss");
-        var date = dateFormat.format(jwtUtils.getExpirationDate(refreshToken));
-        response.addHeader("expiration", date);
+        var refreshDate = dateFormat.format(jwtUtils.getExpirationDate(refreshToken));
+        var accessDate = dateFormat.format(jwtUtils.getExpirationDate(accessToken));
+        response.addHeader("refresh_expiration", refreshDate);
+        response.addHeader("access_expiration", accessDate);
     }
 
     public void validateUserData(UserModel model) throws FileNotFoundException, IOException, Exception {
@@ -134,11 +141,8 @@ public class UserUtils {
                     Authority.OP_ADD_ADMIN, Authority.OP_DELETE_ADMIN, Authority.OP_ACCESS_USER, Authority.OP_EDIT_USER,
                     Authority.OP_DELETE_USER, Authority.OP_ADD_USER, Authority.OP_ADD_ROLE, Authority.OP_DELETE_ROLE,
                     Authority.OP_ACCESS_ROLE, Authority.OP_DELETE_POST, Authority.OP_DELETE_COMMENT };
-            return (UserDetails) User.builder()
-                    .username(getAdminUsername())
-                    .password(encoder.encode(getAdminPassword()))
-                    .authorities(authorities)
-                    .build();
+            return (UserDetails) User.builder().username(getAdminUsername())
+                    .password(encoder.encode(getAdminPassword())).authorities(authorities).build();
         }
         return repo.findByEmailOrUsername(username);
     }
@@ -148,6 +152,5 @@ public class UserUtils {
         repo.deleteById(model.getId());
         refreshService.deleteTokenByUserId(model.getId());
     }
-
 
 }

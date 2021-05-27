@@ -1,6 +1,7 @@
 package ir.darkdeveloper.anbarinoo.security;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -16,8 +17,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import ir.darkdeveloper.anbarinoo.security.Crud.RefreshModel;
-import ir.darkdeveloper.anbarinoo.security.Crud.RefreshService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils;
 
@@ -26,72 +25,75 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
     private final UserUtils userUtils;
-    private final RefreshService refreshService;
 
     @Autowired
-    public JwtFilter(@Lazy JwtUtils jwtUtils, @Lazy UserUtils userUtils, RefreshService refreshService) {
+    public JwtFilter(@Lazy JwtUtils jwtUtils, @Lazy UserUtils userUtils) {
         this.jwtUtils = jwtUtils;
-        this.refreshService = refreshService;
         this.userUtils = userUtils;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        //String token = request.getHeader("Authorization");
 
         String refreshToken = request.getHeader("refresh_token");
         String accessToken = request.getHeader("access_token");
 
-        if (refreshToken != null && accessToken != null) {
+        if (refreshToken != null && accessToken != null && !jwtUtils.isTokenExpired(refreshToken)) {
+
             String username = jwtUtils.getUsername(refreshToken);
+            Long userId = ((Integer) jwtUtils.getAllClaimsFromToken(refreshToken).get("user_id")).longValue();
 
-            Long userId = username.equals(userUtils.getAdminUsername()) ? userUtils.getAdminId()
-                    : userUtils.getUserIdByUsernameOrEmail(username);
+            authenticateUser(username);
 
-            String storedAccessToken = refreshService.getRefreshByUserId(userId).getAccessToken();
-            String storedRefreshToken = refreshService.getRefreshByUserId(userId).getRefreshToken();
-            if (storedAccessToken != null && storedRefreshToken != null && accessToken.equals(storedAccessToken)
-                    && refreshToken.equals(storedRefreshToken) && !jwtUtils.isTokenExpired(storedRefreshToken)) {
+            String newAccessToken = accessToken;
+            
+            setUpRefreshToken(newAccessToken, accessToken, username, userId);
 
-                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-                if (username != null && auth == null) {
-                    UserDetails userDetails = userUtils.loadUserByUsername(username);
-                    UsernamePasswordAuthenticationToken upToken = new UsernamePasswordAuthenticationToken(userDetails,
-                            null, userDetails.getAuthorities());
-                    SecurityContextHolder.getContext().setAuthentication(upToken);
-                    String newAccessToken = jwtUtils.generateAccessToken(username);
-                    RefreshModel refreshModel = new RefreshModel();
-                    refreshModel.setAccessToken(newAccessToken);
-                    refreshModel.setRefreshToken(storedRefreshToken);
-                    refreshModel.setUserId(userId);
-                    if (username.equals(userUtils.getAdminUsername())) {
-                        refreshModel.setId(refreshService.getIdByUserId(userUtils.getAdminId()));
-                        response.addHeader("user_id", "" + refreshModel.getId());
-                    } else {
-                        refreshModel
-                                .setId(refreshService.getIdByUserId(userUtils.getUserIdByUsernameOrEmail(username)));
-                    }
-                    refreshService.saveToken(refreshModel);
-                    response.addHeader("access_token", newAccessToken);
-                    response.addHeader("refresh_token", refreshToken);
-                }
-
-            }
+            setUpHeader(response, refreshToken, newAccessToken);
         }
 
         filterChain.doFilter(request, response);
     }
 
-    /*     public boolean userAdminEndpointCheck(HttpServletRequest request, UserDetails model){
-        String endPoint = request.getRequestURI();
-        switch(endPoint){
-            case "/api/user/role/":
-            return model.getAuthorities().contains(Authority.OP_ACCESS_ROLE);
-            case "/api/user/update/":
-            return model.getAuthorities().contains(Authority.OP_ACCESS_ROLE);
+    private void authenticateUser(String username) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (username != null && auth == null) {
+            //db query
+            UserDetails userDetails = userUtils.loadUserByUsername(username);
+            UsernamePasswordAuthenticationToken upToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+                    userDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(upToken);
+
         }
-    } */
+    }
+
+    private void setUpRefreshToken(String newAccessToken, String accessToken, String username, Long userId) {
+        if (jwtUtils.isTokenExpired(accessToken)) {
+            newAccessToken = jwtUtils.generateAccessToken(username);
+            //db query
+            // String storedRefreshToken = refreshService.getRefreshByUserId(userId).getRefreshToken();
+
+            // RefreshModel refreshModel = new RefreshModel();
+            // refreshModel.setAccessToken(newAccessToken);
+            // refreshModel.setRefreshToken(storedRefreshToken);
+            // refreshModel.setUserId(userId);
+            // //db query
+            // refreshModel.setId(refreshService.getIdByUserId(userId));
+            // // db query
+            // refreshService.saveToken(refreshModel);
+        }
+    }
+
+    private void setUpHeader(HttpServletResponse response, String refreshToken, String newAccessToken) {
+        // Format that js Date object understand
+        var dateFormat = new SimpleDateFormat("EE MMM dd yyyy HH:mm:ss");
+        var refreshDate = dateFormat.format(jwtUtils.getExpirationDate(refreshToken));
+        var accessDate = dateFormat.format(jwtUtils.getExpirationDate(newAccessToken));
+        response.addHeader("refresh_expiration", refreshDate);
+        response.addHeader("access_expiration", accessDate);
+        response.addHeader("refresh_token", refreshToken);
+        response.addHeader("access_token", newAccessToken);
+    }
 
 }
