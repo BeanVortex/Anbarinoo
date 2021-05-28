@@ -87,6 +87,14 @@ public class UserModel implements UserDetails, ImageUtil {
     @OneToMany(mappedBy = "user")
     private List<ProductModel> products;
 
+    // For saving products I need it
+    public UserModel(Long id) {
+        this.id = id;
+    }
+
+    public UserModel() {
+    }
+
     @Override
     public String getPassword() {
         return password;
@@ -143,4 +151,3 @@ public class UserModel implements UserDetails, ImageUtil {
     }
 
 }
-
