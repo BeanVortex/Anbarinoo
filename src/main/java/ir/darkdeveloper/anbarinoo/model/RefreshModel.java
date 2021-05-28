@@ -1,4 +1,4 @@
-package ir.darkdeveloper.anbarinoo.security.Crud;
+package ir.darkdeveloper.anbarinoo.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,6 +22,5 @@ public class RefreshModel {
     private Long userId;
 
     private String accessToken;
-    private String refreshToken;
-    
+        
 }

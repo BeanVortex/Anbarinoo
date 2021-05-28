@@ -1,9 +1,11 @@
-package ir.darkdeveloper.anbarinoo.security.Crud;
+package ir.darkdeveloper.anbarinoo.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 
 @Repository
 public interface RefreshRepo extends JpaRepository<RefreshModel, Long> {

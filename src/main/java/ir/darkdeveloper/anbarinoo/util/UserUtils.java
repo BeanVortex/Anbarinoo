@@ -19,11 +19,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import ir.darkdeveloper.anbarinoo.model.Authority;
+import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.UserRepo;
 import ir.darkdeveloper.anbarinoo.security.JwtAuth;
-import ir.darkdeveloper.anbarinoo.security.Crud.RefreshModel;
-import ir.darkdeveloper.anbarinoo.security.Crud.RefreshService;
+import ir.darkdeveloper.anbarinoo.service.RefreshService;
 import ir.darkdeveloper.anbarinoo.service.UserRolesService;
 
 @Component
@@ -80,7 +80,6 @@ public class UserUtils {
         String accessToken = jwtUtils.generateAccessToken(username);
         String refreshToken = jwtUtils.generateRefreshToken(username, rModel.getUserId());
 
-        rModel.setRefreshToken(refreshToken);
         rModel.setAccessToken(accessToken);
 
         refreshService.saveToken(rModel);

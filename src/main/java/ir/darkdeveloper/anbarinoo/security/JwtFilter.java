@@ -17,6 +17,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import ir.darkdeveloper.anbarinoo.model.RefreshModel;
+import ir.darkdeveloper.anbarinoo.service.RefreshService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils;
 
@@ -25,11 +27,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
     private final UserUtils userUtils;
+    private final RefreshService refreshService;
 
     @Autowired
-    public JwtFilter(@Lazy JwtUtils jwtUtils, @Lazy UserUtils userUtils) {
+    public JwtFilter(@Lazy JwtUtils jwtUtils, @Lazy UserUtils userUtils, RefreshService refreshService) {
         this.jwtUtils = jwtUtils;
         this.userUtils = userUtils;
+        this.refreshService = refreshService;
     }
 
     @Override
@@ -46,13 +50,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
             authenticateUser(username);
 
-            String newAccessToken = accessToken;
-            
-            setUpRefreshToken(newAccessToken, accessToken, username, userId);
-
-            setUpHeader(response, refreshToken, newAccessToken);
+            setUpHeader(response, refreshToken, accessToken, username, userId);
         }
-
         filterChain.doFilter(request, response);
     }
 
@@ -68,32 +67,34 @@ public class JwtFilter extends OncePerRequestFilter {
         }
     }
 
-    private void setUpRefreshToken(String newAccessToken, String accessToken, String username, Long userId) {
+    private void setUpHeader(HttpServletResponse response, String refreshToken, String accessToken, String username,
+            Long userId) {
+
+        String newAccessToken = accessToken;
+
+        // if this if didn't execute it means the access token is still valid
         if (jwtUtils.isTokenExpired(accessToken)) {
-            newAccessToken = jwtUtils.generateAccessToken(username);
             //db query
-            // String storedRefreshToken = refreshService.getRefreshByUserId(userId).getRefreshToken();
+            String storedAccessToken = refreshService.getRefreshByUserId(userId).getAccessToken();
+            if (accessToken.equals(storedAccessToken)) {
+                newAccessToken = jwtUtils.generateAccessToken(username);
+                RefreshModel refreshModel = new RefreshModel();
+                refreshModel.setAccessToken(newAccessToken);
+                refreshModel.setUserId(userId);
+                //db query
+                refreshModel.setId(refreshService.getIdByUserId(userId));
+                // db query
+                refreshService.saveToken(refreshModel);
+                // Format that js Date object understand
+                var dateFormat = new SimpleDateFormat("EE MMM dd yyyy HH:mm:ss");
+                var accessDate = dateFormat.format(jwtUtils.getExpirationDate(newAccessToken));
+                response.addHeader("access_expiration", accessDate);
+                response.addHeader("access_token", newAccessToken);
+            } else
+                //if stored token is not equal with user send token, it will return 403
+                SecurityContextHolder.getContext().setAuthentication(null);
 
-            // RefreshModel refreshModel = new RefreshModel();
-            // refreshModel.setAccessToken(newAccessToken);
-            // refreshModel.setRefreshToken(storedRefreshToken);
-            // refreshModel.setUserId(userId);
-            // //db query
-            // refreshModel.setId(refreshService.getIdByUserId(userId));
-            // // db query
-            // refreshService.saveToken(refreshModel);
         }
-    }
-
-    private void setUpHeader(HttpServletResponse response, String refreshToken, String newAccessToken) {
-        // Format that js Date object understand
-        var dateFormat = new SimpleDateFormat("EE MMM dd yyyy HH:mm:ss");
-        var refreshDate = dateFormat.format(jwtUtils.getExpirationDate(refreshToken));
-        var accessDate = dateFormat.format(jwtUtils.getExpirationDate(newAccessToken));
-        response.addHeader("refresh_expiration", refreshDate);
-        response.addHeader("access_expiration", accessDate);
-        response.addHeader("refresh_token", refreshToken);
-        response.addHeader("access_token", newAccessToken);
     }
 
 }
