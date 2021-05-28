@@ -15,6 +15,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -39,25 +40,26 @@ public class ProductModel {
     private String description;
 
     @ElementCollection
-    @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "id"))
+    @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"))
     private List<String> images;
 
     @Transient
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<MultipartFile> files;
 
-    @Column(nullable = false)
+    @Column()
     private Double price;
 
-    @Column(nullable = false, name = "sell_price")
+    @Column( name = "sell_price")
     private Double sellPrice;
 
-    @Column(nullable = false, name = "buy_price")
+    @Column( name = "buy_price")
     private Double buyPrice;
 
-    @Column(nullable = false, name = "sell_count")
+    @Column( name = "sell_count")
     private int soldCount;
 
-    @Column(nullable = false, name = "buy_count")
+    @Column( name = "buy_count")
     private int boughtCount;
 
     @ManyToOne
@@ -65,7 +67,7 @@ public class ProductModel {
     private UserModel user;
 
 
-    @Column(nullable = false, name = "total_count")
+    @Column( name = "total_count")
     private int totalCount;
 
     @Column(name = "created_at", updatable = false)
