@@ -1,9 +1,10 @@
 package ir.darkdeveloper.anbarinoo.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +15,7 @@ import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/products")
 public class ProductController {
     private final ProductService service;
 
@@ -23,24 +24,20 @@ public class ProductController {
         this.service = service;
     }
 
-    @PostMapping({"/products/save", "/products/save/"})
-    @PreAuthorize("#model.user.email.equals(authentication.name) ||" +
-            "#model.user.email.equals('DarkDeveloper')")
-    public ProductModel saveProduct(@ModelAttribute ProductModel model) {
-        return service.saveProduct(model);
+    @PostMapping("/save/")
+    public ProductModel saveProduct(@ModelAttribute ProductModel model, HttpServletRequest request) {
+        return service.saveProduct(model, request);
     }
 
-    @PostMapping({"/products/search/", "/products/search"})
+    @PostMapping("/search/")
     public Page<ProductModel> findByNameContains(@RequestParam String name, Pageable pageable) {
         return service.findByNameContains(name, pageable);
     }
 
 
-    @PostMapping({"/products/update", "/products/update/"})
-    @PreAuthorize("#model.user.email.equals(authentication.name) ||" +
-            "#model.user.email.equals('DarkDeveloper')")
-    public ProductModel updateProduct(@ModelAttribute ProductModel model) {
-        return service.saveProduct(model);
+    @PostMapping("/update/")
+    public ProductModel updateProduct(@ModelAttribute ProductModel model, HttpServletRequest request) {
+        return service.saveProduct(model, request);
     }
 
     /*@GetMapping({"/api/user/{id}", "/api/user/{id}/"})
