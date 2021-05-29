@@ -39,7 +39,6 @@ public class JwtUtils {
     @PostConstruct
     public void initSecret(){
         secret = encoder.encode(secret);
-        System.out.println("SECRET : " + secret);
     }
 
     public String generateRefreshToken(String username, Long userId) {
