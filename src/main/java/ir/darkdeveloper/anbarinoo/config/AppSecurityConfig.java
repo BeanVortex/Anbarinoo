@@ -42,12 +42,29 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
         http.csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/**", "/css/**", "/fonts/**", "/js/**", "/img/**", "/api/user/signup/", "/api/user/login/", "/api/post/all/")
+                .antMatchers("/", "/info", "/css/**",
+                 "/fonts/**", 
+                 "/js/**", "/img/**", 
+                 "/api/user/signup/",
+                  "/api/user/login/",
+                   "/api/post/all/",
+                   "/oauth2/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
-                // .and()
-                // .formLogin()
+                .and()
+                .formLogin()
+                .disable()
+                .oauth2Login()
+                    .authorizationEndpoint()
+                        .baseUri("/oauth2/authorize")
+                        .and()
+                    .redirectionEndpoint()
+                        .baseUri("/oauth2/callback")
+                    .and()
+                    .userInfoEndpoint()
+                        .userService(null)
+                .and()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

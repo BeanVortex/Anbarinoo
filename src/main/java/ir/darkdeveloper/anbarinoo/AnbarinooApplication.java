@@ -10,4 +10,6 @@ public class AnbarinooApplication {
 		SpringApplication.run(AnbarinooApplication.class, args);
 	}
 
+	
+
 }

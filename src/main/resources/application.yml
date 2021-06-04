@@ -32,6 +32,13 @@ spring:
     user:
       name: ENC(1hak+QtSRqr4mBHZJYSx2mUT8bchOLpf)
       password: ENC(G1d9E+0lFVNTXE6CYoATcA==)
+    oauth2:
+      client:
+        registration.google:
+          client-secret: ayQozzK4j9XaHcih1buX2c45
+          client-id: 928737657170-bajaa9nnk3p3apfuptcgln3roi1vqol2.apps.googleusercontent.com
+          scope: email,profile
+          redirect-uri: http://localhost:8080/login/callback
   banner:
     location: classpath:banners/banner4
     # width:

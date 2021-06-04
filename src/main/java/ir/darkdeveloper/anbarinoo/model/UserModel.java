@@ -1,12 +1,17 @@
 package ir.darkdeveloper.anbarinoo.model;
 
+import java.security.AuthProvider;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -23,8 +28,10 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.multipart.MultipartFile;
 
 import ir.darkdeveloper.anbarinoo.util.ImageUtil;
@@ -34,7 +41,7 @@ import lombok.Data;
 @Entity
 @Table(name = "users")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class UserModel implements UserDetails, ImageUtil {
+public class UserModel implements UserDetails, ImageUtil, OAuth2User {
 
     private static final long serialVersionUID = 1L;
 
@@ -49,10 +56,16 @@ public class UserModel implements UserDetails, ImageUtil {
     private String userName;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Column(nullable = false)
     private String password;
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider;
+
+    // TODO: Enable for oauth logs and disable for local logs
     private Boolean enabled = true;
+
+    private String providerId;
 
     @Transient
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -77,7 +90,6 @@ public class UserModel implements UserDetails, ImageUtil {
     private String shopName;
 
     private String shopImage;
-
 
     private String address;
 
@@ -117,7 +129,10 @@ public class UserModel implements UserDetails, ImageUtil {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> auth = new ArrayList<>();
-        roles.forEach(e -> auth.addAll(e.getAuthorities()));
+        if (roles != null)
+            roles.forEach(e -> auth.addAll(e.getAuthorities()));
+        else
+            auth.add(Authority.OP_ACCESS_USER);
         return auth;
     }
 
@@ -148,6 +163,17 @@ public class UserModel implements UserDetails, ImageUtil {
     @Override
     public String getImage() {
         return profilePicture;
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+
+        return new HashMap<>();
+    }
+
+    @Override
+    public String getName() {
+        return userName;
     }
 
 }
