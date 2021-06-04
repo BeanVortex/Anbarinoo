@@ -20,6 +20,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import ir.darkdeveloper.anbarinoo.security.JwtFilter;
+import ir.darkdeveloper.anbarinoo.service.OAuth2UserService;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 
 @Configuration
@@ -29,11 +30,13 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
 
     private final UserService userService;
     private final JwtFilter jwtFilter;
+    private final OAuth2UserService oAuth2UserService;
 
     @Autowired
-    public AppSecurityConfig(@Lazy UserService userService, JwtFilter jwtFilter) {
+    public AppSecurityConfig(@Lazy UserService userService, JwtFilter jwtFilter, OAuth2UserService oAuth2UserService) {
         this.userService = userService;
         this.jwtFilter = jwtFilter;
+        this.oAuth2UserService = oAuth2UserService;
     }
 
     @Override
@@ -42,19 +45,20 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
         http.csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/", "/info", "/css/**",
-                 "/fonts/**", 
-                 "/js/**", "/img/**", 
-                 "/api/user/signup/",
-                  "/api/user/login/",
-                   "/api/post/all/",
-                   "/oauth2/**")
-                .permitAll()
-                .anyRequest()
-                .authenticated()
+                    .antMatchers("/", "/info", "/css/**",
+                                "/fonts/**", 
+                                "/js/**", "/img/**", 
+                                "/api/user/signup/",
+                                "/api/user/login/",
+                                "/api/post/all/",
+                                "/oauth2/**") 
+                        .permitAll()
+                    .anyRequest()
+                        .authenticated()
                 .and()
                 .formLogin()
-                .disable()
+                    .disable()
+
                 .oauth2Login()
                     .authorizationEndpoint()
                         .baseUri("/oauth2/authorize")
@@ -63,13 +67,13 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
                         .baseUri("/oauth2/callback")
                     .and()
                     .userInfoEndpoint()
-                        .userService(null)
-                .and()
+                        .userService(oAuth2UserService)
+                    .and()
                 .and()
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                    .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override
