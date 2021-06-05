@@ -31,13 +31,18 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
     private final UserService userService;
     private final JwtFilter jwtFilter;
     private final OAuth2UserService oAuth2UserService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Autowired
-    public AppSecurityConfig(@Lazy UserService userService, JwtFilter jwtFilter, OAuth2UserService oAuth2UserService) {
+    public AppSecurityConfig(@Lazy UserService userService, JwtFilter jwtFilter,
+                         OAuth2UserService oAuth2UserService, OAuth2SuccessHandler oAuth2SuccessHandler) {
         this.userService = userService;
         this.jwtFilter = jwtFilter;
         this.oAuth2UserService = oAuth2UserService;
+        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
     }
+
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -64,11 +69,12 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
                         .baseUri("/oauth2/authorize")
                         .and()
                     .redirectionEndpoint()
-                        .baseUri("/oauth2/callback")
+                        .baseUri("/login/callback")
                     .and()
                     .userInfoEndpoint()
                         .userService(oAuth2UserService)
                     .and()
+                    .successHandler(oAuth2SuccessHandler)
                 .and()
                 .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
