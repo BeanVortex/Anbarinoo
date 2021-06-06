@@ -20,6 +20,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import ir.darkdeveloper.anbarinoo.security.JwtFilter;
+import ir.darkdeveloper.anbarinoo.security.OAuth2FailureHandler;
 import ir.darkdeveloper.anbarinoo.security.OAuth2RequestRepo;
 import ir.darkdeveloper.anbarinoo.security.OAuth2SuccessHandler;
 import ir.darkdeveloper.anbarinoo.service.OAuth2UserService;
@@ -35,16 +36,18 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
     private final OAuth2UserService oAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2RequestRepo  oAuth2RequestRepo;
+    private final OAuth2FailureHandler oAuth2FailureHandler;
 
     @Autowired
     public AppSecurityConfig(@Lazy UserService userService, JwtFilter jwtFilter,
                          OAuth2UserService oAuth2UserService, OAuth2SuccessHandler oAuth2SuccessHandler,
-                         OAuth2RequestRepo  oAuth2RequestRepo) {
+                         OAuth2RequestRepo  oAuth2RequestRepo, OAuth2FailureHandler oAuth2FailureHandler) {
         this.userService = userService;
         this.jwtFilter = jwtFilter;
         this.oAuth2UserService = oAuth2UserService;
         this.oAuth2SuccessHandler = oAuth2SuccessHandler;
         this.oAuth2RequestRepo = oAuth2RequestRepo;
+        this.oAuth2FailureHandler = oAuth2FailureHandler;
     }
 
 
@@ -81,7 +84,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
                         .userService(oAuth2UserService)
                     .and()
                         .successHandler(oAuth2SuccessHandler)
-                    // TODO Failure handler
+                        .failureHandler(oAuth2FailureHandler)
                 .and()
                 .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
