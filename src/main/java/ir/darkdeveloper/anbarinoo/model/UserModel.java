@@ -64,8 +64,6 @@ public class UserModel implements UserDetails, ImageUtil, OAuth2User {
     // TODO: Enable for oauth logs and disable for local logs
     private Boolean enabled = true;
 
-    private String providerId;
-
     @Transient
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private MultipartFile file;

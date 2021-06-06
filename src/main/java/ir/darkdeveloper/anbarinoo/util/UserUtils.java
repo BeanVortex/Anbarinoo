@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import ir.darkdeveloper.anbarinoo.model.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.Authority;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
@@ -58,15 +59,21 @@ public class UserUtils {
         this.ioUtils = ioUtils;
     }
 
+    /**
+     * 
+     * @param model has username and password (JwtAuth)
+     * @param userId for super admin, pass null
+     * @param rawPass for super admin, pass null
+     * @param response
+     */
     public void authenticateUser(JwtAuth model, Long userId, String rawPass, HttpServletResponse response) {
         String username = model.getUsername();
         String password = model.getPassword();
 
-        if (rawPass != null) {
+        if (rawPass != null)
             authManager.authenticate(new UsernamePasswordAuthenticationToken(username, rawPass));
-        } else {
+        else
             authManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        }
 
         RefreshModel rModel = new RefreshModel();
         if (model.getUsername().equals(getAdminUsername())) {
@@ -84,12 +91,12 @@ public class UserUtils {
 
         refreshService.saveToken(rModel);
 
-        response.addHeader("access_token", accessToken);
-        response.addHeader("refresh_token", refreshToken);
-
+        
         SimpleDateFormat dateFormat = new SimpleDateFormat("EE MMM dd yyyy HH:mm:ss");
         var refreshDate = dateFormat.format(jwtUtils.getExpirationDate(refreshToken));
         var accessDate = dateFormat.format(jwtUtils.getExpirationDate(accessToken));
+        response.addHeader("refresh_token", refreshToken);
+        response.addHeader("access_token", accessToken);
         response.addHeader("refresh_expiration", refreshDate);
         response.addHeader("access_expiration", accessDate);
     }
@@ -97,25 +104,23 @@ public class UserUtils {
     public void validateUserData(UserModel model) throws FileNotFoundException, IOException, Exception {
         model.setRoles(roleService.getRole("USER"));
 
-        if (model.getUserName() == null || model.getUserName().trim().equals("")) {
+        if (model.getUserName() == null || model.getUserName().trim().equals(""))
             model.setUserName(model.getEmail().split("@")[0]);
-        }
 
         UserModel preModel = repo.findUserById(model.getId());
 
-        if (model.getId() != null && model.getFile() != null) {
+        if (model.getId() != null && model.getFile() != null)
             Files.delete(Paths.get(ioUtils.getImagePath(preModel, path)));
-        }
 
-        if (preModel != null && preModel.getProfilePicture() != null) {
+        if (preModel != null && preModel.getProfilePicture() != null)
             model.setProfilePicture(preModel.getProfilePicture());
-        }
 
         String fileName = ioUtils.saveFile(model.getFile(), path);
-        if (fileName != null) {
+        if (fileName != null)
             model.setProfilePicture(fileName);
-        }
+
         model.setPassword(encoder.encode(model.getPassword()));
+        model.setProvider(AuthProvider.LOCAL);
     }
 
     public Long getUserIdByUsernameOrEmail(String username) {

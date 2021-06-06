@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -32,8 +33,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final OAuth2Properties oAuth2Properties;
 
     @Autowired
-    public OAuth2SuccessHandler(JwtUtils jwtUtils, OAuth2RequestRepo oAuth2RequestRepo, UserService userService,
-            OAuth2Properties oAuth2Properties) {
+    public OAuth2SuccessHandler(@Lazy JwtUtils jwtUtils, OAuth2RequestRepo oAuth2RequestRepo,
+            @Lazy UserService userService, OAuth2Properties oAuth2Properties) {
         this.jwtUtils = jwtUtils;
         this.oAuth2RequestRepo = oAuth2RequestRepo;
         this.userService = userService;
@@ -85,8 +86,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         var accessDate = dateFormat.format(jwtUtils.getExpirationDate(accessToken));
 
         response.addHeader("refresh_token", refreshToken);
-        response.addHeader("refresh_expiration", refreshDate);
         response.addHeader("access_token", accessToken);
+        response.addHeader("refresh_expiration", refreshDate);
         response.addHeader("access_expiration", accessDate);
     }
 
@@ -98,7 +99,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private boolean isAuthorizedRedirectUri(String uri) {
         URI clientRedirectUri = URI.create(uri);
 
-        return oAuth2Properties.getOauth2().getAuthorizedRedirectUris().stream().anyMatch(authorizedRedirectUri -> {
+        return oAuth2Properties.getAuthorizedRedirectUris().stream().anyMatch(authorizedRedirectUri -> {
             // Only validate host and port. Let the clients use different paths if they want to
             // So I dont check the path of uri 
             URI authorizedURI = URI.create(authorizedRedirectUri);

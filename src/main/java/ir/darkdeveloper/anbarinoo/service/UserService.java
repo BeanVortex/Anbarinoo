@@ -75,12 +75,12 @@ public class UserService implements UserDetailsService {
     public ResponseEntity<?> loginUser(JwtAuth model, HttpServletResponse response) {
 
         try {
-            if (model.getUsername().equals(userUtils.getAdminUsername())) {
+            if (model.getUsername().equals(userUtils.getAdminUsername()))
                 userUtils.authenticateUser(model, null, null, response);
-            } else {
+            else
                 userUtils.authenticateUser(model, userUtils.getUserIdByUsernameOrEmail(model.getUsername()), null,
                         response);
-            }
+
             return new ResponseEntity<>(repo.findByEmailOrUsername(model.getUsername()), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -93,9 +93,9 @@ public class UserService implements UserDetailsService {
                 || !auth.getName().equals(model.getEmail())) {
             try {
 
-                if (model.getUserName() != null && model.getUserName().equals(userUtils.getAdminUsername())) {
+                if (model.getUserName() != null && model.getUserName().equals(userUtils.getAdminUsername()))
                     return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-                }
+
                 String rawPass = model.getPassword();
                 userUtils.validateUserData(model);
                 repo.save(model);

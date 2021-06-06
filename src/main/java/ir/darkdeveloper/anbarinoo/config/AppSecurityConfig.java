@@ -71,7 +71,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
 
                 .oauth2Login()
                     .authorizationEndpoint()
-                        .baseUri("/oauth2/authorize")
+                        .baseUri("/login/oauth2")
                         .authorizationRequestRepository(oAuth2RequestRepo)
                         .and()
                     .redirectionEndpoint()
@@ -80,7 +80,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
                     .userInfoEndpoint()
                         .userService(oAuth2UserService)
                     .and()
-                    .successHandler(oAuth2SuccessHandler)
+                        .successHandler(oAuth2SuccessHandler)
+                    // TODO Failure handler
                 .and()
                 .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
