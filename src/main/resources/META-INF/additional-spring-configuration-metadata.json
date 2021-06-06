@@ -1,5 +1,32 @@
-{"properties": [{
-  "name": "jwt.secretkey",
-  "type": "java.lang.String",
-  "description": "start application with '-Djasypt.encryptor.password=ChangeMe' option"
-}]}
+{"properties": [
+  {
+    "name": "jwt.secretkey",
+    "type": "java.lang.String",
+    "description": "start application with '-Djasypt.encryptor.password=ChangeMe' option"
+  },
+  {
+    "name": "oauth2.authorized-redirect-uris",
+    "type": "java.util.List",
+    "description": "A description for 'oauth2.authorized-redirect-uris'"
+  },
+  {
+    "name": "spring.security.oauth2.client.registration.google.client-secret",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.security.oauth2.client.registration.google.client-secret'"
+  },
+  {
+    "name": "spring.security.oauth2.client.registration.google.client-id",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.security.oauth2.client.registration.google.client-id'"
+  },
+  {
+    "name": "spring.security.oauth2.client.registration.google.redirect-uri",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.security.oauth2.client.registration.google.redirect-uri'"
+  },
+  {
+    "name": "spring.security.oauth2.client.registration.google.scope",
+    "type": "java.util.List",
+    "description": "A description for 'spring.security.oauth2.client.registration.google.scope'"
+  }
+]}

@@ -20,6 +20,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import ir.darkdeveloper.anbarinoo.security.JwtFilter;
+import ir.darkdeveloper.anbarinoo.security.OAuth2RequestRepo;
+import ir.darkdeveloper.anbarinoo.security.OAuth2SuccessHandler;
 import ir.darkdeveloper.anbarinoo.service.OAuth2UserService;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 
@@ -32,14 +34,17 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
     private final JwtFilter jwtFilter;
     private final OAuth2UserService oAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final OAuth2RequestRepo  oAuth2RequestRepo;
 
     @Autowired
     public AppSecurityConfig(@Lazy UserService userService, JwtFilter jwtFilter,
-                         OAuth2UserService oAuth2UserService, OAuth2SuccessHandler oAuth2SuccessHandler) {
+                         OAuth2UserService oAuth2UserService, OAuth2SuccessHandler oAuth2SuccessHandler,
+                         OAuth2RequestRepo  oAuth2RequestRepo) {
         this.userService = userService;
         this.jwtFilter = jwtFilter;
         this.oAuth2UserService = oAuth2UserService;
         this.oAuth2SuccessHandler = oAuth2SuccessHandler;
+        this.oAuth2RequestRepo = oAuth2RequestRepo;
     }
 
 
@@ -67,6 +72,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
                 .oauth2Login()
                     .authorizationEndpoint()
                         .baseUri("/oauth2/authorize")
+                        .authorizationRequestRepository(oAuth2RequestRepo)
                         .and()
                     .redirectionEndpoint()
                         .baseUri("/login/callback")

@@ -37,7 +37,9 @@ spring:
         registration.google:
           client-secret: ayQozzK4j9XaHcih1buX2c45
           client-id: 928737657170-bajaa9nnk3p3apfuptcgln3roi1vqol2.apps.googleusercontent.com
-          scope: email,profile
+          scope:
+            - email
+            - profile
           redirect-uri: http://localhost:8080/login/callback
   banner:
     location: classpath:banners/banner4
@@ -48,6 +50,16 @@ spring:
 
 server:
   port: 8080
+
+oauth2:
+  authorizedRedirectUris:
+    # I wont check /oauth2/redirect so it is usesless
+    #- http://localhost:3000/oauth2/redirect
+    - http://localhost:3000
+    - myandroidapp://oauth2/redirect
+    - myiosapp://oauth2/redirect
+
+
 # docker-secret:
 #   bind-path: /run/secrets
 
