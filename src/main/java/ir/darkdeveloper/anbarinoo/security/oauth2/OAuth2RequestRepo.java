@@ -1,4 +1,4 @@
-package ir.darkdeveloper.anbarinoo.security;
+package ir.darkdeveloper.anbarinoo.security.oauth2;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

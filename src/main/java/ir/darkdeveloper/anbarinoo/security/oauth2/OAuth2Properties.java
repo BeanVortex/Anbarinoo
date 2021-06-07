@@ -1,4 +1,4 @@
-package ir.darkdeveloper.anbarinoo.security;
+package ir.darkdeveloper.anbarinoo.security.oauth2;
 
 import java.util.ArrayList;
 import java.util.List;

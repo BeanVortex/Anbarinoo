@@ -1,5 +1,8 @@
 spring:
-  profiles.active: dev
+  profiles:
+    active: dev
+    include:
+    - user
 ---
 jwt:
   secretkey: RandomSecret
@@ -29,9 +32,6 @@ spring:
     username: darkdeveloper
     password: 1234
   security:
-    user:
-      name: ENC(1hak+QtSRqr4mBHZJYSx2mUT8bchOLpf)
-      password: ENC(G1d9E+0lFVNTXE6CYoATcA==)
     oauth2:
       client:
         registration.google:
@@ -58,6 +58,7 @@ oauth2:
     - http://localhost:3000
     - myandroidapp://oauth2/redirect
     - myiosapp://oauth2/redirect
+
 
 
 # docker-secret:

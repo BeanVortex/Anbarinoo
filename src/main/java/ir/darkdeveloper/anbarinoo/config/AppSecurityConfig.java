@@ -19,11 +19,11 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import ir.darkdeveloper.anbarinoo.security.JwtFilter;
-import ir.darkdeveloper.anbarinoo.security.OAuth2FailureHandler;
-import ir.darkdeveloper.anbarinoo.security.OAuth2RequestRepo;
-import ir.darkdeveloper.anbarinoo.security.OAuth2SuccessHandler;
-import ir.darkdeveloper.anbarinoo.service.OAuth2UserService;
+import ir.darkdeveloper.anbarinoo.security.jwt.JwtFilter;
+import ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2FailureHandler;
+import ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2RequestRepo;
+import ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2SuccessHandler;
+import ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2UserService;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 
 @Configuration

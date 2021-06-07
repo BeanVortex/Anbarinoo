@@ -1,4 +1,6 @@
-package ir.darkdeveloper.anbarinoo.security;
+package ir.darkdeveloper.anbarinoo.security.oauth2;
+
+import static ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2RequestRepo.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 import java.io.IOException;
 
@@ -12,8 +14,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import static ir.darkdeveloper.anbarinoo.security.OAuth2RequestRepo.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 import ir.darkdeveloper.anbarinoo.util.CookieUtils;
 

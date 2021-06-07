@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ir.darkdeveloper.anbarinoo.model.UserModel;
-import ir.darkdeveloper.anbarinoo.security.JwtAuth;
+import ir.darkdeveloper.anbarinoo.security.jwt.JwtAuth;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 
 @RestController

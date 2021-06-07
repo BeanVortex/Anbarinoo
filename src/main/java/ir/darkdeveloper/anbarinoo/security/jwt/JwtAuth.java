@@ -1,4 +1,4 @@
-package ir.darkdeveloper.anbarinoo.security;
+package ir.darkdeveloper.anbarinoo.security.jwt;
 
 import lombok.Data;
 

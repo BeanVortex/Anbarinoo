@@ -19,7 +19,8 @@ import org.springframework.stereotype.Service;
 import ir.darkdeveloper.anbarinoo.model.Authority;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.UserRepo;
-import ir.darkdeveloper.anbarinoo.security.JwtAuth;
+import ir.darkdeveloper.anbarinoo.security.jwt.JwtAuth;
+import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
 import ir.darkdeveloper.anbarinoo.util.UserUtils;
 
 @Service("userService")
@@ -27,11 +28,13 @@ public class UserService implements UserDetailsService {
 
     private final UserRepo repo;
     private final UserUtils userUtils;
+    private AdminUserProperties adminUser;
 
     @Autowired
-    public UserService(UserRepo repo, UserRolesService roleService, UserUtils userUtils) {
+    public UserService(UserRepo repo, UserRolesService roleService, UserUtils userUtils, AdminUserProperties adminUser) {
         this.repo = repo;
         this.userUtils = userUtils;
+        this.adminUser = adminUser;
     }
 
     @Override
@@ -75,7 +78,7 @@ public class UserService implements UserDetailsService {
     public ResponseEntity<?> loginUser(JwtAuth model, HttpServletResponse response) {
 
         try {
-            if (model.getUsername().equals(userUtils.getAdminUsername()))
+            if (model.getUsername().equals(adminUser.getUsername()))
                 userUtils.authenticateUser(model, null, null, response);
             else
                 userUtils.authenticateUser(model, userUtils.getUserIdByUsernameOrEmail(model.getUsername()), null,
@@ -93,7 +96,7 @@ public class UserService implements UserDetailsService {
                 || !auth.getName().equals(model.getEmail())) {
             try {
 
-                if (model.getUserName() != null && model.getUserName().equals(userUtils.getAdminUsername()))
+                if (model.getUserName() != null && model.getUserName().equals(adminUser.getUsername()))
                     return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 
                 String rawPass = model.getPassword();

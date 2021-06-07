@@ -9,7 +9,6 @@ import java.text.SimpleDateFormat;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,37 +18,30 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import ir.darkdeveloper.anbarinoo.model.AuthProvider;
-import ir.darkdeveloper.anbarinoo.model.Authority;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.UserRepo;
-import ir.darkdeveloper.anbarinoo.security.JwtAuth;
+import ir.darkdeveloper.anbarinoo.security.jwt.JwtAuth;
 import ir.darkdeveloper.anbarinoo.service.RefreshService;
 import ir.darkdeveloper.anbarinoo.service.UserRolesService;
 
 @Component
 public class UserUtils {
 
-    @Value("${spring.security.user.name}")
-    private String adminUsername;
-
-    @Value("${spring.security.user.password}")
-    private String adminPassword;
-
-    private final Long adminId = -1L;
     private final String path = "profiles/";
-
     private final AuthenticationManager authManager;
     private final JwtUtils jwtUtils;
     private final UserRolesService roleService;
     private final RefreshService refreshService;
     private final UserRepo repo;
     private final PasswordEncoder encoder;
+    private final AdminUserProperties adminUser;
     private final IOUtils ioUtils;
 
     @Autowired
     public UserUtils(AuthenticationManager authManager, JwtUtils jwtUtils, UserRolesService roleService,
-            RefreshService refreshService, UserRepo repo, PasswordEncoder encoder, IOUtils ioUtils) {
+            RefreshService refreshService, UserRepo repo, PasswordEncoder encoder, IOUtils ioUtils,
+            AdminUserProperties adminUser) {
         this.authManager = authManager;
         this.jwtUtils = jwtUtils;
         this.roleService = roleService;
@@ -57,6 +49,7 @@ public class UserUtils {
         this.repo = repo;
         this.encoder = encoder;
         this.ioUtils = ioUtils;
+        this.adminUser = adminUser;
     }
 
     /**
@@ -76,9 +69,9 @@ public class UserUtils {
             authManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
         RefreshModel rModel = new RefreshModel();
-        if (model.getUsername().equals(getAdminUsername())) {
-            rModel.setUserId(getAdminId());
-            rModel.setId(refreshService.getIdByUserId(getAdminId()));
+        if (model.getUsername().equals(adminUser.getUsername())) {
+            rModel.setUserId(adminUser.getId());
+            rModel.setId(refreshService.getIdByUserId(adminUser.getId()));
         } else {
             rModel.setId(refreshService.getIdByUserId(userId));
             rModel.setUserId(getUserIdByUsernameOrEmail(username));
@@ -91,7 +84,6 @@ public class UserUtils {
 
         refreshService.saveToken(rModel);
 
-        
         SimpleDateFormat dateFormat = new SimpleDateFormat("EE MMM dd yyyy HH:mm:ss");
         var refreshDate = dateFormat.format(jwtUtils.getExpirationDate(refreshToken));
         var accessDate = dateFormat.format(jwtUtils.getExpirationDate(accessToken));
@@ -127,26 +119,12 @@ public class UserUtils {
         return repo.findUserIdByUsername(username);
     }
 
-    public String getAdminUsername() {
-        return adminUsername;
-    }
-
-    public Long getAdminId() {
-        return adminId;
-    }
-
-    public String getAdminPassword() {
-        return adminPassword;
-    }
 
     public UserDetails loadUserByUsername(String username) {
-        if (username.equals(getAdminUsername())) {
-            GrantedAuthority[] authorities = { Authority.OP_ACCESS_ADMIN, Authority.OP_EDIT_ADMIN,
-                    Authority.OP_ADD_ADMIN, Authority.OP_DELETE_ADMIN, Authority.OP_ACCESS_USER, Authority.OP_EDIT_USER,
-                    Authority.OP_DELETE_USER, Authority.OP_ADD_USER, Authority.OP_ADD_ROLE, Authority.OP_DELETE_ROLE,
-                    Authority.OP_ACCESS_ROLE, Authority.OP_DELETE_POST, Authority.OP_DELETE_COMMENT };
-            return (UserDetails) User.builder().username(getAdminUsername())
-                    .password(encoder.encode(getAdminPassword())).authorities(authorities).build();
+        if (username.equals(adminUser.getUsername())) {
+            GrantedAuthority[] authorities = (GrantedAuthority[]) adminUser.getAuthorities().toArray();
+            return (UserDetails) User.builder().username(adminUser.getUsername())
+                    .password(encoder.encode(adminUser.getPassword())).authorities(authorities).build();
         }
         return repo.findByEmailOrUsername(username);
     }
