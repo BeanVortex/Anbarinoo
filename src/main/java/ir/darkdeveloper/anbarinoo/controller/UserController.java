@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ir.darkdeveloper.anbarinoo.model.UserModel;
@@ -40,6 +41,11 @@ public class UserController {
     @PostMapping("/login/")
     public ResponseEntity<?> loginUser(@RequestBody JwtAuth model, HttpServletResponse response) {
         return userService.loginUser(model, response);
+    }
+
+    @GetMapping("/verify/")
+    public ResponseEntity<?> verifyUserEmail(@RequestParam("t") String token) {
+        return userService.verifyUserEmail(token);
     }
 
     @PostMapping("/update/")

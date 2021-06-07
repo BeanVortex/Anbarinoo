@@ -4,12 +4,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
+import javax.print.DocFlavor.STRING;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,14 +22,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
+import ir.darkdeveloper.anbarinoo.exception.EmailNotValidException;
 import ir.darkdeveloper.anbarinoo.exception.PasswordException;
 import ir.darkdeveloper.anbarinoo.model.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
+import ir.darkdeveloper.anbarinoo.model.VerificationModel;
 import ir.darkdeveloper.anbarinoo.repository.UserRepo;
 import ir.darkdeveloper.anbarinoo.security.jwt.JwtAuth;
 import ir.darkdeveloper.anbarinoo.service.RefreshService;
 import ir.darkdeveloper.anbarinoo.service.UserRolesService;
+import ir.darkdeveloper.anbarinoo.service.VerificationService;
 
 @Component
 public class UserUtils {
@@ -37,12 +45,13 @@ public class UserUtils {
     private final UserRepo repo;
     private final PasswordEncoder encoder;
     private final AdminUserProperties adminUser;
+    private final VerificationService verificationService;
     private final IOUtils ioUtils;
 
     @Autowired
     public UserUtils(AuthenticationManager authManager, JwtUtils jwtUtils, UserRolesService roleService,
             RefreshService refreshService, UserRepo repo, PasswordEncoder encoder, IOUtils ioUtils,
-            AdminUserProperties adminUser) {
+            AdminUserProperties adminUser, VerificationService verificationService) {
         this.authManager = authManager;
         this.jwtUtils = jwtUtils;
         this.roleService = roleService;
@@ -51,6 +60,7 @@ public class UserUtils {
         this.encoder = encoder;
         this.ioUtils = ioUtils;
         this.adminUser = adminUser;
+        this.verificationService = verificationService;
     }
 
     /**
@@ -64,10 +74,24 @@ public class UserUtils {
         String username = model.getUsername();
         String password = model.getPassword();
 
+        var user = repo.findByEmailOrUsername(username);
+
+        UsernamePasswordAuthenticationToken auth = null;
         if (rawPass != null)
-            authManager.authenticate(new UsernamePasswordAuthenticationToken(username, rawPass));
+            auth = new UsernamePasswordAuthenticationToken(username, rawPass);
         else
-            authManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            auth = new UsernamePasswordAuthenticationToken(username, password);
+            
+        try {
+            authManager.authenticate(auth);
+        } catch (Exception e) {
+            throw new BadRequestException("Bad Credentials");
+        }
+
+        if (!user.getEnabled()) {
+            sendEmail(user);
+            throw new EmailNotValidException("Email is not verified! Check your emails");
+        }
 
         RefreshModel rModel = new RefreshModel();
         if (model.getUsername().equals(adminUser.getUsername())) {
@@ -137,10 +161,7 @@ public class UserUtils {
 
         validateUserData(model);
         repo.save(model);
-        JwtAuth jwtAuth = new JwtAuth();
-        jwtAuth.setUsername(model.getEmail());
-        jwtAuth.setPassword(model.getPassword());
-        authenticateUser(jwtAuth, model.getId(), rawPass, response);
+        sendEmail(model);
     }
 
     public Long getUserIdByUsernameOrEmail(String username) {
@@ -160,6 +181,15 @@ public class UserUtils {
         Files.delete(Paths.get(ioUtils.getImagePath(model, path)));
         repo.deleteById(model.getId());
         refreshService.deleteTokenByUserId(model.getId());
+    }
+
+    private void sendEmail(UserModel model) {
+        String token = UUID.randomUUID().toString();
+        VerificationModel emailVerify = new VerificationModel(token, model, LocalDateTime.now().plusMinutes(20));
+        verificationService.saveToken(emailVerify);
+
+        //TODO EMAIL SEND
+
     }
 
 }

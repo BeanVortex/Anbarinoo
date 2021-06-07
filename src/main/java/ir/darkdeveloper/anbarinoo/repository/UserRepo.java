@@ -9,17 +9,19 @@ import org.springframework.stereotype.Repository;
 
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 
-
 @Repository
 public interface UserRepo extends PagingAndSortingRepository<UserModel, Long> {
 
     @Query("SELECT model FROM UserModel model WHERE model.email = :username OR model.userName = :username")
-    public UserModel findByEmailOrUsername(@Param("username") String username);
+    UserModel findByEmailOrUsername(@Param("username") String username);
 
-    public UserModel findUserById(Long id);
+    UserModel findUserById(Long id);
 
-    public Page<UserModel> findAll(Pageable pageable);
+    Page<UserModel> findAll(Pageable pageable);
 
     @Query("SELECT model.id FROM UserModel model WHERE model.email = :username OR model.userName = :username")
-    public Long findUserIdByUsername(@Param("username") String username);
+    Long findUserIdByUsername(@Param("username") String username);
+
+    @Query("UPDATE UserMode model SET model.enabled = true WHERE model.id = :id")
+    void trueEnabledById(@Param("id") Long id);
 }
