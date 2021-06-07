@@ -94,7 +94,7 @@ public class UserUtils {
         response.addHeader("access_expiration", accessDate);
     }
 
-    public void validateUserData(UserModel model) throws IOException, Exception {
+    public void validateUserData(UserModel model) throws IOException {
         model.setRoles(roleService.getRole("USER"));
 
         if (model.getUserName() == null || model.getUserName().trim().equals(""))
@@ -156,7 +156,7 @@ public class UserUtils {
         return repo.findByEmailOrUsername(username);
     }
 
-    public void deleteUser(UserModel model) throws Exception {
+    public void deleteUser(UserModel model) throws IOException {
         Files.delete(Paths.get(ioUtils.getImagePath(model, path)));
         repo.deleteById(model.getId());
         refreshService.deleteTokenByUserId(model.getId());

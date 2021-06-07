@@ -19,8 +19,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.DataExistsException;
 import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
+import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
 import ir.darkdeveloper.anbarinoo.model.Authority;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.UserRepo;
@@ -43,13 +45,11 @@ public class UserService implements UserDetailsService {
         this.adminUser = adminUser;
     }
 
-    //TODO exception handle
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userUtils.loadUserByUsername(username);
     }
 
-    //TODO exception handle
     @Transactional
     public UserModel updateUser(UserModel model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -58,15 +58,13 @@ public class UserService implements UserDetailsService {
             try {
                 userUtils.validateUserData(model);
                 return repo.save(model);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (IOException e) {
+                throw new InternalServerException(e.getLocalizedMessage());
             }
         }
-        return null;
+        throw new ForbiddenException("You are not allowed to update user!");
     }
 
-
-    //TODO exception handle
     @Transactional
     @PreAuthorize("authentication.name == this.getAdminUsername() || #user.getEmail() == authentication.name")
     public ResponseEntity<?> deleteUser(UserModel user) {
@@ -74,9 +72,8 @@ public class UserService implements UserDetailsService {
             UserModel model = repo.findUserById(user.getId());
             userUtils.deleteUser(model);
             return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (IOException e) {
+            throw new InternalServerException(e.getLocalizedMessage());
         }
     }
 
@@ -85,23 +82,22 @@ public class UserService implements UserDetailsService {
         return repo.findAll(pageable);
     }
 
-    //TODO exception handle
     public ResponseEntity<?> loginUser(JwtAuth model, HttpServletResponse response) {
 
         try {
+
             if (model.getUsername().equals(adminUser.getUsername()))
                 userUtils.authenticateUser(model, null, null, response);
             else
                 userUtils.authenticateUser(model, userUtils.getUserIdByUsernameOrEmail(model.getUsername()), null,
                         response);
-
             return new ResponseEntity<>(repo.findByEmailOrUsername(model.getUsername()), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new BadRequestException("User with these credentials does not exists!");
         }
     }
 
-    public ResponseEntity<?> signUpUser(UserModel model, HttpServletResponse response) throws IOException, Exception{
+    public ResponseEntity<?> signUpUser(UserModel model, HttpServletResponse response) throws IOException, Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth.getName().equals("anonymousUser") || auth.getAuthorities().contains(Authority.OP_ACCESS_ADMIN)
                 || !auth.getName().equals(model.getEmail())) {
@@ -112,9 +108,8 @@ public class UserService implements UserDetailsService {
                 throw new DataExistsException("User exists!");
             }
         }
-        throw new ForbiddenException();
+        throw new ForbiddenException("You are not allowed to signup a user!");
     }
-
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public UserModel getUserInfo(UserModel model) {

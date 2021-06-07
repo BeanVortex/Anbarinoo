@@ -1,6 +1,8 @@
 package ir.darkdeveloper.anbarinoo.util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.UUID;
@@ -11,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class IOUtils {
-    
+
     /**
      * 
      * @param file MultipartFile
@@ -19,7 +21,7 @@ public class IOUtils {
      * @return
      * @throws Exception
      */
-    public String saveFile(MultipartFile file, String path) throws Exception {
+    public String saveFile(MultipartFile file, String path) throws IOException {
         if (file != null) {
             // first it may not upload and save file in the path. should create static/img
             // folder in resources
@@ -32,10 +34,9 @@ public class IOUtils {
         return null;
     }
 
-
-    public String getImagePath(ImageUtil model, String path) throws Exception{
+    public String getImagePath(ImageUtil model, String path) throws FileNotFoundException {
         return ResourceUtils.getFile("classpath:static/img/" + path).getAbsolutePath() + File.separator
-                        + model.getImage();
+                + model.getImage();
     }
 
 }
