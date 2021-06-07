@@ -22,6 +22,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -40,6 +41,7 @@ import lombok.Data;
 @Entity
 @Table(name = "users")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@JsonIgnoreProperties(value = "attributes")
 public class UserModel implements UserDetails, ImageUtil, OAuth2User {
 
     private static final long serialVersionUID = 1L;
@@ -58,7 +60,7 @@ public class UserModel implements UserDetails, ImageUtil, OAuth2User {
     private String password;
 
     @Transient
-    @Column(name = "password_repeat")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String passwordRepeat;
 
     @NotNull

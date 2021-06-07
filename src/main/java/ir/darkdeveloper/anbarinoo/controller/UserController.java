@@ -1,5 +1,7 @@
 package ir.darkdeveloper.anbarinoo.controller;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,6 @@ import ir.darkdeveloper.anbarinoo.service.UserService;
 public class UserController {
 
     private final UserService userService;
-    
 
     @Autowired
     public UserController(UserService userService) {
@@ -31,20 +32,20 @@ public class UserController {
     }
 
     @PostMapping("/signup/")
-    public ResponseEntity<?> signUpUser(@ModelAttribute UserModel model, HttpServletResponse response) {
+    public ResponseEntity<?> signUpUser(@ModelAttribute UserModel model, HttpServletResponse response)
+            throws IOException, Exception {
         return userService.signUpUser(model, response);
     }
 
     @PostMapping("/login/")
     public ResponseEntity<?> loginUser(@RequestBody JwtAuth model, HttpServletResponse response) {
-      return userService.loginUser(model, response);
+        return userService.loginUser(model, response);
     }
 
     @PostMapping("/update/")
     public UserModel updateUser(@ModelAttribute UserModel model) {
         return userService.updateUser(model);
     }
-
 
     @DeleteMapping("/")
     public ResponseEntity<?> deleteUser(@RequestBody UserModel model) {
@@ -57,7 +58,7 @@ public class UserController {
     }
 
     @GetMapping("/")
-    public UserModel getUserInfo(@RequestBody UserModel model){
+    public UserModel getUserInfo(@RequestBody UserModel model) {
         return userService.getUserInfo(model);
     }
 }

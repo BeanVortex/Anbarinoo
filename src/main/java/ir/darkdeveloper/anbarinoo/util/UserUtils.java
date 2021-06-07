@@ -1,6 +1,5 @@
 package ir.darkdeveloper.anbarinoo.util;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -17,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.PasswordException;
 import ir.darkdeveloper.anbarinoo.model.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
@@ -94,15 +94,18 @@ public class UserUtils {
         response.addHeader("access_expiration", accessDate);
     }
 
-    public void validateUserData(UserModel model) throws FileNotFoundException, IOException, Exception {
+    public void validateUserData(UserModel model) throws IOException, Exception {
         model.setRoles(roleService.getRole("USER"));
 
         if (model.getUserName() == null || model.getUserName().trim().equals(""))
             model.setUserName(model.getEmail().split("@")[0]);
 
+        if (model.getPassword() == null || model.getPassword().isBlank())
+            throw new PasswordException("Password can't be empty!");
+
         if (model.getPasswordRepeat() == null || !model.getPassword().equals(model.getPasswordRepeat()))
             throw new PasswordException("Passwords do not match!");
-        
+
         UserModel preModel = repo.findUserById(model.getId());
 
         if (model.getId() != null && model.getFile() != null)
@@ -117,6 +120,27 @@ public class UserUtils {
 
         model.setPassword(encoder.encode(model.getPassword()));
         model.setProvider(AuthProvider.LOCAL);
+    }
+
+    public void signupValidation(UserModel model, HttpServletResponse response) throws IOException, Exception {
+
+        if (model.getUserName() != null && model.getUserName().equals(adminUser.getUsername()))
+            throw new BadRequestException("User exists!");
+
+        String rawPass = model.getPassword();
+        String rawPassRep = model.getPasswordRepeat();
+
+        if (rawPass == null || rawPass.isBlank())
+            throw new PasswordException("Password can't be empty");
+        if (!rawPass.equals(rawPassRep))
+            throw new PasswordException("Passwords do not match");
+
+        validateUserData(model);
+        repo.save(model);
+        JwtAuth jwtAuth = new JwtAuth();
+        jwtAuth.setUsername(model.getEmail());
+        jwtAuth.setPassword(model.getPassword());
+        authenticateUser(jwtAuth, model.getId(), rawPass, response);
     }
 
     public Long getUserIdByUsernameOrEmail(String username) {

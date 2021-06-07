@@ -1,5 +1,7 @@
 package ir.darkdeveloper.anbarinoo.service;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
@@ -16,9 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException.Forbidden;
 
-import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.DataExistsException;
 import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
 import ir.darkdeveloper.anbarinoo.model.Authority;
@@ -43,11 +43,13 @@ public class UserService implements UserDetailsService {
         this.adminUser = adminUser;
     }
 
+    //TODO exception handle
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userUtils.loadUserByUsername(username);
     }
 
+    //TODO exception handle
     @Transactional
     public UserModel updateUser(UserModel model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -63,6 +65,8 @@ public class UserService implements UserDetailsService {
         return null;
     }
 
+
+    //TODO exception handle
     @Transactional
     @PreAuthorize("authentication.name == this.getAdminUsername() || #user.getEmail() == authentication.name")
     public ResponseEntity<?> deleteUser(UserModel user) {
@@ -81,6 +85,7 @@ public class UserService implements UserDetailsService {
         return repo.findAll(pageable);
     }
 
+    //TODO exception handle
     public ResponseEntity<?> loginUser(JwtAuth model, HttpServletResponse response) {
 
         try {
@@ -96,31 +101,20 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public ResponseEntity<?> signUpUser(UserModel model, HttpServletResponse response) throws ForbiddenException{
+    public ResponseEntity<?> signUpUser(UserModel model, HttpServletResponse response) throws IOException, Exception{
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth.getName().equals("anonymousUser") || auth.getAuthorities().contains(Authority.OP_ACCESS_ADMIN)
                 || !auth.getName().equals(model.getEmail())) {
             try {
-
-                if (model.getUserName() != null && model.getUserName().equals(adminUser.getUsername()))
-                    throw new BadRequestException("User exists!");
-
-                String rawPass = model.getPassword();
-                userUtils.validateUserData(model);
-                repo.save(model);
-                JwtAuth jwtAuth = new JwtAuth();
-                jwtAuth.setUsername(model.getEmail());
-                jwtAuth.setPassword(model.getPassword());
-                userUtils.authenticateUser(jwtAuth, model.getId(), rawPass, response);
+                userUtils.signupValidation(model, response);
                 return new ResponseEntity<>(repo.findByEmailOrUsername(model.getUsername()), HttpStatus.OK);
             } catch (DataIntegrityViolationException e) {
                 throw new DataExistsException("User exists!");
-            } catch (Exception e) {
-                throw new BadRequestException(e.getMessage());
             }
         }
         throw new ForbiddenException();
     }
+
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public UserModel getUserInfo(UserModel model) {
