@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import ir.darkdeveloper.anbarinoo.exception.PasswordException;
 import ir.darkdeveloper.anbarinoo.model.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
@@ -99,6 +100,9 @@ public class UserUtils {
         if (model.getUserName() == null || model.getUserName().trim().equals(""))
             model.setUserName(model.getEmail().split("@")[0]);
 
+        if (model.getPasswordRepeat() == null || !model.getPassword().equals(model.getPasswordRepeat()))
+            throw new PasswordException("Passwords do not match!");
+        
         UserModel preModel = repo.findUserById(model.getId());
 
         if (model.getId() != null && model.getFile() != null)
@@ -118,7 +122,6 @@ public class UserUtils {
     public Long getUserIdByUsernameOrEmail(String username) {
         return repo.findUserIdByUsername(username);
     }
-
 
     public UserDetails loadUserByUsername(String username) {
         if (username.equals(adminUser.getUsername())) {

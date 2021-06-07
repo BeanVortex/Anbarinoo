@@ -57,6 +57,10 @@ public class UserModel implements UserDetails, ImageUtil, OAuth2User {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
+    @Transient
+    @Column(name = "password_repeat")
+    private String passwordRepeat;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;

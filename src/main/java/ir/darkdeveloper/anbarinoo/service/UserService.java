@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException.Forbidden;
 
+import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
+import ir.darkdeveloper.anbarinoo.exception.DataExistsException;
+import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
 import ir.darkdeveloper.anbarinoo.model.Authority;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.UserRepo;
@@ -31,7 +36,8 @@ public class UserService implements UserDetailsService {
     private AdminUserProperties adminUser;
 
     @Autowired
-    public UserService(UserRepo repo, UserRolesService roleService, UserUtils userUtils, AdminUserProperties adminUser) {
+    public UserService(UserRepo repo, UserRolesService roleService, UserUtils userUtils,
+            AdminUserProperties adminUser) {
         this.repo = repo;
         this.userUtils = userUtils;
         this.adminUser = adminUser;
@@ -90,14 +96,14 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public ResponseEntity<?> signUpUser(UserModel model, HttpServletResponse response) {
+    public ResponseEntity<?> signUpUser(UserModel model, HttpServletResponse response) throws ForbiddenException{
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth.getName().equals("anonymousUser") || auth.getAuthorities().contains(Authority.OP_ACCESS_ADMIN)
                 || !auth.getName().equals(model.getEmail())) {
             try {
 
                 if (model.getUserName() != null && model.getUserName().equals(adminUser.getUsername()))
-                    return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+                    throw new BadRequestException("User exists!");
 
                 String rawPass = model.getPassword();
                 userUtils.validateUserData(model);
@@ -107,11 +113,13 @@ public class UserService implements UserDetailsService {
                 jwtAuth.setPassword(model.getPassword());
                 userUtils.authenticateUser(jwtAuth, model.getId(), rawPass, response);
                 return new ResponseEntity<>(repo.findByEmailOrUsername(model.getUsername()), HttpStatus.OK);
+            } catch (DataIntegrityViolationException e) {
+                throw new DataExistsException("User exists!");
             } catch (Exception e) {
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+                throw new BadRequestException(e.getMessage());
             }
         }
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        throw new ForbiddenException();
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")

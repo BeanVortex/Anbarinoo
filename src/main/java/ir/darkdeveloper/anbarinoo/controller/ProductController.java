@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,23 +26,17 @@ public class ProductController {
     }
 
     @PostMapping("/save/")
-    public ProductModel saveProduct(@ModelAttribute ProductModel model, HttpServletRequest request) {
-        return service.saveProduct(model, request);
+    public ResponseEntity<ProductModel> saveProduct(@ModelAttribute ProductModel model, HttpServletRequest request) {
+        return ResponseEntity.ok().body(service.saveProduct(model, request));
     }
 
     @PostMapping("/search/")
-    public Page<ProductModel> findByNameContains(@RequestParam String name, Pageable pageable) {
-        return service.findByNameContains(name, pageable);
+    public ResponseEntity<Page<ProductModel>> findByNameContains(@RequestParam String name, Pageable pageable) {
+        return ResponseEntity.ok().body(service.findByNameContains(name, pageable));
     }
-
 
     @PostMapping("/update/")
-    public ProductModel updateProduct(@ModelAttribute ProductModel model, HttpServletRequest request) {
-        return service.saveProduct(model, request);
+    public ResponseEntity<ProductModel> updateProduct(@ModelAttribute ProductModel model, HttpServletRequest request) {
+        return ResponseEntity.ok().body(service.saveProduct(model, request));
     }
-
-    /*@GetMapping({"/api/user/{id}", "/api/user/{id}/"})
-    public List<ProductModel> findByUserId(@PathVariable("id") int id) {
-        return service.findByUserID(id);
-    }*/
 }
