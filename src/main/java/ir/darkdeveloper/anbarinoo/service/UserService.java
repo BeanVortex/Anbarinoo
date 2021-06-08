@@ -1,11 +1,12 @@
 package ir.darkdeveloper.anbarinoo.service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,25 +26,21 @@ import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
 import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
 import ir.darkdeveloper.anbarinoo.model.Authority;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
+import ir.darkdeveloper.anbarinoo.model.VerificationModel;
 import ir.darkdeveloper.anbarinoo.repository.UserRepo;
 import ir.darkdeveloper.anbarinoo.security.jwt.JwtAuth;
 import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
 import ir.darkdeveloper.anbarinoo.util.UserUtils;
+import lombok.AllArgsConstructor;
 
 @Service("userService")
+@AllArgsConstructor
 public class UserService implements UserDetailsService {
 
     private final UserRepo repo;
     private final UserUtils userUtils;
-    private AdminUserProperties adminUser;
-
-    @Autowired
-    public UserService(UserRepo repo, UserRolesService roleService, UserUtils userUtils,
-            AdminUserProperties adminUser) {
-        this.repo = repo;
-        this.userUtils = userUtils;
-        this.adminUser = adminUser;
-    }
+    private final AdminUserProperties adminUser;
+    private final VerificationService verificationService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -84,17 +81,13 @@ public class UserService implements UserDetailsService {
 
     public ResponseEntity<?> loginUser(JwtAuth model, HttpServletResponse response) {
 
-        try {
+        if (model.getUsername().equals(adminUser.getUsername()))
+            userUtils.authenticateUser(model, null, null, response);
+        else
+            userUtils.authenticateUser(model, userUtils.getUserIdByUsernameOrEmail(model.getUsername()), null,
+                    response);
+        return new ResponseEntity<>(repo.findByEmailOrUsername(model.getUsername()), HttpStatus.OK);
 
-            if (model.getUsername().equals(adminUser.getUsername()))
-                userUtils.authenticateUser(model, null, null, response);
-            else
-                userUtils.authenticateUser(model, userUtils.getUserIdByUsernameOrEmail(model.getUsername()), null,
-                        response);
-            return new ResponseEntity<>(repo.findByEmailOrUsername(model.getUsername()), HttpStatus.OK);
-        } catch (Exception e) {
-            throw new BadRequestException("User with these credentials does not exists!");
-        }
     }
 
     public ResponseEntity<?> signUpUser(UserModel model, HttpServletResponse response) throws IOException, Exception {
@@ -114,6 +107,26 @@ public class UserService implements UserDetailsService {
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public UserModel getUserInfo(UserModel model) {
         return repo.findUserById(model.getId());
+    }
+
+    @Transactional
+    public ResponseEntity<?> verifyUserEmail(String token) {
+
+        Optional<VerificationModel> model = verificationService.findByToken(token);
+
+        try {
+            if (model.isPresent())
+                if (model.get().getExpiresAt().isAfter(LocalDateTime.now())) {
+                    model.get().setVerifiedAt(LocalDateTime.now());
+                    repo.trueEnabledById(model.get().getUser().getId());
+                    verificationService.saveToken(model.get());
+                    return new ResponseEntity<>("Email Successfully verified", HttpStatus.OK);
+                } else
+                    throw new BadRequestException("Link is expired. try logging in again");
+        } catch (Exception e) {
+            throw new InternalServerException(e.getLocalizedMessage());
+        }
+        throw new InternalServerException("Link does not exists");
     }
 
 }

@@ -33,6 +33,7 @@ dependencies {
     implementation "io.springfox:springfox-boot-starter:3.0.0"
 	implementation 'org.springframework.security:spring-security-oauth2-jose:5.5.0'
 	implementation 'org.springframework.security:spring-security-oauth2-client:5.5.0'
+	implementation "org.springframework.boot:spring-boot-starter-mail:2.5.0"
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'org.postgresql:postgresql'

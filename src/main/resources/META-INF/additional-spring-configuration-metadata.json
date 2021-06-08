@@ -48,5 +48,10 @@
     "name": "user.admin.id",
     "type": "java.lang.Long",
     "description": "A description for 'user.admin.id'"
+  },
+  {
+    "name": "user.email-verification-disabled",
+    "type": "java.lang.Boolean",
+    "description": "A description for 'user.email-verification-disabled'"
   }
 ]}

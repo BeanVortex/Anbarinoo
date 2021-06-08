@@ -3,6 +3,7 @@ spring:
     active: dev
     include:
     - user
+    - email
 ---
 jwt:
   secretkey: RandomSecret

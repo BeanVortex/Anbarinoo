@@ -17,3 +17,4 @@ user:
       - OP_ADD_USER
       - OP_DELETE_POST
       - OP_DELETE_COMMENT
+  email-verification-disabled: true

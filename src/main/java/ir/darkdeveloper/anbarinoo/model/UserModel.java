@@ -67,8 +67,7 @@ public class UserModel implements UserDetails, ImageUtil, OAuth2User {
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
 
-    // TODO: Enable for oauth logs and disable for local logs
-    private Boolean enabled = true;
+    private Boolean enabled;
 
     @Transient
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -160,7 +159,7 @@ public class UserModel implements UserDetails, ImageUtil, OAuth2User {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Override
     public boolean isEnabled() {
-        return this.getEnabled();
+        return enabled;
     }
 
     @Override
