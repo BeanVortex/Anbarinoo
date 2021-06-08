@@ -109,19 +109,23 @@ public class UserService implements UserDetailsService {
         return repo.findUserById(model.getId());
     }
 
+    @Transactional
     public ResponseEntity<?> verifyUserEmail(String token) {
 
         Optional<VerificationModel> model = verificationService.findByToken(token);
 
-        if (model.isPresent())
-            if (model.get().getExpiresAt().isBefore(LocalDateTime.now())) {
-                model.get().setVerifiedAt(LocalDateTime.now());
-                repo.trueEnabledById(model.get().getUser().getId());
-                verificationService.saveToken(model.get());
-                return new ResponseEntity<>("Email Successfully verified", HttpStatus.OK);
-            } else
-                throw new BadRequestException("Link is expired. try logging in again");
-
+        try {
+            if (model.isPresent())
+                if (model.get().getExpiresAt().isAfter(LocalDateTime.now())) {
+                    model.get().setVerifiedAt(LocalDateTime.now());
+                    repo.trueEnabledById(model.get().getUser().getId());
+                    verificationService.saveToken(model.get());
+                    return new ResponseEntity<>("Email Successfully verified", HttpStatus.OK);
+                } else
+                    throw new BadRequestException("Link is expired. try logging in again");
+        } catch (Exception e) {
+            throw new InternalServerException(e.getLocalizedMessage());
+        }
         throw new InternalServerException("Link does not exists");
     }
 

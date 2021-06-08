@@ -1,5 +1,16 @@
 spring.mail:
-    host:
-    username:
-    password:
-    port: 8080
+  host: localhost
+  username: darkd
+  password: 1234
+  port: 1025
+  properties:
+    mail:
+      smtp:
+        ssl:
+          trust: "*"
+        auth: true
+        starttls:
+          enable: true
+        connectiontimeout: 5000
+        timeout: 3000
+        writetimeout: 5000

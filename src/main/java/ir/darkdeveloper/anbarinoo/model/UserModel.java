@@ -29,7 +29,6 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -68,7 +67,6 @@ public class UserModel implements UserDetails, ImageUtil, OAuth2User {
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
 
-    @Value("${user.email-verification-disabled}")
     private Boolean enabled;
 
     @Transient
@@ -161,7 +159,7 @@ public class UserModel implements UserDetails, ImageUtil, OAuth2User {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Override
     public boolean isEnabled() {
-        return this.getEnabled();
+        return enabled;
     }
 
     @Override
