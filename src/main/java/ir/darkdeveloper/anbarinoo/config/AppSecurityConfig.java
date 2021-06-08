@@ -104,7 +104,6 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
     }
 
 
-
     @Bean
     public PasswordEncoder passEncode() {
         return new BCryptPasswordEncoder(12);

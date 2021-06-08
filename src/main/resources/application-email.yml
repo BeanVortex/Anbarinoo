@@ -1,0 +1,5 @@
+spring.mail:
+    host:
+    username:
+    password:
+    port: 8080
