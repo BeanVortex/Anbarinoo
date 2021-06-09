@@ -19,4 +19,12 @@ public class MainController {
     public Principal p(Principal principal){
         return principal;
     }
+
+    @GetMapping("/forbidden")
+    @ResponseBody
+    public String forbidden(){
+        return "Error 403: Forbidden";
+    }
+    
+
 }
