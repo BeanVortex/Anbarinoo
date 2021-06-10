@@ -60,8 +60,6 @@ oauth2:
     - myandroidapp://oauth2/redirect
     - myiosapp://oauth2/redirect
 
-
-
 # docker-secret:
 #   bind-path: /run/secrets
 
