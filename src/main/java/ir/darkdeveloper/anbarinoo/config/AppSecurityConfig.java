@@ -20,6 +20,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import ir.darkdeveloper.anbarinoo.security.exception.RestAuthenticationEntryPoint;
 import ir.darkdeveloper.anbarinoo.security.jwt.JwtFilter;
 import ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2FailureHandler;
 import ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2RequestRepo;
@@ -77,6 +78,9 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
                         .permitAll()
                     .anyRequest()
                         .authenticated()
+                .and()
+                .exceptionHandling()
+                    .authenticationEntryPoint(new RestAuthenticationEntryPoint())
                 .and()
                 .formLogin()
                     .disable()
