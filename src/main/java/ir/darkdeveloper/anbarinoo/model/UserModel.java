@@ -118,6 +118,7 @@ public class UserModel implements UserDetails, ImageUtil, OAuth2User {
     public String getUsername() {
         return email;
     }
+    
 
     public String getUserName() {
         return userName;

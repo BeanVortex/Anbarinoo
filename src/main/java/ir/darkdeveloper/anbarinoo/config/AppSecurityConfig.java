@@ -3,7 +3,6 @@ package ir.darkdeveloper.anbarinoo.config;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -39,8 +38,6 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2RequestRepo  oAuth2RequestRepo;
     private final OAuth2FailureHandler oAuth2FailureHandler;
-    @Value("${user.email-verification-disabled}")
-    private Boolean userEnabled;
 
     @Autowired
     public AppSecurityConfig(@Lazy UserService userService, JwtFilter jwtFilter,
@@ -120,16 +117,12 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
     public PasswordEncoder passEncode() {
         return new BCryptPasswordEncoder(12);
     }
-    @Bean("userEnabled")
-    public Boolean userEnabled(){
-        return userEnabled;
-    }
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("*"));
-        configuration.addExposedHeader("refresh_token, access_token, expiration, user_id");
+        configuration.addExposedHeader("refresh_token, access_token, access_expiration, refresh_expiration");
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
