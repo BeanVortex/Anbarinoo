@@ -66,6 +66,10 @@ public class ProductModel {
     @JoinColumn(name = "user_id")
     private UserModel user;
 
+    @ManyToOne
+    @JoinColumn(name="cat_id")
+    private CategoryModel category;
+
 
     @Column( name = "total_count")
     private int totalCount;

@@ -9,6 +9,7 @@ jwt:
   secretkey: RandomSecret
 jasypt:
   encryptor:
+    password: ChangeMe
     algorithm: PBEWithMD5AndDES
     iv-generator-classname: org.jasypt.iv.NoIvGenerator
 spring:
