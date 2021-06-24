@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.transaction.Transactional;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -19,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.DataExistsException;
@@ -66,8 +66,7 @@ public class UserService implements UserDetailsService {
     @PreAuthorize("authentication.name == @userService.getAdminUser().getUsername() || #user.getEmail().equals(authentication.name)")
     public ResponseEntity<?> deleteUser(UserModel user) {
         try {
-            UserModel model = repo.findUserById(user.getId());
-            userUtils.deleteUser(model);
+            userUtils.deleteUser(user);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (IOException e) {
             throw new InternalServerException(e.getLocalizedMessage());

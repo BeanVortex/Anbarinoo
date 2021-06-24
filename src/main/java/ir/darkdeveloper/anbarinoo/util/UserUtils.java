@@ -121,8 +121,11 @@ public class UserUtils {
 
         UserModel preModel = repo.findUserById(model.getId());
 
-        if (model.getId() != null && model.getFile() != null)
-            Files.delete(Paths.get(ioUtils.getImagePath(preModel, path)));
+        if (model.getId() != null && model.getFile() != null) {
+            String imgPath = ioUtils.getImagePath(preModel, path);
+            if (imgPath != null)
+                Files.delete(Paths.get(imgPath));
+        }
 
         if (preModel != null && preModel.getProfilePicture() != null)
             model.setProfilePicture(preModel.getProfilePicture());
@@ -172,9 +175,16 @@ public class UserUtils {
     }
 
     public void deleteUser(UserModel model) throws IOException {
-        Files.delete(Paths.get(ioUtils.getImagePath(model, path)));
-        repo.deleteById(model.getId());
-        refreshService.deleteTokenByUserId(model.getId());
+        UserModel model2 = (UserModel) loadUserByUsername(model.getEmail());
+        if (!model2.isEnabled()) {
+            throw new EmailNotValidException("Email is not verified! Check your emails");
+        }
+        String imgPath = ioUtils.getImagePath(model2, path);
+        if (imgPath != null)
+            Files.delete(Paths.get(imgPath));
+
+        repo.deleteById(model2.getId());
+        refreshService.deleteTokenByUserId(model2.getId());
     }
 
     private void sendEmail(UserModel model) {

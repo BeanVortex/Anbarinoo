@@ -19,7 +19,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 
-
 @SpringBootTest
 public class UserServiceTest {
 
@@ -41,7 +40,7 @@ public class UserServiceTest {
     }
 
     @BeforeEach
-    void userSetup(){
+    void userSetup() {
         user = new UserModel();
         user.setEmail("email");
         user.setAddress("address");
@@ -62,15 +61,15 @@ public class UserServiceTest {
 
     @Test
     @WithMockUser(username = "email", password = "pass1")
-    void deleteUser(){
+    void deleteUser() {
         service.deleteUser(user);
-      /*   Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        /*   Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         System.out.println(authentication.getName()); */
     }
 
     @Test
-    void updateUser(){
-        
+    void updateUser() {
+
     }
 
 }

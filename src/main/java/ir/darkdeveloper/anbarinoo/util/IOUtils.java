@@ -25,7 +25,7 @@ public class IOUtils {
         if (file != null) {
             // first it may not upload and save file in the path. should create static/img
             // folder in resources
-            String location = ResourceUtils.getFile("classpath:static/img/" + path).getAbsolutePath();
+            String location = ResourceUtils.getFile("classpath:static/user/" + path).getAbsolutePath();
             byte[] bytes = file.getBytes();
             String fileName = UUID.randomUUID() + "." + file.getContentType().split("/")[1];
             Files.write(Paths.get(location + File.separator + fileName), bytes);
@@ -35,7 +35,9 @@ public class IOUtils {
     }
 
     public String getImagePath(ImageUtil model, String path) throws FileNotFoundException {
-        return ResourceUtils.getFile("classpath:static/img/" + path).getAbsolutePath() + File.separator
+        if (model.getImage() == null)
+            return null;
+        return ResourceUtils.getFile("classpath:static/user/" + path).getAbsolutePath() + File.separator
                 + model.getImage();
     }
 

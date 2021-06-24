@@ -2,7 +2,6 @@ package ir.darkdeveloper.anbarinoo.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -23,7 +22,8 @@ public interface UserRepo extends PagingAndSortingRepository<UserModel, Long> {
     @Query("SELECT model.id FROM UserModel model WHERE model.email = :username OR model.userName = :username")
     Long findUserIdByUsername(@Param("username") String username);
 
-    @Modifying
+    // @Transactional
+    // @Modifying
     @Query("UPDATE UserModel m SET m.enabled = true WHERE m.id = :id")
     void trueEnabledById(@Param("id") Long id);
 }
