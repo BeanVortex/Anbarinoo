@@ -50,8 +50,9 @@ public class UserServiceTest {
         user.setUserName("user n");
         user.setPassword("pass1");
         user.setPasswordRepeat("pass1");
+        
         user.setEnabled(true);
-        user.setFile(null);
+        user.setProfileFile(null);
     }
 
     @Test

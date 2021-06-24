@@ -71,10 +71,14 @@ public class UserModel implements UserDetails, ImageUtil, OAuth2User {
 
     @Transient
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private MultipartFile file;
+    private MultipartFile shopFile;
 
     @Column(name = "profile")
     private String profilePicture;
+
+    @Transient
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private MultipartFile profileFile;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role", referencedColumnName = "name"))
