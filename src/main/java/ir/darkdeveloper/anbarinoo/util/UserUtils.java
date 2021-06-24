@@ -37,7 +37,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class UserUtils {
 
-    private final String path = "profiles/";
+    private final String path = "profile_images/";
     private final AuthenticationManager authManager;
     private final JwtUtils jwtUtils;
     private final UserRolesService roleService;

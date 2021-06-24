@@ -63,7 +63,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    @PreAuthorize("authentication.name == this.getAdminUsername() || #user.getEmail() == authentication.name")
+    @PreAuthorize("authentication.name == @userService.getAdminUser().getUsername() || #user.getEmail().equals(authentication.name)")
     public ResponseEntity<?> deleteUser(UserModel user) {
         try {
             UserModel model = repo.findUserById(user.getId());
@@ -129,4 +129,7 @@ public class UserService implements UserDetailsService {
         throw new InternalServerException("Link does not exists");
     }
 
+    public AdminUserProperties getAdminUser(){
+        return adminUser;
+    }
 }

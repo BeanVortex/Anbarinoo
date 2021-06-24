@@ -7,6 +7,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 
+
 @SpringBootTest
 public class UserServiceTest {
 
     private final UserService service;
+    private UserModel user;
+
     @Autowired
     public UserServiceTest(UserService service) {
         this.service = service;
@@ -36,20 +40,37 @@ public class UserServiceTest {
         SecurityContextHolder.setContext(securityContext);
     }
 
-    @Test
-    @WithMockUser(username = "anonymous")
-    void save() throws IOException, Exception {
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        UserModel user = new UserModel();
+    @BeforeEach
+    void userSetup(){
+        user = new UserModel();
         user.setEmail("email");
         user.setAddress("address");
         user.setDescription("desc");
-        user.setUserName("usern");
+        user.setUserName("user n");
         user.setPassword("pass1");
         user.setPasswordRepeat("pass1");
         user.setEnabled(true);
         user.setFile(null);
+    }
+
+    @Test
+    @WithMockUser(username = "anonymous")
+    void signUp() throws IOException, Exception {
+        HttpServletResponse response = mock(HttpServletResponse.class);
         service.signUpUser(user, response);
+    }
+
+    @Test
+    @WithMockUser(username = "email", password = "pass1")
+    void deleteUser(){
+        service.deleteUser(user);
+      /*   Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(authentication.getName()); */
+    }
+
+    @Test
+    void updateUser(){
+        
     }
 
 }
