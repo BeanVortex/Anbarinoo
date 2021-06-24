@@ -47,7 +47,6 @@ public class UserService implements UserDetailsService {
         return userUtils.loadUserByUsername(username);
     }
 
-    @Transactional
     public UserModel updateUser(UserModel model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (!auth.getName().equals("anonymousUser") || auth.getAuthorities().contains(Authority.OP_ACCESS_ADMIN)

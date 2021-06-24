@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,23 +55,29 @@ public class UserServiceTest {
     }
 
     @Test
-    @WithMockUser(username = "anonymous")
+    @Order(1)
+    @WithMockUser(username = "anonymousUser")
     void signUp() throws IOException, Exception {
         HttpServletResponse response = mock(HttpServletResponse.class);
         service.signUpUser(user, response);
     }
 
     @Test
-    @WithMockUser(username = "email", password = "pass1")
+    @WithMockUser(username = "email")
+    @Order(3)
+    @Disabled
     void deleteUser() {
         service.deleteUser(user);
-        /*   Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println(authentication.getName()); */
     }
 
     @Test
+    @Order(2)
+    @WithMockUser(username = "email")
     void updateUser() {
-
+        user.setDescription("dex");
+        user.setShopName("shop1");
+        user.setId(((UserModel)service.loadUserByUsername(user.getEmail())).getId());
+        service.updateUser(user);
     }
 
 }
