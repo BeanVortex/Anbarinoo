@@ -11,13 +11,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import ir.darkdeveloper.anbarinoo.model.UserModel;
+
 @Component
 public class IOUtils {
 
     /**
      * 
      * @param file MultipartFile
-     * @param path after img/
+     * @param path after user/
      * @return
      * @throws Exception
      */
@@ -34,11 +36,45 @@ public class IOUtils {
         return null;
     }
 
-    public String getImagePath(ImageUtil model, String path) throws FileNotFoundException {
-        if (model.getImage() == null)
+    public String getImagePath(String path, String fileName) throws FileNotFoundException {
+        if (fileName == null)
             return null;
-        return ResourceUtils.getFile("classpath:static/user/" + path).getAbsolutePath() + File.separator
-                + model.getImage();
+        return ResourceUtils.getFile("classpath:static/user/" + path).getAbsolutePath() + File.separator + fileName;
+    }
+
+    public void handleUserImages(UserModel model, String path, UserUtils utils)
+            throws FileNotFoundException, IOException {
+        UserModel preModel = (UserModel) utils.loadUserByUsername(model.getEmail());
+
+        deleteUserImages(preModel, path);
+
+        if (model.getProfileFile() != null && preModel != null && preModel.getProfileImage() != null)
+            model.setProfileImage(preModel.getProfileImage());
+
+        if (model.getShopFile() != null && preModel != null && preModel.getShopImage() != null)
+            model.setShopImage(preModel.getShopImage());
+
+        String profileFileName = saveFile(model.getProfileFile(), path);
+        if (profileFileName != null)
+            model.setProfileImage(profileFileName);
+
+        String shopFileName = saveFile(model.getShopFile(), path);
+        if (shopFileName != null)
+            model.setShopImage(shopFileName);
+    }
+
+    public void deleteUserImages(UserModel model, String path) throws FileNotFoundException, IOException {
+        if (model != null && model.getId() != null && model.getProfileImage() != null) {
+            String imgPath = getImagePath(path, model.getProfileImage());
+            if (imgPath != null)
+                Files.delete(Paths.get(imgPath));
+        }
+
+        if (model != null && model.getId() != null && model.getShopImage() != null) {
+            String imgPath = getImagePath(path, model.getShopImage());
+            if (imgPath != null)
+                Files.delete(Paths.get(imgPath));
+        }
     }
 
 }

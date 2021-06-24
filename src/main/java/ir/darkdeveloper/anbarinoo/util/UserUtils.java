@@ -1,8 +1,6 @@
 package ir.darkdeveloper.anbarinoo.util;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -119,20 +117,7 @@ public class UserUtils {
         if (model.getPasswordRepeat() == null || !model.getPassword().equals(model.getPasswordRepeat()))
             throw new PasswordException("Passwords do not match!");
 
-        UserModel preModel = repo.findUserById(model.getId());
-
-        if (model.getId() != null && model.getFile() != null) {
-            String imgPath = ioUtils.getImagePath(preModel, path);
-            if (imgPath != null)
-                Files.delete(Paths.get(imgPath));
-        }
-
-        if (preModel != null && preModel.getProfilePicture() != null)
-            model.setProfilePicture(preModel.getProfilePicture());
-
-        String fileName = ioUtils.saveFile(model.getFile(), path);
-        if (fileName != null)
-            model.setProfilePicture(fileName);
+        ioUtils.handleUserImages(model, path, this);
 
         model.setPassword(encoder.encode(model.getPassword()));
         model.setProvider(AuthProvider.LOCAL);
@@ -176,12 +161,10 @@ public class UserUtils {
 
     public void deleteUser(UserModel model) throws IOException {
         UserModel model2 = (UserModel) loadUserByUsername(model.getEmail());
-        if (!model2.isEnabled()) {
+        if (!model2.isEnabled())
             throw new EmailNotValidException("Email is not verified! Check your emails");
-        }
-        String imgPath = ioUtils.getImagePath(model2, path);
-        if (imgPath != null)
-            Files.delete(Paths.get(imgPath));
+
+        ioUtils.deleteUserImages(model2, path);
 
         repo.deleteById(model2.getId());
         refreshService.deleteTokenByUserId(model2.getId());

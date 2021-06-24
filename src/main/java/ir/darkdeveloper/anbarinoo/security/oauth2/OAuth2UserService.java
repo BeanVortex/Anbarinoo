@@ -30,7 +30,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             user.setEmail(oAuth2User.getAttribute("email"));
         }
         user.setEnabled(oAuth2User.getAttribute("email_verified"));
-        user.setProfilePicture(oAuth2User.getAttribute("picture"));
+        user.setProfileImage(oAuth2User.getAttribute("picture"));
         user.setProvider(AuthProvider.GOOGLE);
         user = repo.save(user);
         return user;

@@ -34,7 +34,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.multipart.MultipartFile;
 
-import ir.darkdeveloper.anbarinoo.util.ImageUtil;
 import lombok.Data;
 
 @Data
@@ -42,7 +41,7 @@ import lombok.Data;
 @Table(name = "users")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @JsonIgnoreProperties(value = "attributes")
-public class UserModel implements UserDetails, ImageUtil, OAuth2User {
+public class UserModel implements UserDetails, OAuth2User {
 
     private static final long serialVersionUID = 1L;
 
@@ -74,7 +73,7 @@ public class UserModel implements UserDetails, ImageUtil, OAuth2User {
     private MultipartFile shopFile;
 
     @Column(name = "profile")
-    private String profilePicture;
+    private String profileImage;
 
     @Transient
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -167,10 +166,6 @@ public class UserModel implements UserDetails, ImageUtil, OAuth2User {
         return enabled;
     }
 
-    @Override
-    public String getImage() {
-        return profilePicture;
-    }
 
     @Override
     public Map<String, Object> getAttributes() {

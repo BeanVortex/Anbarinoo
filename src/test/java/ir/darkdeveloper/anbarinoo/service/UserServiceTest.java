@@ -8,12 +8,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -50,9 +51,13 @@ public class UserServiceTest {
         user.setUserName("user n");
         user.setPassword("pass1");
         user.setPasswordRepeat("pass1");
-        
         user.setEnabled(true);
-        user.setProfileFile(null);
+        MockMultipartFile file1 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!".getBytes());
+        MockMultipartFile file2 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!".getBytes());
+        user.setProfileFile(file1);
+        user.setShopFile(file2);
     }
 
     @Test
@@ -64,21 +69,33 @@ public class UserServiceTest {
     }
 
     @Test
+    @Order(2)
     @WithMockUser(username = "email")
-    @Order(3)
-    @Disabled
-    void deleteUser() {
-        service.deleteUser(user);
+    void updateUserWithNullImages() {
+        user.setDescription("dex");
+        user.setShopName("shop1");
+        user.setProfileFile(null);
+        user.setShopFile(null);
+        user.setId(((UserModel) service.loadUserByUsername(user.getEmail())).getId());
+        service.updateUser(user);
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     @WithMockUser(username = "email")
-    void updateUser() {
+    void updateUserWithImages() {
         user.setDescription("dex");
         user.setShopName("shop1");
-        user.setId(((UserModel)service.loadUserByUsername(user.getEmail())).getId());
+        user.setId(((UserModel) service.loadUserByUsername(user.getEmail())).getId());
         service.updateUser(user);
+    }
+
+    @Test
+    @WithMockUser(username = "email")
+    @Order(4)
+    //@Disabled
+    void deleteUser() {
+        service.deleteUser(user);
     }
 
 }
