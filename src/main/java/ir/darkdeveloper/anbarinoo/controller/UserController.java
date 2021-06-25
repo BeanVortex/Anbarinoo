@@ -63,8 +63,8 @@ public class UserController {
         return userService.allUsers(pageable);
     }
 
-    @GetMapping("/")
-    public UserModel getUserInfo(@RequestBody UserModel model) {
-        return userService.getUserInfo(model);
+    @GetMapping("/{id}/")
+    public UserModel getUserInfo(@RequestParam("id") Long id) {
+        return userService.getUserInfo(id);
     }
 }

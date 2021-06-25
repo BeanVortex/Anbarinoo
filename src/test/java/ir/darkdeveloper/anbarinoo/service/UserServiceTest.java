@@ -1,5 +1,6 @@
 package ir.darkdeveloper.anbarinoo.service;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
@@ -92,10 +93,24 @@ public class UserServiceTest {
 
     @Test
     @WithMockUser(username = "email")
-    @Order(4)
+    //@Order(5)
     //@Disabled
     void deleteUser() {
-        service.deleteUser(user);
+        //service.deleteUser(user);
+    }
+
+    @Test
+    @Order(4)
+    @WithMockUser(username = "email", authorities = {"OP_ACCESS_USER"})
+    void getUserInfo(){
+        UserModel model = service.getUserInfo(user.getId());
+        assertNull(model);
+    }
+
+    @Test
+    @Order(5)
+    void verifyUserEmail(){
+
     }
 
 }

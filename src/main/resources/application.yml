@@ -13,7 +13,6 @@ jasypt:
     algorithm: PBEWithMD5AndDES
     iv-generator-classname: org.jasypt.iv.NoIvGenerator
 spring:
-  profiles: dev
   jpa:
     show-sql: true
     hibernate:
@@ -28,6 +27,8 @@ spring:
     #show-sql: true
   config:
     use-legacy-processing: true
+    activate:
+      on-profile: dev
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/anbarinoo

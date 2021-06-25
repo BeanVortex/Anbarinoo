@@ -103,8 +103,8 @@ public class UserService implements UserDetailsService {
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public UserModel getUserInfo(UserModel model) {
-        return repo.findUserById(model.getId());
+    public UserModel getUserInfo(Long id) {
+        return repo.findUserById(id);
     }
 
     @Transactional
