@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.EmailNotValidException;
+import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
 import ir.darkdeveloper.anbarinoo.exception.PasswordException;
 import ir.darkdeveloper.anbarinoo.model.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
@@ -124,6 +125,8 @@ public class UserUtils {
     }
 
     public void signupValidation(UserModel model, HttpServletResponse response) throws IOException, Exception {
+        if(model.getId() != null)
+            throw new ForbiddenException("You are not allowed to sign up! :|");
 
         if (model.getUserName() != null && model.getUserName().equals(adminUser.getUsername()))
             throw new BadRequestException("User exists!");

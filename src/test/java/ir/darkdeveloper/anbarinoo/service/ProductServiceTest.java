@@ -1,16 +1,7 @@
 package ir.darkdeveloper.anbarinoo.service;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.mock;
-
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletResponse;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,19 +11,21 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
 
+import ir.darkdeveloper.anbarinoo.model.CategoryModel;
+import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 
 @SpringBootTest
-public class UserServiceTest {
+public class ProductServiceTest {
 
-    private final UserService service;
+    private final ProductService productService;
+    private ProductModel product;
     private UserModel user;
 
     @Autowired
-    public UserServiceTest(UserService service) {
-        this.service = service;
+    public ProductServiceTest(ProductService productService) {
+        this.productService = productService;
     }
 
     @BeforeAll
@@ -45,7 +38,7 @@ public class UserServiceTest {
     }
 
     @BeforeEach
-    void userSetup() {
+    void productSetup(){
         user = new UserModel();
         user.setEmail("email");
         user.setAddress("address");
@@ -60,57 +53,23 @@ public class UserServiceTest {
                 "Hello, World!".getBytes());
         user.setProfileFile(file1);
         user.setShopFile(file2);
+        product = new ProductModel();
+        product.setName("name");
+        product.setDescription("description");
+        product.setBoughtCount(25);
+        product.setBuyPrice(156d);
+        product.setSellPrice(180d);
+        product.setSoldCount(13);
+        product.setTotalCount(50);
+        product.setUser(user);
+        CategoryModel cat =  new CategoryModel();
+        cat.setName("cat");
+        product.setCategory(cat);
+        
     }
 
     @Test
-    @Order(1)
-    @WithMockUser(username = "anonymousUser")
-    void signUp() throws IOException, Exception {
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        service.signUpUser(user, response);
-    }
-
-    @Test
-    @Order(2)
-    @WithMockUser(username = "email")
-    void updateUserWithNullImages() {
-        user.setDescription("dex");
-        user.setShopName("shop1");
-        user.setProfileFile(null);
-        user.setShopFile(null);
-        user.setId(((UserModel) service.loadUserByUsername(user.getEmail())).getId());
-        service.updateUser(user);
-    }
-
-    @Test
-    @Order(3)
-    @WithMockUser(username = "email")
-    void updateUserWithImages() {
-        user.setDescription("dex");
-        user.setShopName("shop1");
-        user.setId(((UserModel) service.loadUserByUsername(user.getEmail())).getId());
-        service.updateUser(user);
-    }
-
-    @Test
-    @WithMockUser(username = "email")
-    //@Order(5)
-    @Disabled
-    void deleteUser() {
-        service.deleteUser(user);
-    }
-
-    @Test
-    @Order(4)
-    @WithMockUser(username = "email", authorities = {"OP_ACCESS_USER"})
-    void getUserInfo(){
-        UserModel model = service.getUserInfo(user.getId());
-        assertNull(model);
-    }
-
-    @Test
-    @Order(5)
-    void verifyUserEmail(){
+    void saveProduct() {
 
     }
 
