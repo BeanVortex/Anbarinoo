@@ -17,6 +17,8 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
+*.war
+
 ### IntelliJ IDEA ###
 .idea
 *.iws

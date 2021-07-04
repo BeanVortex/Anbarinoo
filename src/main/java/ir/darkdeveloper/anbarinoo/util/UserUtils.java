@@ -1,7 +1,6 @@
 package ir.darkdeveloper.anbarinoo.util;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -97,13 +96,13 @@ public class UserUtils {
 
         refreshService.saveToken(rModel);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EE MMM dd yyyy HH:mm:ss");
-        var refreshDate = dateFormat.format(jwtUtils.getExpirationDate(refreshToken));
-        var accessDate = dateFormat.format(jwtUtils.getExpirationDate(accessToken));
+        //SimpleDateFormat dateFormat = new SimpleDateFormat("EE MMM dd yyyy HH:mm:ss");
+        // var refreshDate = dateFormat.format();
+        // var accessDate = dateFormat.format();
         response.addHeader("refresh_token", refreshToken);
         response.addHeader("access_token", accessToken);
-        response.addHeader("refresh_expiration", refreshDate);
-        response.addHeader("access_expiration", accessDate);
+        response.addHeader("refresh_expiration", jwtUtils.getExpirationDate(refreshToken).toString());
+        response.addHeader("access_expiration", jwtUtils.getExpirationDate(accessToken).toString());
     }
 
     public void validateUserData(UserModel model) throws IOException {
@@ -125,7 +124,7 @@ public class UserUtils {
     }
 
     public void signupValidation(UserModel model, HttpServletResponse response) throws IOException, Exception {
-        if(model.getId() != null)
+        if (model.getId() != null)
             throw new ForbiddenException("You are not allowed to sign up! :|");
 
         if (model.getUserName() != null && model.getUserName().equals(adminUser.getUsername()))

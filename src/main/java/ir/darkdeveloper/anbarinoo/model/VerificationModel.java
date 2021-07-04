@@ -12,6 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.Data;
@@ -22,7 +24,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class VerificationModel {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -38,11 +39,14 @@ public class VerificationModel {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    // Format that js Date object understand
+    @JsonFormat(pattern = "EE MMM dd yyyy HH:mm:ss")
     private LocalDateTime expiresAt;
 
+    @JsonFormat(pattern = "EE MMM dd yyyy HH:mm:ss")
     private LocalDateTime verifiedAt;
 
-    public VerificationModel( String token, UserModel user, LocalDateTime expiresAt) {
+    public VerificationModel(String token, UserModel user, LocalDateTime expiresAt) {
         this.token = token;
         this.user = user;
         this.expiresAt = expiresAt;

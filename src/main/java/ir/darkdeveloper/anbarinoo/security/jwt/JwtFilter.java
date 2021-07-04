@@ -1,7 +1,6 @@
 package ir.darkdeveloper.anbarinoo.security.jwt;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -85,10 +84,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 refreshModel.setId(refreshService.getIdByUserId(userId));
                 // db query
                 refreshService.saveToken(refreshModel);
-                // Format that js Date object understand
-                var dateFormat = new SimpleDateFormat("EE MMM dd yyyy HH:mm:ss");
-                var accessDate = dateFormat.format(jwtUtils.getExpirationDate(newAccessToken));
-                response.addHeader("access_expiration", accessDate);
+                response.addHeader("access_expiration", jwtUtils.getExpirationDate(newAccessToken).toString());
                 response.addHeader("access_token", newAccessToken);
             } else
                 //if stored token is not equal with user send token, it will return 403
