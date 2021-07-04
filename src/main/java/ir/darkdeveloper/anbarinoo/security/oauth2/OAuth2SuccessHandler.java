@@ -23,7 +23,6 @@ import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.CookieUtils;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import lombok.var;
 
 @Component
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -78,18 +77,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private void headerSetup(HttpServletResponse response, Authentication authentication) {
         UserModel user = (UserModel) userService.loadUserByUsername(authentication.getName());
 
-        var dateFormat = new SimpleDateFormat("EE MMM dd yyyy HH:mm:ss");
-
-        var refreshToken = jwtUtils.generateRefreshToken(user.getEmail(), user.getId());
-        var accessToken = jwtUtils.generateAccessToken(user.getEmail());
-
-        var refreshDate = dateFormat.format(jwtUtils.getExpirationDate(refreshToken));
-        var accessDate = dateFormat.format(jwtUtils.getExpirationDate(accessToken));
+        String refreshToken = jwtUtils.generateRefreshToken(user.getEmail(), user.getId());
+        String accessToken = jwtUtils.generateAccessToken(user.getEmail());
 
         response.addHeader("refresh_token", refreshToken);
         response.addHeader("access_token", accessToken);
-        response.addHeader("refresh_expiration", refreshDate);
-        response.addHeader("access_expiration", accessDate);
+        response.addHeader("refresh_expiration", jwtUtils.getExpirationDate(refreshToken).toString());
+        response.addHeader("access_expiration", jwtUtils.getExpirationDate(accessToken).toString());
     }
 
     private void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
