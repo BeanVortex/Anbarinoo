@@ -4,7 +4,6 @@ import static ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2RequestRepo.REDIR
 
 import java.io.IOException;
 import java.net.URI;
-import java.text.SimpleDateFormat;
 import java.util.Optional;
 
 import javax.servlet.ServletException;
@@ -43,7 +42,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-            Authentication authentication) throws IOException, ServletException {
+            Authentication authentication) throws IOException {
         String targetUrl = determineTargetUrl(request, response, authentication);
 
         if (response.isCommitted()) {
@@ -79,7 +78,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         String refreshToken = jwtUtils.generateRefreshToken(user.getEmail(), user.getId());
         String accessToken = jwtUtils.generateAccessToken(user.getEmail());
-
         response.addHeader("refresh_token", refreshToken);
         response.addHeader("access_token", accessToken);
         response.addHeader("refresh_expiration", jwtUtils.getExpirationDate(refreshToken).toString());
@@ -98,11 +96,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             // Only validate host and port. Let the clients use different paths if they want to
             // So I dont check the path of uri 
             URI authorizedURI = URI.create(authorizedRedirectUri);
-            if (authorizedURI.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
-                    && authorizedURI.getPort() == clientRedirectUri.getPort()) {
-                return true;
-            }
-            return false;
+            return authorizedURI.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
+                    && authorizedURI.getPort() == clientRedirectUri.getPort();
         });
     }
 

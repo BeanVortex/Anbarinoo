@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -19,14 +18,14 @@ import ir.darkdeveloper.anbarinoo.model.UserModel;
 @SpringBootTest
 public class ProductServiceTest {
 
-    private final ProductService productService;
+    // private final ProductService productService;
     private ProductModel product;
     private UserModel user;
 
-    @Autowired
-    public ProductServiceTest(ProductService productService) {
-        this.productService = productService;
-    }
+    // @Autowired
+    // public ProductServiceTest(ProductService productService) {
+    //     this.productService = productService;
+    // }
 
     @BeforeAll
     static void setUp() {
