@@ -5,8 +5,8 @@ services:
     image: 'anbarinoo:latest'
     build:
       context: .
-      network: host
     container_name: app
+    restart: always
     depends_on:
       - db
     environment:
@@ -18,6 +18,18 @@ services:
   db:
     image: 'postgres:13.1-alpine'
     container_name: db
+    restart: always
     environment:
       - POSTGRES_USER=compose-postgres
       - POSTGRES_PASSWORD=compose-postgres
+  nginx:
+    container_name: nginx
+    image: nginx
+    restart: always
+    volumes:
+      - ./conf/etc/nginx/conf.d
+      - ./html:/usr/share/nginx/html
+    ports:
+      - "80:80"
+    links:
+      - app
