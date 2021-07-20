@@ -24,6 +24,7 @@ import io.jsonwebtoken.UnsupportedJwtException;
 @Service
 public class JwtUtils {
 
+    // defined in application.properties or application.yml
     @Value("${jwt.secretkey}")
     private String secret;
 
@@ -38,10 +39,14 @@ public class JwtUtils {
 
     @PostConstruct
     public void initSecret(){
+        // encodes the jwt secret
+        // note that previous token after restarting application won't work
         secret = encoder.encode(secret);
     }
 
+    // generates a unique jwt token
     public String generateRefreshToken(String username, Long userId) {
+        // expires in 21 days
         Date date = new Date(System.currentTimeMillis() + 60 * 60 * 24 * 7 * 3 * 1000);
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS256, secret)
@@ -50,8 +55,9 @@ public class JwtUtils {
                 .claim("user_id", userId).setExpiration(date).compact();
     }
 
+    // Generates access token
     public String generateAccessToken(String username) {
-        Date date = new Date(System.currentTimeMillis() + 60 * 1 * 1000);
+        Date date = new Date(System.currentTimeMillis() + 60 * 1000);
         return Jwts.builder().signWith(SignatureAlgorithm.HS256, secret).setSubject(username).setIssuedAt(new Date())
                 .setExpiration(date).compact();
     }
@@ -65,7 +71,6 @@ public class JwtUtils {
     }
 
     public Boolean isTokenExpired(String token) {
-
         try {
             Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
             return false;
