@@ -1,57 +1,64 @@
-{"properties": [
-  {
-    "name": "jwt.secretkey",
-    "type": "java.lang.String",
-    "description": "start application with '-Djasypt.encryptor.password=ChangeMe' option"
-  },
-  {
-    "name": "oauth2.authorized-redirect-uris",
-    "type": "java.util.List",
-    "description": "A description for 'oauth2.authorized-redirect-uris'"
-  },
-  {
-    "name": "spring.security.oauth2.client.registration.google.client-secret",
-    "type": "java.lang.String",
-    "description": "A description for 'spring.security.oauth2.client.registration.google.client-secret'"
-  },
-  {
-    "name": "spring.security.oauth2.client.registration.google.client-id",
-    "type": "java.lang.String",
-    "description": "A description for 'spring.security.oauth2.client.registration.google.client-id'"
-  },
-  {
-    "name": "spring.security.oauth2.client.registration.google.redirect-uri",
-    "type": "java.lang.String",
-    "description": "A description for 'spring.security.oauth2.client.registration.google.redirect-uri'"
-  },
-  {
-    "name": "spring.security.oauth2.client.registration.google.scope",
-    "type": "java.util.List",
-    "description": "A description for 'spring.security.oauth2.client.registration.google.scope'"
-  },
-  {
-    "name": "user.admin.authorities",
-    "type": "java.util.List",
-    "description": "A description for 'user.admin.authorities'"
-  },
-  {
-    "name": "user.admin.password",
-    "type": "java.lang.String",
-    "description": "A description for 'user.admin.password'"
-  },
-  {
-    "name": "user.admin.username",
-    "type": "java.lang.String",
-    "description": "A description for 'user.admin.username'"
-  },
-  {
-    "name": "user.admin.id",
-    "type": "java.lang.Long",
-    "description": "A description for 'user.admin.id'"
-  },
-  {
-    "name": "user.email-verification-disabled",
-    "type": "java.lang.Boolean",
-    "description": "A description for 'user.email-verification-disabled'"
-  }
-]}
+{
+  "properties": [
+    {
+      "name": "jwt.secretkey",
+      "type": "java.lang.String",
+      "description": "start application with '-Djasypt.encryptor.password=ChangeMe' option"
+    },
+    {
+      "name": "oauth2.authorized-redirect-uris",
+      "type": "java.util.List",
+      "description": "A description for 'oauth2.authorized-redirect-uris'"
+    },
+    {
+      "name": "spring.security.oauth2.client.registration.google.client-secret",
+      "type": "java.lang.String",
+      "description": "A description for 'spring.security.oauth2.client.registration.google.client-secret'"
+    },
+    {
+      "name": "spring.security.oauth2.client.registration.google.client-id",
+      "type": "java.lang.String",
+      "description": "A description for 'spring.security.oauth2.client.registration.google.client-id'"
+    },
+    {
+      "name": "spring.security.oauth2.client.registration.google.redirect-uri",
+      "type": "java.lang.String",
+      "description": "A description for 'spring.security.oauth2.client.registration.google.redirect-uri'"
+    },
+    {
+      "name": "spring.security.oauth2.client.registration.google.scope",
+      "type": "java.util.List",
+      "description": "A description for 'spring.security.oauth2.client.registration.google.scope'"
+    },
+    {
+      "name": "user.admin.authorities",
+      "type": "java.util.List",
+      "description": "A description for 'user.admin.authorities'"
+    },
+    {
+      "name": "user.admin.password",
+      "type": "java.lang.String",
+      "description": "A description for 'user.admin.password'"
+    },
+    {
+      "name": "user.admin.username",
+      "type": "java.lang.String",
+      "description": "A description for 'user.admin.username'"
+    },
+    {
+      "name": "user.admin.id",
+      "type": "java.lang.Long",
+      "description": "A description for 'user.admin.id'"
+    },
+    {
+      "name": "user.email-verification-disabled",
+      "type": "java.lang.Boolean",
+      "description": "A description for 'user.email-verification-disabled'"
+    },
+    {
+      "name": "trust.store",
+      "type": "java.lang.String",
+      "description": "Description for trust.store."
+    }
+  ]
+}

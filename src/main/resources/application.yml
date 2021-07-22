@@ -4,6 +4,7 @@ spring:
     include:
     - user
     - email
+    - server
 ---
 jwt:
   secretkey: RandomSecret
@@ -51,14 +52,10 @@ spring:
     # margin:
     # invert:
 
-server:
-  port: 8080
-  tomcat:
-    uri-encoding: UTF-8
 
 oauth2:
   authorizedRedirectUris:
-    # I wont check /oauth2/redirect so it is usesless
+    # I wont check /oauth2/redirect so it is useless
     #- http://localhost:3000/oauth2/redirect
     - http://localhost:3000
     - myandroidapp://oauth2/redirect
@@ -73,11 +70,6 @@ oauth2:
 #server.ssl.key-alias=tomcat
 #
 #security.require-ssl=true
-
-# jasypt.encryptor.algorithm=PBEWithMD5AndDES
-# jasypt.encryptor.iv-generator-classname=org.jasypt.iv.NoIvGenerator
-
-#docker-secret.bind-path=/run/secrets
 
 #debug=true
 #trace=true
