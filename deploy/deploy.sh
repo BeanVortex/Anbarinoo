@@ -3,11 +3,13 @@ cd ..
 read -p "Run tests? [Y/n]
 " answer
 
+gradle clean
 if [ $answer == "N" ] || [ $answer == "n" ]; then
-    rm -r ./src/test
+    gradle assemble
+else
+  gradle build
 fi
 
-gradle clean build
 cd ./build/libs
 cp $(ls | grep -v "plain") ../../deploy/
 cd ../../deploy
