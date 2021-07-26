@@ -4,8 +4,8 @@ read -p "Run tests? [Y/n]
 " answer
 
 gradle clean
-if [ $answer == "N" ] || [ $answer == "n" ]; then
-    gradle assemble
+if [ "$answer" == "N" ] || [ ""$answer"" == "n" ]; then
+  gradle assemble
 else
   gradle build
 fi
