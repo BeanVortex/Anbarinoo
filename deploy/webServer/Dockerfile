@@ -1,4 +1,5 @@
 FROM ubuntu:latest
+FROM nginx
 RUN apt update -y \
     && apt-get install software-properties-common -y \
     && apt-get update -y \
