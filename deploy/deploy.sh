@@ -3,6 +3,11 @@ cd ..
 read -p "Run tests? [Y/n]
 " answer
 
+FILE=$(ls | grep *.war)
+if [ -f "$FILE" ]; then
+    rm $FILE
+fi
+
 gradle clean
 if [ "$answer" = "N" ] || [ "$answer" = "n" ]; then
   gradle assemble
