@@ -1,19 +1,19 @@
 # The format used for the keystore. It could be set to JKS in case it is a JKS file
 server:
-  ssl:
-    key-store-type: PKCS12
-    # The path to the keystore containing the certificate
-    key-store: classpath:keystore/anbarinoo.p12
-    # The password used to generate the certificate
-    key-store-password: password
-    # The alias mapped to the certificate
-    key-alias: anbarinoo
-    enabled: true
-  port: 8443
+#  ssl:
+#    key-store-type: PKCS12
+#    # The path to the keystore containing the certificate
+#    key-store: classpath:keystore/anbarinoo.p12
+#    # The password used to generate the certificate
+#    key-store-password: password
+#    # The alias mapped to the certificate
+#    key-alias: anbarinoo
+#    enabled: true
+  port: 8080
   tomcat:
     uri-encoding: UTF-8
 
 #trust store location
-trust:
-  store: classpath:keystore/anbarinoo.p12
-  store.password: password
+#trust:
+#  store: classpath:keystore/anbarinoo.p12
+#  store.password: password
