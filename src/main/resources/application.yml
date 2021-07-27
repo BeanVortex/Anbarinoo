@@ -63,13 +63,6 @@ oauth2:
 # docker-secret:
 #   bind-path: /run/secrets
 
-#server.ssl.key-store-type=JKS
-#server.ssl.key-store=classpath:keystore.jks
-#server.ssl.key-store-password=123456
-#server.ssl.key-alias=tomcat
-#
-#security.require-ssl=true
-
 #debug=true
 #trace=true
 

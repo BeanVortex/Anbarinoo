@@ -16,6 +16,6 @@ else
 fi
 
 cd ./build/libs
-cp $(ls | grep -v "plain") ../../deploy/
+cp $(ls | grep -v "plain") ../../deploy/app/
 cd ../../deploy
 docker-compose up -d
