@@ -3,8 +3,7 @@ version: '2'
 services:
   app:
     image: 'anbarinoo:latest'
-    build:
-      context: .
+    build: ./app
     container_name: app
     restart: always
     depends_on:
@@ -26,6 +25,7 @@ services:
       - POSTGRES_PASSWORD=compose-postgres
   nginx:
     container_name: nginx
+    build: ./webServer
     image: nginx
     restart: always
     entrypoint: apt install python3-certbot-nginx
