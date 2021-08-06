@@ -1,6 +1,7 @@
 package ir.darkdeveloper.anbarinoo.util;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -53,6 +54,8 @@ public class UserUtils {
     private final EmailService emailService;
     private final Boolean userEnabled;
 
+    public static final SimpleDateFormat TOKEN_EXPIRATION_FORMAT = new SimpleDateFormat("EE MMM dd yyyy HH:mm:ss");
+
     /**
      * @param model   has username and password (JwtAuth)
      * @param userId  for super admin, pass null
@@ -99,13 +102,16 @@ public class UserUtils {
 
         refreshService.saveToken(rModel);
 
-        //SimpleDateFormat dateFormat = new SimpleDateFormat("EE MMM dd yyyy HH:mm:ss");
-        // var refreshDate = dateFormat.format();
-        // var accessDate = dateFormat.format();
+        setupHeader(response, accessToken, refreshToken);
+    }
+
+    public void setupHeader(HttpServletResponse response, String accessToken, String refreshToken) {
+        var refreshDate = TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken).toString());
+        var accessDate = TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken).toString());
         response.addHeader("refresh_token", refreshToken);
         response.addHeader("access_token", accessToken);
-        response.addHeader("refresh_expiration", jwtUtils.getExpirationDate(refreshToken).toString());
-        response.addHeader("access_expiration", jwtUtils.getExpirationDate(accessToken).toString());
+        response.addHeader("refresh_expiration", refreshDate);
+        response.addHeader("access_expiration", accessDate);
     }
 
     public void validateUserData(UserModel model) throws IOException {

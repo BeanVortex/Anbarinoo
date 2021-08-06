@@ -10,6 +10,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ir.darkdeveloper.anbarinoo.util.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
@@ -29,19 +30,22 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final OAuth2RequestRepo oAuth2RequestRepo;
     private final UserService userService;
     private final OAuth2Properties oAuth2Properties;
+    private final UserUtils userUtils;
 
     @Autowired
     public OAuth2SuccessHandler(@Lazy JwtUtils jwtUtils, OAuth2RequestRepo oAuth2RequestRepo,
-            @Lazy UserService userService, OAuth2Properties oAuth2Properties) {
+                                @Lazy UserService userService, OAuth2Properties oAuth2Properties,
+                                UserUtils userUtils) {
         this.jwtUtils = jwtUtils;
         this.oAuth2RequestRepo = oAuth2RequestRepo;
         this.userService = userService;
         this.oAuth2Properties = oAuth2Properties;
+        this.userUtils = userUtils;
     }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-            Authentication authentication) throws IOException {
+                                        Authentication authentication) throws IOException {
         String targetUrl = determineTargetUrl(request, response, authentication);
 
         if (response.isCommitted()) {
@@ -55,7 +59,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     @Override
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response,
-            Authentication authentication) {
+                                        Authentication authentication) {
 
         Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue);
@@ -74,13 +78,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private void headerSetup(HttpServletResponse response, Authentication authentication) {
         UserModel user = (UserModel) userService.loadUserByUsername(authentication.getName());
-
         String refreshToken = jwtUtils.generateRefreshToken(user.getEmail(), user.getId());
         String accessToken = jwtUtils.generateAccessToken(user.getEmail());
-        response.addHeader("refresh_token", refreshToken);
-        response.addHeader("access_token", accessToken);
-        response.addHeader("refresh_expiration", jwtUtils.getExpirationDate(refreshToken).toString());
-        response.addHeader("access_expiration", jwtUtils.getExpirationDate(accessToken).toString());
+
+        userUtils.setupHeader(response, accessToken, refreshToken);
     }
 
     private void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {

@@ -6,7 +6,10 @@ import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -17,7 +20,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.event.annotation.BeforeTestMethod;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -30,6 +35,7 @@ class ChequeServiceTest {
 
     private UserModel user;
     private ChequeModel cheque;
+    private HttpServletRequest request;
 
     private final ChequeService chequeService;
     private final UserService userService;
@@ -69,6 +75,9 @@ class ChequeServiceTest {
         cheque.setIssuedAt(LocalDateTime.now());
         cheque.setValidTill(LocalDateTime.now().plusDays(5));
 
+        request = mock(HttpServletRequest.class);
+
+
     }
 
     @Test
@@ -77,9 +86,9 @@ class ChequeServiceTest {
         HttpServletResponse response = mock(HttpServletResponse.class);
         userService.signUpUser(user, response);
         UserModel fetchedModel = (UserModel) userService.loadUserByUsername("email");
-        Map<String, String> headers = new HashMap<>();
-        for (String key : response.getHeaderNames())
-            headers.put(key, response.getHeader(key));
+        jwtUtils.generateRefreshToken(user.getEmail(), user.getId());
+
+        assertThat(response.containsHeader("refresh_token")).isTrue();
 
         assertThat(fetchedModel.getEmail()).isEqualTo(user.getEmail());
         assertThat(fetchedModel.getEnabled()).isEqualTo(true);
@@ -92,6 +101,11 @@ class ChequeServiceTest {
         cheque.setUser(user);
         chequeService.saveCheque(cheque);
 //        chequeService.getCheque()
+    }
+
+
+    void setUpHeader(){
+
     }
 
 

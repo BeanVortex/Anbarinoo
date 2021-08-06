@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,7 +37,7 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain)
             throws ServletException, IOException {
 
         String refreshToken = request.getHeader("refresh_token");
@@ -49,7 +50,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             authenticateUser(username);
 
-            setUpHeader(response, refreshToken, accessToken, username, userId);
+            setUpHeader(response, accessToken, username, userId);
         }
         filterChain.doFilter(request, response);
     }
@@ -66,10 +67,10 @@ public class JwtFilter extends OncePerRequestFilter {
         }
     }
 
-    private void setUpHeader(HttpServletResponse response, String refreshToken, String accessToken, String username,
-            Long userId) {
+    private void setUpHeader(HttpServletResponse response, String accessToken, String username,
+                             Long userId) {
 
-        String newAccessToken = accessToken;
+        String newAccessToken;
 
         // if this if didn't execute it means the access token is still valid
         if (jwtUtils.isTokenExpired(accessToken)) {
@@ -84,7 +85,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 refreshModel.setId(refreshService.getIdByUserId(userId));
                 // db query
                 refreshService.saveToken(refreshModel);
-                response.addHeader("access_expiration", jwtUtils.getExpirationDate(newAccessToken).toString());
+                var accessExpiration = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(newAccessToken).toString());
+                response.addHeader("access_expiration", accessExpiration);
                 response.addHeader("access_token", newAccessToken);
             } else
                 //if stored token is not equal with user send token, it will return 403
