@@ -35,7 +35,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Autowired
     public OAuth2SuccessHandler(@Lazy JwtUtils jwtUtils, OAuth2RequestRepo oAuth2RequestRepo,
                                 @Lazy UserService userService, OAuth2Properties oAuth2Properties,
-                                UserUtils userUtils) {
+                                @Lazy UserUtils userUtils) {
         this.jwtUtils = jwtUtils;
         this.oAuth2RequestRepo = oAuth2RequestRepo;
         this.userService = userService;

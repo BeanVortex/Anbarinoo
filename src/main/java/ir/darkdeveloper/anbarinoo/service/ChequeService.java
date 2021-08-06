@@ -25,6 +25,7 @@ import javax.transaction.Transactional;
 import java.sql.SQLDataException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ChequeService {
@@ -50,8 +51,9 @@ public class ChequeService {
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ChequeModel saveCheque(ChequeModel cheque) {
+    public ChequeModel saveCheque(ChequeModel cheque, HttpServletRequest req) {
         try {
+            userUtils.checkCurrentUserIsTheSameAuthed(req);
             return repo.save(cheque);
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
@@ -90,8 +92,9 @@ public class ChequeService {
     public ChequeModel getCheque(Long id, HttpServletRequest req) {
         try {
             userUtils.checkCurrentUserIsTheSameAuthed(req);
-            if (repo.findById(id).isPresent())
-                return repo.findById(id).get();
+            Optional<ChequeModel> cheque = repo.findById(id);
+            if (cheque.isPresent())
+                return cheque.get();
         } catch (Exception e) {
             throw new BadRequestException(e.getLocalizedMessage());
         }

@@ -106,8 +106,9 @@ public class UserUtils {
     }
 
     public void setupHeader(HttpServletResponse response, String accessToken, String refreshToken) {
-        var refreshDate = TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken).toString());
-        var accessDate = TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken).toString());
+        var a = jwtUtils.getExpirationDate(refreshToken).toString();
+        var refreshDate = TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
+        var accessDate = TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
         response.addHeader("refresh_token", refreshToken);
         response.addHeader("access_token", accessToken);
         response.addHeader("refresh_expiration", refreshDate);
@@ -194,7 +195,10 @@ public class UserUtils {
     public void checkCurrentUserIsTheSameAuthed(HttpServletRequest req) {
         Long userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!repo.findUserById(userId).getUserName().equals(auth.getName()))
+        var authName = auth.getName();
+        var userName = repo.findUserById(userId).getUserName();
+        var userEmail = repo.findUserById(userId).getEmail();
+        if (!(userName.equals(authName) || userEmail.equals(authName)))
             throw new ForbiddenException("You can't delete this cheque. It does not belong to you");
     }
 

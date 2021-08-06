@@ -31,8 +31,8 @@ public class ChequeController {
     }
 
     @PostMapping("/save/")
-    public ResponseEntity<?> saveCheque(@RequestBody ChequeModel cheque) {
-        return ResponseEntity.ok().body(service.saveCheque(cheque));
+    public ResponseEntity<?> saveCheque(@RequestBody ChequeModel cheque, HttpServletRequest req) {
+        return ResponseEntity.ok().body(service.saveCheque(cheque, req));
     }
 
     @PostMapping("/update/")
