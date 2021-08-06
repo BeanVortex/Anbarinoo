@@ -1,5 +1,6 @@
 package ir.darkdeveloper.anbarinoo.model;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import lombok.Data;
 public class UserRoles implements Serializable {
     
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id

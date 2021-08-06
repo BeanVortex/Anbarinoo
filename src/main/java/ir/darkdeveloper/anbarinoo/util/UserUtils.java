@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
@@ -106,7 +105,6 @@ public class UserUtils {
     }
 
     public void setupHeader(HttpServletResponse response, String accessToken, String refreshToken) {
-        var a = jwtUtils.getExpirationDate(refreshToken).toString();
         var refreshDate = TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
         var accessDate = TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
         response.addHeader("refresh_token", refreshToken);

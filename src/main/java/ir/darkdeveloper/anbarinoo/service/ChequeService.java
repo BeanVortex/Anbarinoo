@@ -1,31 +1,25 @@
 package ir.darkdeveloper.anbarinoo.service;
 
-import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
-import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
-import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
-import ir.darkdeveloper.anbarinoo.exception.NoContentException;
-import ir.darkdeveloper.anbarinoo.repository.UserRepo;
-import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import ir.darkdeveloper.anbarinoo.util.UserUtils;
-import javassist.NotFoundException;
+import java.util.List;
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
+
 import org.hibernate.exception.DataException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
+import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
+import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.ChequeModel;
 import ir.darkdeveloper.anbarinoo.repository.ChequeRepo;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
-import java.sql.SQLDataException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Optional;
+import ir.darkdeveloper.anbarinoo.util.UserUtils;
+import javassist.NotFoundException;
 
 @Service
 public class ChequeService {
@@ -75,7 +69,7 @@ public class ChequeService {
     }
 
     @Transactional
-    @PreAuthorize("authentication.name.equals(@userService.getAdminUser().getUsername())")
+    @PreAuthorize("authentication.name.equals(@userService.getAdminUser().getUsername()) || #id != null")
     public ResponseEntity<?> deleteCheque(Long id, HttpServletRequest req) {
         try {
             userUtils.checkCurrentUserIsTheSameAuthed(req);
