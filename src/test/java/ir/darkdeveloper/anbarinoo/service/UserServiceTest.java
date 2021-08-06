@@ -47,7 +47,7 @@ public class UserServiceTest {
     @BeforeEach
     void userSetup() {
         user = new UserModel();
-        user.setEmail("email");
+        user.setEmail("email@mail.com");
         user.setAddress("address");
         user.setDescription("desc");
         user.setUserName("user n");
@@ -65,14 +65,14 @@ public class UserServiceTest {
     @Test
     @Order(1)
     @WithMockUser(username = "anonymousUser")
-    void signUp() throws IOException, Exception {
+    void signUp() throws  Exception {
         HttpServletResponse response = mock(HttpServletResponse.class);
         service.signUpUser(user, response);
     }
 
     @Test
     @Order(2)
-    @WithMockUser(username = "email")
+    @WithMockUser(username = "email@mail.com")
     void updateUserWithNullImages() {
         user.setDescription("dex");
         user.setShopName("shop1");
@@ -84,7 +84,7 @@ public class UserServiceTest {
 
     @Test
     @Order(3)
-    @WithMockUser(username = "email")
+    @WithMockUser(username = "email@mail.com")
     void updateUserWithImages() {
         user.setDescription("dex");
         user.setShopName("shop1");
@@ -93,16 +93,16 @@ public class UserServiceTest {
     }
 
     @Test
-    @WithMockUser(username = "email")
-    //@Order(5)
-    @Disabled
+    @WithMockUser(username = "email@mail.com")
+    @Order(5)
+    //@Disabled
     void deleteUser() {
         service.deleteUser(user);
     }
 
     @Test
     @Order(4)
-    @WithMockUser(username = "email", authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void getUserInfo(){
         UserModel model = service.getUserInfo(user.getId());
         assertNull(model);

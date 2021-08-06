@@ -29,13 +29,11 @@ import java.util.List;
 public class ChequeService {
 
     private final ChequeRepo repo;
-    private final JwtUtils jwtUtils;
     private final UserUtils userUtils;
 
     @Autowired
-    public ChequeService(ChequeRepo repo, JwtUtils jwtUtils, UserUtils userUtils) {
+    public ChequeService(ChequeRepo repo, UserUtils userUtils) {
         this.repo = repo;
-        this.jwtUtils = jwtUtils;
         this.userUtils = userUtils;
     }
 

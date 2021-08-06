@@ -3,6 +3,8 @@ package ir.darkdeveloper.anbarinoo.util;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -62,7 +64,7 @@ public class UserUtils {
 
         var user = repo.findByEmailOrUsername(username);
 
-        UsernamePasswordAuthenticationToken auth = null;
+        UsernamePasswordAuthenticationToken auth;
         if (rawPass != null)
             auth = new UsernamePasswordAuthenticationToken(username, rawPass);
         else
@@ -109,6 +111,13 @@ public class UserUtils {
     public void validateUserData(UserModel model) throws IOException {
         model.setRoles(roleService.getRole("USER"));
 
+        var VALID_EMAIL_REGEX =
+                Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+
+        var matcher = VALID_EMAIL_REGEX.matcher(model.getEmail());
+        if (!matcher.find())
+            throw new EmailNotValidException("Email is not correct");
+
         if (model.getUserName() == null || model.getUserName().trim().equals(""))
             model.setUserName(model.getEmail().split("@")[0]);
 
@@ -118,13 +127,14 @@ public class UserUtils {
         if (model.getPasswordRepeat() == null || !model.getPassword().equals(model.getPasswordRepeat()))
             throw new PasswordException("Passwords do not match!");
 
+
         ioUtils.handleUserImages(model, path, this);
 
         model.setPassword(encoder.encode(model.getPassword()));
         model.setProvider(AuthProvider.LOCAL);
     }
 
-    public void signupValidation(UserModel model, HttpServletResponse response) throws IOException, Exception {
+    public void signupValidation(UserModel model, HttpServletResponse response) throws Exception {
         if (model.getId() != null)
             throw new ForbiddenException("You are not allowed to sign up! :|");
 
@@ -156,7 +166,7 @@ public class UserUtils {
     public UserDetails loadUserByUsername(String username) {
         if (username.equals(adminUser.getUsername())) {
             GrantedAuthority[] authorities = (GrantedAuthority[]) adminUser.getAuthorities().toArray();
-            return (UserDetails) User.builder().username(adminUser.getUsername())
+            return  User.builder().username(adminUser.getUsername())
                     .password(encoder.encode(adminUser.getPassword())).authorities(authorities).build();
         }
         return repo.findByEmailOrUsername(username);

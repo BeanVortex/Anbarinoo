@@ -1,8 +1,8 @@
 plugins {
-	id 'org.springframework.boot' version '2.5.0'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'java'
-	id 'war'
+    id 'org.springframework.boot' version '2.5.0'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+    id 'war'
 }
 
 group = 'ir.darkdeveloper'
@@ -10,9 +10,9 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '16'
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 jar.into('static') {
@@ -20,35 +20,38 @@ jar.into('static') {
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-tomcat:2.5.2'
-	implementation 'org.springframework.boot:spring-boot-configuration-processor:2.5.2'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-tomcat:2.5.2'
+    implementation 'org.springframework.boot:spring-boot-configuration-processor:2.5.2'
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
-	implementation "com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3"
+    implementation "com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3"
     implementation "io.springfox:springfox-boot-starter:3.0.0"
-	implementation 'org.springframework.security:spring-security-oauth2-jose:5.5.0'
-	implementation 'org.springframework.security:spring-security-oauth2-client:5.5.0'
-	implementation "org.springframework.boot:spring-boot-starter-mail:2.5.0"
-	implementation "io.springfox:springfox-boot-starter:3.0.0"
-	implementation "io.springfox:springfox-swagger2:3.0.0"
-	implementation 'io.springfox:springfox-swagger-ui:3.0.0'
-	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'org.postgresql:postgresql'
-	//annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-	annotationProcessor 'org.projectlombok:lombok'
-	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
+    implementation 'org.springframework.security:spring-security-oauth2-jose:5.5.0'
+    implementation 'org.springframework.security:spring-security-oauth2-client:5.5.0'
+    implementation "org.springframework.boot:spring-boot-starter-mail:2.5.0"
+    implementation "io.springfox:springfox-boot-starter:3.0.0"
+    implementation "io.springfox:springfox-swagger2:3.0.0"
+    implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'org.postgresql:postgresql'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+    testImplementation "org.assertj:assertj-core:3.20.2"
+    testImplementation "com.h2database:h2:1.4.200"
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
 }
 
 test {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
