@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,11 +52,9 @@ public class UserUtils {
     private final Boolean userEnabled;
 
     /**
-     * 
-     * @param model has username and password (JwtAuth)
-     * @param userId for super admin, pass null
+     * @param model   has username and password (JwtAuth)
+     * @param userId  for super admin, pass null
      * @param rawPass for super admin, pass null
-     * @param response
      */
     public void authenticateUser(JwtAuth model, Long userId, String rawPass, HttpServletResponse response) {
         String username = model.getUsername();
@@ -173,6 +174,13 @@ public class UserUtils {
         refreshService.deleteTokenByUserId(model2.getId());
     }
 
+    public void checkCurrentUserIsTheSameAuthed(HttpServletRequest req) {
+        Long userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (!repo.findUserById(userId).getUserName().equals(auth.getName()))
+            throw new ForbiddenException("You can't delete this cheque. It does not belong to you");
+    }
+
     private void sendEmail(UserModel model) {
         String token = UUID.randomUUID().toString();
         VerificationModel emailVerify = new VerificationModel(token, model, LocalDateTime.now().plusMinutes(20));
@@ -182,5 +190,6 @@ public class UserUtils {
         emailService.send(model.getEmail(), emailService.buildEmail(model.getName(), link));
 
     }
+
 
 }

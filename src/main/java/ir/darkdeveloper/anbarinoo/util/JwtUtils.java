@@ -38,7 +38,7 @@ public class JwtUtils {
     }
 
     @PostConstruct
-    public void initSecret(){
+    public void initSecret() {
         // encodes the jwt secret
         // note that previous token after restarting application won't work
         secret = encoder.encode(secret);
@@ -66,6 +66,10 @@ public class JwtUtils {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
     }
 
+    public Long getUserId(String refreshToken) {
+        return ((Integer) getAllClaimsFromToken(refreshToken).get("user_id")).longValue();
+    }
+
     public Claims getAllClaimsFromToken(String token) throws JwtException {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
     }
@@ -74,18 +78,18 @@ public class JwtUtils {
         try {
             Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
             return false;
-          } catch (SignatureException e) {
+        } catch (SignatureException e) {
             logger.error("Invalid JWT signature: {}", e.getMessage());
-          } catch (MalformedJwtException e) {
+        } catch (MalformedJwtException e) {
             logger.error("Invalid JWT token: {}", e.getMessage());
-          } catch (ExpiredJwtException e) {
+        } catch (ExpiredJwtException e) {
             logger.error("JWT token is expired: {}", e.getMessage());
-          } catch (UnsupportedJwtException e) {
+        } catch (UnsupportedJwtException e) {
             logger.error("JWT token is unsupported: {}", e.getMessage());
-          } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             logger.error("JWT claims string is empty: {}", e.getMessage());
-          }
-          return true;      
+        }
+        return true;
     }
 
     public Date getExpirationDate(String token) throws JwtException {

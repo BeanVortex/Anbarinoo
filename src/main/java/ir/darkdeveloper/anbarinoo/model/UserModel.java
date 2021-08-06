@@ -7,19 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -100,6 +88,16 @@ public class UserModel implements UserDetails, OAuth2User {
 
     private String description;
 
+    @ManyToOne
+    @JoinColumn(name = "financial_id")
+    private FinancialModel financial;
+
+    @OneToMany(mappedBy = "user")
+    private List<DebtOrDemandModel> debtOrDemand;
+
+    @OneToMany(mappedBy = "user")
+    private List<ChequeModel> cheques;
+
     //mappedBy is read-only. can't add product while creating user
     @OneToMany(mappedBy = "user")
     private List<ProductModel> products;
@@ -121,7 +119,6 @@ public class UserModel implements UserDetails, OAuth2User {
     public String getUsername() {
         return email;
     }
-    
 
     public String getUserName() {
         return userName;
@@ -165,7 +162,6 @@ public class UserModel implements UserDetails, OAuth2User {
     public boolean isEnabled() {
         return enabled;
     }
-
 
     @Override
     public Map<String, Object> getAttributes() {
