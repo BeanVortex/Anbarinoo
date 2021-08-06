@@ -131,6 +131,7 @@ public class UserUtils {
         ioUtils.handleUserImages(model, path, this);
 
         model.setPassword(encoder.encode(model.getPassword()));
+        model.setPasswordRepeat("");
         model.setProvider(AuthProvider.LOCAL);
     }
 
@@ -166,7 +167,7 @@ public class UserUtils {
     public UserDetails loadUserByUsername(String username) {
         if (username.equals(adminUser.getUsername())) {
             GrantedAuthority[] authorities = (GrantedAuthority[]) adminUser.getAuthorities().toArray();
-            return  User.builder().username(adminUser.getUsername())
+            return User.builder().username(adminUser.getUsername())
                     .password(encoder.encode(adminUser.getPassword())).authorities(authorities).build();
         }
         return repo.findByEmailOrUsername(username);

@@ -3,6 +3,7 @@ package ir.darkdeveloper.anbarinoo.service;
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
 import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
+import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.repository.UserRepo;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils;
@@ -38,10 +39,10 @@ public class ChequeService {
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public List<ChequeModel> getCheques(Long id, HttpServletRequest req) {
+    public List<ChequeModel> getChequesByUserId(Long userId, HttpServletRequest req) {
         try {
             userUtils.checkCurrentUserIsTheSameAuthed(req);
-            return repo.findChequeModelsByUser_Id(id);
+            return repo.findChequeModelsByUser_Id(userId);
         } catch (Exception e) {
             throw new BadRequestException(e.getLocalizedMessage());
         }
@@ -83,6 +84,18 @@ public class ChequeService {
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
         }
+    }
+
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    public ChequeModel getCheque(Long id, HttpServletRequest req) {
+        try {
+            userUtils.checkCurrentUserIsTheSameAuthed(req);
+            if (repo.findById(id).isPresent())
+                return repo.findById(id).get();
+        } catch (Exception e) {
+            throw new BadRequestException(e.getLocalizedMessage());
+        }
+        throw new NoContentException("Data you are looking for is not found");
     }
 
 }

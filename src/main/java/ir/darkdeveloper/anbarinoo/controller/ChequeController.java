@@ -20,9 +20,14 @@ public class ChequeController {
         this.service = service;
     }
 
+    @GetMapping("/user/{id}/")
+    public ResponseEntity<?> getChequesByUserId(@PathVariable Long id, HttpServletRequest req) {
+        return ResponseEntity.ok().body(service.getChequesByUserId(id, req));
+    }
+
     @GetMapping("/{id}/")
-    public ResponseEntity<?> getCheques(@PathVariable Long id, HttpServletRequest req) {
-        return ResponseEntity.ok().body(service.getCheques(id, req));
+    public ResponseEntity<?> getCheque(@PathVariable Long id, HttpServletRequest req) {
+        return ResponseEntity.ok().body(service.getCheque(id, req));
     }
 
     @PostMapping("/save/")

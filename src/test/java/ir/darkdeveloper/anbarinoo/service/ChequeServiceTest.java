@@ -1,6 +1,8 @@
 package ir.darkdeveloper.anbarinoo.service;
 
+import ir.darkdeveloper.anbarinoo.model.ChequeModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
+import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,18 +19,27 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @SpringBootTest
 class ChequeServiceTest {
 
     private UserModel user;
+    private ChequeModel cheque;
 
+    private final ChequeService chequeService;
     private final UserService userService;
+    private final JwtUtils jwtUtils;
 
     @Autowired
-    ChequeServiceTest(UserService userService) {
+    ChequeServiceTest(ChequeService chequeService, UserService userService, JwtUtils jwtUtils) {
+        this.chequeService = chequeService;
         this.userService = userService;
+        this.jwtUtils = jwtUtils;
     }
 
     @BeforeAll
@@ -46,10 +57,18 @@ class ChequeServiceTest {
         user.setEmail("email@mail.com");
         user.setAddress("address");
         user.setDescription("desc");
-//        user.setUserName("user n");
         user.setPassword("pass1");
         user.setPasswordRepeat("pass1");
         user.setEnabled(false);
+
+        cheque = new ChequeModel();
+        cheque.setAmount(new BigDecimal("554.55"));
+        cheque.setIsDebt(true);
+        cheque.setNameOf("DD");
+        cheque.setPayTo("GG");
+        cheque.setIssuedAt(LocalDateTime.now());
+        cheque.setValidTill(LocalDateTime.now().plusDays(5));
+
     }
 
     @Test
@@ -58,6 +77,10 @@ class ChequeServiceTest {
         HttpServletResponse response = mock(HttpServletResponse.class);
         userService.signUpUser(user, response);
         UserModel fetchedModel = (UserModel) userService.loadUserByUsername("email");
+        Map<String, String> headers = new HashMap<>();
+        for (String key : response.getHeaderNames())
+            headers.put(key, response.getHeader(key));
+
         assertThat(fetchedModel.getEmail()).isEqualTo(user.getEmail());
         assertThat(fetchedModel.getEnabled()).isEqualTo(true);
         assertThat(fetchedModel.getUserName()).isEqualTo("email");
@@ -66,7 +89,9 @@ class ChequeServiceTest {
     @Test
     @WithMockUser(username = "email@mail.com")
     void saveCheque() {
-
+        cheque.setUser(user);
+        chequeService.saveCheque(cheque);
+//        chequeService.getCheque()
     }
 
 
