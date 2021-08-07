@@ -117,8 +117,10 @@ public class IOUtils {
             fileNames.add(saveFile(file, PRODUCT_IMAGE_PATH));
 
 
-        if (!fileNames.isEmpty())
-            product.getImages().addAll(fileNames);
+        if (!fileNames.isEmpty()) {
+//            product.getImages().addAll(fileNames);
+            product.setImages(fileNames);
+        }
 
     }
 

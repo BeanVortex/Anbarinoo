@@ -62,12 +62,10 @@ public record ProductServiceTest(ProductService productService,
         user.setPassword("pass1");
         user.setPasswordRepeat("pass1");
         user.setEnabled(true);
-        MockMultipartFile file1 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!".getBytes());
-        MockMultipartFile file2 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!".getBytes());
-        user.setProfileFile(file1);
-        user.setShopFile(file2);
+//        MockMultipartFile file1 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+//                "Hello, World!".getBytes());
+//        MockMultipartFile file2 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+//                "Hello, World!".getBytes());
         product = new ProductModel();
         product.setName("name");
         product.setDescription("description");
@@ -76,6 +74,11 @@ public record ProductServiceTest(ProductService productService,
         product.setSellPrice(180d);
         product.setSoldCount(13);
         product.setTotalCount(50);
+        MockMultipartFile file3 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!".getBytes());
+        MockMultipartFile file4 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!".getBytes());
+        product.setFiles(Arrays.asList(file3, file4));
         request = mock(HttpServletRequest.class);
         System.out.println("ProductServiceTest.setUp");
     }
@@ -149,6 +152,15 @@ public record ProductServiceTest(ProductService productService,
         product.setSellPrice(5d);
         product.setSoldCount(6);
         product.setTotalCount(10);
+        MockMultipartFile file3 = new MockMultipartFile("file", "helladsfo.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!".getBytes());
+        MockMultipartFile file4 = new MockMultipartFile("file", "heladsflo.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!".getBytes());
+        MockMultipartFile file5 = new MockMultipartFile("file", "heladsflo.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!".getBytes());
+//        MockMultipartFile file6 = new MockMultipartFile("file", "heladsflo.jpg", MediaType.IMAGE_JPEG_VALUE,
+//                "Hello, World!".getBytes());
+        product.setFiles(Arrays.asList(file3, file4, file5/*, file6*/));
         product.setCategory(electronics);
         productService.updateProduct(product, request);
         getProduct();
@@ -171,6 +183,24 @@ public record ProductServiceTest(ProductService productService,
         });
     }
 
+    @Test
+    @Order(7)
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    void getOneUserProducts() {
+        var pageable = PageRequest.of(0, 8);
+        var products = productService.getOneUserProducts(user.getId(), pageable, request);
+        products.getContent().forEach(p -> {
+            assertThat(p.getName()).isEqualTo(product.getName());
+            assertThat(p.getBoughtCount()).isEqualTo(product.getBoughtCount());
+        });
+    }
+
+    @Test
+    @Order(8)
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    void deleteProduct() {
+        productService.deleteProduct(product.getId(), request);
+    }
 
     //should return the object; data is being removed
     private HttpServletRequest setUpHeader() {

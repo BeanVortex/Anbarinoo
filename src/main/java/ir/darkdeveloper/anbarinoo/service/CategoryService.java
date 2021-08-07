@@ -2,6 +2,7 @@ package ir.darkdeveloper.anbarinoo.service;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +28,13 @@ public class CategoryService {
     public CategoryModel saveCategory(CategoryModel model) {
         return repo.save(model);
     }
+
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
     public List<CategoryModel> findByNameContains(String name) {
         return repo.findByNameContains(name);
     }
-    
+
+    public CategoryModel getCategoryById(Long id, HttpServletRequest request) {
+        return repo.findById(id).get();
+    }
 }
