@@ -71,6 +71,7 @@ public class ProductService {
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    @Transactional
     public ProductModel getProduct(Long productId, HttpServletRequest req) {
         try {
             userUtils.checkCurrentUserIsTheSameAuthed(req);

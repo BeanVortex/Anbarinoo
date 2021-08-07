@@ -28,19 +28,16 @@ public class CategoryController {
 
 
     @PostMapping("/save/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
     public ResponseEntity<CategoryModel> saveCategory(@ModelAttribute CategoryModel model) {
         return ResponseEntity.ok().body(service.saveCategory(model));
     }
 
     @PostMapping("/search/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
     public ResponseEntity<List<CategoryModel>> findByNameContains(@RequestParam String name) {
         return ResponseEntity.ok().body(service.findByNameContains(name));
     }
 
     @PostMapping("/update/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
     public ResponseEntity<CategoryModel> updateCategory(@ModelAttribute CategoryModel model) {
         return ResponseEntity.ok().body(service.saveCategory(model));
     }

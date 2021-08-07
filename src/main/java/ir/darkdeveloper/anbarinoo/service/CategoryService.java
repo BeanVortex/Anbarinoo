@@ -5,6 +5,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
@@ -22,10 +23,11 @@ public class CategoryService {
 
 
     @Transactional
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
     public CategoryModel saveCategory(CategoryModel model) {
         return repo.save(model);
     }
-
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
     public List<CategoryModel> findByNameContains(String name) {
         return repo.findByNameContains(name);
     }

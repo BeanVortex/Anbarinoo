@@ -86,6 +86,8 @@ public class IOUtils {
 
         List<String> fileNames = new ArrayList<>();
         List<MultipartFile> files = product.getFiles();
+        if (files == null || files.size() == 0)
+            return;
 
 
         if (prevProduct.isPresent()) {

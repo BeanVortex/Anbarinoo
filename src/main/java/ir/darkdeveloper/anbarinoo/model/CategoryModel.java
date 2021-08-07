@@ -1,23 +1,20 @@
 package ir.darkdeveloper.anbarinoo.model;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @Table(name = "categories")
+@NoArgsConstructor
 public class CategoryModel {
-    
+
     @Id
     @GeneratedValue
     private Long id;
@@ -25,8 +22,24 @@ public class CategoryModel {
     @Column(nullable = false)
     private String name;
 
-    @ManyToMany
-    @JoinColumn(name = "sub_category_id")
-    private List<CategoryModel> subCategory;
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    private CategoryModel parent;
 
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<CategoryModel> children = new ArrayList<>();
+
+    public CategoryModel(String name) {
+        this.name = name;
+    }
+
+    public CategoryModel(String name, CategoryModel parent) {
+        this.name = name;
+        this.parent = parent;
+    }
+
+    public void addChild(CategoryModel children) {
+        this.children.add(children);
+    }
 }
+
