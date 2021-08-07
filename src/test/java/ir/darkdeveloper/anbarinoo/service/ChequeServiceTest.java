@@ -68,8 +68,8 @@ public record ChequeServiceTest(ChequeService chequeService,
 
 
     @Test
-    @WithMockUser(username = "anonymousUser")
     @Order(1)
+    @WithMockUser(username = "anonymousUser")
     void saveUser() throws Exception {
         HttpServletResponse response = mock(HttpServletResponse.class);
         userService.signUpUser(user, response);
@@ -82,8 +82,8 @@ public record ChequeServiceTest(ChequeService chequeService,
     }
 
     @Test
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     @Order(2)
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void saveCheque() {
         System.out.println("saveCheque");
         UserModel userModel = new UserModel();
@@ -93,8 +93,8 @@ public record ChequeServiceTest(ChequeService chequeService,
     }
 
     @Test
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     @Order(3)
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void getCheque() {
         System.out.println("getCheque");
         ChequeModel fetchedCheque = chequeService.getCheque(cheque.getId(), request);
@@ -102,8 +102,8 @@ public record ChequeServiceTest(ChequeService chequeService,
     }
 
     @Test
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     @Order(4)
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void getChequesByUserId() {
         System.out.println("getChequesByUserId");
         List<ChequeModel> cheques = chequeService.getChequesByUserId(user.getId(), request);
@@ -114,17 +114,27 @@ public record ChequeServiceTest(ChequeService chequeService,
     }
 
     @Test
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     @Order(5)
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void updateCheque() {
         System.out.println("updateCheque");
         cheque.setIsCheckedOut(true);
-        chequeService.updateCheque(cheque, request);
+        cheque = chequeService.updateCheque(cheque, request);
+        assertThat(cheque.getIsCheckedOut()).isTrue();
     }
 
     @Test
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     @Order(6)
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    void findByPayToContains() {
+        System.out.println("findByPayToContains");
+        List<ChequeModel> cheques = chequeService.findByPayToContains(cheque.getPayTo(), request);
+        assertThat(cheques.get(0)).isNotNull();
+    }
+
+    @Test
+    @Order(7)
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void deleteCheque() {
         System.out.println("deleteCheque");
         chequeService.deleteCheque(cheque.getId(), request);
