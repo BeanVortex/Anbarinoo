@@ -5,9 +5,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
+import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
+import ir.darkdeveloper.anbarinoo.exception.NoContentException;
+import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,11 +19,14 @@ import ir.darkdeveloper.anbarinoo.model.UserModel;
 @Component
 public class IOUtils {
 
+    private static final String USER_IMAGE_PATH = "profile_images/";
+    private static final String PRODUCT_IMAGE_PATH = "product_images/";
+
     /**
      * @param file MultipartFile
      * @param path after user/
      */
-    public String saveFile(MultipartFile file, String path) throws IOException {
+    private String saveFile(MultipartFile file, String path) throws IOException {
         if (file != null) {
             // first it may not upload and save file in the path. should create static/img
             // folder in resources
@@ -40,11 +45,11 @@ public class IOUtils {
         return ResourceUtils.getFile("classpath:static/user/" + path).getAbsolutePath() + File.separator + fileName;
     }
 
-    public void handleUserImages(UserModel model, String path, UserUtils utils)
+    public void handleUserImage(UserModel model, UserUtils utils)
             throws IOException {
         UserModel preModel = (UserModel) utils.loadUserByUsername(model.getEmail());
 
-        deleteUserImages(preModel, path);
+        deleteUserImages(preModel);
 
         if (model.getProfileFile() != null && preModel != null && preModel.getProfileImage() != null)
             model.setProfileImage(preModel.getProfileImage());
@@ -52,27 +57,86 @@ public class IOUtils {
         if (model.getShopFile() != null && preModel != null && preModel.getShopImage() != null)
             model.setShopImage(preModel.getShopImage());
 
-        String profileFileName = saveFile(model.getProfileFile(), path);
+        String profileFileName = saveFile(model.getProfileFile(), USER_IMAGE_PATH);
         if (profileFileName != null)
             model.setProfileImage(profileFileName);
 
-        String shopFileName = saveFile(model.getShopFile(), path);
+        String shopFileName = saveFile(model.getShopFile(), USER_IMAGE_PATH);
         if (shopFileName != null)
             model.setShopImage(shopFileName);
     }
 
-    public void deleteUserImages(UserModel model, String path) throws IOException {
+    public void deleteUserImages(UserModel model) throws IOException {
         if (model != null && model.getId() != null && model.getProfileImage() != null) {
-            String imgPath = getImagePath(path, model.getProfileImage());
+            String imgPath = getImagePath(USER_IMAGE_PATH, model.getProfileImage());
             if (imgPath != null)
                 Files.delete(Paths.get(imgPath));
         }
 
         if (model != null && model.getId() != null && model.getShopImage() != null) {
-            String imgPath = getImagePath(path, model.getShopImage());
+            String imgPath = getImagePath(USER_IMAGE_PATH, model.getShopImage());
             if (imgPath != null)
                 Files.delete(Paths.get(imgPath));
         }
     }
 
+
+    public void handleUserProductImages(ProductModel product, Optional<ProductModel> prevProduct)
+            throws IOException {
+
+        List<String> fileNames = new ArrayList<>();
+        List<MultipartFile> files = product.getFiles();
+
+
+        if (prevProduct.isPresent()) {
+
+            // deleting previous product images file
+            if (product.getImages() != null)
+                prevProduct.get().getImages().forEach(image -> {
+                    if (!product.getImages().contains(image)) {
+                        try {
+                            prevProduct.get().getImages().remove(image);
+                            Files.delete(Paths.get(PRODUCT_IMAGE_PATH + image));
+                        } catch (IOException e) {
+                            throw new BadRequestException("Can't delete previous images");
+                        }
+                    }
+                });
+
+
+            if (prevProduct.get().getImages().size() + files.size() > 5)
+                throw new BadRequestException("You can't upload images more than 5!");
+            //adding remaining images name in previous product
+            fileNames.addAll(prevProduct.get().getImages());
+        }
+
+
+        for (MultipartFile file : files)
+            fileNames.add(saveFile(file, PRODUCT_IMAGE_PATH));
+
+
+        if (!fileNames.isEmpty())
+            product.getImages().addAll(fileNames);
+
+    }
+
+
+    public void deleteUserProductImages(List<ProductModel> products) throws IOException {
+        if (products != null)
+            for (ProductModel product : products)
+                for (String file : product.getImages())
+                    Files.delete(Paths.get(PRODUCT_IMAGE_PATH + file));
+
+    }
+
+    public void deleteProductFiles(Optional<ProductModel> productOpt) throws IOException {
+        if (productOpt.isEmpty())
+            throw new NoContentException("Product does not exists");
+        ProductModel product = productOpt.get();
+        List<String> names = product.getImages();
+        String path = ResourceUtils.getFile("classpath:static/user/product_images").getAbsolutePath();
+        for (String name : names)
+            Files.delete(Paths.get(path + File.separator + name));
+
+    }
 }

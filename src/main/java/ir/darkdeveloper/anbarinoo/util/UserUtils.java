@@ -40,7 +40,6 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class UserUtils {
 
-    private final String path = "profile_images/";
     private final AuthenticationManager authManager;
     private final JwtUtils jwtUtils;
     private final UserRolesService roleService;
@@ -133,7 +132,7 @@ public class UserUtils {
             throw new PasswordException("Passwords do not match!");
 
 
-        ioUtils.handleUserImages(model, path, this);
+        ioUtils.handleUserImage(model, this);
 
         model.setPassword(encoder.encode(model.getPassword()));
         model.setPasswordRepeat("");
@@ -179,14 +178,14 @@ public class UserUtils {
     }
 
     public void deleteUser(UserModel model) throws IOException {
-        UserModel model2 = (UserModel) loadUserByUsername(model.getEmail());
-        if (!model2.isEnabled())
+        UserModel user = (UserModel) loadUserByUsername(model.getEmail());
+        if (!user.isEnabled())
             throw new EmailNotValidException("Email is not verified! Check your emails");
 
-        ioUtils.deleteUserImages(model2, path);
-
-        repo.deleteById(model2.getId());
-        refreshService.deleteTokenByUserId(model2.getId());
+        ioUtils.deleteUserImages(user);
+        ioUtils.deleteUserProductImages(user.getProducts());
+        repo.deleteById(user.getId());
+        refreshService.deleteTokenByUserId(user.getId());
     }
 
     public void checkCurrentUserIsTheSameAuthed(HttpServletRequest req) {

@@ -14,6 +14,7 @@ import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.ChequeModel;
+import ir.darkdeveloper.anbarinoo.util.IOUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils;
 import javassist.NotFoundException;
 import org.hibernate.exception.DataException;
@@ -38,12 +39,14 @@ public class ProductService {
     private final ProductRepository repo;
     private final JwtUtils jwtUtils;
     private final UserUtils userUtils;
+    private final IOUtils ioUtils;
 
     @Autowired
-    public ProductService(ProductRepository repo, JwtUtils jwtUtils, UserUtils userUtils) {
+    public ProductService(ProductRepository repo, JwtUtils jwtUtils, UserUtils userUtils, IOUtils ioUtils) {
         this.repo = repo;
         this.jwtUtils = jwtUtils;
         this.userUtils = userUtils;
+        this.ioUtils = ioUtils;
     }
 
     @Transactional
@@ -110,7 +113,8 @@ public class ProductService {
     public ResponseEntity<?> deleteProduct(Long id, HttpServletRequest req) {
         try {
             userUtils.checkCurrentUserIsTheSameAuthed(req);
-            deleteProductFiles(id);
+            Optional<ProductModel> productOpt = repo.findById(id);
+            ioUtils.deleteProductFiles(productOpt);
             repo.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (DataException s) {
@@ -120,43 +124,19 @@ public class ProductService {
         }
     }
 
-    private List<String> saveFiles(List<MultipartFile> files) throws IOException {
-        List<String> fileNames = new ArrayList<>();
-
-        for (MultipartFile file : files)
-            if (file != null) {
-                String path = ResourceUtils.getFile("classpath:static/user/product_images").getAbsolutePath();
-                byte[] bytes = file.getBytes();
-                String fileName = UUID.randomUUID() + "." + Objects.requireNonNull(file.getContentType()).split("/")[1];
-                Files.write(Paths.get(path + File.separator + fileName), bytes);
-                fileNames.add(fileName);
-            }
-
-        return fileNames;
-    }
-
-    private void deleteProductFiles(Long id) throws IOException {
-        Optional<ProductModel> productOpt = repo.findById(id);
-        if (productOpt.isEmpty())
-            throw new NoContentException("Product does not exists");
-        ProductModel product = productOpt.get();
-        List<String> names = product.getImages();
-        String path = ResourceUtils.getFile("classpath:static/user/product_images").getAbsolutePath();
-        for (String name : names)
-            Files.delete(Paths.get(path + File.separator + name));
-    }
-
     @NotNull
-    private ProductModel saveProductModel(ProductModel productModel, HttpServletRequest request) throws IOException {
+    private ProductModel saveProductModel(ProductModel product, HttpServletRequest request) throws IOException {
         String refreshToken = request.getHeader("refresh_token");
         Long userId = ((Integer) jwtUtils.getAllClaimsFromToken(refreshToken).get("user_id")).longValue();
-        productModel.setUser(new UserModel(userId));
+        product.setUser(new UserModel(userId));
 
-        List<String> fileNames = saveFiles(productModel.getFiles());
-        if (!fileNames.isEmpty())
-            productModel.setImages(fileNames);
+        Optional<ProductModel> prevProduct = Optional.empty();
+        if (product.getId() != null)
+            prevProduct = repo.findById(product.getId());
 
-        return repo.save(productModel);
+        ioUtils.handleUserProductImages(product, prevProduct);
+
+        return repo.save(product);
     }
 
 

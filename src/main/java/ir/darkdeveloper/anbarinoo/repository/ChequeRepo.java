@@ -13,6 +13,8 @@ public interface ChequeRepo extends JpaRepository<ChequeModel, Long> {
 
     List<ChequeModel> findChequeModelsByUser_Id(Long id);
 
+    List<ChequeModel> findChequeModelByPayToContains(String payTo);
+
 //    @Query("SELECT model FROM ChequeModel model WHERE model.user.id = :id")
 //    List<ChequeModel> findChequeModelByUserId(@Param("id") Long id);
 }

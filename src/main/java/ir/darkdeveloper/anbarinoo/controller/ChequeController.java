@@ -1,7 +1,10 @@
 package ir.darkdeveloper.anbarinoo.controller;
 
 import ir.darkdeveloper.anbarinoo.model.ChequeModel;
+import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,6 +41,11 @@ public class ChequeController {
     @PostMapping("/update/")
     public ResponseEntity<?> updateCheque(@RequestBody ChequeModel cheque, HttpServletRequest req) {
         return ResponseEntity.ok().body(service.updateCheque(cheque, req));
+    }
+
+    @PostMapping("/search/")
+    public ResponseEntity<?> findByPayToContains(@RequestParam String payTo, HttpServletRequest request) {
+        return ResponseEntity.ok().body(service.findByPayToContains(payTo, request));
     }
 
     @DeleteMapping("/{id}/")

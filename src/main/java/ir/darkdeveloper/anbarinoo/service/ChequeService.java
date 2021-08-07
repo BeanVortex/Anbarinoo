@@ -6,8 +6,11 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
+import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import org.hibernate.exception.DataException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -96,4 +99,13 @@ public class ChequeService {
         throw new NoContentException("Data you are looking for is not found");
     }
 
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    public List<ChequeModel> findByPayToContains(String payTo, HttpServletRequest req) {
+        try {
+            userUtils.checkCurrentUserIsTheSameAuthed(req);
+            return repo.findChequeModelByPayToContains(payTo);
+        } catch (Exception e) {
+            throw new BadRequestException(e.getLocalizedMessage());
+        }
+    }
 }
