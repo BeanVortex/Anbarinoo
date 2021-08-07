@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.springframework.stereotype.Component;
@@ -17,11 +18,8 @@ import ir.darkdeveloper.anbarinoo.model.UserModel;
 public class IOUtils {
 
     /**
-     * 
      * @param file MultipartFile
      * @param path after user/
-     * @return
-     * @throws Exception
      */
     public String saveFile(MultipartFile file, String path) throws IOException {
         if (file != null) {
@@ -29,7 +27,7 @@ public class IOUtils {
             // folder in resources
             String location = ResourceUtils.getFile("classpath:static/user/" + path).getAbsolutePath();
             byte[] bytes = file.getBytes();
-            String fileName = UUID.randomUUID() + "." + file.getContentType().split("/")[1];
+            String fileName = UUID.randomUUID() + "." + Objects.requireNonNull(file.getContentType()).split("/")[1];
             Files.write(Paths.get(location + File.separator + fileName), bytes);
             return fileName;
         }
@@ -43,7 +41,7 @@ public class IOUtils {
     }
 
     public void handleUserImages(UserModel model, String path, UserUtils utils)
-            throws FileNotFoundException, IOException {
+            throws IOException {
         UserModel preModel = (UserModel) utils.loadUserByUsername(model.getEmail());
 
         deleteUserImages(preModel, path);
@@ -63,7 +61,7 @@ public class IOUtils {
             model.setShopImage(shopFileName);
     }
 
-    public void deleteUserImages(UserModel model, String path) throws FileNotFoundException, IOException {
+    public void deleteUserImages(UserModel model, String path) throws IOException {
         if (model != null && model.getId() != null && model.getProfileImage() != null) {
             String imgPath = getImagePath(path, model.getProfileImage());
             if (imgPath != null)

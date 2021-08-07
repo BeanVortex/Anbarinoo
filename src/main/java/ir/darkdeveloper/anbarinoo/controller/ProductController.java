@@ -31,8 +31,8 @@ public class ProductController {
     }
 
     @PostMapping("/search/")
-    public ResponseEntity<Page<ProductModel>> findByNameContains(@RequestParam String name, Pageable pageable) {
-        return ResponseEntity.ok().body(service.findByNameContains(name, pageable));
+    public ResponseEntity<Page<ProductModel>> findByNameContains(@RequestParam String name, Pageable pageable, HttpServletRequest request) {
+        return ResponseEntity.ok().body(service.findByNameContains(name, pageable, request));
     }
 
     @PostMapping("/update/")

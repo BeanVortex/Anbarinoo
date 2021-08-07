@@ -88,7 +88,7 @@ public class UserService implements UserDetailsService {
 
     }
 
-    public ResponseEntity<?> signUpUser(UserModel model, HttpServletResponse response) throws  Exception {
+    public ResponseEntity<?> signUpUser(UserModel model, HttpServletResponse response) throws Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth.getName().equals("anonymousUser") || auth.getAuthorities().contains(Authority.OP_ACCESS_ADMIN)
                 || !auth.getName().equals(model.getEmail())) {

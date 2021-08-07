@@ -6,10 +6,7 @@ import static org.mockito.Mockito.mock;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,6 +20,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 
 @SpringBootTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserServiceTest {
 
     private final UserService service;
@@ -63,7 +61,7 @@ public class UserServiceTest {
     @Test
     @Order(1)
     @WithMockUser(username = "anonymousUser")
-    void signUp() throws  Exception {
+    void signUp() throws Exception {
         HttpServletResponse response = mock(HttpServletResponse.class);
         service.signUpUser(user, response);
     }
@@ -91,25 +89,23 @@ public class UserServiceTest {
     }
 
     @Test
-    @WithMockUser(username = "email@mail.com")
-    @Order(5)
-    //@Disabled
-    void deleteUser() {
-        service.deleteUser(user);
-    }
-
-    @Test
     @Order(4)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
-    void getUserInfo(){
+    void getUserInfo() {
         UserModel model = service.getUserInfo(user.getId());
         assertNull(model);
     }
 
     @Test
+    @WithMockUser(username = "email@mail.com")
     @Order(5)
-    void verifyUserEmail(){
+    void deleteUser() {
+        service.deleteUser(user);
+    }
 
+    @Test
+    @Order(6)
+    void verifyUserEmail() {
     }
 
 }

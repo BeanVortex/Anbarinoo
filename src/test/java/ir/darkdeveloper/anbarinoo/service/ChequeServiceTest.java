@@ -4,16 +4,13 @@ import ir.darkdeveloper.anbarinoo.model.ChequeModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils;
-import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.*;
-import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.annotation.Rollback;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,22 +27,16 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ChequeServiceTest {
+public record ChequeServiceTest(ChequeService chequeService,
+                                UserService userService,
+                                JwtUtils jwtUtils) {
 
     private static UserModel user;
     private static HttpServletRequest request;
     private static ChequeModel cheque;
 
-    private final ChequeService chequeService;
-    private final UserService userService;
-    private final JwtUtils jwtUtils;
-
-
     @Autowired
-    ChequeServiceTest(ChequeService chequeService, UserService userService, JwtUtils jwtUtils) {
-        this.chequeService = chequeService;
-        this.userService = userService;
-        this.jwtUtils = jwtUtils;
+    public ChequeServiceTest {
     }
 
     @BeforeAll
@@ -82,6 +73,7 @@ public class ChequeServiceTest {
     void saveUser() throws Exception {
         HttpServletResponse response = mock(HttpServletResponse.class);
         userService.signUpUser(user, response);
+        request = setUpHeader();
         UserModel fetchedModel = (UserModel) userService.loadUserByUsername(user.getEmail());
         assertThat(fetchedModel.getEmail()).isEqualTo(user.getEmail());
         assertThat(fetchedModel.getEnabled()).isEqualTo(true);
@@ -97,7 +89,6 @@ public class ChequeServiceTest {
         UserModel userModel = new UserModel();
         userModel.setId(user.getId());
         cheque.setUser(userModel);
-        request = setUpHeader();
         chequeService.saveCheque(cheque, request);
     }
 
@@ -106,7 +97,6 @@ public class ChequeServiceTest {
     @Order(3)
     void getCheque() {
         System.out.println("getCheque");
-        request = setUpHeader();
         ChequeModel fetchedCheque = chequeService.getCheque(cheque.getId(), request);
         assertThat(fetchedCheque).isNotNull();
     }
@@ -128,9 +118,7 @@ public class ChequeServiceTest {
     @Order(5)
     void updateCheque() {
         System.out.println("updateCheque");
-        request = setUpHeader();
         cheque.setIsCheckedOut(true);
-        request = setUpHeader();
         chequeService.updateCheque(cheque, request);
     }
 
@@ -139,13 +127,12 @@ public class ChequeServiceTest {
     @Order(6)
     void deleteCheque() {
         System.out.println("deleteCheque");
-        request = setUpHeader();
         chequeService.deleteCheque(cheque.getId(), request);
     }
 
 
     //should return the object; data is being removed
-    HttpServletRequest setUpHeader() {
+    private HttpServletRequest setUpHeader() {
 
         Map<String, String> headers = new HashMap<>();
         headers.put(null, "HTTP/1.1 200 OK");

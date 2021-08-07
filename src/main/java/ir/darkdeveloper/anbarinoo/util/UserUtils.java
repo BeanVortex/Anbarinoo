@@ -184,15 +184,16 @@ public class UserUtils {
             throw new EmailNotValidException("Email is not verified! Check your emails");
 
         ioUtils.deleteUserImages(model2, path);
-        //verificationService
 
         repo.deleteById(model2.getId());
         refreshService.deleteTokenByUserId(model2.getId());
     }
 
     public void checkCurrentUserIsTheSameAuthed(HttpServletRequest req) {
-        Long userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getName().equals(adminUser.getUsername()))
+            return;
+        Long userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
         var authName = auth.getName();
         var userName = repo.findUserById(userId).getUserName();
         var userEmail = repo.findUserById(userId).getEmail();

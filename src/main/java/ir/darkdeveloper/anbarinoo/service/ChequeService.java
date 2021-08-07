@@ -69,7 +69,8 @@ public class ChequeService {
     }
 
     @Transactional
-    @PreAuthorize("authentication.name.equals(@userService.getAdminUser().getUsername()) || #id != null")
+//    @PreAuthorize("authentication.name.equals(@userService.getAdminUser().getUsername()) || #id != null")
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ResponseEntity<?> deleteCheque(Long id, HttpServletRequest req) {
         try {
             userUtils.checkCurrentUserIsTheSameAuthed(req);
