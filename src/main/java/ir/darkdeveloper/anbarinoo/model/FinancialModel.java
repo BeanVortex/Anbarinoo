@@ -30,7 +30,7 @@ public class FinancialModel {
     @Column(nullable = false)
     private Integer tax = 9;
 
-    @OneToOne(mappedBy = "financial")
-    private UserModel users;
+//    @OneToOne(mappedBy = "financial")
+//    private UserModel user;
 
 }

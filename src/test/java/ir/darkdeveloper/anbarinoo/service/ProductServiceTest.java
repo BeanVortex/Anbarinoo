@@ -1,5 +1,7 @@
 package ir.darkdeveloper.anbarinoo.service;
 
+import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
+import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils;
 import org.junit.jupiter.api.*;
@@ -26,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -38,7 +41,7 @@ public record ProductServiceTest(ProductService productService,
 
 
     private static ProductModel product;
-    private static UserModel user;
+    private static UserModel user, user2;
     private static HttpServletRequest request;
     private static CategoryModel cat1;
     private static CategoryModel electronics;
@@ -90,17 +93,22 @@ public record ProductServiceTest(ProductService productService,
         HttpServletResponse response = mock(HttpServletResponse.class);
         userService.signUpUser(user, response);
         request = setUpHeader();
+        user2 = new UserModel();
+        user2.setEmail("email2@mail.com");
+        user2.setPassword("pass1");
+        user2.setPasswordRepeat("pass1");
+        userService.signUpUser(user2, response);
+
         System.out.println("ProductServiceTest.saveUser");
     }
 
-    //sub cat should save before the top cat
     @Test
     @Order(2)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void saveCategory() {
         System.out.println("ProductServiceTest.saveCategory");
         cat1 = new CategoryModel("Other");
-        categoryService.saveCategory(cat1);
+        categoryService.saveCategory(cat1, request);
         electronics = new CategoryModel("Electronics");
         CategoryModel mobilePhones = new CategoryModel("Mobile phones", electronics);
         CategoryModel washingMachines = new CategoryModel("Washing machines", electronics);
@@ -113,7 +121,7 @@ public record ProductServiceTest(ProductService productService,
         CategoryModel galaxy = new CategoryModel("Galaxy", samsung);
         samsung.addChild(galaxy);
 
-        categoryService.saveCategory(electronics);
+        categoryService.saveCategory(electronics, request);
     }
 
     @Test
@@ -141,7 +149,7 @@ public record ProductServiceTest(ProductService productService,
 
     @Test
     @Order(5)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(username = "email@mail.com",authorities = {"OP_ACCESS_USER"})
     void updateProduct() {
         System.out.println("ProductServiceTest.updateProduct");
         product.setName("updatedName");
@@ -186,10 +194,12 @@ public record ProductServiceTest(ProductService productService,
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void getOneUserProducts() {
         var pageable = PageRequest.of(0, 8);
-        var products = productService.getOneUserProducts(user.getId(), pageable, request);
-        products.getContent().forEach(p -> {
-            assertThat(p.getName()).isEqualTo(product.getName());
-            assertThat(p.getBoughtCount()).isEqualTo(product.getBoughtCount());
+        assertThrows(ForbiddenException.class, () -> {
+            var products = productService.getOneUserProducts(user2.getId(), pageable, request);
+            products.getContent().forEach(p -> {
+                assertThat(p.getName()).isEqualTo(product.getName());
+                assertThat(p.getBoughtCount()).isEqualTo(product.getBoughtCount());
+            });
         });
     }
 

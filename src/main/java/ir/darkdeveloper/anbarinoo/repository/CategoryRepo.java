@@ -1,6 +1,7 @@
 package ir.darkdeveloper.anbarinoo.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -11,5 +12,7 @@ import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 public interface CategoryRepo extends JpaRepository<CategoryModel, Long> {
 
     List<CategoryModel> findByNameContains(String name);
+
+    List<CategoryModel> findAllByUserId(Long user_id);
 
 }

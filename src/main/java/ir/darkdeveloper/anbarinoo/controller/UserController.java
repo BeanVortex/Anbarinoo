@@ -2,6 +2,7 @@ package ir.darkdeveloper.anbarinoo.controller;
 
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class UserController {
 
     @PostMapping("/signup/")
     public ResponseEntity<?> signUpUser(@ModelAttribute UserModel model, HttpServletResponse response)
-            throws IOException, Exception {
+            throws Exception {
         return userService.signUpUser(model, response);
     }
 
@@ -42,13 +43,13 @@ public class UserController {
     }
 
     @PostMapping("/update/")
-    public UserModel updateUser(@ModelAttribute UserModel model) {
-        return userService.updateUser(model);
+    public UserModel updateUser(@ModelAttribute UserModel model, HttpServletRequest req) {
+        return userService.updateUser(model, req);
     }
 
-    @DeleteMapping("/")
-    public ResponseEntity<?> deleteUser(@RequestBody UserModel model) {
-        return userService.deleteUser(model);
+    @DeleteMapping("/{id}/")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id, HttpServletRequest req) {
+        return userService.deleteUser(id, req);
     }
 
     @GetMapping("/all/")

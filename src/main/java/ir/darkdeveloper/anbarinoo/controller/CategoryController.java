@@ -25,23 +25,24 @@ public class CategoryController {
 
 
     @PostMapping("/save/")
-    public ResponseEntity<CategoryModel> saveCategory(@RequestBody CategoryModel model) {
-        return ResponseEntity.ok().body(service.saveCategory(model));
-    }
-
-    @PostMapping("/search/")
-    public ResponseEntity<List<CategoryModel>> findByNameContains(@RequestParam String name) {
-        return ResponseEntity.ok().body(service.findByNameContains(name));
+    public ResponseEntity<?> saveCategory(@RequestBody CategoryModel model, HttpServletRequest request) {
+        return ResponseEntity.ok().body(service.saveCategory(model, request));
     }
 
     @PostMapping("/update/")
-    public ResponseEntity<CategoryModel> updateCategory(@ModelAttribute CategoryModel model) {
-        return ResponseEntity.ok().body(service.saveCategory(model));
+    public ResponseEntity<?> updateCategory(@ModelAttribute CategoryModel model, HttpServletRequest request) {
+        return ResponseEntity.ok().body(service.saveCategory(model, request));
     }
 
-    @GetMapping("/{id}/")
-    public ResponseEntity<?> getCategoryById(@PathVariable Long id, HttpServletRequest request) {
-        return ResponseEntity.ok().body(service.getCategoryById(id, request));
+    @GetMapping("/user/{id}/")
+    public ResponseEntity<?> getCategoriesByUserId(@PathVariable Long id, HttpServletRequest request) {
+        return ResponseEntity.ok().body(service.getCategoriesByUserId(id, request));
+    }
+
+
+    @DeleteMapping("/{id}/")
+    public ResponseEntity<?> deleteCategoryById(@PathVariable Long id, HttpServletRequest request) {
+        return ResponseEntity.ok().body(service.deleteCategory(id, request));
     }
 
 }

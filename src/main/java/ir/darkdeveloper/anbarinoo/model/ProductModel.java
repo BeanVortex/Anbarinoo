@@ -50,29 +50,27 @@ public class ProductModel {
 
     private Double price;
 
-    @Column( name = "buy_price")
+    @Column(name = "buy_price")
     private Double buyPrice;
 
-    @Column( name = "sell_count")
+    @Column(name = "sell_count")
     private int soldCount;
 
-    @Column( name = "buy_count")
+    @Column(name = "buy_count")
     private int boughtCount;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "username")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userName")
     @JsonIdentityReference(alwaysAsId = true)
     private UserModel user;
 
     @ManyToOne
-    @JoinColumn(name="cat_id")
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name")
-    @JsonIdentityReference(alwaysAsId = true)
+    @JoinColumn(name = "cat_id")
     private CategoryModel category;
 
 
-    @Column( name = "total_count")
+    @Column(name = "total_count")
     private Integer totalCount;
 
     @Column(name = "created_at", updatable = false)

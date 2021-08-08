@@ -21,10 +21,6 @@ public interface RefreshRepo extends JpaRepository<RefreshModel, Long> {
     @Query("SELECT model FROM RefreshModel model WHERE model.userId=:id")
     RefreshModel getRefreshByUserId(@Param("id") Long id);
 
-    @Transactional
-    @Modifying
-    @Query("UPDATE RefreshModel model SET model.accessToken = :token WHERE model.userId=:id ")
-    RefreshModel updateTokenByUserId(@Param("id") Long userId, @Param("token") String accessToken);
 
     @Query("SELECT model.id FROM RefreshModel model WHERE model.userId=:id")
 	Long getIdByUserId(@Param("id") Long adminId);

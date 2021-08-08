@@ -1,5 +1,6 @@
 package ir.darkdeveloper.anbarinoo.repository;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -17,7 +18,8 @@ public interface UserRepo extends PagingAndSortingRepository<UserModel, Long> {
 
     UserModel findUserById(Long id);
 
-    Page<UserModel> findAll(Pageable pageable);
+    @NotNull
+    Page<UserModel> findAll(@NotNull Pageable pageable);
 
     @Query("SELECT model.id FROM UserModel model WHERE model.email = :username OR model.userName = :username")
     Long findUserIdByUsername(@Param("username") String username);

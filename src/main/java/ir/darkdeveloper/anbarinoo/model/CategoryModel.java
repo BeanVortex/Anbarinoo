@@ -26,9 +26,15 @@ public class CategoryModel {
     @Column(nullable = false)
     private String name;
 
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
+    private UserModel user;
+
     @ManyToOne
     @JoinColumn(name = "parent_id")
-
     private CategoryModel parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, orphanRemoval = true)

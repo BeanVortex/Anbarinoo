@@ -113,7 +113,7 @@ public class UserUtils {
     }
 
     public void validateUserData(UserModel model) throws IOException {
-        model.setRoles(roleService.getRole("USER"));
+        model.setRoles(roleService.findAllByName("USER"));
 
         var VALID_EMAIL_REGEX =
                 Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
@@ -177,8 +177,8 @@ public class UserUtils {
         return repo.findByEmailOrUsername(username);
     }
 
-    public void deleteUser(UserModel model) throws IOException {
-        UserModel user = (UserModel) loadUserByUsername(model.getEmail());
+    public void deleteUser(Long id) throws IOException {
+        var user = repo.findUserById(id);
         if (!user.isEnabled())
             throw new EmailNotValidException("Email is not verified! Check your emails");
 
@@ -186,18 +186,6 @@ public class UserUtils {
         ioUtils.deleteUserProductImages(user.getProducts());
         repo.deleteById(user.getId());
         refreshService.deleteTokenByUserId(user.getId());
-    }
-
-    public void checkCurrentUserIsTheSameAuthed(HttpServletRequest req) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth.getName().equals(adminUser.getUsername()))
-            return;
-        Long userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
-        var authName = auth.getName();
-        var userName = repo.findUserById(userId).getUserName();
-        var userEmail = repo.findUserById(userId).getEmail();
-        if (!(userName.equals(authName) || userEmail.equals(authName)))
-            throw new ForbiddenException("You can't delete this cheque. It does not belong to you");
     }
 
     private void sendEmail(UserModel model) {

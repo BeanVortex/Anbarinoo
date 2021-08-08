@@ -2,10 +2,14 @@ package ir.darkdeveloper.anbarinoo.service;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ir.darkdeveloper.anbarinoo.util.JwtUtils;
+import ir.darkdeveloper.anbarinoo.util.UserUtils;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,16 +23,23 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserServiceTest {
 
+    private static HttpServletRequest request;
     private final UserService service;
+    private final JwtUtils jwtUtils;
     private UserModel user;
 
+
     @Autowired
-    public UserServiceTest(UserService service) {
+    public UserServiceTest(UserService service, JwtUtils jwtUtils) {
         this.service = service;
+        this.jwtUtils = jwtUtils;
     }
 
     @BeforeAll
@@ -38,6 +49,7 @@ public class UserServiceTest {
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
+        request = mock(HttpServletRequest.class);
     }
 
     @BeforeEach
@@ -64,6 +76,7 @@ public class UserServiceTest {
     void signUp() throws Exception {
         HttpServletResponse response = mock(HttpServletResponse.class);
         service.signUpUser(user, response);
+        request = setUpHeader();
     }
 
     @Test
@@ -75,7 +88,7 @@ public class UserServiceTest {
         user.setProfileFile(null);
         user.setShopFile(null);
         user.setId(((UserModel) service.loadUserByUsername(user.getEmail())).getId());
-        service.updateUser(user);
+        service.updateUser(user, request);
     }
 
     @Test
@@ -85,7 +98,7 @@ public class UserServiceTest {
         user.setDescription("dex");
         user.setShopName("shop1");
         user.setId(((UserModel) service.loadUserByUsername(user.getEmail())).getId());
-        service.updateUser(user);
+        service.updateUser(user, request);
     }
 
     @Test
@@ -100,12 +113,38 @@ public class UserServiceTest {
     @WithMockUser(username = "email@mail.com")
     @Order(5)
     void deleteUser() {
-        service.deleteUser(user);
+        service.deleteUser(user.getId(), request);
     }
 
     @Test
     @Order(6)
     void verifyUserEmail() {
     }
+
+
+    //should return the object; data is being removed
+    private HttpServletRequest setUpHeader() {
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put(null, "HTTP/1.1 200 OK");
+        headers.put("Content-Type", "text/html");
+
+        String refreshToken = jwtUtils.generateRefreshToken(user.getEmail(), user.getId());
+        String accessToken = jwtUtils.generateAccessToken(user.getEmail());
+        var refreshDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
+        var accessDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
+        headers.put("refresh_token", refreshToken);
+        headers.put("access_token", accessToken);
+        headers.put("refresh_expiration", refreshDate);
+        headers.put("access_expiration", accessDate);
+
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        for (String key : headers.keySet())
+            when(request.getHeader(key)).thenReturn(headers.get(key));
+
+        return request;
+    }
+
 
 }

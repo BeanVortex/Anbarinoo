@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ir.darkdeveloper.anbarinoo.exception.*;
+import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,10 +23,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
-import ir.darkdeveloper.anbarinoo.exception.DataExistsException;
-import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
-import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
 import ir.darkdeveloper.anbarinoo.model.Authority;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.model.VerificationModel;
@@ -41,19 +40,25 @@ public class UserService implements UserDetailsService {
     private final UserUtils userUtils;
     private final AdminUserProperties adminUser;
     private final VerificationService verificationService;
+    private final JwtUtils jwtUtils;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userUtils.loadUserByUsername(username);
     }
 
-    public UserModel updateUser(UserModel model) {
+    @Transactional
+    @PreAuthorize("authentication.name.equals(@userService.getAdminUser().getUsername()) || #model.getId() != null")
+    public UserModel updateUser(UserModel model, HttpServletRequest req) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (!auth.getName().equals("anonymousUser") || auth.getAuthorities().contains(Authority.OP_ACCESS_ADMIN)
                 || auth.getName().equals(model.getEmail())) {
             try {
+                checkUserIsSameUserForRequest(model.getId(), req, "update");
                 userUtils.validateUserData(model);
                 return repo.save(model);
+            } catch (ForbiddenException f) {
+                throw new ForbiddenException(f.getLocalizedMessage());
             } catch (IOException e) {
                 throw new InternalServerException(e.getLocalizedMessage());
             }
@@ -62,21 +67,30 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    @PreAuthorize("authentication.name.equals(@userService.getAdminUser().getUsername()) || #user.getEmail().equals(authentication.name)")
-    public ResponseEntity<?> deleteUser(UserModel user) {
+    @PreAuthorize("authentication.name.equals(@userService.getAdminUser().getUsername()) || #id != null")
+    public ResponseEntity<?> deleteUser(Long id, HttpServletRequest req) {
         try {
-            userUtils.deleteUser(user);
-            return new ResponseEntity<>(HttpStatus.OK);
+            var userOpt = repo.findById(id);
+            if (userOpt.isPresent()) {
+                checkUserIsSameUserForRequest(userOpt.get().getId(), req, "delete");
+                userUtils.deleteUser(id);
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+        } catch (ForbiddenException f) {
+            throw new ForbiddenException(f.getLocalizedMessage());
         } catch (IOException e) {
             throw new InternalServerException(e.getLocalizedMessage());
         }
+        throw new NoContentException("User does not exist");
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN')")
     public Page<UserModel> allUsers(Pageable pageable) {
         return repo.findAll(pageable);
     }
 
+    @Transactional
     public ResponseEntity<?> loginUser(JwtAuth model, HttpServletResponse response) {
 
         if (model.getUsername().equals(adminUser.getUsername()))
@@ -88,6 +102,7 @@ public class UserService implements UserDetailsService {
 
     }
 
+    @Transactional
     public ResponseEntity<?> signUpUser(UserModel model, HttpServletResponse response) throws Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth.getName().equals("anonymousUser") || auth.getAuthorities().contains(Authority.OP_ACCESS_ADMIN)
@@ -102,7 +117,7 @@ public class UserService implements UserDetailsService {
         throw new ForbiddenException("You are not allowed to signup a user!");
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN')")
     public UserModel getUserInfo(Long id) {
         return repo.findUserById(id);
     }
@@ -129,5 +144,11 @@ public class UserService implements UserDetailsService {
 
     public AdminUserProperties getAdminUser() {
         return adminUser;
+    }
+
+    private void checkUserIsSameUserForRequest(Long userId, HttpServletRequest req, String operation) {
+        Long id = jwtUtils.getUserId(req.getHeader("refresh_token"));
+        if (!userId.equals(id))
+            throw new ForbiddenException("You can't " + operation + " another user's products");
     }
 }

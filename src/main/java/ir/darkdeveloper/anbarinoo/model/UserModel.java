@@ -107,6 +107,11 @@ public class UserModel implements UserDetails, OAuth2User {
     @JsonIdentityReference(alwaysAsId = true)
     private List<ProductModel> products;
 
+    @OneToMany(mappedBy = "user")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
+    private List<CategoryModel> categories;
+
     // For saving products I need it
     public UserModel(Long id) {
         this.id = id;
