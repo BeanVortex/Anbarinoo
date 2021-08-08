@@ -21,16 +21,16 @@ public class FinancialModel {
 
     @Column(nullable = false)
     private BigDecimal costs = new BigDecimal(0);
-    ;
+
 
     @Column(nullable = false)
     private BigDecimal profit = new BigDecimal(0);
-    ;
+
 
     @Column(nullable = false)
     private Integer tax = 9;
 
-    @OneToMany(mappedBy = "financial")
-    private List<UserModel> users;
+    @OneToOne(mappedBy = "financial")
+    private UserModel users;
 
 }

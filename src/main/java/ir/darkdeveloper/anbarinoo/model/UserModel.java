@@ -1,5 +1,6 @@
 package ir.darkdeveloper.anbarinoo.model;
 
+import java.io.Serial;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,10 +10,7 @@ import java.util.Map;
 
 import javax.persistence.*;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -31,6 +29,7 @@ import lombok.Data;
 @JsonIgnoreProperties(value = "attributes")
 public class UserModel implements UserDetails, OAuth2User {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -40,7 +39,7 @@ public class UserModel implements UserDetails, OAuth2User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = true, unique = true)
+    @Column(unique = true)
     private String userName;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -88,18 +87,24 @@ public class UserModel implements UserDetails, OAuth2User {
 
     private String description;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "financial_id")
     private FinancialModel financial;
 
     @OneToMany(mappedBy = "user")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     private List<DebtOrDemandModel> debtOrDemand;
 
     @OneToMany(mappedBy = "user")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     private List<ChequeModel> cheques;
 
     //mappedBy is read-only. can't add product while creating user
     @OneToMany(mappedBy = "user")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     private List<ProductModel> products;
 
     // For saving products I need it

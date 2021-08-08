@@ -15,6 +15,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -47,11 +48,7 @@ public class ProductModel {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<MultipartFile> files;
 
-    @Column()
     private Double price;
-
-    @Column( name = "sell_price")
-    private Double sellPrice;
 
     @Column( name = "buy_price")
     private Double buyPrice;
@@ -64,15 +61,19 @@ public class ProductModel {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "username")
+    @JsonIdentityReference(alwaysAsId = true)
     private UserModel user;
 
     @ManyToOne
     @JoinColumn(name="cat_id")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name")
+    @JsonIdentityReference(alwaysAsId = true)
     private CategoryModel category;
 
 
     @Column( name = "total_count")
-    private int totalCount;
+    private Integer totalCount;
 
     @Column(name = "created_at", updatable = false)
     @CreationTimestamp

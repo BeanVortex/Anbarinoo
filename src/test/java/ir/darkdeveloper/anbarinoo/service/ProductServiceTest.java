@@ -71,7 +71,6 @@ public record ProductServiceTest(ProductService productService,
         product.setDescription("description");
         product.setBoughtCount(25);
         product.setBuyPrice(156d);
-        product.setSellPrice(180d);
         product.setSoldCount(13);
         product.setTotalCount(50);
         MockMultipartFile file3 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
@@ -149,7 +148,6 @@ public record ProductServiceTest(ProductService productService,
         product.setDescription("updatedDescription");
         product.setBoughtCount(15);
         product.setBuyPrice(25d);
-        product.setSellPrice(5d);
         product.setSoldCount(6);
         product.setTotalCount(10);
         MockMultipartFile file3 = new MockMultipartFile("file", "helladsfo.jpg", MediaType.IMAGE_JPEG_VALUE,
