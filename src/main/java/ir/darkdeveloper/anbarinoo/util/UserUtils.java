@@ -6,15 +6,12 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -112,33 +109,6 @@ public class UserUtils {
         response.addHeader("access_expiration", accessDate);
     }
 
-    public void validateUserData(UserModel model) throws IOException {
-        model.setRoles(roleService.findAllByName("USER"));
-
-        var VALID_EMAIL_REGEX =
-                Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
-
-        var matcher = VALID_EMAIL_REGEX.matcher(model.getEmail());
-        if (!matcher.find())
-            throw new EmailNotValidException("Email is not correct");
-
-        if (model.getUserName() == null || model.getUserName().trim().equals(""))
-            model.setUserName(model.getEmail().split("@")[0]);
-
-        if (model.getPassword() == null || model.getPassword().isBlank())
-            throw new PasswordException("Password can't be empty!");
-
-        if (model.getPasswordRepeat() == null || !model.getPassword().equals(model.getPasswordRepeat()))
-            throw new PasswordException("Passwords do not match!");
-
-
-        ioUtils.handleUserImage(model, this);
-
-        model.setPassword(encoder.encode(model.getPassword()));
-        model.setPasswordRepeat("");
-        model.setProvider(AuthProvider.LOCAL);
-    }
-
     public void signupValidation(UserModel model, HttpServletResponse response) throws Exception {
         if (model.getId() != null)
             throw new ForbiddenException("You are not allowed to sign up! :|");
@@ -146,15 +116,14 @@ public class UserUtils {
         if (model.getUserName() != null && model.getUserName().equals(adminUser.getUsername()))
             throw new BadRequestException("User exists!");
 
-        String rawPass = model.getPassword();
-        String rawPassRep = model.getPasswordRepeat();
+        var rawPass = validatePassword(model);
+        validateEmail(model);
 
-        if (rawPass == null || rawPass.isBlank())
-            throw new PasswordException("Password can't be empty");
-        if (!rawPass.equals(rawPassRep))
-            throw new PasswordException("Passwords do not match");
-
-        validateUserData(model);
+        model.setRoles(roleService.findAllByName("USER"));
+        ioUtils.handleUserImage(model, this, false);
+        model.setPassword(encoder.encode(model.getPassword()));
+        model.setPasswordRepeat("");
+        model.setProvider(AuthProvider.LOCAL);
         model.setEnabled(userEnabled);
         repo.save(model);
         if (!model.getEnabled())
@@ -164,8 +133,31 @@ public class UserUtils {
 
     }
 
+    public void validateEmail(UserModel model) {
+        //for update when email is null
+        if (model.getEmail() == null) {
+            var foundUser = (repo.findUserById(model.getId()));
+            foundUser.ifPresent(userModel -> model.setEmail(userModel.getEmail()));
+        }
+
+        if (model.getEmail() != null) {
+            var VALID_EMAIL_REGEX =
+                    Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+            var matcher = VALID_EMAIL_REGEX.matcher(model.getEmail());
+            if (!matcher.find())
+                throw new EmailNotValidException("Email is not correct");
+
+            if (model.getUserName() == null || model.getUserName().trim().equals(""))
+                model.setUserName(model.getEmail().split("@")[0]);
+        }
+    }
+
     public Long getUserIdByUsernameOrEmail(String username) {
         return repo.findUserIdByUsername(username);
+    }
+
+    public UserModel getUserById(Long id) {
+        return repo.findUserById(id).orElse(null);
     }
 
     public UserDetails loadUserByUsername(String username) {
@@ -179,13 +171,46 @@ public class UserUtils {
 
     public void deleteUser(Long id) throws IOException {
         var user = repo.findUserById(id);
-        if (!user.isEnabled())
-            throw new EmailNotValidException("Email is not verified! Check your emails");
+        if (user.isPresent()) {
+            if (!user.get().isEnabled())
+                throw new EmailNotValidException("Email is not verified! Check your emails");
 
-        ioUtils.deleteUserImages(user);
-        ioUtils.deleteUserProductImages(user.getProducts());
-        repo.deleteById(user.getId());
-        refreshService.deleteTokenByUserId(user.getId());
+            ioUtils.deleteUserImages(user.get());
+            ioUtils.deleteUserProductImages(user.get().getProducts());
+            repo.deleteById(user.get().getId());
+            refreshService.deleteTokenByUserId(user.get().getId());
+        }
+    }
+
+    public void resetPasswordUsingPrevious(UserModel user) {
+        if (user.getPassword() != null && user.getPasswordRepeat() != null) {
+            if (user.getPrevPassword() != null) {
+                validatePassword(user);
+
+                var foundUser = (repo.findUserById(user.getId()));
+                foundUser.ifPresent(userModel -> {
+                    if (encoder.matches(user.getPrevPassword(), foundUser.get().getPassword()))
+                        user.setPassword(encoder.encode(user.getPassword()));
+                });
+            } else
+                throw new PasswordException("Enter previous password to change");
+        }
+    }
+
+    public String validatePassword(UserModel user) {
+        var rawPass = user.getPassword();
+        var rawPassRep = user.getPasswordRepeat();
+        if (rawPass != null && rawPassRep != null) {
+            if (rawPass.isBlank())
+                throw new PasswordException("Password can't be empty");
+
+            if (rawPassRep.isBlank())
+                throw new PasswordException("Password repeat can't be empty");
+
+            if (!rawPass.equals(rawPassRep))
+                throw new PasswordException("Passwords do not match");
+        }
+        return rawPass;
     }
 
     private void sendEmail(UserModel model) {

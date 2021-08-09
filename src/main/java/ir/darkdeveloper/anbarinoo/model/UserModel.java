@@ -12,7 +12,10 @@ import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.*;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,6 +30,7 @@ import lombok.Data;
 @Table(name = "users")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @JsonIgnoreProperties(value = "attributes")
+@DynamicUpdate
 public class UserModel implements UserDetails, OAuth2User {
 
     @Serial
@@ -39,15 +43,20 @@ public class UserModel implements UserDetails, OAuth2User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String userName;
 
+    @Column(nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Transient
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String passwordRepeat;
+
+    @Transient
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String prevPassword;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -59,12 +68,15 @@ public class UserModel implements UserDetails, OAuth2User {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private MultipartFile shopFile;
 
-    @Column(name = "profile")
-    private String profileImage;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String shopImage;
 
     @Transient
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private MultipartFile profileFile;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String profileImage;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role", referencedColumnName = "name"))
@@ -81,7 +93,6 @@ public class UserModel implements UserDetails, OAuth2User {
 
     private String shopName;
 
-    private String shopImage;
 
     private String address;
 

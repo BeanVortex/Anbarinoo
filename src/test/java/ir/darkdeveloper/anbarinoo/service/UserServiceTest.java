@@ -1,6 +1,8 @@
 package ir.darkdeveloper.anbarinoo.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,6 +21,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import ir.darkdeveloper.anbarinoo.model.UserModel;
@@ -28,18 +31,16 @@ import java.util.Map;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class UserServiceTest {
+public record UserServiceTest(UserService service,
+                              JwtUtils jwtUtils,
+                              PasswordEncoder encoder) {
 
     private static HttpServletRequest request;
-    private final UserService service;
-    private final JwtUtils jwtUtils;
-    private UserModel user;
+    private static UserModel user;
 
 
     @Autowired
-    public UserServiceTest(UserService service, JwtUtils jwtUtils) {
-        this.service = service;
-        this.jwtUtils = jwtUtils;
+    public UserServiceTest {
     }
 
     @BeforeAll
@@ -50,17 +51,11 @@ public class UserServiceTest {
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         request = mock(HttpServletRequest.class);
-    }
-
-    @BeforeEach
-    void userSetup() {
         user = new UserModel();
         user.setEmail("email@mail.com");
         user.setAddress("address");
         user.setDescription("desc");
         user.setUserName("user n");
-        user.setPassword("pass1");
-        user.setPasswordRepeat("pass1");
         user.setEnabled(true);
         MockMultipartFile file1 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
                 "Hello, World!".getBytes());
@@ -75,49 +70,108 @@ public class UserServiceTest {
     @WithMockUser(username = "anonymousUser")
     void signUp() throws Exception {
         HttpServletResponse response = mock(HttpServletResponse.class);
+        user.setPassword("pass1");
+        user.setPasswordRepeat("pass1");
         service.signUpUser(user, response);
         request = setUpHeader();
     }
 
     @Test
     @Order(2)
-    @WithMockUser(username = "email@mail.com")
-    void updateUserWithNullImages() {
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    void updateUserWithDeleteImagesAndNullEmail() {
         user.setDescription("dex");
         user.setShopName("shop1");
+        user.setEmail(null);
         user.setProfileFile(null);
         user.setShopFile(null);
-        user.setId(((UserModel) service.loadUserByUsername(user.getEmail())).getId());
+        user.setShopImage(null);
+        user.setProfileImage(null);
         service.updateUser(user, request);
+        var fetchedUser = service.getUserInfo(user.getId(), request);
+        assertThat(fetchedUser.getProfileImage()).isNull();
+        assertThat(fetchedUser.getShopImage()).isNull();
     }
+
 
     @Test
     @Order(3)
     @WithMockUser(username = "email@mail.com")
-    void updateUserWithImages() {
+    void updateUserWithNewImages() {
         user.setDescription("dex");
         user.setShopName("shop1");
-        user.setId(((UserModel) service.loadUserByUsername(user.getEmail())).getId());
+        MockMultipartFile file1 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!".getBytes());
+        MockMultipartFile file2 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!".getBytes());
+        user.setProfileFile(file1);
+        user.setShopFile(file2);
         service.updateUser(user, request);
+        var fetchedUser = service.getUserInfo(user.getId(), request);
+        assertThat(encoder.matches(user.getPassword(), fetchedUser.getPassword())).isTrue();
     }
 
     @Test
     @Order(4)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
-    void getUserInfo() {
-        UserModel model = service.getUserInfo(user.getId());
-        assertNull(model);
+    void updateUserWithKeepImagesAndNullPasswords() {
+        assertThrows(Exception.class, () -> {
+        });
+        user.setPassword(null);
+        user.setPasswordRepeat(null);
+        user.setShopFile(null);
+        user.setProfileFile(null);
+        service.updateUser(user, request);
+        var fetchedUser = service.getUserInfo(user.getId(), request);
+        assertThat(fetchedUser.getPassword()).isNotNull();
     }
 
     @Test
-    @WithMockUser(username = "email@mail.com")
     @Order(5)
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    void updateUserWithKeepImagesAndNewPasswords() {
+        user.setPrevPassword("pass1234");
+        user.setPassword("pass4321");
+        user.setPasswordRepeat("pass4321");
+        user.setShopFile(null);
+        user.setProfileFile(null);
+        service.updateUser(user, request);
+        var fetchedUser = service.getUserInfo(user.getId(), request);
+        assertThat(encoder.matches("pass4321", fetchedUser.getPassword())).isTrue();
+    }
+
+    @Test
+    @Order(6)
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    void updateUserWithKeepImagesAndWithNewEmail() {
+        user.setEmail("email2@mail.com");
+        user.setPassword(null);
+        user.setPasswordRepeat(null);
+        user.setShopFile(null);
+        user.setProfileFile(null);
+        service.updateUser(user, request);
+        var fetchedUser = service.getUserInfo(user.getId(), request);
+        assertThat(fetchedUser.getEmail()).isEqualTo("email2@mail.com");
+    }
+
+
+    @Test
+    @Order(7)
+    @WithMockUser(username = "email2@mail.com", authorities = {"OP_ACCESS_USER"})
+    void getUserInfo() {
+        UserModel model = service.getUserInfo(user.getId(), request);
+        assertThat(model.getEmail()).isEqualTo("email2@mail.com");
+    }
+
+    @Test
+    @WithMockUser(username = "email2@mail.com")
+    @Order(8)
     void deleteUser() {
         service.deleteUser(user.getId(), request);
     }
 
     @Test
-    @Order(6)
+    @Order(9)
     void verifyUserEmail() {
     }
 

@@ -4,11 +4,15 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import ir.darkdeveloper.anbarinoo.exception.*;
+import ir.darkdeveloper.anbarinoo.util.IOUtils;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
+import org.hibernate.Session;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,21 +46,29 @@ public class UserService implements UserDetailsService {
     private final AdminUserProperties adminUser;
     private final VerificationService verificationService;
     private final JwtUtils jwtUtils;
+    private final IOUtils ioUtils;
+    private final PasswordEncoder encoder;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userUtils.loadUserByUsername(username);
     }
 
+
+    // for image updates: only send file
+    // to keep images: only send their names
+    // to delete images: null files and names
     @Transactional
-    @PreAuthorize("authentication.name.equals(@userService.getAdminUser().getUsername()) || #model.getId() != null")
+//    @PreAuthorize("authentication.name.equals(@userService.getAdminUser().getUsername()) || #model.getId() != null")
     public UserModel updateUser(UserModel model, HttpServletRequest req) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (!auth.getName().equals("anonymousUser") || auth.getAuthorities().contains(Authority.OP_ACCESS_ADMIN)
                 || auth.getName().equals(model.getEmail())) {
             try {
                 checkUserIsSameUserForRequest(model.getId(), req, "update");
-                userUtils.validateUserData(model);
+                userUtils.resetPasswordUsingPrevious(model);
+                userUtils.validateEmail(model);
+                ioUtils.handleUserImage(model, userUtils, true);
                 return repo.save(model);
             } catch (ForbiddenException f) {
                 throw new ForbiddenException(f.getLocalizedMessage());
@@ -117,9 +130,19 @@ public class UserService implements UserDetailsService {
         throw new ForbiddenException("You are not allowed to signup a user!");
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN')")
-    public UserModel getUserInfo(Long id) {
-        return repo.findUserById(id);
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
+    public UserModel getUserInfo(Long id, HttpServletRequest req) {
+        try {
+            var userOpt = repo.findUserById(id);
+
+            if (userOpt.isPresent()) {
+                checkUserIsSameUserForRequest(id, req, "fetch");
+                return userOpt.get();
+            }
+        } catch (ForbiddenException f) {
+            throw new ForbiddenException(f.getLocalizedMessage());
+        }
+        throw new NoContentException("User does not exist");
     }
 
     @Transactional

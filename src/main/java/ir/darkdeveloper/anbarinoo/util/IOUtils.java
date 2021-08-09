@@ -45,17 +45,24 @@ public class IOUtils {
         return ResourceUtils.getFile("classpath:static/user/" + path).getAbsolutePath() + File.separator + fileName;
     }
 
-    public void handleUserImage(UserModel model, UserUtils utils)
+    public void handleUserImage(UserModel model, UserUtils utils, Boolean isUpdate)
             throws IOException {
-        UserModel preModel = (UserModel) utils.loadUserByUsername(model.getEmail());
+        var preModel = new UserModel();
+        if (!isUpdate)
+            preModel = (UserModel) utils.loadUserByUsername(model.getEmail());
+        else
+            preModel = utils.getUserById(model.getId());
 
-        deleteUserImages(preModel);
 
-        if (model.getProfileFile() != null && preModel != null && preModel.getProfileImage() != null)
-            model.setProfileImage(preModel.getProfileImage());
+        //update or delete
+        // for image updates: only send file
+        // to delete images: null files and names
+        // to keep images: only send their names
+        if (model.getShopFile() != null || model.getShopImage() == null)
+            deleteShopFile(preModel);
+        if (model.getProfileFile() != null || model.getProfileImage() == null)
+            deleteProfileFile(preModel);
 
-        if (model.getShopFile() != null && preModel != null && preModel.getShopImage() != null)
-            model.setShopImage(preModel.getShopImage());
 
         String profileFileName = saveFile(model.getProfileFile(), USER_IMAGE_PATH);
         if (profileFileName != null)
@@ -66,15 +73,23 @@ public class IOUtils {
             model.setShopImage(shopFileName);
     }
 
-    public void deleteUserImages(UserModel model) throws IOException {
-        if (model != null && model.getId() != null && model.getProfileImage() != null) {
-            String imgPath = getImagePath(USER_IMAGE_PATH, model.getProfileImage());
+    public void deleteUserImages(UserModel preModel) throws IOException {
+        deleteProfileFile(preModel);
+        deleteShopFile(preModel);
+    }
+
+    private void deleteProfileFile(UserModel preModel) throws IOException {
+        if (preModel != null && preModel.getId() != null && preModel.getProfileImage() != null) {
+            String imgPath = getImagePath(USER_IMAGE_PATH, preModel.getProfileImage());
             if (imgPath != null)
                 Files.delete(Paths.get(imgPath));
-        }
 
-        if (model != null && model.getId() != null && model.getShopImage() != null) {
-            String imgPath = getImagePath(USER_IMAGE_PATH, model.getShopImage());
+        }
+    }
+
+    private void deleteShopFile(UserModel preModel) throws IOException {
+        if (preModel != null && preModel.getId() != null && preModel.getShopImage() != null) {
+            String imgPath = getImagePath(USER_IMAGE_PATH, preModel.getShopImage());
             if (imgPath != null)
                 Files.delete(Paths.get(imgPath));
         }
