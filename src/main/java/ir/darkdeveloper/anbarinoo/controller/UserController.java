@@ -42,9 +42,9 @@ public class UserController {
         return userService.verifyUserEmail(token);
     }
 
-    @PostMapping("/update/")
-    public UserModel updateUser(@ModelAttribute UserModel model, HttpServletRequest req) {
-        return userService.updateUser(model, req);
+    @PutMapping("/update/{id}/")
+    public UserModel updateUser(@ModelAttribute UserModel model, @PathVariable Long id, HttpServletRequest req) {
+        return userService.updateUser(model, id, req);
     }
 
     @DeleteMapping("/{id}/")

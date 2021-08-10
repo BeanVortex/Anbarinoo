@@ -30,16 +30,15 @@ public class CategoryModel {
     @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    @JsonIdentityReference(alwaysAsId = true)
     private UserModel user;
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     private CategoryModel parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    @JsonIdentityReference(alwaysAsId = true)
     private List<CategoryModel> children = new ArrayList<>();
 
     public CategoryModel(String name) {

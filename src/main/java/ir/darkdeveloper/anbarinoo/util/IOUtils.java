@@ -21,6 +21,9 @@ public class IOUtils {
 
     private static final String USER_IMAGE_PATH = "profile_images/";
     private static final String PRODUCT_IMAGE_PATH = "product_images/";
+    private static final String DEFAULT_PROFILE_IMAGE = "noProfile.jpeg";
+    private static final String DEFAULT_SHOP_IMAGE = "noImage.png";
+
 
     /**
      * @param file MultipartFile
@@ -45,23 +48,39 @@ public class IOUtils {
         return ResourceUtils.getFile("classpath:static/user/" + path).getAbsolutePath() + File.separator + fileName;
     }
 
-    public void handleUserImage(UserModel model, UserUtils utils, Boolean isUpdate)
+    public void handleUserImage(UserModel model, UserUtils utils, Boolean isUpdate, Long updateUserId)
             throws IOException {
-        var preModel = new UserModel();
-        if (!isUpdate)
-            preModel = (UserModel) utils.loadUserByUsername(model.getEmail());
-        else
-            preModel = utils.getUserById(model.getId());
+        UserModel preModel = null;
+        if (isUpdate)
+            preModel = utils.getUserById(updateUserId);
+        else {
+            if (model.getShopImage() == null)
+                model.setShopImage("noImage.png");
+            if (model.getProfileImage() == null)
+                model.setProfileImage("noProfile.jpeg");
+        }
 
 
-        //update or delete
-        // for image updates: only send file
-        // to delete images: null files and names
-        // to keep images: only send their names
-        if (model.getShopFile() != null || model.getShopImage() == null)
+        //second condition is for default image when user wants to delete the previous image
+        if (model.getShopFile() != null ||
+                (model.getShopImage() != null
+                        && model.getShopImage().equals("default")
+                        && preModel != null
+                        && !preModel.getShopImage().equals(DEFAULT_SHOP_IMAGE))) {
+
             deleteShopFile(preModel);
-        if (model.getProfileFile() != null || model.getProfileImage() == null)
+            model.setShopImage(DEFAULT_SHOP_IMAGE);
+        }
+
+        if (model.getProfileFile() != null ||
+                (model.getProfileImage() != null
+                        && model.getProfileImage().equals("default")
+                        && preModel != null
+                        && !preModel.getProfileImage().equals(DEFAULT_PROFILE_IMAGE))) {
+
             deleteProfileFile(preModel);
+            model.setProfileImage(DEFAULT_PROFILE_IMAGE);
+        }
 
 
         String profileFileName = saveFile(model.getProfileFile(), USER_IMAGE_PATH);
@@ -74,8 +93,10 @@ public class IOUtils {
     }
 
     public void deleteUserImages(UserModel preModel) throws IOException {
-        deleteProfileFile(preModel);
-        deleteShopFile(preModel);
+        if (!preModel.getProfileImage().equals(DEFAULT_PROFILE_IMAGE))
+            deleteProfileFile(preModel);
+        if (!preModel.getShopImage().equals(DEFAULT_SHOP_IMAGE))
+            deleteShopFile(preModel);
     }
 
     private void deleteProfileFile(UserModel preModel) throws IOException {

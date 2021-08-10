@@ -98,8 +98,23 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
     @Order(3)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void getCategoriesByUserId() {
-        List<CategoryModel> categories = categoryService.getCategoriesByUserId(user.getId(), request);
+        var categories = categoryService.getCategoriesByUserId(user.getId(), request);
         assertThat(categories.size()).isNotEqualTo(0);
+    }
+
+    @Test
+    @Order(4)
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    void deleteCategory() {
+        categoryService.deleteCategory(electronics.getId(), request);
+    }
+
+    @Test
+    @Order(5)
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    void getUserAfterCatDelete() {
+        var fetchedUser = userService.getUserInfo(user.getId(), request);
+        assertThat(fetchedUser).isNotNull();
     }
 
 

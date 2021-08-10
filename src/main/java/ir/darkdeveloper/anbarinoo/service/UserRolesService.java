@@ -1,6 +1,7 @@
 package ir.darkdeveloper.anbarinoo.service;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.transaction.Transactional;
 
@@ -37,7 +38,7 @@ public class UserRolesService {
         return repo.findAll();
     }
 
-    public List<UserRoles> findAllByName(String name) {
+    public Set<UserRoles> findAllByName(String name) {
         return repo.findAllByName(name);
     }
 

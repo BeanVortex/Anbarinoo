@@ -32,4 +32,6 @@ public interface UserRepo extends PagingAndSortingRepository<UserModel, Long> {
     @Modifying
     @Query("UPDATE UserModel m SET m.enabled = true WHERE m.id = :id")
     void trueEnabledById(@Param("id") Long id);
+
+
 }

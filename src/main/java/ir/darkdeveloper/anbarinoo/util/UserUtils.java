@@ -1,10 +1,15 @@
 package ir.darkdeveloper.anbarinoo.util;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -120,7 +125,7 @@ public class UserUtils {
         validateEmail(model);
 
         model.setRoles(roleService.findAllByName("USER"));
-        ioUtils.handleUserImage(model, this, false);
+        ioUtils.handleUserImage(model, this, false, null);
         model.setPassword(encoder.encode(model.getPassword()));
         model.setPasswordRepeat("");
         model.setProvider(AuthProvider.LOCAL);
@@ -134,12 +139,6 @@ public class UserUtils {
     }
 
     public void validateEmail(UserModel model) {
-        //for update when email is null
-        if (model.getEmail() == null) {
-            var foundUser = (repo.findUserById(model.getId()));
-            foundUser.ifPresent(userModel -> model.setEmail(userModel.getEmail()));
-        }
-
         if (model.getEmail() != null) {
             var VALID_EMAIL_REGEX =
                     Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
@@ -169,32 +168,49 @@ public class UserUtils {
         return repo.findByEmailOrUsername(username);
     }
 
-    public void deleteUser(Long id) throws IOException {
-        var user = repo.findUserById(id);
-        if (user.isPresent()) {
-            if (!user.get().isEnabled())
-                throw new EmailNotValidException("Email is not verified! Check your emails");
+    public void deleteUser(UserModel user) throws IOException {
+        if (!user.isEnabled())
+            throw new EmailNotValidException("Email is not verified! Check your emails");
 
-            ioUtils.deleteUserImages(user.get());
-            ioUtils.deleteUserProductImages(user.get().getProducts());
-            repo.deleteById(user.get().getId());
-            refreshService.deleteTokenByUserId(user.get().getId());
-        }
+        ioUtils.deleteUserImages(user);
+        ioUtils.deleteUserProductImages(user.getProducts());
+        refreshService.deleteTokenByUserId(user.getId());
+        repo.deleteById(user.getId());
+
     }
 
-    public void resetPasswordUsingPrevious(UserModel user) {
+    private void resetPasswordUsingPrevious(UserModel user, Long userId) {
+        //update pass
         if (user.getPassword() != null && user.getPasswordRepeat() != null) {
             if (user.getPrevPassword() != null) {
                 validatePassword(user);
 
-                var foundUser = (repo.findUserById(user.getId()));
+                var foundUser = repo.findUserById(userId);
                 foundUser.ifPresent(userModel -> {
                     if (encoder.matches(user.getPrevPassword(), foundUser.get().getPassword()))
                         user.setPassword(encoder.encode(user.getPassword()));
+
                 });
             } else
                 throw new PasswordException("Enter previous password to change");
+        } else {
+            //keep pass
+            var foundUser = repo.findUserById(userId);
+            foundUser.ifPresent(userModel -> user.setPassword(userModel.getPassword()));
         }
+    }
+
+    public UserModel updateUser(UserModel user, Long id) throws IOException {
+        //email update
+        //userUtils.validateEmail(model);
+        resetPasswordUsingPrevious(user, id);
+        ioUtils.handleUserImage(user, this, true, id);
+        var fetchedUser = repo.findUserById(id);
+        if (fetchedUser.isPresent()) {
+            fetchedUser.get().merge(user);
+            return fetchedUser.get();
+        }
+        return null;
     }
 
     public String validatePassword(UserModel user) {

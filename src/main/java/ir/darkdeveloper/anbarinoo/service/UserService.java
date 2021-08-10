@@ -47,7 +47,6 @@ public class UserService implements UserDetailsService {
     private final VerificationService verificationService;
     private final JwtUtils jwtUtils;
     private final IOUtils ioUtils;
-    private final PasswordEncoder encoder;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -56,27 +55,21 @@ public class UserService implements UserDetailsService {
 
 
     // for image updates: only send file
-    // to keep images: only send their names
-    // to delete images: null files and names
+    // to keep images: null files and names
+    // to delete images: only send 'default' for image names
+    //#model.getId() == null should be null. if wasn't other users can change other users data due to implementation of this method!!
     @Transactional
-//    @PreAuthorize("authentication.name.equals(@userService.getAdminUser().getUsername()) || #model.getId() != null")
-    public UserModel updateUser(UserModel model, HttpServletRequest req) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!auth.getName().equals("anonymousUser") || auth.getAuthorities().contains(Authority.OP_ACCESS_ADMIN)
-                || auth.getName().equals(model.getEmail())) {
-            try {
-                checkUserIsSameUserForRequest(model.getId(), req, "update");
-                userUtils.resetPasswordUsingPrevious(model);
-                userUtils.validateEmail(model);
-                ioUtils.handleUserImage(model, userUtils, true);
-                return repo.save(model);
-            } catch (ForbiddenException f) {
-                throw new ForbiddenException(f.getLocalizedMessage());
-            } catch (IOException e) {
-                throw new InternalServerException(e.getLocalizedMessage());
-            }
+    @PreAuthorize("authentication.name.equals(@userService.getAdminUser().getUsername()) || #model.getId() == null")
+    public UserModel updateUser(UserModel model, Long id, HttpServletRequest req) {
+        try {
+            checkUserIsSameUserForRequest(id, req, "update");
+            var updatedUser = userUtils.updateUser(model, id);
+            return repo.save(updatedUser);
+        } catch (ForbiddenException f) {
+            throw new ForbiddenException(f.getLocalizedMessage());
+        } catch (IOException e) {
+            throw new InternalServerException(e.getLocalizedMessage());
         }
-        throw new ForbiddenException("You are not allowed to update user!");
     }
 
     @Transactional
@@ -86,7 +79,7 @@ public class UserService implements UserDetailsService {
             var userOpt = repo.findById(id);
             if (userOpt.isPresent()) {
                 checkUserIsSameUserForRequest(userOpt.get().getId(), req, "delete");
-                userUtils.deleteUser(id);
+                userUtils.deleteUser(userOpt.get());
                 return new ResponseEntity<>(HttpStatus.OK);
             }
         } catch (ForbiddenException f) {
@@ -116,18 +109,15 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
+    @PreAuthorize("authentication.name.equals(@userService.getAdminUser().getUsername()) " +
+            "|| authentication.name.equals('anonymousUser')")
     public ResponseEntity<?> signUpUser(UserModel model, HttpServletResponse response) throws Exception {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth.getName().equals("anonymousUser") || auth.getAuthorities().contains(Authority.OP_ACCESS_ADMIN)
-                || !auth.getName().equals(model.getEmail())) {
-            try {
-                userUtils.signupValidation(model, response);
-                return new ResponseEntity<>(repo.findByEmailOrUsername(model.getUsername()), HttpStatus.OK);
-            } catch (DataIntegrityViolationException e) {
-                throw new DataExistsException("User exists!");
-            }
+        try {
+            userUtils.signupValidation(model, response);
+            return new ResponseEntity<>(repo.findByEmailOrUsername(model.getUsername()), HttpStatus.OK);
+        } catch (DataIntegrityViolationException e) {
+            throw new DataExistsException("User exists!");
         }
-        throw new ForbiddenException("You are not allowed to signup a user!");
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")

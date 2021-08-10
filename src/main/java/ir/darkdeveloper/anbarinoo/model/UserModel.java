@@ -2,11 +2,7 @@ package ir.darkdeveloper.anbarinoo.model;
 
 import java.io.Serial;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.persistence.*;
 
@@ -33,20 +29,16 @@ import lombok.Data;
 @DynamicUpdate
 public class UserModel implements UserDetails, OAuth2User {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-
     @Id
     @GeneratedValue
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, updatable = false)
     private String email;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String userName;
 
-    @Column(nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
@@ -58,7 +50,6 @@ public class UserModel implements UserDetails, OAuth2User {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String prevPassword;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
 
@@ -79,9 +70,9 @@ public class UserModel implements UserDetails, OAuth2User {
     private String profileImage;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role", referencedColumnName = "name"))
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private List<UserRoles> roles;
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name")
+    private Set<UserRoles> roles;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -104,23 +95,19 @@ public class UserModel implements UserDetails, OAuth2User {
 
     @OneToMany(mappedBy = "user")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    @JsonIdentityReference(alwaysAsId = true)
     private List<DebtOrDemandModel> debtOrDemand;
 
     @OneToMany(mappedBy = "user")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    @JsonIdentityReference(alwaysAsId = true)
     private List<ChequeModel> cheques;
 
     //mappedBy is read-only. can't add product while creating user
     @OneToMany(mappedBy = "user")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    @JsonIdentityReference(alwaysAsId = true)
     private List<ProductModel> products;
 
     @OneToMany(mappedBy = "user")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    @JsonIdentityReference(alwaysAsId = true)
     private List<CategoryModel> categories;
 
     // For saving products I need it
@@ -193,6 +180,35 @@ public class UserModel implements UserDetails, OAuth2User {
     @Override
     public String getName() {
         return userName;
+    }
+
+    public void merge(UserModel other) {
+        id = other.id == null ? id : other.id;
+        email = other.email == null ? email : other.email;
+        userName = other.userName == null ? userName : other.userName;
+        password = other.password == null ? password : other.password;
+        passwordRepeat = other.passwordRepeat == null ? passwordRepeat : other.passwordRepeat;
+        prevPassword = other.prevPassword == null ? prevPassword : other.prevPassword;
+        provider = other.provider == null ? provider : other.provider;
+        enabled = other.enabled == null ? enabled : other.enabled;
+        shopFile = other.shopFile == null ? shopFile : other.shopFile;
+        shopImage = other.shopImage == null ? shopImage : other.shopImage;
+        profileFile = other.profileFile == null ? profileFile : other.profileFile;
+        profileImage = other.profileImage == null ? profileImage : other.profileImage;
+        createdAt = other.createdAt == null ? createdAt : other.createdAt;
+        updatedAt = other.updatedAt == null ? updatedAt : other.updatedAt;
+        shopName = other.shopName == null ? shopName : other.shopName;
+        address = other.address == null ? address : other.address;
+        description = other.description == null ? description : other.description;
+        financial = other.financial == null ? financial : other.financial;
+        if (other.cheques != null)
+            cheques.addAll(other.cheques);
+        if (other.debtOrDemand != null)
+            debtOrDemand.addAll(other.debtOrDemand);
+        if (other.products != null)
+            products.addAll(other.products);
+        if (other.categories != null)
+            categories.addAll(other.categories);
     }
 
 }
