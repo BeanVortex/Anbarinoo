@@ -27,13 +27,15 @@ public class ProductController {
     }
 
     @PostMapping("/search/")
-    public ResponseEntity<Page<ProductModel>> findByNameContains(@RequestParam String name, Pageable pageable, HttpServletRequest request) {
+    public ResponseEntity<Page<ProductModel>> findByNameContains(@RequestParam String name, Pageable pageable,
+                                                                 HttpServletRequest request) {
         return ResponseEntity.ok().body(service.findByNameContains(name, pageable, request));
     }
 
-    @PostMapping("/update/")
-    public ResponseEntity<ProductModel> updateProduct(@ModelAttribute ProductModel model, HttpServletRequest request) {
-        return ResponseEntity.ok().body(service.updateProduct(model, request));
+    @PutMapping("/update/{id}/")
+    public ResponseEntity<ProductModel> updateProduct(@ModelAttribute ProductModel model, @PathVariable("id") Long productId,
+                                                      HttpServletRequest request) {
+        return ResponseEntity.ok().body(service.updateProduct(model, productId, request));
     }
 
     @GetMapping("/{id}/")
@@ -42,7 +44,8 @@ public class ProductController {
     }
 
     @GetMapping("/user/{id}/")
-    public ResponseEntity<?> getOneUserProducts(@PathVariable("id") Long userId, Pageable pageable, HttpServletRequest request) {
+    public ResponseEntity<?> getOneUserProducts(@PathVariable("id") Long userId, Pageable pageable,
+                                                HttpServletRequest request) {
         return ResponseEntity.ok().body(service.getOneUserProducts(userId, pageable, request));
     }
 

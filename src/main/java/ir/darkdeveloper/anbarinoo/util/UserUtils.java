@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -125,7 +126,7 @@ public class UserUtils {
         validateEmail(model);
 
         model.setRoles(roleService.findAllByName("USER"));
-        ioUtils.handleUserImage(model, this, false, null);
+        ioUtils.handleUserImage(model, false, Optional.empty());
         model.setPassword(encoder.encode(model.getPassword()));
         model.setPasswordRepeat("");
         model.setProvider(AuthProvider.LOCAL);
@@ -179,13 +180,12 @@ public class UserUtils {
 
     }
 
-    private void resetPasswordUsingPrevious(UserModel user, Long userId) {
+    private void resetPasswordUsingPrevious(UserModel user, Optional<UserModel> foundUser) {
         //update pass
         if (user.getPassword() != null && user.getPasswordRepeat() != null) {
             if (user.getPrevPassword() != null) {
                 validatePassword(user);
 
-                var foundUser = repo.findUserById(userId);
                 foundUser.ifPresent(userModel -> {
                     if (encoder.matches(user.getPrevPassword(), foundUser.get().getPassword()))
                         user.setPassword(encoder.encode(user.getPassword()));
@@ -195,7 +195,6 @@ public class UserUtils {
                 throw new PasswordException("Enter previous password to change");
         } else {
             //keep pass
-            var foundUser = repo.findUserById(userId);
             foundUser.ifPresent(userModel -> user.setPassword(userModel.getPassword()));
         }
     }
@@ -203,12 +202,12 @@ public class UserUtils {
     public UserModel updateUser(UserModel user, Long id) throws IOException {
         //email update
         //userUtils.validateEmail(model);
-        resetPasswordUsingPrevious(user, id);
-        ioUtils.handleUserImage(user, this, true, id);
-        var fetchedUser = repo.findUserById(id);
-        if (fetchedUser.isPresent()) {
-            fetchedUser.get().merge(user);
-            return fetchedUser.get();
+        var foundUser = repo.findUserById(id);
+        resetPasswordUsingPrevious(user, foundUser);
+        ioUtils.handleUserImage(user,  true, foundUser);
+        if (foundUser.isPresent()) {
+            foundUser.get().merge(user);
+            return foundUser.get();
         }
         return null;
     }

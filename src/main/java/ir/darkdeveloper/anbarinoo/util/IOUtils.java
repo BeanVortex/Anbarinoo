@@ -48,37 +48,35 @@ public class IOUtils {
         return ResourceUtils.getFile("classpath:static/user/" + path).getAbsolutePath() + File.separator + fileName;
     }
 
-    public void handleUserImage(UserModel model, UserUtils utils, Boolean isUpdate, Long updateUserId)
+    public void handleUserImage(UserModel model, Boolean isUpdate, Optional<UserModel> preUser)
             throws IOException {
-        UserModel preModel = null;
-        if (isUpdate)
-            preModel = utils.getUserById(updateUserId);
-        else {
+        if (!isUpdate) {
             if (model.getShopImage() == null)
                 model.setShopImage("noImage.png");
             if (model.getProfileImage() == null)
                 model.setProfileImage("noProfile.jpeg");
         }
 
-
         //second condition is for default image when user wants to delete the previous image
-        if (model.getShopFile() != null ||
-                (model.getShopImage() != null
-                        && model.getShopImage().equals("default")
-                        && preModel != null
-                        && !preModel.getShopImage().equals(DEFAULT_SHOP_IMAGE))) {
+            if (model.getShopFile() != null ||
+                    (model.getShopImage() != null
+                            && model.getShopImage().equals("default")
+                            && preUser.isPresent()
+                            && !preUser.get().getShopImage().equals(DEFAULT_SHOP_IMAGE))) {
 
-            deleteShopFile(preModel);
-            model.setShopImage(DEFAULT_SHOP_IMAGE);
-        }
+                if (preUser.isPresent())
+                    deleteShopFile(preUser.get());
+                model.setShopImage(DEFAULT_SHOP_IMAGE);
+            }
 
         if (model.getProfileFile() != null ||
                 (model.getProfileImage() != null
                         && model.getProfileImage().equals("default")
-                        && preModel != null
-                        && !preModel.getProfileImage().equals(DEFAULT_PROFILE_IMAGE))) {
+                        && preUser.isPresent()
+                        && !preUser.get().getProfileImage().equals(DEFAULT_PROFILE_IMAGE))) {
 
-            deleteProfileFile(preModel);
+            if (preUser.isPresent())
+                deleteProfileFile(preUser.get());
             model.setProfileImage(DEFAULT_PROFILE_IMAGE);
         }
 

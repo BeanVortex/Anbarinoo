@@ -68,12 +68,6 @@ public record UserServiceTest(UserService service,
         user.setDescription("desc");
         user.setUserName("user n");
         user.setEnabled(true);
-//        MockMultipartFile file1 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-//                "Hello, World!".getBytes());
-//        MockMultipartFile file2 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-//                "Hello, World!".getBytes());
-//        user.setProfileFile(file1);
-//        user.setShopFile(file2);
         user.setPassword("pass1");
         user.setPasswordRepeat("pass1");
         service.signUpUser(user, response);
@@ -105,10 +99,9 @@ public record UserServiceTest(UserService service,
         userId = user.getId();
     }
 
-
     @Test
     @Order(2)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_EDIT_USER", "OP_ACCESS_USER"})
     void updateUserWithKeepImagesAndNullPasswords() {
         var user = new UserModel();
         user.setAddress("DFDF");
@@ -119,7 +112,7 @@ public record UserServiceTest(UserService service,
 
     @Test
     @Order(3)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_EDIT_USER", "OP_ACCESS_USER"})
     void updateUserWithKeepImagesAndNewPasswords() {
         var user = new UserModel();
         user.setPrevPassword("pass1");
@@ -130,10 +123,9 @@ public record UserServiceTest(UserService service,
         assertThat(encoder.matches("pass4321", fetchedUser.getPassword())).isTrue();
     }
 
-
     @Test
     @Order(4)
-    @WithMockUser(username = "email@mail.com", authorities = "OP_ACCESS_USER")
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_EDIT_USER", "OP_ACCESS_USER"})
     void updateUserWithNewImages() {
         var user = new UserModel();
         user.setDescription("dex");
@@ -153,7 +145,7 @@ public record UserServiceTest(UserService service,
 
     @Test
     @Order(5)
-    @WithMockUser(username = "email@mail.com", authorities = "OP_ACCESS_USER")
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_EDIT_USER", "OP_ACCESS_USER"})
     void updateUserWithDefaultImages() {
         var user = new UserModel();
         user.setDescription("dex");
@@ -169,7 +161,6 @@ public record UserServiceTest(UserService service,
         assertThat(fetchedUser2.getProfileImage()).isEqualTo("noProfile.jpeg");
     }
 
-
     @Test
     @Order(6)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
@@ -183,7 +174,7 @@ public record UserServiceTest(UserService service,
 
     @Test
     @Order(7)
-    @WithMockUser
+    @WithMockUser(authorities = "OP_DELETE_USER")
     void deleteUser() {
         service.deleteUser(userId, request);
     }
@@ -196,12 +187,10 @@ public record UserServiceTest(UserService service,
         assertThat(roles.size()).isNotEqualTo(0);
     }
 
-
     @Test
     @Order(8)
     void verifyUserEmail() {
     }
-
 
     //should return the object; data is being removed
     private HttpServletRequest setUpHeader(UserModel user) {
@@ -226,6 +215,5 @@ public record UserServiceTest(UserService service,
 
         return request;
     }
-
 
 }

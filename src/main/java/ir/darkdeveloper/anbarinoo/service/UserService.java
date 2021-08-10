@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import ir.darkdeveloper.anbarinoo.exception.*;
 import ir.darkdeveloper.anbarinoo.util.IOUtils;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
+import javassist.NotFoundException;
 import org.hibernate.Session;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -46,7 +47,6 @@ public class UserService implements UserDetailsService {
     private final AdminUserProperties adminUser;
     private final VerificationService verificationService;
     private final JwtUtils jwtUtils;
-    private final IOUtils ioUtils;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -59,12 +59,15 @@ public class UserService implements UserDetailsService {
     // to delete images: only send 'default' for image names
     //#model.getId() == null should be null. if wasn't other users can change other users data due to implementation of this method!!
     @Transactional
-    @PreAuthorize("authentication.name.equals(@userService.getAdminUser().getUsername()) || #model.getId() == null")
+    @PreAuthorize("hasAnyAuthority('OP_EDIT_USER')")
     public UserModel updateUser(UserModel model, Long id, HttpServletRequest req) {
         try {
+            if (model.getId() != null) throw new NotFoundException("User id should null, can't update");
             checkUserIsSameUserForRequest(id, req, "update");
             var updatedUser = userUtils.updateUser(model, id);
             return repo.save(updatedUser);
+        } catch (NotFoundException n) {
+            throw new BadRequestException(n.getLocalizedMessage());
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (IOException e) {
@@ -73,15 +76,18 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    @PreAuthorize("authentication.name.equals(@userService.getAdminUser().getUsername()) || #id != null")
+    @PreAuthorize("hasAnyAuthority('OP_DELETE_USER')")
     public ResponseEntity<?> deleteUser(Long id, HttpServletRequest req) {
         try {
+            if (id == null) throw new NotFoundException("User id is null, can't update");
             var userOpt = repo.findById(id);
             if (userOpt.isPresent()) {
                 checkUserIsSameUserForRequest(userOpt.get().getId(), req, "delete");
                 userUtils.deleteUser(userOpt.get());
                 return new ResponseEntity<>(HttpStatus.OK);
             }
+        } catch (NotFoundException n) {
+            throw new BadRequestException(n.getLocalizedMessage());
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (IOException e) {
@@ -89,7 +95,6 @@ public class UserService implements UserDetailsService {
         }
         throw new NoContentException("User does not exist");
     }
-
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN')")
     public Page<UserModel> allUsers(Pageable pageable) {
@@ -138,7 +143,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     public ResponseEntity<?> verifyUserEmail(String token) {
 
-        Optional<VerificationModel> model = verificationService.findByToken(token);
+        var model = verificationService.findByToken(token);
 
         try {
             if (model.isPresent())
@@ -160,7 +165,7 @@ public class UserService implements UserDetailsService {
     }
 
     private void checkUserIsSameUserForRequest(Long userId, HttpServletRequest req, String operation) {
-        Long id = jwtUtils.getUserId(req.getHeader("refresh_token"));
+        var id = jwtUtils.getUserId(req.getHeader("refresh_token"));
         if (!userId.equals(id))
             throw new ForbiddenException("You can't " + operation + " another user's products");
     }

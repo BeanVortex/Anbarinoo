@@ -41,11 +41,11 @@ public record ProductServiceTest(ProductService productService,
 
 
     private static ProductModel product;
-    private static UserModel user, user2;
     private static HttpServletRequest request;
     private static CategoryModel cat1;
     private static CategoryModel electronics;
-
+    private static Long userId;
+    private static Long userId2;
 
     @Autowired
     public ProductServiceTest {
@@ -57,30 +57,6 @@ public record ProductServiceTest(ProductService productService,
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
-        user = new UserModel();
-        user.setEmail("email@mail.com");
-        user.setAddress("address");
-        user.setDescription("desc");
-        user.setUserName("user n");
-        user.setPassword("pass1");
-        user.setPasswordRepeat("pass1");
-        user.setEnabled(true);
-//        MockMultipartFile file1 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-//                "Hello, World!".getBytes());
-//        MockMultipartFile file2 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-//                "Hello, World!".getBytes());
-        product = new ProductModel();
-        product.setName("name");
-        product.setDescription("description");
-        product.setBoughtCount(25);
-        product.setBuyPrice(156d);
-        product.setSoldCount(13);
-        product.setTotalCount(50);
-        MockMultipartFile file3 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!".getBytes());
-        MockMultipartFile file4 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!".getBytes());
-        product.setFiles(Arrays.asList(file3, file4));
         request = mock(HttpServletRequest.class);
         System.out.println("ProductServiceTest.setUp");
     }
@@ -91,14 +67,23 @@ public record ProductServiceTest(ProductService productService,
     @WithMockUser(username = "anonymousUser")
     void saveUser() throws Exception {
         HttpServletResponse response = mock(HttpServletResponse.class);
+        var user = new UserModel();
+        user.setEmail("email@mail.com");
+        user.setAddress("address");
+        user.setDescription("desc");
+        user.setUserName("user n");
+        user.setPassword("pass1");
+        user.setPasswordRepeat("pass1");
+        user.setEnabled(true);
         userService.signUpUser(user, response);
-        request = setUpHeader();
-        user2 = new UserModel();
+        userId = user.getId();
+        request = setUpHeader(user.getEmail(), userId);
+        var user2 = new UserModel();
         user2.setEmail("email2@mail.com");
         user2.setPassword("pass1");
         user2.setPasswordRepeat("pass1");
         userService.signUpUser(user2, response);
-
+        userId2 = user2.getId();
         System.out.println("ProductServiceTest.saveUser");
     }
 
@@ -129,6 +114,18 @@ public record ProductServiceTest(ProductService productService,
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void saveProduct() {
         System.out.println("ProductServiceTest.saveProduct");
+        product = new ProductModel();
+        product.setName("name");
+        product.setDescription("description");
+        product.setBoughtCount(25);
+        product.setBuyPrice(156d);
+        product.setSoldCount(13);
+        product.setTotalCount(50);
+        MockMultipartFile file3 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!".getBytes());
+        MockMultipartFile file4 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!".getBytes());
+        product.setFiles(Arrays.asList(file3, file4));
         product.setCategory(cat1);
         productService.saveProduct(product, request);
     }
@@ -139,7 +136,7 @@ public record ProductServiceTest(ProductService productService,
     void getProduct() {
         System.out.println("ProductServiceTest.getProduct");
         var fetchedProduct = productService.getProduct(product.getId(), request);
-        assertThat(fetchedProduct.getUser().getId()).isEqualTo(user.getId());
+        assertThat(fetchedProduct.getUser().getId()).isEqualTo(userId);
         assertThat(fetchedProduct.getBoughtCount()).isEqualTo(product.getBoughtCount());
         assertThat(fetchedProduct.getSoldCount()).isEqualTo(product.getSoldCount());
         assertThat(fetchedProduct.getTotalCount()).isEqualTo(product.getTotalCount());
@@ -149,7 +146,7 @@ public record ProductServiceTest(ProductService productService,
 
     @Test
     @Order(5)
-    @WithMockUser(username = "email@mail.com",authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void updateProduct() {
         System.out.println("ProductServiceTest.updateProduct");
         product.setName("updatedName");
@@ -168,7 +165,8 @@ public record ProductServiceTest(ProductService productService,
 //                "Hello, World!".getBytes());
         product.setFiles(Arrays.asList(file3, file4, file5/*, file6*/));
         product.setCategory(electronics);
-        productService.updateProduct(product, request);
+
+        productService.updateProduct(product, userId, request);
         getProduct();
         var fetchedProduct = productService.getProduct(product.getId(), request);
         assertThat(fetchedProduct.getCategory().getName())
@@ -195,7 +193,7 @@ public record ProductServiceTest(ProductService productService,
     void getOneUserProducts() {
         var pageable = PageRequest.of(0, 8);
         assertThrows(ForbiddenException.class, () -> {
-            var products = productService.getOneUserProducts(user2.getId(), pageable, request);
+            var products = productService.getOneUserProducts(userId2, pageable, request);
             products.getContent().forEach(p -> {
                 assertThat(p.getName()).isEqualTo(product.getName());
                 assertThat(p.getBoughtCount()).isEqualTo(product.getBoughtCount());
@@ -211,14 +209,14 @@ public record ProductServiceTest(ProductService productService,
     }
 
     //should return the object; data is being removed
-    private HttpServletRequest setUpHeader() {
+    private HttpServletRequest setUpHeader(String email, Long userId) {
 
         Map<String, String> headers = new HashMap<>();
         headers.put(null, "HTTP/1.1 200 OK");
         headers.put("Content-Type", "text/html");
 
-        String refreshToken = jwtUtils.generateRefreshToken(user.getEmail(), user.getId());
-        String accessToken = jwtUtils.generateAccessToken(user.getEmail());
+        String refreshToken = jwtUtils.generateRefreshToken(email, userId);
+        String accessToken = jwtUtils.generateAccessToken(email);
         var refreshDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
         var accessDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
         headers.put("refresh_token", refreshToken);
