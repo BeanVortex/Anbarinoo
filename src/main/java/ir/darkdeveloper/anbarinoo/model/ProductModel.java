@@ -58,10 +58,10 @@ public class ProductModel {
     private Double buyPrice;
 
     @Column(name = "sell_count")
-    private int soldCount;
+    private Integer soldCount;
 
     @Column(name = "buy_count")
-    private int boughtCount;
+    private Integer boughtCount;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -86,4 +86,18 @@ public class ProductModel {
     private LocalDateTime updatedAt;
 
 
+    public void merge(ProductModel other) {
+        id = other.id == null ? id : other.id;
+        name = other.name == null ? name : other.name;
+        description = other.description == null ? description : other.description;
+        price = other.price == null ? price : other.price;
+        buyPrice = other.buyPrice == null ? buyPrice : other.buyPrice;
+        soldCount = other.soldCount == null ? soldCount : other.soldCount;
+        boughtCount = other.boughtCount == null ? boughtCount : other.boughtCount;
+        category = other.category == null ? category : other.category;
+        totalCount = other.totalCount == null ? totalCount : other.totalCount;
+        createdAt = other.createdAt == null ? createdAt : other.createdAt;
+        updatedAt = other.updatedAt == null ? updatedAt : other.updatedAt;
+    }
 }
+

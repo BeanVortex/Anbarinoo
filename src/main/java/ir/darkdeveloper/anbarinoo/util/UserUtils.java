@@ -174,7 +174,7 @@ public class UserUtils {
             throw new EmailNotValidException("Email is not verified! Check your emails");
 
         ioUtils.deleteUserImages(user);
-        ioUtils.deleteUserProductImages(user.getProducts());
+        ioUtils.deleteProductImagesOfUser(user.getProducts());
         refreshService.deleteTokenByUserId(user.getId());
         repo.deleteById(user.getId());
 

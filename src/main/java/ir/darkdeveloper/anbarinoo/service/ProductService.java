@@ -28,16 +28,25 @@ import javax.transaction.Transactional;
 @AllArgsConstructor
 public class ProductService {
     private final ProductRepository repo;
-    private final JwtUtils jwtUtils;
     private final IOUtils ioUtils;
     private final ProductUtils productUtils;
 
+
+    /**
+     * saves a new product to the user id of refresh token
+     * if image files are null, then sets a default image
+     * if not, saves files and sets images
+     *
+     * @param product id should be null
+     * @param request should contain refresh token
+     */
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ProductModel saveProduct(ProductModel productModel, HttpServletRequest request) {
+    public ProductModel saveProduct(ProductModel product, HttpServletRequest request) {
         try {
-            productModel.setUser(new UserModel(jwtUtils.getUserId(request.getHeader("refresh_token"))));
-            return productUtils.saveProductModel(productModel, request);
+            return productUtils.saveProduct(product, request);
+        } catch (BadRequestException b) {
+            throw new BadRequestException(b.getLocalizedMessage());
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
         }
@@ -88,25 +97,92 @@ public class ProductService {
         }
     }
 
+
+    /**
+     * For regular update with no images: another users can't update not owned products
+     *
+     * @param product   should files and id and images and user be null
+     * @param productId should not to be null
+     * @param req       should contain refresh token
+     * @return updated product with kept images
+     */
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ProductModel updateProduct(ProductModel productModel, Long productId, HttpServletRequest req) {
+    public ProductModel updateProduct(ProductModel product, Long productId, HttpServletRequest req) {
         try {
-            if (productModel.getId() != null) throw new NotFoundException("Product id should null, can't update");
+            if (product.getId() != null) throw new BadRequestException("Product id should null, can't update");
             var foundProduct = repo.findById(productId);
             if (foundProduct.isPresent()) {
                 productUtils.checkUserIsSameUserForRequest(foundProduct.get().getUser().getId(), req, "update");
-                return productUtils.saveProductModel(productModel, req);
+                return productUtils.updateProduct(product, foundProduct.get());
             }
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
-        } catch (NotFoundException n) {
+        } catch (BadRequestException n) {
             throw new BadRequestException(n.getLocalizedMessage());
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
         }
         throw new NoContentException("This product does not exist");
     }
+
+    /**
+     * For Images update only: another users can't update not owned products
+     *
+     * @param product   should files and id and images not to be null and user be null
+     * @param productId should not to be null
+     * @param req       should contain refresh token
+     * @return updated product with new images
+     */
+    @Transactional
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    public ProductModel updateProductImages(ProductModel product, Long productId, HttpServletRequest req) {
+        try {
+            if (product.getId() != null) throw new BadRequestException("Product id should null, can't update");
+            var foundProduct = repo.findById(productId);
+            if (foundProduct.isPresent()) {
+                productUtils.checkUserIsSameUserForRequest(foundProduct.get().getUser().getId(), req, "update");
+                return productUtils.updateProductImages(product, foundProduct.get());
+            }
+        } catch (ForbiddenException f) {
+            throw new ForbiddenException(f.getLocalizedMessage());
+        } catch (BadRequestException n) {
+            throw new BadRequestException(n.getLocalizedMessage());
+        } catch (Exception e) {
+            throw new InternalServerException(e.getLocalizedMessage());
+        }
+        throw new NoContentException("This product does not exist");
+    }
+
+    /**
+     * For Images delete only: another users can't update not owned products
+     *
+     * @param product   should images name not to be null and user and id be null, image names are going to delete
+     * @param productId should not to be null
+     * @param req       should contain refresh token
+     */
+    @Transactional
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    public ResponseEntity<?> deleteUpdateProductImages(ProductModel product, Long productId, HttpServletRequest req) {
+        try {
+            if (product.getId() != null) throw new BadRequestException("Product id should null, can't update");
+            var foundProduct = repo.findById(productId);
+            if (foundProduct.isPresent()) {
+                productUtils.checkUserIsSameUserForRequest(foundProduct.get().getUser().getId(), req,
+                        "delete images of");
+                productUtils.deleteUpdateProductImages(product, foundProduct.get());
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+        } catch (ForbiddenException f) {
+            throw new ForbiddenException(f.getLocalizedMessage());
+        } catch (BadRequestException n) {
+            throw new BadRequestException(n.getLocalizedMessage());
+        } catch (Exception e) {
+            throw new InternalServerException(e.getLocalizedMessage());
+        }
+        throw new NoContentException("This product does not exist");
+    }
+
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
@@ -115,7 +191,7 @@ public class ProductService {
             var productOpt = repo.findById(id);
             if (productOpt.isPresent()) {
                 productUtils.checkUserIsSameUserForRequest(productOpt.get().getUser().getId(), req, "delete");
-                ioUtils.deleteProductFiles(productOpt);
+                ioUtils.deleteProductFiles(productOpt.get());
                 repo.deleteById(id);
                 return new ResponseEntity<>(HttpStatus.OK);
             }
