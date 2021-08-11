@@ -53,5 +53,23 @@ public class CategoryModel {
     public void addChild(CategoryModel children) {
         this.children.add(children);
     }
+
+    @Override
+    public String toString() {
+        if (parent != null)
+            return "CategoryModel{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    ", user=" + user +
+                    ", parent=" + parent.getName() +
+                    '}';
+        else
+            return "CategoryModel{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    ", user=" + user +
+                    ", parent=null" +
+                    '}';
+    }
 }
 

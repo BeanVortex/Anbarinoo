@@ -192,8 +192,8 @@ public class IOUtils {
      * @param preProduct: will iterate in this product images and find the one which is going to delete and deletes it
      */
     public void updateDeleteProductImages(ProductModel product, ProductModel preProduct) {
-        preProduct.getImages().forEach(oldImg -> {
-            if (product.getImages().contains(oldImg)) {
+        product.getImages().forEach(oldImg -> {
+            if (preProduct.getImages().contains(oldImg)) {
                 try {
                     var imgPath = getImagePath(PRODUCT_IMAGE_PATH, oldImg);
                     if (!oldImg.equals(DEFAULT_PRODUCT_IMAGE) && imgPath != null)
@@ -204,6 +204,8 @@ public class IOUtils {
                 }
             }
         });
+        if (preProduct.getImages().size() == 0)
+            preProduct.getImages().add(DEFAULT_PRODUCT_IMAGE);
     }
 
     /**

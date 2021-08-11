@@ -51,6 +51,7 @@ public class ProductUtils {
         if (product.getUser() != null) throw new ForbiddenException("You can't change the post owner");
 
         ioUtils.addProductImages(product, preProduct);
+        product.setUser(new UserModel(preProduct.getUser().getId()));
         return repo.save(product);
     }
 
@@ -63,6 +64,7 @@ public class ProductUtils {
 
     public void updateDeleteProductImages(ProductModel product, ProductModel preProduct) {
         ioUtils.updateDeleteProductImages(product, preProduct);
+
         repo.save(preProduct);
     }
 }

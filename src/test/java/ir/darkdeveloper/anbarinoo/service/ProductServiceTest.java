@@ -144,7 +144,6 @@ public record ProductServiceTest(ProductService productService,
     @Order(5)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void updateProduct() {
-        System.out.println("ProductServiceTest.updateProduct");
         var product = new ProductModel();
         product.setName("updatedName");
         product.setDescription("updatedDescription");
@@ -152,15 +151,6 @@ public record ProductServiceTest(ProductService productService,
         product.setBuyPrice(25d);
         product.setSoldCount(6);
         product.setTotalCount(10);
-        MockMultipartFile file3 = new MockMultipartFile("file", "helladsfo.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!".getBytes());
-        MockMultipartFile file4 = new MockMultipartFile("file", "heladsflo.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!".getBytes());
-        MockMultipartFile file5 = new MockMultipartFile("file", "heladsflo.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!".getBytes());
-//        MockMultipartFile file6 = new MockMultipartFile("file", "heladsflo.jpg", MediaType.IMAGE_JPEG_VALUE,
-//                "Hello, World!".getBytes());
-        product.setFiles(Arrays.asList(file3, file4, file5/*, file6*/));
         product.setCategory(electronics);
 
         productService.updateProduct(product, productId, request);
@@ -172,6 +162,67 @@ public record ProductServiceTest(ProductService productService,
 
     @Test
     @Order(6)
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    void updateProductImages() {
+        var product = new ProductModel();
+
+        MockMultipartFile file3 = new MockMultipartFile("file", "helladsfo.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!".getBytes());
+        MockMultipartFile file4 = new MockMultipartFile("file", "heladsflo.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!".getBytes());
+        MockMultipartFile file5 = new MockMultipartFile("file", "heladsflo.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!".getBytes());
+//        MockMultipartFile file6 = new MockMultipartFile("file", "heladsflo.jpg", MediaType.IMAGE_JPEG_VALUE,
+//                "Hello, World!".getBytes());
+        product.setFiles(Arrays.asList(file3, file4, file5/*, file6*/));
+
+        productService.updateProductImages(product, productId, request);
+
+        var fetchedProduct = productService.getProduct(productId, request);
+        assertThat(fetchedProduct.getImages().size()).isNotEqualTo(0);
+        for (var image : fetchedProduct.getImages())
+            assertThat(image).isNotEqualTo("noImage.png");
+    }
+
+    @Test
+    @Order(7)
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    @Disabled
+    void deleteAllUpdateProductImages() {
+        var product = new ProductModel();
+        var fetchedProduct = productService.getProduct(productId, request);
+        product.setImages(fetchedProduct.getImages());
+
+        productService.updateDeleteProductImages(product, productId, request);
+
+        var fetchedProduct2 = productService.getProduct(productId, request);
+        assertThat(fetchedProduct2.getImages().size()).isNotEqualTo(0);
+        for (var image : fetchedProduct2.getImages())
+            assertThat(image).isEqualTo("noImage.png");
+    }
+
+    @Test
+    @Order(8)
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    void delete3UpdateProductImages() {
+        var product = new ProductModel();
+        var fetchedProduct = productService.getProduct(productId, request);
+        var fileNames = fetchedProduct.getImages();
+        fileNames.remove(0);
+        fileNames.remove(1);
+        product.setImages(fileNames);
+
+        productService.updateDeleteProductImages(product, productId, request);
+
+        var fetchedProduct2 = productService.getProduct(productId, request);
+        assertThat(fetchedProduct2.getImages().size()).isEqualTo(2);
+        for (var image : fetchedProduct2.getImages())
+            assertThat(image).isNotEqualTo("noImage.png");
+    }
+
+
+    @Test
+    @Order(9)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void findByNameContains() {
         System.out.println("ProductServiceTest. findByNameContains");
@@ -187,7 +238,7 @@ public record ProductServiceTest(ProductService productService,
     }
 
     @Test
-    @Order(7)
+    @Order(10)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void getOneUserProducts() {
         var pageable = PageRequest.of(0, 8);
@@ -204,10 +255,10 @@ public record ProductServiceTest(ProductService productService,
     }
 
     @Test
-    @Order(8)
+    @Order(11)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void deleteProduct() {
-        productService.deleteProduct(userId, request);
+        productService.deleteProduct(productId, request);
     }
 
     //should return the object; data is being removed
@@ -233,6 +284,5 @@ public record ProductServiceTest(ProductService productService,
 
         return request;
     }
-
 
 }
