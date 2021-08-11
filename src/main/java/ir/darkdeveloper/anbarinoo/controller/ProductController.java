@@ -22,20 +22,32 @@ public class ProductController {
     }
 
     @PostMapping("/save/")
-    public ResponseEntity<ProductModel> saveProduct(@ModelAttribute ProductModel model, HttpServletRequest request) {
+    public ResponseEntity<?> saveProduct(@ModelAttribute ProductModel model, HttpServletRequest request) {
         return ResponseEntity.ok().body(service.saveProduct(model, request));
     }
 
     @PostMapping("/search/")
-    public ResponseEntity<Page<ProductModel>> findByNameContains(@RequestParam String name, Pageable pageable,
-                                                                 HttpServletRequest request) {
+    public ResponseEntity<?> findByNameContains(@RequestParam String name, Pageable pageable,
+                                                HttpServletRequest request) {
         return ResponseEntity.ok().body(service.findByNameContains(name, pageable, request));
     }
 
     @PutMapping("/update/{id}/")
-    public ResponseEntity<ProductModel> updateProduct(@ModelAttribute ProductModel model, @PathVariable("id") Long productId,
-                                                      HttpServletRequest request) {
+    public ResponseEntity<?> updateProduct(@ModelAttribute ProductModel model, @PathVariable("id") Long productId,
+                                           HttpServletRequest request) {
         return ResponseEntity.ok().body(service.updateProduct(model, productId, request));
+    }
+
+    @PutMapping("/update/images/{id}/")
+    public ResponseEntity<?> updateProductImages(@ModelAttribute ProductModel model, @PathVariable("id") Long productId,
+                                                 HttpServletRequest request) {
+        return ResponseEntity.ok().body(service.updateProductImages(model, productId, request));
+    }
+
+    @PutMapping("/update/delete/images/{id}/")
+    public ResponseEntity<?> updateDeleteProductImages(@ModelAttribute ProductModel model, @PathVariable("id") Long productId,
+                                                       HttpServletRequest request) {
+        return service.updateDeleteProductImages(model, productId, request);
     }
 
     @GetMapping("/{id}/")

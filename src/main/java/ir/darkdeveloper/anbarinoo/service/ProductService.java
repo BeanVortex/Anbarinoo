@@ -163,14 +163,14 @@ public class ProductService {
      */
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ResponseEntity<?> deleteUpdateProductImages(ProductModel product, Long productId, HttpServletRequest req) {
+    public ResponseEntity<?> updateDeleteProductImages(ProductModel product, Long productId, HttpServletRequest req) {
         try {
             if (product.getId() != null) throw new BadRequestException("Product id should null, can't update");
             var foundProduct = repo.findById(productId);
             if (foundProduct.isPresent()) {
                 productUtils.checkUserIsSameUserForRequest(foundProduct.get().getUser().getId(), req,
                         "delete images of");
-                productUtils.deleteUpdateProductImages(product, foundProduct.get());
+                productUtils.updateDeleteProductImages(product, foundProduct.get());
                 return new ResponseEntity<>(HttpStatus.OK);
             }
         } catch (ForbiddenException f) {

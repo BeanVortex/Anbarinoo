@@ -61,8 +61,8 @@ public class ProductUtils {
             throw new ForbiddenException("You can't " + operation + " another user's products");
     }
 
-    public void deleteUpdateProductImages(ProductModel product, ProductModel preProduct) {
-        ioUtils.deleteUpdateProductImages(product, preProduct);
+    public void updateDeleteProductImages(ProductModel product, ProductModel preProduct) {
+        ioUtils.updateDeleteProductImages(product, preProduct);
         repo.save(preProduct);
     }
 }

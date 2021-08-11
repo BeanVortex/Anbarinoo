@@ -191,7 +191,7 @@ public class IOUtils {
      * @param product:    in this you should specify which image is going to delete
      * @param preProduct: will iterate in this product images and find the one which is going to delete and deletes it
      */
-    public void deleteUpdateProductImages(ProductModel product, ProductModel preProduct) {
+    public void updateDeleteProductImages(ProductModel product, ProductModel preProduct) {
         preProduct.getImages().forEach(oldImg -> {
             if (product.getImages().contains(oldImg)) {
                 try {
