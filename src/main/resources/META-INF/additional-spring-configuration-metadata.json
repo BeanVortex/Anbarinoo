@@ -59,6 +59,11 @@
       "name": "trust.store",
       "type": "java.lang.String",
       "description": "Description for trust.store."
+    },
+    {
+      "name": "server.name",
+      "type": "java.lang.String",
+      "description": "Description for server.name."
     }
   ]
 }

@@ -184,16 +184,13 @@ public class UserModel implements UserDetails, OAuth2User {
 
     public void merge(UserModel other) {
         id = other.id == null ? id : other.id;
-        email = other.email == null ? email : other.email;
         userName = other.userName == null ? userName : other.userName;
         password = other.password == null ? password : other.password;
         passwordRepeat = other.passwordRepeat == null ? passwordRepeat : other.passwordRepeat;
         prevPassword = other.prevPassword == null ? prevPassword : other.prevPassword;
         provider = other.provider == null ? provider : other.provider;
         enabled = other.enabled == null ? enabled : other.enabled;
-        shopFile = other.shopFile == null ? shopFile : other.shopFile;
         shopImage = other.shopImage == null ? shopImage : other.shopImage;
-        profileFile = other.profileFile == null ? profileFile : other.profileFile;
         profileImage = other.profileImage == null ? profileImage : other.profileImage;
         createdAt = other.createdAt == null ? createdAt : other.createdAt;
         updatedAt = other.updatedAt == null ? updatedAt : other.updatedAt;
@@ -201,14 +198,20 @@ public class UserModel implements UserDetails, OAuth2User {
         address = other.address == null ? address : other.address;
         description = other.description == null ? description : other.description;
         financial = other.financial == null ? financial : other.financial;
-        if (other.cheques != null)
-            cheques.addAll(other.cheques);
-        if (other.debtOrDemand != null)
-            debtOrDemand.addAll(other.debtOrDemand);
-        if (other.products != null)
-            products.addAll(other.products);
-        if (other.categories != null)
-            categories.addAll(other.categories);
     }
 
+    public void update(UserModel other) {
+        id = other.id != null && id != null ? other.id : id;
+        userName = other.userName != null && userName != null ? other.userName : userName;
+        provider = other.provider != null && provider != null ? other.provider : provider;
+        enabled = other.enabled != null && enabled != null ? other.enabled : enabled;
+        shopImage = other.shopImage != null && shopImage != null ? other.shopImage : shopImage;
+        profileImage = other.profileImage != null && profileImage != null ? other.profileImage : profileImage;
+        createdAt = other.createdAt != null && createdAt != null ? other.createdAt : createdAt;
+        updatedAt = other.updatedAt != null && updatedAt != null ? other.updatedAt : updatedAt;
+        shopName = other.shopName != null && shopName != null ? other.shopName : shopName;
+        address = other.address != null && address != null ? other.address : address;
+        description = other.description != null && description != null ? other.description : description;
+        financial = other.financial != null && financial != null ? other.financial : financial;
+    }
 }

@@ -1,6 +1,5 @@
 package ir.darkdeveloper.anbarinoo.controller;
 
-import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,14 +26,14 @@ public class UserController {
     }
 
     @PostMapping("/signup/")
-    public ResponseEntity<?> signUpUser(@ModelAttribute UserModel model, HttpServletResponse response)
+    public ResponseEntity<?> signUpUser(@ModelAttribute UserModel user, HttpServletResponse response)
             throws Exception {
-        return userService.signUpUser(model, response);
+        return userService.signUpUser(user, response);
     }
 
     @PostMapping("/login/")
-    public ResponseEntity<?> loginUser(@RequestBody JwtAuth model, HttpServletResponse response) {
-        return userService.loginUser(model, response);
+    public ResponseEntity<?> loginUser(@RequestBody JwtAuth authModel, HttpServletResponse response) {
+        return userService.loginUser(authModel, response);
     }
 
     @GetMapping("/verify/")
@@ -43,8 +42,19 @@ public class UserController {
     }
 
     @PutMapping("/update/{id}/")
-    public UserModel updateUser(@ModelAttribute UserModel model, @PathVariable Long id, HttpServletRequest req) {
-        return userService.updateUser(model, id, req);
+    public UserModel updateUser(@ModelAttribute UserModel user, @PathVariable Long id, HttpServletRequest req) {
+        return userService.updateUser(user, id, req);
+    }
+
+    @PutMapping("/update/images/{id}/")
+    public UserModel updateUserImages(@ModelAttribute UserModel user, @PathVariable Long id, HttpServletRequest req) {
+        return userService.updateUserImages(user, id, req);
+    }
+
+    @PutMapping("/update/delete-images/{id}/")
+    public UserModel updateDeleteUserImages(@ModelAttribute UserModel user, @PathVariable Long id,
+                                            HttpServletRequest req) {
+        return userService.updateDeleteUserImages(user, id, req);
     }
 
     @DeleteMapping("/{id}/")

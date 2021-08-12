@@ -1,32 +1,6 @@
 package ir.darkdeveloper.anbarinoo.util;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
-
-import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
-import ir.darkdeveloper.anbarinoo.exception.EmailNotValidException;
-import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
-import ir.darkdeveloper.anbarinoo.exception.PasswordException;
+import ir.darkdeveloper.anbarinoo.exception.*;
 import ir.darkdeveloper.anbarinoo.model.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
@@ -38,6 +12,22 @@ import ir.darkdeveloper.anbarinoo.service.UserRolesService;
 import ir.darkdeveloper.anbarinoo.service.VerificationService;
 import ir.darkdeveloper.anbarinoo.util.email.EmailService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 @Component
 @AllArgsConstructor
@@ -54,17 +44,19 @@ public class UserUtils {
     private final IOUtils ioUtils;
     private final EmailService emailService;
     private final Boolean userEnabled;
+    @Value("${server.name}")
+    private final String serverName;
 
     public static final SimpleDateFormat TOKEN_EXPIRATION_FORMAT = new SimpleDateFormat("EE MMM dd yyyy HH:mm:ss");
 
     /**
-     * @param model   has username and password (JwtAuth)
+     * @param authModel   has username and password (JwtAuth)
      * @param userId  for super admin, pass null
      * @param rawPass for super admin, pass null
      */
-    public void authenticateUser(JwtAuth model, Long userId, String rawPass, HttpServletResponse response) {
-        String username = model.getUsername();
-        String password = model.getPassword();
+    public void authenticateUser(JwtAuth authModel, Long userId, String rawPass, HttpServletResponse response) {
+        String username = authModel.getUsername();
+        String password = authModel.getPassword();
 
         var user = repo.findByEmailOrUsername(username);
 
@@ -88,7 +80,7 @@ public class UserUtils {
         }
 
         RefreshModel rModel = new RefreshModel();
-        if (model.getUsername().equals(adminUser.getUsername())) {
+        if (authModel.getUsername().equals(adminUser.getUsername())) {
             rModel.setUserId(adminUser.getId());
             rModel.setId(refreshService.getIdByUserId(adminUser.getId()));
         } else {
@@ -115,40 +107,40 @@ public class UserUtils {
         response.addHeader("access_expiration", accessDate);
     }
 
-    public void signupValidation(UserModel model, HttpServletResponse response) throws Exception {
-        if (model.getId() != null)
+    public void signupValidation(UserModel user, HttpServletResponse response) throws Exception {
+        if (user.getId() != null)
             throw new ForbiddenException("You are not allowed to sign up! :|");
 
-        if (model.getUserName() != null && model.getUserName().equals(adminUser.getUsername()))
+        if (user.getUserName() != null && user.getUserName().equals(adminUser.getUsername()))
             throw new BadRequestException("User exists!");
 
-        var rawPass = validatePassword(model);
-        validateEmail(model);
+        var rawPass = validatePassword(user);
+        validateEmail(user);
 
-        model.setRoles(roleService.findAllByName("USER"));
-        ioUtils.handleUserImage(model, false, Optional.empty());
-        model.setPassword(encoder.encode(model.getPassword()));
-        model.setPasswordRepeat("");
-        model.setProvider(AuthProvider.LOCAL);
-        model.setEnabled(userEnabled);
-        repo.save(model);
-        if (!model.getEnabled())
-            sendEmail(model);
+        user.setRoles(roleService.findAllByName("USER"));
+        ioUtils.saveUserImages(user);
+        user.setPassword(encoder.encode(user.getPassword()));
+        user.setPasswordRepeat("");
+        user.setProvider(AuthProvider.LOCAL);
+        user.setEnabled(userEnabled);
+        repo.save(user);
+        if (!user.getEnabled())
+            sendEmail(user);
         else
-            authenticateUser(new JwtAuth(model.getEmail(), rawPass), model.getId(), rawPass, response);
+            authenticateUser(new JwtAuth(user.getEmail(), rawPass), user.getId(), rawPass, response);
 
     }
 
-    public void validateEmail(UserModel model) {
-        if (model.getEmail() != null) {
+    public void validateEmail(UserModel user) {
+        if (user.getEmail() != null) {
             var VALID_EMAIL_REGEX =
                     Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
-            var matcher = VALID_EMAIL_REGEX.matcher(model.getEmail());
+            var matcher = VALID_EMAIL_REGEX.matcher(user.getEmail());
             if (!matcher.find())
                 throw new EmailNotValidException("Email is not correct");
 
-            if (model.getUserName() == null || model.getUserName().trim().equals(""))
-                model.setUserName(model.getEmail().split("@")[0]);
+            if (user.getUserName() == null || user.getUserName().trim().equals(""))
+                user.setUserName(user.getEmail().split("@")[0]);
         }
     }
 
@@ -156,9 +148,6 @@ public class UserUtils {
         return repo.findUserIdByUsername(username);
     }
 
-    public UserModel getUserById(Long id) {
-        return repo.findUserById(id).orElse(null);
-    }
 
     public UserDetails loadUserByUsername(String username) {
         if (username.equals(adminUser.getUsername())) {
@@ -180,36 +169,56 @@ public class UserUtils {
 
     }
 
-    private void resetPasswordUsingPrevious(UserModel user, Optional<UserModel> foundUser) {
+    /**
+     * updates preUser Password
+     */
+    private void updatePasswordUsingPrevious(UserModel user, UserModel preUser) {
         //update pass
         if (user.getPassword() != null && user.getPasswordRepeat() != null) {
             if (user.getPrevPassword() != null) {
                 validatePassword(user);
-
-                foundUser.ifPresent(userModel -> {
-                    if (encoder.matches(user.getPrevPassword(), foundUser.get().getPassword()))
-                        user.setPassword(encoder.encode(user.getPassword()));
-
-                });
+                if (encoder.matches(user.getPrevPassword(), preUser.getPassword()))
+                    preUser.setPassword(encoder.encode(user.getPassword()));
             } else
                 throw new PasswordException("Enter previous password to change");
-        } else {
-            //keep pass
-            foundUser.ifPresent(userModel -> user.setPassword(userModel.getPassword()));
         }
+        //else keep preUser pass
+
     }
 
-    public UserModel updateUser(UserModel user, Long id) throws IOException {
+    public UserModel updateUser(UserModel user, Long id) {
         //email update
         //userUtils.validateEmail(model);
+        if (user.getProfileImage() != null || user.getShopImage() != null) {
+            user.setProfileImage(null);
+            user.setShopImage(null);
+        }
         var foundUser = repo.findUserById(id);
-        resetPasswordUsingPrevious(user, foundUser);
-        ioUtils.handleUserImage(user,  true, foundUser);
         if (foundUser.isPresent()) {
+            updatePasswordUsingPrevious(user, foundUser.get());
+            foundUser.get().update(user);
+            return foundUser.get();
+        }
+        throw new NoContentException("User not found");
+    }
+
+    public UserModel updateUserImages(UserModel user, Long id) throws IOException {
+        var foundUser = repo.findUserById(id);
+        if (foundUser.isPresent()) {
+            ioUtils.updateUserImages(user, foundUser.get());
             foundUser.get().merge(user);
             return foundUser.get();
         }
-        return null;
+        throw new NoContentException("User not found");
+    }
+
+    public UserModel updateDeleteUserImages(UserModel user, Long id) throws IOException {
+        var foundUser = repo.findUserById(id);
+        if (foundUser.isPresent()) {
+            ioUtils.updateDeleteUserImages(user, foundUser.get());
+            return foundUser.get();
+        }
+        throw new NoContentException("User not found");
     }
 
     public String validatePassword(UserModel user) {
@@ -228,13 +237,13 @@ public class UserUtils {
         return rawPass;
     }
 
-    private void sendEmail(UserModel model) {
+    private void sendEmail(UserModel user) {
         String token = UUID.randomUUID().toString();
-        VerificationModel emailVerify = new VerificationModel(token, model, LocalDateTime.now().plusMinutes(20));
+        VerificationModel emailVerify = new VerificationModel(token, user, LocalDateTime.now().plusMinutes(20));
         verificationService.saveToken(emailVerify);
 
-        String link = "http://localhost:8080/api/user/verify/?t=" + token;
-        emailService.send(model.getEmail(), emailService.buildEmail(model.getName(), link));
+        String link = serverName + "/api/user/verify/?t=" + token;
+        emailService.send(user.getEmail(), emailService.buildEmail(user.getName(), link));
 
     }
 

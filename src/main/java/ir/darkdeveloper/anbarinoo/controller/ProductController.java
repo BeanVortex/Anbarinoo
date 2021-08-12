@@ -22,8 +22,8 @@ public class ProductController {
     }
 
     @PostMapping("/save/")
-    public ResponseEntity<?> saveProduct(@ModelAttribute ProductModel model, HttpServletRequest request) {
-        return ResponseEntity.ok().body(service.saveProduct(model, request));
+    public ResponseEntity<?> saveProduct(@ModelAttribute ProductModel product, HttpServletRequest request) {
+        return ResponseEntity.ok().body(service.saveProduct(product, request));
     }
 
     @PostMapping("/search/")
@@ -33,21 +33,21 @@ public class ProductController {
     }
 
     @PutMapping("/update/{id}/")
-    public ResponseEntity<?> updateProduct(@ModelAttribute ProductModel model, @PathVariable("id") Long productId,
+    public ResponseEntity<?> updateProduct(@ModelAttribute ProductModel product, @PathVariable("id") Long productId,
                                            HttpServletRequest request) {
-        return ResponseEntity.ok().body(service.updateProduct(model, productId, request));
+        return ResponseEntity.ok().body(service.updateProduct(product, productId, request));
     }
 
     @PutMapping("/update/images/{id}/")
-    public ResponseEntity<?> updateProductImages(@ModelAttribute ProductModel model, @PathVariable("id") Long productId,
+    public ResponseEntity<?> updateProductImages(@ModelAttribute ProductModel product, @PathVariable("id") Long productId,
                                                  HttpServletRequest request) {
-        return ResponseEntity.ok().body(service.updateProductImages(model, productId, request));
+        return ResponseEntity.ok().body(service.updateProductImages(product, productId, request));
     }
 
-    @PutMapping("/update/delete/images/{id}/")
-    public ResponseEntity<?> updateDeleteProductImages(@ModelAttribute ProductModel model, @PathVariable("id") Long productId,
+    @PutMapping("/update/delete-images/{id}/")
+    public ResponseEntity<?> updateDeleteProductImages(@ModelAttribute ProductModel product, @PathVariable("id") Long productId,
                                                        HttpServletRequest request) {
-        return service.updateDeleteProductImages(model, productId, request);
+        return service.updateDeleteProductImages(product, productId, request);
     }
 
     @GetMapping("/{id}/")

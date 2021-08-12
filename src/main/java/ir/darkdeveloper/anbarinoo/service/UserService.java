@@ -54,23 +54,74 @@ public class UserService implements UserDetailsService {
     }
 
 
-    // for image updates: only send file
-    // to keep images: null files and names
-    // to delete images: only send 'default' for image names
-    //#model.getId() == null should be null. if wasn't other users can change other users data due to implementation of this method!!
+    /**
+     * #model.getId() == null should be null. if wasn't other users can change other users data due to implementation of this method!!
+     */
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_EDIT_USER')")
     public UserModel updateUser(UserModel model, Long id, HttpServletRequest req) {
         try {
-            if (model.getId() != null) throw new NotFoundException("User id should null, can't update");
+            if (model.getId() != null) throw new BadRequestException("User id should null, can't update");
             checkUserIsSameUserForRequest(id, req, "update");
             var updatedUser = userUtils.updateUser(model, id);
             return repo.save(updatedUser);
-        } catch (NotFoundException n) {
+        } catch (BadRequestException n) {
             throw new BadRequestException(n.getLocalizedMessage());
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
-        } catch (IOException e) {
+        } catch (NoContentException e) {
+            throw new NoContentException(e.getLocalizedMessage());
+        }
+    }
+
+    /**
+     * updates user images, other values will be ignored
+     *
+     * @param user other values will be ignored expect files
+     * @param id   should not to be null
+     * @return updated user images
+     */
+    @Transactional
+    @PreAuthorize("hasAnyAuthority('OP_EDIT_USER')")
+    public UserModel updateUserImages(UserModel user, Long id, HttpServletRequest req) {
+        try {
+            if (user.getId() != null) throw new BadRequestException("User id should null, can't update");
+            checkUserIsSameUserForRequest(id, req, "update images");
+            var updatedUser = userUtils.updateUserImages(user, id);
+            return repo.save(updatedUser);
+        } catch (BadRequestException n) {
+            throw new BadRequestException(n.getLocalizedMessage());
+        } catch (ForbiddenException f) {
+            throw new ForbiddenException(f.getLocalizedMessage());
+        } catch (NoContentException e) {
+            throw new NoContentException(e.getLocalizedMessage());
+        } catch (Exception e) {
+            throw new InternalServerException(e.getLocalizedMessage());
+        }
+    }
+
+    /**
+     * delete user images
+     *
+     * @param user other values will be ignored expect file names
+     * @param id   should not to be null
+     * @return user with deleted image(s) (default images)
+     */
+    @Transactional
+    @PreAuthorize("hasAnyAuthority('OP_EDIT_USER')")
+    public UserModel updateDeleteUserImages(UserModel user, Long id, HttpServletRequest req) {
+        try {
+            if (user.getId() != null) throw new BadRequestException("User id should null, can't update");
+            checkUserIsSameUserForRequest(id, req, "delete images");
+            var updatedUser = userUtils.updateDeleteUserImages(user, id);
+            return repo.save(updatedUser);
+        } catch (BadRequestException n) {
+            throw new BadRequestException(n.getLocalizedMessage());
+        } catch (ForbiddenException f) {
+            throw new ForbiddenException(f.getLocalizedMessage());
+        } catch (NoContentException e) {
+            throw new NoContentException(e.getLocalizedMessage());
+        } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
         }
     }

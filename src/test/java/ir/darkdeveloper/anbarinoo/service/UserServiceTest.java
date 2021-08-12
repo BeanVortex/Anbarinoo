@@ -1,16 +1,6 @@
 package ir.darkdeveloper.anbarinoo.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import ir.darkdeveloper.anbarinoo.model.CategoryModel;
+import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils;
 import org.junit.jupiter.api.*;
@@ -25,11 +15,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import ir.darkdeveloper.anbarinoo.model.UserModel;
-
-import java.util.Arrays;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -49,7 +42,6 @@ public record UserServiceTest(UserService service,
     @BeforeAll
     static void setUp() {
         Authentication authentication = Mockito.mock(Authentication.class);
-        // Mockito.whens() for your authorization object
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
@@ -103,24 +95,30 @@ public record UserServiceTest(UserService service,
     @Order(2)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_EDIT_USER", "OP_ACCESS_USER"})
     void updateUserWithKeepImagesAndNullPasswords() {
+        var fetchedUser = service.getUserInfo(userId, request);
         var user = new UserModel();
         user.setAddress("DFDF");
         service.updateUser(user, userId, request);
-        var fetchedUser = service.getUserInfo(userId, request);
-        assertThat(fetchedUser.getPassword()).isNotNull();
+        var fetchedUser2 = service.getUserInfo(userId, request);
+        assertThat(fetchedUser2.getPassword()).isNotNull();
+        assertThat(fetchedUser2.getShopImage()).isEqualTo(fetchedUser.getShopImage());
+        assertThat(fetchedUser2.getProfileImage()).isEqualTo(fetchedUser.getProfileImage());
     }
 
     @Test
     @Order(3)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_EDIT_USER", "OP_ACCESS_USER"})
     void updateUserWithKeepImagesAndNewPasswords() {
+        var fetchedUser = service.getUserInfo(userId, request);
         var user = new UserModel();
         user.setPrevPassword("pass1");
         user.setPassword("pass4321");
         user.setPasswordRepeat("pass4321");
         service.updateUser(user, userId, request);
-        var fetchedUser = service.getUserInfo(userId, request);
-        assertThat(encoder.matches("pass4321", fetchedUser.getPassword())).isTrue();
+        var fetchedUser2 = service.getUserInfo(userId, request);
+        assertThat(encoder.matches("pass4321", fetchedUser2.getPassword())).isTrue();
+        assertThat(fetchedUser2.getShopImage()).isEqualTo(fetchedUser.getShopImage());
+        assertThat(fetchedUser2.getProfileImage()).isEqualTo(fetchedUser.getProfileImage());
     }
 
     @Test
@@ -137,28 +135,29 @@ public record UserServiceTest(UserService service,
         user.setProfileFile(file1);
         user.setShopFile(file2);
         var fetchedUser = service.getUserInfo(userId, request);
-        service.updateUser(user, userId, request);
+        service.updateUserImages(user, userId, request);
         var fetchedUser2 = service.getUserInfo(userId, request);
         assertThat(fetchedUser.getShopImage()).isNotEqualTo(fetchedUser2.getShopImage());
         assertThat(fetchedUser.getProfileImage()).isNotEqualTo(fetchedUser2.getProfileImage());
+        assertThat(fetchedUser.getDescription()).isNotEqualTo(user.getDescription());
     }
 
     @Test
     @Order(5)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_EDIT_USER", "OP_ACCESS_USER"})
-    void updateUserWithDefaultImages() {
+    void updateDeleteUserImages() {
         var user = new UserModel();
-        user.setDescription("dex");
-        user.setShopName("shop1");
-        user.setShopImage("default");
-        user.setProfileImage("default");
+        user.setDescription("dexfd");
         var fetchedUser = service.getUserInfo(userId, request);
-        service.updateUser(user, userId, request);
+        user.setProfileImage(fetchedUser.getProfileImage());
+        user.setShopImage(fetchedUser.getShopImage());
+        service.updateDeleteUserImages(user, userId, request);
         var fetchedUser2 = service.getUserInfo(userId, request);
         assertThat(fetchedUser.getShopImage()).isNotEqualTo(fetchedUser2.getShopImage());
         assertThat(fetchedUser.getProfileImage()).isNotEqualTo(fetchedUser2.getProfileImage());
         assertThat(fetchedUser2.getShopImage()).isEqualTo("noImage.png");
         assertThat(fetchedUser2.getProfileImage()).isEqualTo("noProfile.jpeg");
+        assertThat(fetchedUser.getDescription()).isNotEqualTo(user.getDescription());
     }
 
     @Test
@@ -188,7 +187,7 @@ public record UserServiceTest(UserService service,
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     void verifyUserEmail() {
     }
 

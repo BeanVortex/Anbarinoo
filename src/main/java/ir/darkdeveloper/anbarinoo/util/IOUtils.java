@@ -1,20 +1,21 @@
 package ir.darkdeveloper.anbarinoo.util;
 
+import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
+import ir.darkdeveloper.anbarinoo.model.ProductModel;
+import ir.darkdeveloper.anbarinoo.model.UserModel;
+import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
-
-import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
-import ir.darkdeveloper.anbarinoo.exception.NoContentException;
-import ir.darkdeveloper.anbarinoo.model.ProductModel;
-import org.springframework.stereotype.Component;
-import org.springframework.util.ResourceUtils;
-import org.springframework.web.multipart.MultipartFile;
-
-import ir.darkdeveloper.anbarinoo.model.UserModel;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @Component
 public class IOUtils {
@@ -54,54 +55,62 @@ public class IOUtils {
     }
 
     /**
-     * to make profile and shop image to default, send their names as 'default'
-     * to update profile and shop image, send their files
+     * Saves user images
      *
-     * @param model-
-     * @param isUpdate-
-     * @param preUser-
+     * @param user  if images are null then the default will set
      * @throws IOException -
      */
-    public void handleUserImage(UserModel model, Boolean isUpdate, Optional<UserModel> preUser)
+    public void saveUserImages(UserModel user)
             throws IOException {
-        if (!isUpdate) {
-            if (model.getShopImage() == null)
-                model.setShopImage(DEFAULT_SHOP_IMAGE);
-            if (model.getProfileImage() == null)
-                model.setProfileImage(DEFAULT_PROFILE_IMAGE);
-        }
 
-        //second condition is for default image when user wants to delete the previous image
-        if (model.getShopFile() != null ||
-                (model.getShopImage() != null
-                        && model.getShopImage().equals("default")
-                        && preUser.isPresent()
-                        && !preUser.get().getShopImage().equals(DEFAULT_SHOP_IMAGE))) {
+        if (user.getShopImage() == null || user.getShopFile() == null)
+            user.setShopImage(DEFAULT_SHOP_IMAGE);
+        if (user.getProfileImage() == null || user.getProfileFile() == null)
+            user.setProfileImage(DEFAULT_PROFILE_IMAGE);
 
-            if (preUser.isPresent())
-                deleteShopFile(preUser.get());
-            model.setShopImage(DEFAULT_SHOP_IMAGE);
-        }
-
-        if (model.getProfileFile() != null ||
-                (model.getProfileImage() != null
-                        && model.getProfileImage().equals("default")
-                        && preUser.isPresent()
-                        && !preUser.get().getProfileImage().equals(DEFAULT_PROFILE_IMAGE))) {
-
-            if (preUser.isPresent())
-                deleteProfileFile(preUser.get());
-            model.setProfileImage(DEFAULT_PROFILE_IMAGE);
-        }
-
-
-        String profileFileName = saveFile(model.getProfileFile(), USER_IMAGE_PATH);
+        String profileFileName = saveFile(user.getProfileFile(), USER_IMAGE_PATH);
         if (profileFileName != null)
-            model.setProfileImage(profileFileName);
+            user.setProfileImage(profileFileName);
 
-        String shopFileName = saveFile(model.getShopFile(), USER_IMAGE_PATH);
+        String shopFileName = saveFile(user.getShopFile(), USER_IMAGE_PATH);
         if (shopFileName != null)
-            model.setShopImage(shopFileName);
+            user.setShopImage(shopFileName);
+    }
+
+    public void updateUserImages(UserModel user, UserModel preUser) throws IOException {
+
+        if (user.getShopFile() != null && !preUser.getShopImage().equals(DEFAULT_SHOP_IMAGE))
+            deleteShopFile(preUser);
+
+
+        if (user.getProfileFile() != null && !preUser.getProfileImage().equals(DEFAULT_PROFILE_IMAGE))
+            deleteProfileFile(preUser);
+
+
+        String profileFileName = saveFile(user.getProfileFile(), USER_IMAGE_PATH);
+        if (profileFileName != null) {
+            user.setProfileImage(profileFileName);
+            preUser.setProfileImage(null);
+        }
+
+        String shopFileName = saveFile(user.getShopFile(), USER_IMAGE_PATH);
+        if (shopFileName != null) {
+            user.setShopImage(shopFileName);
+            preUser.setShopImage(null);
+        }
+    }
+
+
+    public void updateDeleteUserImages(UserModel user, UserModel preUser) throws IOException {
+        if (user.getShopImage() != null && user.getShopImage().equals(preUser.getShopImage())) {
+            deleteShopFile(preUser);
+            preUser.setShopImage(DEFAULT_SHOP_IMAGE);
+        }
+
+        if (user.getProfileImage() != null && user.getProfileImage().equals(preUser.getProfileImage())) {
+            deleteProfileFile(preUser);
+            preUser.setProfileImage(DEFAULT_PROFILE_IMAGE);
+        }
     }
 
     /**
@@ -238,4 +247,5 @@ public class IOUtils {
                 Files.delete(Paths.get(imgPath));
         }
     }
+
 }

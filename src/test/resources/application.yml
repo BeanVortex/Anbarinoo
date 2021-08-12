@@ -40,6 +40,9 @@ user:
 jwt:
   secretkey: RandomSecret
 
+server.name: https://www.anbarinoo.ir
+
+
 spring.mail:
   host: localhost
   username: darkd
