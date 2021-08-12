@@ -103,6 +103,7 @@ public record UserServiceTest(UserService service,
         assertThat(fetchedUser2.getPassword()).isNotNull();
         assertThat(fetchedUser2.getShopImage()).isEqualTo(fetchedUser.getShopImage());
         assertThat(fetchedUser2.getProfileImage()).isEqualTo(fetchedUser.getProfileImage());
+        assertThat(fetchedUser2.getProvider()).isEqualTo(fetchedUser.getProvider());
     }
 
     @Test

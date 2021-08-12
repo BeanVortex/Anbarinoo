@@ -89,8 +89,7 @@ public class UserModel implements UserDetails, OAuth2User {
 
     private String description;
 
-    @OneToOne
-    @JoinColumn(name = "financial_id")
+    @OneToOne(mappedBy = "user")
     private FinancialModel financial;
 
     @OneToMany(mappedBy = "user")

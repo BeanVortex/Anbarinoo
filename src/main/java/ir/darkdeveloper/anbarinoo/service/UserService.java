@@ -1,42 +1,30 @@
 package ir.darkdeveloper.anbarinoo.service;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import ir.darkdeveloper.anbarinoo.exception.*;
-import ir.darkdeveloper.anbarinoo.util.IOUtils;
+import ir.darkdeveloper.anbarinoo.model.UserModel;
+import ir.darkdeveloper.anbarinoo.repository.UserRepo;
+import ir.darkdeveloper.anbarinoo.security.jwt.JwtAuth;
+import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
+import ir.darkdeveloper.anbarinoo.util.UserUtils;
 import javassist.NotFoundException;
-import org.hibernate.Session;
+import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ir.darkdeveloper.anbarinoo.model.Authority;
-import ir.darkdeveloper.anbarinoo.model.UserModel;
-import ir.darkdeveloper.anbarinoo.model.VerificationModel;
-import ir.darkdeveloper.anbarinoo.repository.UserRepo;
-import ir.darkdeveloper.anbarinoo.security.jwt.JwtAuth;
-import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
-import ir.darkdeveloper.anbarinoo.util.UserUtils;
-import lombok.AllArgsConstructor;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Service("userService")
 @AllArgsConstructor
@@ -58,7 +46,7 @@ public class UserService implements UserDetailsService {
      * #model.getId() == null should be null. if wasn't other users can change other users data due to implementation of this method!!
      */
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_EDIT_USER')")
+    @PreAuthorize("hasAnyAuthority('OP_EDIT_USER') && #id != null")
     public UserModel updateUser(UserModel model, Long id, HttpServletRequest req) {
         try {
             if (model.getId() != null) throw new BadRequestException("User id should null, can't update");
@@ -82,7 +70,7 @@ public class UserService implements UserDetailsService {
      * @return updated user images
      */
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_EDIT_USER')")
+    @PreAuthorize("hasAnyAuthority('OP_EDIT_USER')&& #id != null")
     public UserModel updateUserImages(UserModel user, Long id, HttpServletRequest req) {
         try {
             if (user.getId() != null) throw new BadRequestException("User id should null, can't update");
@@ -108,7 +96,7 @@ public class UserService implements UserDetailsService {
      * @return user with deleted image(s) (default images)
      */
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_EDIT_USER')")
+    @PreAuthorize("hasAnyAuthority('OP_EDIT_USER') && #id != null")
     public UserModel updateDeleteUserImages(UserModel user, Long id, HttpServletRequest req) {
         try {
             if (user.getId() != null) throw new BadRequestException("User id should null, can't update");

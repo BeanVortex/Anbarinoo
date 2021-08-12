@@ -61,9 +61,9 @@
       "description": "Description for trust.store."
     },
     {
-      "name": "server.name",
+      "name": "server.domain_name",
       "type": "java.lang.String",
-      "description": "Description for server.name."
+      "description": "Description for server.domain_name."
     }
   ]
 }

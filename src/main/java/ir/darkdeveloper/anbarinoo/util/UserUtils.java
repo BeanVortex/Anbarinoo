@@ -12,7 +12,6 @@ import ir.darkdeveloper.anbarinoo.service.UserRolesService;
 import ir.darkdeveloper.anbarinoo.service.VerificationService;
 import ir.darkdeveloper.anbarinoo.util.email.EmailService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -44,15 +43,14 @@ public class UserUtils {
     private final IOUtils ioUtils;
     private final EmailService emailService;
     private final Boolean userEnabled;
-    @Value("${server.name}")
-    private final String serverName;
+    private final String domainName;
 
     public static final SimpleDateFormat TOKEN_EXPIRATION_FORMAT = new SimpleDateFormat("EE MMM dd yyyy HH:mm:ss");
 
     /**
-     * @param authModel   has username and password (JwtAuth)
-     * @param userId  for super admin, pass null
-     * @param rawPass for super admin, pass null
+     * @param authModel has username and password (JwtAuth)
+     * @param userId    for super admin, pass null
+     * @param rawPass   for super admin, pass null
      */
     public void authenticateUser(JwtAuth authModel, Long userId, String rawPass, HttpServletResponse response) {
         String username = authModel.getUsername();
@@ -242,7 +240,7 @@ public class UserUtils {
         VerificationModel emailVerify = new VerificationModel(token, user, LocalDateTime.now().plusMinutes(20));
         verificationService.saveToken(emailVerify);
 
-        String link = serverName + "/api/user/verify/?t=" + token;
+        String link = domainName + "/api/user/verify/?t=" + token;
         emailService.send(user.getEmail(), emailService.buildEmail(user.getName(), link));
 
     }

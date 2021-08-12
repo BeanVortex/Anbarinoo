@@ -40,7 +40,7 @@ user:
 jwt:
   secretkey: RandomSecret
 
-server.name: https://www.anbarinoo.ir
+server.domain_name: https://www.anbarinoo.ir
 
 
 spring.mail:

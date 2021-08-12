@@ -30,7 +30,15 @@ public class FinancialModel {
     @Column(nullable = false)
     private Integer tax = 9;
 
-//    @OneToOne(mappedBy = "financial")
-//    private UserModel user;
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private UserModel user;
 
+    public void update(FinancialModel other) {
+        id = other.id != null && id != null ? other.id : id;
+        earnings = other.earnings != null && earnings != null ? other.earnings : earnings;
+        costs = other.costs != null && costs != null ? other.costs : costs;
+        profit = other.profit != null && profit != null ? other.profit : profit;
+        tax = other.tax != null && tax != null ? other.tax : tax;
+    }
 }
