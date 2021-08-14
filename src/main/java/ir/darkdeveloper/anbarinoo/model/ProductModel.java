@@ -1,5 +1,6 @@
 package ir.darkdeveloper.anbarinoo.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -43,16 +44,13 @@ public class ProductModel {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<MultipartFile> files;
 
-    private Double price;
+    private BigDecimal price;
 
     @Column(name = "buy_price")
-    private Double buyPrice;
+    private BigDecimal buyPrice;
 
-    @Column(name = "sell_count")
-    private Integer soldCount;
-
-    @Column(name = "buy_count")
-    private Integer boughtCount;
+    @OneToMany(mappedBy = "product")
+    private List<SellsModel> sells;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -83,8 +81,6 @@ public class ProductModel {
         description = other.description == null ? description : other.description;
         price = other.price == null ? price : other.price;
         buyPrice = other.buyPrice == null ? buyPrice : other.buyPrice;
-        soldCount = other.soldCount == null ? soldCount : other.soldCount;
-        boughtCount = other.boughtCount == null ? boughtCount : other.boughtCount;
         category = other.category == null ? category : other.category;
         totalCount = other.totalCount == null ? totalCount : other.totalCount;
         createdAt = other.createdAt == null ? createdAt : other.createdAt;
