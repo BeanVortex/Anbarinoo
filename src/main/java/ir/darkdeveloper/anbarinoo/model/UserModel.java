@@ -1,6 +1,5 @@
 package ir.darkdeveloper.anbarinoo.model;
 
-import java.io.Serial;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -8,12 +7,13 @@ import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.*;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import ir.darkdeveloper.anbarinoo.model.Auth.AuthProvider;
+import ir.darkdeveloper.anbarinoo.model.Auth.Authority;
+import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
+import ir.darkdeveloper.anbarinoo.model.Financial.DebtOrDemandModel;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -88,9 +88,6 @@ public class UserModel implements UserDetails, OAuth2User {
     private String address;
 
     private String description;
-
-    @OneToOne(mappedBy = "user")
-    private FinancialModel financial;
 
     @OneToMany(mappedBy = "user")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
@@ -196,7 +193,6 @@ public class UserModel implements UserDetails, OAuth2User {
         shopName = other.shopName == null ? shopName : other.shopName;
         address = other.address == null ? address : other.address;
         description = other.description == null ? description : other.description;
-        financial = other.financial == null ? financial : other.financial;
     }
 
     public void update(UserModel other) {
@@ -211,6 +207,5 @@ public class UserModel implements UserDetails, OAuth2User {
         shopName = other.shopName != null && shopName != null ? other.shopName : shopName;
         address = other.address != null && address != null ? other.address : address;
         description = other.description != null && description != null ? other.description : description;
-        financial = other.financial != null && financial != null ? other.financial : financial;
     }
 }

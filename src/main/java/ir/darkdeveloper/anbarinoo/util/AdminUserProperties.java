@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import ir.darkdeveloper.anbarinoo.model.Authority;
+import ir.darkdeveloper.anbarinoo.model.Auth.Authority;
 import lombok.Data;
 
 @Configuration

@@ -1,10 +1,7 @@
 package ir.darkdeveloper.anbarinoo.controller;
 
-import ir.darkdeveloper.anbarinoo.model.ChequeModel;
-import ir.darkdeveloper.anbarinoo.model.ProductModel;
+import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +10,7 @@ import ir.darkdeveloper.anbarinoo.service.ChequeService;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/api/financial/cheque")
+@RequestMapping("/api/user/financial/cheque")
 public class ChequeController {
 
     private final ChequeService service;

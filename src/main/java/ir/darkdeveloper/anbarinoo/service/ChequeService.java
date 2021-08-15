@@ -7,14 +7,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
-import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
-import ir.darkdeveloper.anbarinoo.security.jwt.JwtAuth;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import org.hibernate.exception.DataException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,9 +19,8 @@ import org.springframework.stereotype.Service;
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
-import ir.darkdeveloper.anbarinoo.model.ChequeModel;
+import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
 import ir.darkdeveloper.anbarinoo.repository.ChequeRepo;
-import ir.darkdeveloper.anbarinoo.util.UserUtils;
 import javassist.NotFoundException;
 
 @Service

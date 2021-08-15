@@ -11,6 +11,8 @@ import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import ir.darkdeveloper.anbarinoo.model.Financial.BuysModel;
+import ir.darkdeveloper.anbarinoo.model.Financial.SellsModel;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
@@ -46,11 +48,12 @@ public class ProductModel {
 
     private BigDecimal price;
 
-    @Column(name = "buy_price")
-    private BigDecimal buyPrice;
 
     @OneToMany(mappedBy = "product")
     private List<SellsModel> sells;
+
+    @OneToMany(mappedBy = "product")
+    private List<BuysModel> buys;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -79,8 +82,6 @@ public class ProductModel {
         id = other.id == null ? id : other.id;
         name = other.name == null ? name : other.name;
         description = other.description == null ? description : other.description;
-        price = other.price == null ? price : other.price;
-        buyPrice = other.buyPrice == null ? buyPrice : other.buyPrice;
         category = other.category == null ? category : other.category;
         totalCount = other.totalCount == null ? totalCount : other.totalCount;
         createdAt = other.createdAt == null ? createdAt : other.createdAt;

@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import ir.darkdeveloper.anbarinoo.model.ChequeModel;
+import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
 
 @Repository
 public interface ChequeRepo extends JpaRepository<ChequeModel, Long> {

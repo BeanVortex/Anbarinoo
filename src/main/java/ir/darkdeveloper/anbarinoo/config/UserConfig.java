@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 
-import ir.darkdeveloper.anbarinoo.model.Authority;
+import ir.darkdeveloper.anbarinoo.model.Auth.Authority;
 import ir.darkdeveloper.anbarinoo.model.UserRoles;
 import ir.darkdeveloper.anbarinoo.service.UserRolesService;
 

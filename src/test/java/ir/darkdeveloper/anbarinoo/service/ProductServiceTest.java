@@ -114,9 +114,6 @@ public record ProductServiceTest(ProductService productService,
         var product = new ProductModel();
         product.setName("name");
         product.setDescription("description");
-        product.setBoughtCount(25);
-        product.setBuyPrice(156d);
-        product.setSoldCount(13);
         product.setTotalCount(50);
         MockMultipartFile file3 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
                 "Hello, World!".getBytes());
@@ -144,9 +141,6 @@ public record ProductServiceTest(ProductService productService,
         var product = new ProductModel();
         product.setName("updatedName");
         product.setDescription("updatedDescription");
-        product.setBoughtCount(15);
-        product.setBuyPrice(25d);
-        product.setSoldCount(6);
         product.setTotalCount(10);
         product.setCategory(electronics);
 
@@ -226,12 +220,8 @@ public record ProductServiceTest(ProductService productService,
         var pageable = PageRequest.of(0, 8);
         var product = new ProductModel();
         product.setName("updatedName");
-        product.setBoughtCount(15);
         var foundProducts = productService.findByNameContains(product.getName().substring(0, 2), pageable, request);
-        foundProducts.getContent().forEach(p -> {
-            assertThat(p.getName()).isEqualTo(product.getName());
-            assertThat(p.getBoughtCount()).isEqualTo(product.getBoughtCount());
-        });
+        foundProducts.getContent().forEach(p -> assertThat(p.getName()).isEqualTo(product.getName()));
     }
 
     @Test
@@ -241,13 +231,9 @@ public record ProductServiceTest(ProductService productService,
         var pageable = PageRequest.of(0, 8);
         var product = new ProductModel();
         product.setName("updatedName");
-        product.setBoughtCount(15);
         assertThrows(ForbiddenException.class, () -> {
             var products = productService.getOneUserProducts(userId2, pageable, request);
-            products.getContent().forEach(p -> {
-                assertThat(p.getName()).isEqualTo(product.getName());
-                assertThat(p.getBoughtCount()).isEqualTo(product.getBoughtCount());
-            });
+            products.getContent().forEach(p -> assertThat(p.getName()).isEqualTo(product.getName()));
         });
     }
 

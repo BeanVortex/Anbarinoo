@@ -1,10 +1,11 @@
-package ir.darkdeveloper.anbarinoo.model;
+package ir.darkdeveloper.anbarinoo.model.Financial;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import javax.persistence.*;
 
+import ir.darkdeveloper.anbarinoo.model.UserModel;
 import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.Data;

@@ -1,6 +1,6 @@
 package ir.darkdeveloper.anbarinoo.service;
 
-import ir.darkdeveloper.anbarinoo.model.ChequeModel;
+import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils;

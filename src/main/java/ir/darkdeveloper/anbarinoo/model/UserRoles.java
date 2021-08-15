@@ -8,6 +8,7 @@ import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import ir.darkdeveloper.anbarinoo.model.Auth.Authority;
 import lombok.Data;
 
 @Data

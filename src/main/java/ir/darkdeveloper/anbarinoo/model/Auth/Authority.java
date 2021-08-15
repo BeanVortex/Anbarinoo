@@ -1,4 +1,4 @@
-package ir.darkdeveloper.anbarinoo.model;
+package ir.darkdeveloper.anbarinoo.model.Auth;
 
 import org.springframework.security.core.GrantedAuthority;
 

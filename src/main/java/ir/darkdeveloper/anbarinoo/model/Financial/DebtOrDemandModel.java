@@ -1,4 +1,4 @@
-package ir.darkdeveloper.anbarinoo.model;
+package ir.darkdeveloper.anbarinoo.model.Financial;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import ir.darkdeveloper.anbarinoo.model.UserModel;
 import lombok.Data;
 
 @Data

@@ -1,7 +1,7 @@
 package ir.darkdeveloper.anbarinoo.util;
 
 import ir.darkdeveloper.anbarinoo.exception.*;
-import ir.darkdeveloper.anbarinoo.model.AuthProvider;
+import ir.darkdeveloper.anbarinoo.model.Auth.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.model.VerificationModel;
