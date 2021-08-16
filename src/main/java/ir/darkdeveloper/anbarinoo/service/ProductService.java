@@ -6,7 +6,6 @@ import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.repository.ProductRepository;
-import ir.darkdeveloper.anbarinoo.util.FinancialUtils;
 import ir.darkdeveloper.anbarinoo.util.IOUtils;
 import ir.darkdeveloper.anbarinoo.util.ProductUtils;
 import lombok.AllArgsConstructor;
@@ -28,7 +27,6 @@ public class ProductService {
     private final ProductRepository repo;
     private final IOUtils ioUtils;
     private final ProductUtils productUtils;
-    private final FinancialUtils financialUtils;
 
     /**
      * saves a new product to the user id of refresh token
@@ -169,28 +167,6 @@ public class ProductService {
                 productUtils.checkUserIsSameUserForRequest(foundProduct.get().getUser().getId(), req,
                         "delete images of");
                 productUtils.updateDeleteProductImages(product, foundProduct.get());
-                return new ResponseEntity<>(HttpStatus.OK);
-            }
-        } catch (ForbiddenException f) {
-            throw new ForbiddenException(f.getLocalizedMessage());
-        } catch (BadRequestException n) {
-            throw new BadRequestException(n.getLocalizedMessage());
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
-        throw new NoContentException("This product does not exist");
-    }
-
-    @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ResponseEntity<?> sellProduct(ProductModel product, Long productId, HttpServletRequest req) {
-        try {
-            if (product.getId() != null) throw new BadRequestException("Product id should null, can't update");
-            var foundProduct = repo.findById(productId);
-            if (foundProduct.isPresent()) {
-                productUtils.checkUserIsSameUserForRequest(foundProduct.get().getUser().getId(), req,
-                        "sell");
-                financialUtils.sellProduct(product, foundProduct.get());
                 return new ResponseEntity<>(HttpStatus.OK);
             }
         } catch (ForbiddenException f) {

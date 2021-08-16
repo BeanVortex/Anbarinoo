@@ -18,10 +18,12 @@ public class BuysModel {
     @GeneratedValue
     private Long id;
 
-    @Column(nullable = false)
-    private BigInteger count;
+    @Column(nullable = false, precision = 19, scale = 4)
+    private BigDecimal count;
 
-    @Column(nullable = false)
+    // precision means the whole numbers contains in decimal or integer
+    // scale means the count of numbers after . or point
+    @Column(nullable = false, precision = 19, scale = 4)
     private BigDecimal price;
 
     @Column(nullable = false)
@@ -29,7 +31,6 @@ public class BuysModel {
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
-    @Column(nullable = false)
     private ProductModel product;
 
     @CreationTimestamp

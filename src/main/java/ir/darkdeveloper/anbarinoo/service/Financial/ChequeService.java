@@ -1,4 +1,4 @@
-package ir.darkdeveloper.anbarinoo.service;
+package ir.darkdeveloper.anbarinoo.service.Financial;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +20,7 @@ import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
-import ir.darkdeveloper.anbarinoo.repository.ChequeRepo;
+import ir.darkdeveloper.anbarinoo.repository.Financial.ChequeRepo;
 import javassist.NotFoundException;
 
 @Service
@@ -50,12 +50,12 @@ public class ChequeService {
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ChequeModel updateCheque(ChequeModel cheque, HttpServletRequest req) {
         try {
-            if (cheque.getId() == null) throw new NotFoundException("Cheque id is null, can't update");
+            if (cheque.getId() == null) throw new BadRequestException("Cheque id is null, can't update");
             checkUserIsSameUserForRequest(null, cheque.getId(), null, null, req, "update");
             return repo.save(cheque);
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
-        } catch (NotFoundException n) {
+        } catch (BadRequestException n) {
             throw new BadRequestException(n.getLocalizedMessage());
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
