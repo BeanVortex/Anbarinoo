@@ -11,6 +11,7 @@ import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -135,6 +136,15 @@ public record SellsServiceTest(UserService userService,
         assertThat(fetchedSell.getPrice()).isEqualTo(BigDecimal.valueOf(605050, 4));
     }
 
+    @Test
+    @Order(5)
+    @WithMockUser(authorities = {"OP_ACCESS_USER"})
+    void getAllSellRecordsOfProduct(){
+        var pageable = PageRequest.of(0, 8);
+        var fetchedRecords = sellsService.getAllSellRecordsOfProduct(productId, request, pageable);
+        assertThat(fetchedRecords.getContent().get(0).getId()).isEqualTo(sellId);
+        assertThat(fetchedRecords.getContent().get(0).getPrice()).isEqualTo(BigDecimal.valueOf(605050, 4));
+    }
 
     //should return the object; data is being removed
     private HttpServletRequest setUpHeader(String email, Long userId) {
