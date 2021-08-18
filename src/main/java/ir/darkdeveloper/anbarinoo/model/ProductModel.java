@@ -6,10 +6,7 @@ import java.util.List;
 
 import javax.persistence.*;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 
 import ir.darkdeveloper.anbarinoo.model.Financial.BuysModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.SellsModel;
@@ -50,9 +47,11 @@ public class ProductModel {
 
 
     @OneToMany(mappedBy = "product")
+    @JsonIgnore
     private List<SellsModel> sells;
 
     @OneToMany(mappedBy = "product")
+    @JsonIgnore
     private List<BuysModel> buys;
 
     @ManyToOne

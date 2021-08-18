@@ -110,12 +110,13 @@ public class SellsService {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (BadRequestException n) {
             throw new BadRequestException(n.getLocalizedMessage());
+        } catch (NoContentException n) {
+            throw new NoContentException(n.getLocalizedMessage());
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
         }
         throw new NoContentException("Sell record do not exist.");
     }
-
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public void deleteSell(Long sellId, HttpServletRequest req) {
@@ -129,9 +130,7 @@ public class SellsService {
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
         }
-        throw new NoContentException("Sell record do not exist.");
     }
-
 
     private void checkUserIsSameUserForRequest(Long productId, Long sellId, Long userId, HttpServletRequest req,
                                                String operation) {

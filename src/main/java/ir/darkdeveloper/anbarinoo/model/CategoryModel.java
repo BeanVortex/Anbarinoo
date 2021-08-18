@@ -2,6 +2,7 @@ package ir.darkdeveloper.anbarinoo.model;
 
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.*;
@@ -38,7 +39,7 @@ public class CategoryModel {
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    private List<CategoryModel> children = new ArrayList<>();
+    private List<CategoryModel> children = new LinkedList<>();
 
     public CategoryModel(String name) {
         this.name = name;
@@ -53,22 +54,5 @@ public class CategoryModel {
         this.children.add(children);
     }
 
-    @Override
-    public String toString() {
-        if (parent != null)
-            return "CategoryModel{" +
-                    "id=" + id +
-                    ", name='" + name + '\'' +
-                    ", user=" + user +
-                    ", parent=" + parent.getName() +
-                    '}';
-        else
-            return "CategoryModel{" +
-                    "id=" + id +
-                    ", name='" + name + '\'' +
-                    ", user=" + user +
-                    ", parent=null" +
-                    '}';
-    }
 }
 

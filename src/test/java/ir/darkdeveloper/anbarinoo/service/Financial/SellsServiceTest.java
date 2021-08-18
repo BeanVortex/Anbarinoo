@@ -1,5 +1,6 @@
 package ir.darkdeveloper.anbarinoo.service.Financial;
 
+import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.Financial.SellsModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
@@ -12,6 +13,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,11 +22,11 @@ import org.springframework.security.test.context.support.WithMockUser;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,6 +41,7 @@ public record SellsServiceTest(UserService userService,
     private static Long userId;
     private static Long sellId;
     private static Long productId;
+    private static Pageable pageable;
 
     @Autowired
     public SellsServiceTest {
@@ -52,6 +55,7 @@ public record SellsServiceTest(UserService userService,
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         request = mock(HttpServletRequest.class);
+        pageable = PageRequest.of(0, 8);
     }
 
 
@@ -137,14 +141,33 @@ public record SellsServiceTest(UserService userService,
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
-    void getAllSellRecordsOfProduct(){
-        var pageable = PageRequest.of(0, 8);
+    void getAllSellRecordsOfProduct() {
         var fetchedRecords = sellsService.getAllSellRecordsOfProduct(productId, request, pageable);
         assertThat(fetchedRecords.getContent().get(0).getId()).isEqualTo(sellId);
         assertThat(fetchedRecords.getContent().get(0).getPrice()).isEqualTo(BigDecimal.valueOf(605050, 4));
     }
+
+    @Test
+    @Order(7)
+    @WithMockUser(authorities = {"OP_ACCESS_USER"})
+    void getAllSellRecordsOfUser() {
+        var fetchedRecords = sellsService.getAllSellRecordsOfUser(userId, request, pageable);
+        assertThat(fetchedRecords.getContent().get(0).getId()).isEqualTo(sellId);
+        assertThat(fetchedRecords.getContent().get(0).getPrice()).isEqualTo(BigDecimal.valueOf(605050, 4));
+    }
+
+    @Test
+    @Order(8)
+    @WithMockUser(authorities = {"OP_ACCESS_USER"})
+    void deleteSell() {
+        sellsService.deleteSell(sellId, request);
+        assertThrows(NoContentException.class, () -> sellsService.getSell(sellId, request));
+        var product = productService.getProduct(productId, request);
+        assertThat(product.getId()).isEqualTo(productId);
+    }
+
 
     //should return the object; data is being removed
     private HttpServletRequest setUpHeader(String email, Long userId) {
