@@ -16,6 +16,7 @@ spring:
             - email
             - profile
           redirect-uri: http://localhost:8080/login/callback
+
 user:
   admin:
     id: -1
@@ -59,3 +60,5 @@ spring.mail:
         connectiontimeout: 5000
         timeout: 3000
         writetimeout: 5000
+
+

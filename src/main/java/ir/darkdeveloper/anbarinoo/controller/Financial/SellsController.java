@@ -24,7 +24,7 @@ public class SellsController {
 
 
     @PostMapping("/save/")
-    public ResponseEntity<?> saveProduct(@RequestBody SellsModel sell, HttpServletRequest request) {
+    public ResponseEntity<?> saveSell(@RequestBody SellsModel sell, HttpServletRequest request) {
         return ResponseEntity.ok().body(service.saveSell(sell, request));
     }
 

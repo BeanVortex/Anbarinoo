@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.*;
 import ir.darkdeveloper.anbarinoo.model.Financial.BuysModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.SellsModel;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -24,6 +25,7 @@ import lombok.Data;
 @Table(name = "products")
 @ToString(exclude = "category")
 @EqualsAndHashCode(exclude = "category")
+@NoArgsConstructor
 public class ProductModel {
 
     @Id
@@ -43,8 +45,8 @@ public class ProductModel {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<MultipartFile> files;
 
+    @Column(nullable = false, precision = 19, scale = 4)
     private BigDecimal price;
-
 
     @OneToMany(mappedBy = "product")
     @JsonIgnore
@@ -76,6 +78,9 @@ public class ProductModel {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    public ProductModel(Long id) {
+        this.id = id;
+    }
 
     public void merge(ProductModel other) {
         id = other.id == null ? id : other.id;

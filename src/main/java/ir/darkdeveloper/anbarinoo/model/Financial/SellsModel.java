@@ -1,5 +1,8 @@
 package ir.darkdeveloper.anbarinoo.model.Financial;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -7,12 +10,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Data
 @Entity
 @Table(name = "sells")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class SellsModel {
 
     @Id
@@ -32,6 +35,8 @@ public class SellsModel {
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     private ProductModel product;
 
     @CreationTimestamp

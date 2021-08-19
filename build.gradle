@@ -39,17 +39,17 @@ dependencies {
     implementation "io.springfox:springfox-boot-starter:3.0.0"
     implementation "io.springfox:springfox-swagger2:3.0.0"
     implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.4"
+
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
-
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
     testImplementation "org.assertj:assertj-core:3.20.2"
     testImplementation "com.h2database:h2:1.4.200"
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.2"
-    testImplementation "junit:junit:4.13.2"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 }
