@@ -86,6 +86,7 @@ public record SellsServiceTest(UserService userService,
         product.setName("name");
         product.setDescription("description");
         product.setTotalCount(50);
+        product.setPrice(BigDecimal.valueOf(56));
         productService.saveProduct(product, request);
         productId = product.getId();
     }

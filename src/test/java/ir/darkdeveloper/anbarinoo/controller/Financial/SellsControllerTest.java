@@ -1,9 +1,5 @@
 package ir.darkdeveloper.anbarinoo.controller.Financial;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import ir.darkdeveloper.anbarinoo.model.Financial.SellsModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
@@ -11,16 +7,12 @@ import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils;
+import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,25 +23,20 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-//@WebMvcTest(SellsController.class)
 record SellsControllerTest(SellsController sellController,
                            UserService userService,
                            ProductService productService,
@@ -60,7 +47,6 @@ record SellsControllerTest(SellsController sellController,
     private static Long productId;
     private static Long sellId;
     private static HttpServletRequest request;
-    private static Pageable pageable;
     private static MockMvc mockMvc;
 
     @Autowired
@@ -74,7 +60,6 @@ record SellsControllerTest(SellsController sellController,
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         request = mock(HttpServletRequest.class);
-        pageable = PageRequest.of(0, 8);
     }
 
     @BeforeEach
@@ -123,47 +108,115 @@ record SellsControllerTest(SellsController sellController,
         sell.setProduct(new ProductModel(productId));
         sell.setPrice(BigDecimal.valueOf(5000));
         sell.setCount(BigDecimal.valueOf(8));
-        System.out.println(mapToJson(sell));
         mockMvc.perform(post("/api/product/sell/save/")
                 .header("refresh_token", request.getHeader("refresh_token"))
                 .header("access_token", request.getHeader("access_token"))
                 .content(mapToJson(sell))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.product").value(is(productId), Long.class))
-                .andExpect(jsonPath("$").isMap());
+                .andExpect(jsonPath("$").isMap())
+                .andDo(print())
+                .andDo(result -> {
+                    JSONObject obj = new JSONObject(result.getResponse().getContentAsString());
+                    sellId = obj.getLong("id");
+                });
     }
 
     @Test
     @Order(4)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void updateSell() {
+    void updateSell() throws Exception {
+
+        var sell = new SellsModel();
+        sell.setProduct(new ProductModel(productId));
+        sell.setPrice(BigDecimal.valueOf(9000.568));
+        sell.setCount(BigDecimal.valueOf(60.2));
+        mockMvc.perform(put("/api/product/sell/update/{id}/", sellId)
+                .header("refresh_token", request.getHeader("refresh_token"))
+                .header("access_token", request.getHeader("access_token"))
+                .content(mapToJson(sell))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.price").value(is(BigDecimal.valueOf(9000.568)), BigDecimal.class))
+                .andExpect(jsonPath("$.count").value(is(BigDecimal.valueOf(60.2)), BigDecimal.class))
+                .andDo(print());
+
     }
 
     @Test
     @Order(5)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getAllSellRecordsOfProduct() {
+    void getAllSellRecordsOfProduct() throws Exception {
+
+        mockMvc.perform(get("/api/product/sell/get-by-product/{id}/?page={page}&size={size}",
+                productId, 5, 6)
+                .header("refresh_token", request.getHeader("refresh_token"))
+                .header("access_token", request.getHeader("access_token"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.pageable.pageSize").value(is(6)))
+                .andExpect(jsonPath("$.pageable.pageNumber").value(is(5)))
+                .andExpect(jsonPath("$.totalPages").value(is(1)))
+                .andDo(print());
     }
 
     @Test
     @Order(6)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getAllSellRecordsOfUser() {
+    void getAllSellRecordsOfUser() throws Exception {
+
+        mockMvc.perform(get("/api/product/sell/get-by-user/{id}/?page={page}&size={size}",
+                userId, 0, 2)
+                .header("refresh_token", request.getHeader("refresh_token"))
+                .header("access_token", request.getHeader("access_token"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.content").isNotEmpty())
+                .andExpect(jsonPath("$.pageable.pageSize").value(is(2)))
+                .andExpect(jsonPath("$.pageable.pageNumber").value(is(0)))
+                .andExpect(jsonPath("$.totalPages").value(is(1)))
+                .andDo(print());
+
     }
 
     @Test
     @Order(7)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getSell() {
+    void getSell() throws Exception {
+        mockMvc.perform(get("/api/product/sell/{id}/?page={page}&size={size}",
+                sellId, 0, 2)
+                .header("refresh_token", request.getHeader("refresh_token"))
+                .header("access_token", request.getHeader("access_token"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.id").value(is(5)))
+                .andExpect(jsonPath("$.count").value(is(BigDecimal.valueOf(60.2)), BigDecimal.class))
+                .andDo(print());
     }
 
     @Test
     @Order(8)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void deleteSell() {
+    void deleteSell() throws Exception {
+
+        mockMvc.perform(delete("/api/product/sell/{id}/", sellId)
+                .header("refresh_token", request.getHeader("refresh_token"))
+                .header("access_token", request.getHeader("access_token"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
     private String mapToJson(SellsModel sell) {
@@ -180,13 +233,6 @@ record SellsControllerTest(SellsController sellController,
                     }
                 """.formatted(sell.getId(), sell.getCount(), sell.getPrice(),
                 sell.getTax(), sell.getProduct().getId());
-    }
-
-    private SellsModel mapFromJson(String json) throws IOException {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.findAndRegisterModules();
-        return objectMapper.readValue(json, SellsModel.class);
     }
 
     //should return the object; data is being removed
