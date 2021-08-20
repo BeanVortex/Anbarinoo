@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-record SellsControllerTest(SellsController sellController,
+public record SellsControllerTest(SellsController sellController,
                            UserService userService,
                            ProductService productService,
                            JwtUtils jwtUtils,
@@ -50,7 +50,7 @@ record SellsControllerTest(SellsController sellController,
     private static MockMvc mockMvc;
 
     @Autowired
-    SellsControllerTest {
+    public SellsControllerTest {
     }
 
     @BeforeAll

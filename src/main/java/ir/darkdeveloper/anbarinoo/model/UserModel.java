@@ -72,6 +72,7 @@ public class UserModel implements UserDetails, OAuth2User {
     @ManyToMany(fetch = FetchType.EAGER)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name")
+    @JsonIdentityReference(alwaysAsId = true)
     private Set<UserRoles> roles;
 
     @CreationTimestamp

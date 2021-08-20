@@ -161,6 +161,8 @@ public class UserService implements UserDetailsService {
             return new ResponseEntity<>(repo.findByEmailOrUsername(model.getUsername()), HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             throw new DataExistsException("User exists!");
+        } catch (Exception e) {
+            throw new InternalServerException(e.getLocalizedMessage());
         }
     }
 
