@@ -123,7 +123,7 @@ public class UserService implements UserDetailsService {
             if (userOpt.isPresent()) {
                 checkUserIsSameUserForRequest(userOpt.get().getId(), req, "delete");
                 userUtils.deleteUser(userOpt.get());
-                return new ResponseEntity<>(HttpStatus.OK);
+                return new ResponseEntity<>("Successfully deleted user",HttpStatus.OK);
             }
         } catch (NotFoundException n) {
             throw new BadRequestException(n.getLocalizedMessage());

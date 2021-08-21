@@ -63,7 +63,7 @@ public class UserController {
     }
 
     @GetMapping("/all/")
-    public Page<UserModel> allUsers(Pageable pageable) {
+    public Page<UserModel> getAllUsers(Pageable pageable) {
         return userService.allUsers(pageable);
     }
 
