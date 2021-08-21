@@ -30,7 +30,7 @@ public class CategoryController {
     }
 
     @PostMapping("/update/")
-    public ResponseEntity<?> updateCategory(@ModelAttribute CategoryModel model, HttpServletRequest request) {
+    public ResponseEntity<?> updateCategory(@RequestBody CategoryModel model, HttpServletRequest request) {
         return ResponseEntity.ok().body(service.saveCategory(model, request));
     }
 

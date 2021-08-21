@@ -47,6 +47,7 @@ dependencies {
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+    testImplementation 'com.google.code.gson:gson:2.8.8'
     testImplementation "org.assertj:assertj-core:3.20.2"
     testImplementation "com.h2database:h2:1.4.200"
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.2"

@@ -1,7 +1,5 @@
 package ir.darkdeveloper.anbarinoo.controller;
 
-import ir.darkdeveloper.anbarinoo.model.Financial.SellsModel;
-import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils;
@@ -11,40 +9,22 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.mock.web.MockMultipartHttpServletRequest;
+import org.springframework.mock.web.MockPart;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.util.FileCopyUtils;
-import org.springframework.util.SerializationUtils;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -56,8 +36,9 @@ public record UserControllerTest(UserController controller,
                                  JwtUtils jwtUtils) {
 
     private static Long userId;
-    private static HttpServletRequest request;
     private static MockMvc mockMvc;
+    private static String signupRefreshToken;
+    private static String signupAccessToken;
 
     @Autowired
     public UserControllerTest {
@@ -69,7 +50,6 @@ public record UserControllerTest(UserController controller,
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
-        request = mock(HttpServletRequest.class);
     }
 
     @BeforeEach
@@ -77,70 +57,62 @@ public record UserControllerTest(UserController controller,
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
-
     @Test
     @Order(1)
     @WithMockUser(username = "anonymousUser")
     void signUpUser() throws Exception {
-        var user = new UserModel();
-        user.setEmail("email@mail.com");
-//        MockMultipartFile file1 = new MockMultipartFile("profileFile", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-//                "Hello, World!".getBytes());
-//        MockMultipartFile file2 = new MockMultipartFile("shopFile", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-//                "Hello, World!".getBytes());
-//        user.setProfileFile(file1);
-//        user.setShopFile(file2);
-        user.setAddress("address");
-        user.setDescription("desc");
-        user.setUserName("user n");
-        user.setPassword("pass1");
-        user.setPasswordRepeat("pass1");
-
-
+        MockMultipartFile file1 = new MockMultipartFile("profileFile", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!".getBytes());
+        MockMultipartFile file2 = new MockMultipartFile("shopFile", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!".getBytes());
+        MockPart address = new MockPart("address", "address".getBytes());
+        MockPart des = new MockPart("description", "desc".getBytes());
+        MockPart username = new MockPart("userName", "user n".getBytes());
+        MockPart password = new MockPart("password", "pass1".getBytes());
+        MockPart passwordRepeat = new MockPart("passwordRepeat", "pass1".getBytes());
+        MockPart email = new MockPart("email", "email@mail.com".getBytes());
+        mockMvc.perform(multipart("/api/user/signup/")
+                .file(file1)
+                .file(file2)
+                .part(email, des, username, address, passwordRepeat, password)
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andDo(result -> {
+                    signupRefreshToken = result.getResponse().getHeader("refresh_token");
+                    signupAccessToken = result.getResponse().getHeader("access_token");
+                    JSONObject obj = new JSONObject(result.getResponse().getContentAsString());
+                    userId = obj.getLong("id");
+                })
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.id").isNotEmpty());
     }
 
 
-    private String mapToJson(UserModel user) {
-        return """
-                {
-                    "id": %d,
-                    "email": %s,
-                    "password": %s,
-                    "passwordRepeat": %s,
-                    "description": %s,
-                    "address": %s,
-                    "userName": %s
-                }
-                """.formatted(user.getId(), user.getEmail(), user.getPassword(),
-                user.getPasswordRepeat(), user.getDescription(), user.getAddress(), user.getUserName());
+    @Test
+    @Order(4)
+    @WithMockUser(authorities = "OP_EDIT_USER")
+    void updateUser() throws Exception {
+        MockPart address = new MockPart("address", "UpdatedAddress".getBytes());
+        MockPart des = new MockPart("description", "UpdatedDesc".getBytes());
+        MockPart username = new MockPart("userName", "UpdatedUser n".getBytes());
+        MockPart id = new MockPart("id", null);
+
+        mockMvc.perform(multipart("/api/user/update/{id}/", userId)
+                .part(des, username, address, id)
+                .header("refresh_token", signupRefreshToken)
+                .header("access_token", signupAccessToken)
+                .accept(MediaType.APPLICATION_JSON)
+                .with(request -> {
+                    request.setMethod("PUT");
+                    return request;
+                }))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.address").value(is("UpdatedAddress")))
+                .andExpect(jsonPath("$.description").value(is("UpdatedDesc")))
+                .andExpect(jsonPath("$.userName").value(is("UpdatedUser n")));
     }
 
-    private byte[] mapToByte(UserModel user) {
-        return SerializationUtils.serialize(user);
-    }
 
-
-    //should return the object; data is being removed
-    private HttpServletRequest setUpHeader(String email, Long userId) {
-
-        Map<String, String> headers = new HashMap<>();
-        headers.put(null, "HTTP/1.1 200 OK");
-        headers.put("Content-Type", "text/html");
-
-        String refreshToken = jwtUtils.generateRefreshToken(email, userId);
-        String accessToken = jwtUtils.generateAccessToken(email);
-        var refreshDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
-        var accessDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
-        headers.put("refresh_token", refreshToken);
-        headers.put("access_token", accessToken);
-        headers.put("refresh_expiration", refreshDate);
-        headers.put("access_expiration", accessDate);
-
-
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        for (String key : headers.keySet())
-            when(request.getHeader(key)).thenReturn(headers.get(key));
-
-        return request;
-    }
 }
