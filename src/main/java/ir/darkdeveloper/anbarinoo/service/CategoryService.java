@@ -76,6 +76,10 @@ public class CategoryService {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    public CategoryModel getCategoryById(Long id) {
+        return repo.findById(id).orElse(null);
+    }
+
     private void checkUserIsSameUserForRequest(Long userId, Long categoryId, HttpServletRequest req, String operation) {
         if (userId == null) {
             var catFound = repo.findById(categoryId);

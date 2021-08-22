@@ -1,8 +1,12 @@
 package ir.darkdeveloper.anbarinoo.controller.Financial;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.SellsModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
+import ir.darkdeveloper.anbarinoo.service.CategoryService;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
@@ -38,14 +42,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public record SellsControllerTest(SellsController sellController,
-                           UserService userService,
-                           ProductService productService,
-                           JwtUtils jwtUtils,
-                           WebApplicationContext webApplicationContext) {
+                                  UserService userService,
+                                  ProductService productService,
+                                  JwtUtils jwtUtils,
+                                  WebApplicationContext webApplicationContext,
+                                  CategoryService categoryService) {
 
     private static Long userId;
     private static Long productId;
     private static Long sellId;
+    private static Long catId;
     private static HttpServletRequest request;
     private static MockMvc mockMvc;
 
@@ -88,6 +94,35 @@ public record SellsControllerTest(SellsController sellController,
 
     @Test
     @Order(2)
+    @WithMockUser(authorities = {"OP_ACCESS_USER"})
+    void saveCategory() {
+        System.out.println("ProductServiceTest.saveCategory");
+        var cat1 = new CategoryModel("Other");
+        cat1.setUser(new UserModel(userId));
+        categoryService.saveCategory(cat1, request);
+        var electronics = new CategoryModel("Electronics");
+        electronics.setUser(new UserModel(userId));
+        var mobilePhones = new CategoryModel("Mobile phones", electronics);
+        mobilePhones.setUser(new UserModel(userId));
+        var washingMachines = new CategoryModel("Washing machines", electronics);
+        washingMachines.setUser(new UserModel(userId));
+        electronics.addChild(mobilePhones);
+        electronics.addChild(washingMachines);
+        var iPhone = new CategoryModel("iPhone", mobilePhones);
+        iPhone.setUser(new UserModel(userId));
+        var samsung = new CategoryModel("Samsung", mobilePhones);
+        samsung.setUser(new UserModel(userId));
+        mobilePhones.addChild(iPhone);
+        mobilePhones.addChild(samsung);
+        var galaxy = new CategoryModel("Galaxy", samsung);
+        galaxy.setUser(new UserModel(userId));
+        samsung.addChild(galaxy);
+        categoryService.saveCategory(electronics, request);
+        catId = electronics.getChildren().get(0).getId();
+    }
+
+    @Test
+    @Order(3)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void saveProduct() {
         var product = new ProductModel();
@@ -95,19 +130,21 @@ public record SellsControllerTest(SellsController sellController,
         product.setDescription("description");
         product.setTotalCount(50);
         product.setPrice(BigDecimal.valueOf(500));
+        product.setCategory(new CategoryModel(catId));
         productService.saveProduct(product, request);
         productId = product.getId();
     }
 
 
     @Test
-    @Order(3)
+    @Order(4)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void saveSell() throws Exception {
         var sell = new SellsModel();
         sell.setProduct(new ProductModel(productId));
         sell.setPrice(BigDecimal.valueOf(5000));
         sell.setCount(BigDecimal.valueOf(8));
+        System.out.println(mapToJson(sell));
         mockMvc.perform(post("/api/product/sell/save/")
                 .header("refresh_token", request.getHeader("refresh_token"))
                 .header("access_token", request.getHeader("access_token"))
@@ -115,9 +152,9 @@ public record SellsControllerTest(SellsController sellController,
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andDo(print())
                 .andExpect(jsonPath("$.product").value(is(productId), Long.class))
                 .andExpect(jsonPath("$").isMap())
-                .andDo(print())
                 .andDo(result -> {
                     JSONObject obj = new JSONObject(result.getResponse().getContentAsString());
                     sellId = obj.getLong("id");
@@ -125,7 +162,7 @@ public record SellsControllerTest(SellsController sellController,
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void updateSell() throws Exception {
 
@@ -148,12 +185,12 @@ public record SellsControllerTest(SellsController sellController,
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getAllSellRecordsOfProduct() throws Exception {
 
         mockMvc.perform(get("/api/product/sell/get-by-product/{id}/?page={page}&size={size}",
-                productId, 5, 6)
+                productId, 0, 1)
                 .header("refresh_token", request.getHeader("refresh_token"))
                 .header("access_token", request.getHeader("access_token"))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -161,14 +198,14 @@ public record SellsControllerTest(SellsController sellController,
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.pageable.pageSize").value(is(6)))
-                .andExpect(jsonPath("$.pageable.pageNumber").value(is(5)))
+                .andExpect(jsonPath("$.pageable.pageSize").value(is(1)))
+                .andExpect(jsonPath("$.pageable.pageNumber").value(is(0)))
                 .andExpect(jsonPath("$.totalPages").value(is(1)))
                 .andDo(print());
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getAllSellRecordsOfUser() throws Exception {
 
@@ -189,7 +226,7 @@ public record SellsControllerTest(SellsController sellController,
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getSell() throws Exception {
         mockMvc.perform(get("/api/product/sell/{id}/?page={page}&size={size}",
@@ -200,13 +237,14 @@ public record SellsControllerTest(SellsController sellController,
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.id").value(is(5)))
+                .andExpect(jsonPath("$.product").value(is(productId), Long.class))
+                .andExpect(jsonPath("$.id").value(is(sellId), Long.class))
                 .andExpect(jsonPath("$.count").value(is(BigDecimal.valueOf(60.2)), BigDecimal.class))
                 .andDo(print());
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void deleteSell() throws Exception {
 
@@ -219,20 +257,8 @@ public record SellsControllerTest(SellsController sellController,
                 .andDo(print());
     }
 
-    private String mapToJson(SellsModel sell) {
-        return """
-                {
-                    "id":%d,
-                    "count":%f,
-                    "price":%f,
-                    "tax":%d,
-                    "product":
-                         {
-                            "id":%d
-                         }
-                    }
-                """.formatted(sell.getId(), sell.getCount(), sell.getPrice(),
-                sell.getTax(), sell.getProduct().getId());
+    private String mapToJson(SellsModel sell) throws JsonProcessingException {
+        return new ObjectMapper().writeValueAsString(sell);
     }
 
     //should return the object; data is being removed

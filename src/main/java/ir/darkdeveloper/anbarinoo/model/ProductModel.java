@@ -56,13 +56,7 @@ public class ProductModel {
     @JsonIgnore
     private List<BuysModel> buys;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userName")
-    @JsonIdentityReference(alwaysAsId = true)
-    private UserModel user;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cat_id")
     private CategoryModel category;
 
@@ -82,14 +76,13 @@ public class ProductModel {
         this.id = id;
     }
 
-    public void merge(ProductModel other) {
-        id = other.id == null ? id : other.id;
-        name = other.name == null ? name : other.name;
-        description = other.description == null ? description : other.description;
-        category = other.category == null ? category : other.category;
-        totalCount = other.totalCount == null ? totalCount : other.totalCount;
-        createdAt = other.createdAt == null ? createdAt : other.createdAt;
-        updatedAt = other.updatedAt == null ? updatedAt : other.updatedAt;
+    public void update(ProductModel other) {
+        id = other.id != null || id == null ? other.id : id;
+        name = other.name != null || name == null ? other.name : name;
+        price = other.price != null || price == null ? other.price : price;
+        description = other.description != null || description == null ? other.description : description;
+        category = other.category != null || category == null ? other.category : category;
+        totalCount = other.totalCount != null || totalCount == null ? other.totalCount : totalCount;
     }
 }
 

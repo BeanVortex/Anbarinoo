@@ -5,6 +5,7 @@ import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.ProductRepository;
+import ir.darkdeveloper.anbarinoo.service.CategoryService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,20 +19,21 @@ public class ProductUtils {
     private final JwtUtils jwtUtils;
     private final ProductRepository repo;
     private final IOUtils ioUtils;
+    private final CategoryService categoryService;
 
     @Autowired
-    public ProductUtils(JwtUtils jwtUtils, ProductRepository repo, IOUtils ioUtils) {
+    public ProductUtils(JwtUtils jwtUtils, ProductRepository repo, IOUtils ioUtils, CategoryService categoryService) {
         this.jwtUtils = jwtUtils;
         this.repo = repo;
         this.ioUtils = ioUtils;
+        this.categoryService = categoryService;
     }
 
     @NotNull
     public ProductModel saveProduct(ProductModel product, HttpServletRequest req) throws IOException {
         if (product.getId() != null) throw new BadRequestException("Product id should null, can't update");
-        var refreshToken = req.getHeader("refresh_token");
-        var userId = ((Integer) jwtUtils.getAllClaimsFromToken(refreshToken).get("user_id")).longValue();
-        product.setUser(new UserModel(userId));
+        var fetchedCat = categoryService.getCategoryById(product.getCategory().getId());
+        checkUserIsSameUserForRequest(fetchedCat.getUser().getId(), req, "create");
         ioUtils.saveProductImages(product);
         return repo.save(product);
     }
@@ -39,19 +41,18 @@ public class ProductUtils {
     public ProductModel updateProduct(ProductModel product, ProductModel preProduct) {
         if (product.getImages() != null || product.getFiles() != null)
             throw new ForbiddenException("You can't update images with other data for a product. update images in another way");
-        if (product.getUser() != null) throw new ForbiddenException("You can't change the post owner");
 
-        preProduct.merge(product);
+        preProduct.update(product);
         return repo.save(preProduct);
     }
 
     public ProductModel updateProductImages(ProductModel product, ProductModel preProduct) throws IOException {
         if (product.getFiles() == null)
             throw new BadRequestException("Image files are empty");
-        if (product.getUser() != null) throw new ForbiddenException("You can't change the post owner");
 
         ioUtils.addProductImages(product, preProduct);
-        product.setUser(new UserModel(preProduct.getUser().getId()));
+        product.getCategory().setUser(new UserModel(preProduct.getCategory().getUser().getId()));
+        product.update(preProduct);
         return repo.save(product);
     }
 

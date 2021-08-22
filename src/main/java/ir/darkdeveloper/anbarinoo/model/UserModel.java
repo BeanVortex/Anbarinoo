@@ -92,19 +92,17 @@ public class UserModel implements UserDetails, OAuth2User {
 
     @OneToMany(mappedBy = "user")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     private List<DebtOrDemandModel> debtOrDemand;
 
     @OneToMany(mappedBy = "user")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     private List<ChequeModel> cheques;
 
-    //mappedBy is read-only. can't add product while creating user
     @OneToMany(mappedBy = "user")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    private List<ProductModel> products;
-
-    @OneToMany(mappedBy = "user")
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     private List<CategoryModel> categories;
 
     // For saving products I need it

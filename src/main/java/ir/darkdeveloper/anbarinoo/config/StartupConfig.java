@@ -3,6 +3,7 @@ package ir.darkdeveloper.anbarinoo.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import ir.darkdeveloper.anbarinoo.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -15,16 +16,16 @@ import ir.darkdeveloper.anbarinoo.model.UserRoles;
 import ir.darkdeveloper.anbarinoo.service.UserRolesService;
 
 @Configuration
-public class UserConfig {
+public class StartupConfig {
 
-    private final UserRolesService service;
+    private final UserRolesService rolesService;
 
     @Value("${user.email-verification-disabled}")
     private Boolean userEnabled;
 
     @Autowired
-    public UserConfig(UserRolesService service) {
-        this.service = service;
+    public StartupConfig(UserRolesService rolesService) {
+        this.rolesService = rolesService;
     }
 
     @Bean
@@ -33,9 +34,9 @@ public class UserConfig {
     }
 
     private void createDefaultRole() {
-        if (!service.exists("USER")) {
+        if (!rolesService.exists("USER")) {
             List<Authority> authorities = new ArrayList<>(List.of(Authority.OP_EDIT_USER, Authority.OP_ACCESS_USER, Authority.OP_DELETE_USER));
-            service.saveRole(new UserRoles(1L, "USER", authorities));
+            rolesService.saveRole(new UserRoles(1L, "USER", authorities));
         }
     }
 

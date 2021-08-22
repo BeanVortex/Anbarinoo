@@ -20,11 +20,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.BIG_DECIMAL;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -115,6 +117,7 @@ public record ProductServiceTest(ProductService productService,
         product.setName("name");
         product.setDescription("description");
         product.setTotalCount(50);
+        product.setPrice(BigDecimal.valueOf(500));
         MockMultipartFile file3 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
                 "Hello, World!".getBytes());
         MockMultipartFile file4 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
@@ -131,7 +134,7 @@ public record ProductServiceTest(ProductService productService,
     void getProduct() {
         System.out.println("ProductServiceTest.getProduct");
         var fetchedProduct = productService.getProduct(productId, request);
-        assertThat(fetchedProduct.getUser().getId()).isEqualTo(userId);
+        assertThat(fetchedProduct.getCategory().getUser().getId()).isEqualTo(userId);
     }
 
     @Test

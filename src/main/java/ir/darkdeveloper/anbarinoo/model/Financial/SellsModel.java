@@ -3,8 +3,14 @@ package ir.darkdeveloper.anbarinoo.model.Financial;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
+import ir.darkdeveloper.anbarinoo.model.deserializers.SellsDeserializer;
+import ir.darkdeveloper.anbarinoo.model.serializers.SellsSerialize;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -16,6 +22,10 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "sells")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@JsonDeserialize(using = SellsDeserializer.class)
+@JsonSerialize(using = SellsSerialize.class)
+@AllArgsConstructor
+@NoArgsConstructor
 public class SellsModel {
 
     @Id

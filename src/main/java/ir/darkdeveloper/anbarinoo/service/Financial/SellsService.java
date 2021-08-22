@@ -16,7 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @Service
 public class SellsService {
@@ -89,7 +88,7 @@ public class SellsService {
     public Page<SellsModel> getAllSellRecordsOfUser(Long userId, HttpServletRequest req, Pageable pageable) {
         try {
             checkUserIsSameUserForRequest(null, null, userId, req, "fetch");
-            return repo.findAllByProductUserId(userId, pageable);
+            return repo.findAllByProductCategoryUserId(userId, pageable);
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (BadRequestException n) {
@@ -148,7 +147,7 @@ public class SellsService {
             } else {
                 product = productService.getProduct(productId, req);
             }
-            if (!product.getUser().getId().equals(id))
+            if (!product.getCategory().getUser().getId().equals(id))
                 throw new ForbiddenException("You can't " + operation + " another user's products");
         } else if (!userId.equals(id))
             throw new ForbiddenException("You can't " + operation + " another user's products");

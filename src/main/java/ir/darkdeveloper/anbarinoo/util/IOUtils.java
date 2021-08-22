@@ -188,7 +188,7 @@ public class IOUtils {
             fileNames.add(saveFile(file, PRODUCT_IMAGE_PATH));
 
         //adding remaining images name in previous product
-        product.merge(preProduct);
+        product.update(preProduct);
         fileNames.addAll(preProduct.getImages());
         if (!fileNames.isEmpty())
             product.setImages(fileNames);

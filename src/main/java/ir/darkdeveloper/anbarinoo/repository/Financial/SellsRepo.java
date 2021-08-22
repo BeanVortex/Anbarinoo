@@ -12,6 +12,6 @@ public interface SellsRepo extends PagingAndSortingRepository<SellsModel, Long> 
 
     Page<SellsModel> findAllByProductId(Long product_id, Pageable pageable);
 
-    Page<SellsModel> findAllByProductUserId(Long product_user_id, Pageable pageable);
+    Page<SellsModel> findAllByProductCategoryUserId(Long product_category_user_id, Pageable pageable);
 
 }

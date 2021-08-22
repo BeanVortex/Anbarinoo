@@ -1,5 +1,7 @@
 package ir.darkdeveloper.anbarinoo.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
@@ -112,10 +114,9 @@ public record CategoryControllerTest(UserService userService,
         mockMvc.perform(post("/api/products/category/save/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-
+                .content(mapToJson(electronics))
                 .header("refresh_token", request.getHeader("refresh_token"))
                 .header("access_token", request.getHeader("access_token"))
-                .content(mapToJson(electronics))
         )
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -130,17 +131,9 @@ public record CategoryControllerTest(UserService userService,
     }
 
 
-    private String mapToJson(CategoryModel cat) {
-
-//        final GsonBuilder builder = new GsonBuilder();
-//        builder.excludeFieldsWithModifiers(Modifier.STATIC, Modifier.TRANSIENT, Modifier.VOLATILE)
-//                .registerTypeHierarchyAdapter(byte[].class, new GsonByteArrayToBase64())
-//                .registerTypeAdapter(LocalDateTime.class, new GsonLocalDateTime())
-//        ;
-//        options.forEach(o -> o.applyOptions(builder), null);
-//        this.gson = builder.create();
-        Gson g = new Gson();
-        return new Gson().toJson(cat);
+    private String mapToJson(Object obj) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(obj);
     }
 
     //should return the object; data is being removed

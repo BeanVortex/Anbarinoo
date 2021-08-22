@@ -1,9 +1,11 @@
 package ir.darkdeveloper.anbarinoo.service.Financial;
 
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
+import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.SellsModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
+import ir.darkdeveloper.anbarinoo.service.CategoryService;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
@@ -35,11 +37,13 @@ import static org.mockito.Mockito.when;
 public record SellsServiceTest(UserService userService,
                                JwtUtils jwtUtils,
                                ProductService productService,
-                               SellsService sellsService) {
+                               SellsService sellsService,
+                               CategoryService categoryService) {
 
     private static HttpServletRequest request;
     private static Long userId;
     private static Long sellId;
+    private static Long catId;
     private static Long productId;
     private static Pageable pageable;
 
@@ -77,9 +81,37 @@ public record SellsServiceTest(UserService userService,
         request = setUpHeader(user.getEmail(), userId);
     }
 
-
     @Test
     @Order(2)
+    @WithMockUser( authorities = {"OP_ACCESS_USER"})
+    void saveCategory() {
+        System.out.println("ProductServiceTest.saveCategory");
+        var cat1 = new CategoryModel("Other");
+        cat1.setUser(new UserModel(userId));
+        categoryService.saveCategory(cat1, request);
+        var electronics = new CategoryModel("Electronics");
+        electronics.setUser(new UserModel(userId));
+        var mobilePhones = new CategoryModel("Mobile phones", electronics);
+        mobilePhones.setUser(new UserModel(userId));
+        var washingMachines = new CategoryModel("Washing machines", electronics);
+        washingMachines.setUser(new UserModel(userId));
+        electronics.addChild(mobilePhones);
+        electronics.addChild(washingMachines);
+        var iPhone = new CategoryModel("iPhone", mobilePhones);
+        iPhone.setUser(new UserModel(userId));
+        var samsung = new CategoryModel("Samsung", mobilePhones);
+        samsung.setUser(new UserModel(userId));
+        mobilePhones.addChild(iPhone);
+        mobilePhones.addChild(samsung);
+        var galaxy = new CategoryModel("Galaxy", samsung);
+        galaxy.setUser(new UserModel(userId));
+        samsung.addChild(galaxy);
+        categoryService.saveCategory(electronics, request);
+        catId = electronics.getChildren().get(0).getId();
+    }
+
+    @Test
+    @Order(3)
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void saveProduct() {
         var product = new ProductModel();
@@ -87,13 +119,13 @@ public record SellsServiceTest(UserService userService,
         product.setDescription("description");
         product.setTotalCount(50);
         product.setPrice(BigDecimal.valueOf(56));
+        product.setCategory(new CategoryModel(catId));
         productService.saveProduct(product, request);
         productId = product.getId();
     }
 
-
     @Test
-    @Order(3)
+    @Order(4)
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void saveSell() {
         var sellRecord = new SellsModel();
@@ -106,11 +138,11 @@ public record SellsServiceTest(UserService userService,
         sellId = sellRecord.getId();
         var fetchedSell = sellsService.getSell(sellId, request);
         assertThat(fetchedSell.getProduct()).isNotNull();
-        assertThat(fetchedSell.getProduct().getUser().getId()).isEqualTo(userId);
+        assertThat(fetchedSell.getProduct().getCategory().getUser().getId()).isEqualTo(userId);
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void updateSellWithNullUpdatableValues() {
         var sellRecord = new SellsModel();
@@ -126,7 +158,7 @@ public record SellsServiceTest(UserService userService,
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void updateSell() {
         var sellRecord = new SellsModel();
@@ -142,7 +174,7 @@ public record SellsServiceTest(UserService userService,
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void getAllSellRecordsOfProduct() {
         var fetchedRecords = sellsService.getAllSellRecordsOfProduct(productId, request, pageable);
@@ -151,7 +183,7 @@ public record SellsServiceTest(UserService userService,
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void getAllSellRecordsOfUser() {
         var fetchedRecords = sellsService.getAllSellRecordsOfUser(userId, request, pageable);
@@ -160,7 +192,7 @@ public record SellsServiceTest(UserService userService,
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void deleteSell() {
         sellsService.deleteSell(sellId, request);

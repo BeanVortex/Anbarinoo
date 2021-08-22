@@ -37,7 +37,7 @@ public class ProductService {
      * @param request should contain refresh token
      */
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER') && #product.getCategory() != null")
     public ProductModel saveProduct(ProductModel product, HttpServletRequest request) {
         try {
             return productUtils.saveProduct(product, request);
@@ -53,7 +53,7 @@ public class ProductService {
         try {
             var foundData = repo.findByNameContains(name, pageable);
             if (foundData.getContent().get(0) != null) {
-                productUtils.checkUserIsSameUserForRequest(foundData.getContent().get(0).getUser().getId(),
+                productUtils.checkUserIsSameUserForRequest(foundData.getContent().get(0).getCategory().getUser().getId(),
                         req, "fetch");
                 return foundData;
             }
@@ -70,7 +70,7 @@ public class ProductService {
         try {
             var product = repo.findById(productId);
             if (product.isPresent()) {
-                productUtils.checkUserIsSameUserForRequest(product.get().getUser().getId(), req, "fetch");
+                productUtils.checkUserIsSameUserForRequest(product.get().getCategory().getUser().getId(), req, "fetch");
                 return product.get();
             }
         } catch (ForbiddenException f) {
@@ -85,7 +85,7 @@ public class ProductService {
     public Page<ProductModel> getOneUserProducts(Long userId, Pageable pageable, HttpServletRequest req) {
         try {
             productUtils.checkUserIsSameUserForRequest(userId, req, "fetch");
-            return repo.findAllByUserId(userId, pageable);
+            return repo.findAllByCategoryUserId(userId, pageable);
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (Exception e) {
@@ -109,7 +109,7 @@ public class ProductService {
             if (product.getId() != null) throw new BadRequestException("Product id should null, can't update");
             var foundProduct = repo.findById(productId);
             if (foundProduct.isPresent()) {
-                productUtils.checkUserIsSameUserForRequest(foundProduct.get().getUser().getId(), req, "update");
+                productUtils.checkUserIsSameUserForRequest(foundProduct.get().getCategory().getUser().getId(), req, "update");
                 return productUtils.updateProduct(product, foundProduct.get());
             }
         } catch (ForbiddenException f) {
@@ -137,7 +137,7 @@ public class ProductService {
             if (product.getId() != null) throw new BadRequestException("Product id should null, can't update");
             var foundProduct = repo.findById(productId);
             if (foundProduct.isPresent()) {
-                productUtils.checkUserIsSameUserForRequest(foundProduct.get().getUser().getId(), req, "update");
+                productUtils.checkUserIsSameUserForRequest(foundProduct.get().getCategory().getUser().getId(), req, "update");
                 return productUtils.updateProductImages(product, foundProduct.get());
             }
         } catch (ForbiddenException f) {
@@ -164,7 +164,7 @@ public class ProductService {
             if (product.getId() != null) throw new BadRequestException("Product id should null, can't update");
             var foundProduct = repo.findById(productId);
             if (foundProduct.isPresent()) {
-                productUtils.checkUserIsSameUserForRequest(foundProduct.get().getUser().getId(), req,
+                productUtils.checkUserIsSameUserForRequest(foundProduct.get().getCategory().getUser().getId(), req,
                         "delete images of");
                 productUtils.updateDeleteProductImages(product, foundProduct.get());
                 return new ResponseEntity<>(HttpStatus.OK);
@@ -185,7 +185,7 @@ public class ProductService {
         try {
             var productOpt = repo.findById(id);
             if (productOpt.isPresent()) {
-                productUtils.checkUserIsSameUserForRequest(productOpt.get().getUser().getId(), req, "delete");
+                productUtils.checkUserIsSameUserForRequest(productOpt.get().getCategory().getUser().getId(), req, "delete");
                 ioUtils.deleteProductFiles(productOpt.get());
                 repo.deleteById(id);
                 return new ResponseEntity<>(HttpStatus.OK);
