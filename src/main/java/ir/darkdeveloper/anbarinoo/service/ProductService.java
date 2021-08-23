@@ -7,6 +7,7 @@ import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.repository.ProductRepository;
 import ir.darkdeveloper.anbarinoo.util.IOUtils;
+import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.ProductUtils;
 import lombok.AllArgsConstructor;
 import org.hibernate.exception.DataException;
@@ -27,6 +28,7 @@ public class ProductService {
     private final ProductRepository repo;
     private final IOUtils ioUtils;
     private final ProductUtils productUtils;
+    private final JwtUtils jwtUtils;
 
     /**
      * saves a new product to the user id of refresh token
@@ -41,6 +43,8 @@ public class ProductService {
     public ProductModel saveProduct(ProductModel product, HttpServletRequest request) {
         try {
             return productUtils.saveProduct(product, request);
+        } catch (ForbiddenException f) {
+            throw new ForbiddenException(f.getLocalizedMessage());
         } catch (BadRequestException b) {
             throw new BadRequestException(b.getLocalizedMessage());
         } catch (Exception e) {
@@ -51,12 +55,10 @@ public class ProductService {
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public Page<ProductModel> findByNameContains(String name, Pageable pageable, HttpServletRequest req) {
         try {
-            var foundData = repo.findByNameContains(name, pageable);
-            if (foundData.getContent().get(0) != null) {
-                productUtils.checkUserIsSameUserForRequest(foundData.getContent().get(0).getCategory().getUser().getId(),
-                        req, "fetch");
+            var foundData = repo.findByNameContainsAndCategoryUserId(name,
+                    jwtUtils.getUserId(req.getHeader("refresh_token")), pageable);
+            if (!foundData.getContent().isEmpty() && foundData.getContent().get(0) != null)
                 return foundData;
-            }
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (Exception e) {

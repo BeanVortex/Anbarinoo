@@ -12,7 +12,7 @@ import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/category/products")
 public class ProductController {
     private final ProductService service;
 
@@ -26,7 +26,7 @@ public class ProductController {
         return ResponseEntity.ok().body(service.saveProduct(product, request));
     }
 
-    @PostMapping("/search/")
+    @GetMapping("/search/")
     public ResponseEntity<?> findByNameContains(@RequestParam String name, Pageable pageable,
                                                 HttpServletRequest request) {
         return ResponseEntity.ok().body(service.findByNameContains(name, pageable, request));

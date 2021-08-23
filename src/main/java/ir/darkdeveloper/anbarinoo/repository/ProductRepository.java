@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends PagingAndSortingRepository<ProductModel, Long> {
 
-    Page<ProductModel> findByNameContains(String name, Pageable pageable);
+    Page<ProductModel> findByNameContainsAndCategoryUserId(String name, Long category_user_id, Pageable pageable);
 
     Page<ProductModel> findAllByCategoryUserId(Long category_user_id, Pageable pageable);
 

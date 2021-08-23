@@ -92,7 +92,7 @@ public record CategoryControllerTest(UserService userService,
     void saveCategory() throws Exception {
         CategoryModel electronics = new CategoryModel("Electronics");
         System.out.println(mapToJson(electronics));
-        mockMvc.perform(post("/api/products/category/save/")
+        mockMvc.perform(post("/api/category/save/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(mapToJson(electronics))
@@ -113,7 +113,7 @@ public record CategoryControllerTest(UserService userService,
     void saveASubCategory() throws Exception {
         var subCat = new CategoryModel("Mobiles");
         System.out.println(mapToJson(subCat));
-        mockMvc.perform(post("/api/products/category/sub-category/save/{parentId}/", catId)
+        mockMvc.perform(post("/api/category/sub-category/save/{parentId}/", catId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(mapToJson(subCat))
@@ -133,7 +133,7 @@ public record CategoryControllerTest(UserService userService,
     @Order(4)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getParentCategoryById() throws Exception {
-        mockMvc.perform(get("/api/products/category/{id}/", catId)
+        mockMvc.perform(get("/api/category/{id}/", catId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .header("refresh_token", request.getHeader("refresh_token"))
@@ -151,7 +151,7 @@ public record CategoryControllerTest(UserService userService,
     @Order(5)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getCategoriesByUserId() throws Exception {
-        mockMvc.perform(get("/api/products/category/user/{userId}/", userId)
+        mockMvc.perform(get("/api/category/user/{userId}/", userId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .header("refresh_token", request.getHeader("refresh_token"))
@@ -168,7 +168,7 @@ public record CategoryControllerTest(UserService userService,
     @Order(6)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void deleteCategoryById() throws Exception {
-        mockMvc.perform(delete("/api/products/category/{id}/", catId)
+        mockMvc.perform(delete("/api/category/{id}/", catId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .header("refresh_token", request.getHeader("refresh_token"))
@@ -182,7 +182,7 @@ public record CategoryControllerTest(UserService userService,
     @Order(7)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getSubCategoryByIdAfterParentDelete() throws Exception {
-        mockMvc.perform(get("/api/products/category/{id}/", subCatId)
+        mockMvc.perform(get("/api/category/{id}/", subCatId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .header("refresh_token", request.getHeader("refresh_token"))

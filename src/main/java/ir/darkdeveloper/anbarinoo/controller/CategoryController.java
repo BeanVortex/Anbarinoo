@@ -13,7 +13,7 @@ import ir.darkdeveloper.anbarinoo.service.CategoryService;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/api/products/category")
+@RequestMapping("/api/category")
 public class CategoryController {
 
     private final CategoryService service;
@@ -31,7 +31,7 @@ public class CategoryController {
 
     @PostMapping("/sub-category/save/{parentId}/")
     public ResponseEntity<?> saveSubCategory(@RequestBody CategoryModel model, @PathVariable Long parentId, HttpServletRequest request) {
-        return ResponseEntity.ok().body(service.saveSubCategory(model, parentId,request));
+        return ResponseEntity.ok().body(service.saveSubCategory(model, parentId, request));
     }
 
 

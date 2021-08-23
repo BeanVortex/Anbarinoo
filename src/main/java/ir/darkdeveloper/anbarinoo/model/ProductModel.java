@@ -58,6 +58,8 @@ public class ProductModel {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cat_id")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     private CategoryModel category;
 
 
