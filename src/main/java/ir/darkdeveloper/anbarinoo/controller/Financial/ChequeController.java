@@ -1,4 +1,4 @@
-package ir.darkdeveloper.anbarinoo.controller;
+package ir.darkdeveloper.anbarinoo.controller.Financial;
 
 import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
 import org.springframework.beans.factory.annotation.Autowired;

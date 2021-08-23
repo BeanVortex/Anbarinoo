@@ -37,7 +37,7 @@ public class SellsService {
             if (sell.getProduct() == null || sell.getProduct().getId() == null)
                 throw new BadRequestException("Product id is null, Can't sell");
             if (sell.getId() != null)
-                throw new BadRequestException("Id must be null in the body");
+                throw new BadRequestException("Id must be null to save a sell record");
             checkUserIsSameUserForRequest(sell.getProduct().getId(), null, null, req, "sell");
             return repo.save(sell);
         } catch (ForbiddenException f) {

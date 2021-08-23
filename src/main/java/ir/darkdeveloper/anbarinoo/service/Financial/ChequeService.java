@@ -39,8 +39,11 @@ public class ChequeService {
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ChequeModel saveCheque(ChequeModel cheque, HttpServletRequest req) {
         try {
+            if (cheque.getId() != null) throw new ForbiddenException("Id of cheque must be null");
             cheque.setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
             return repo.save(cheque);
+        } catch (ForbiddenException e) {
+            throw new ForbiddenException(e.getLocalizedMessage());
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
         }

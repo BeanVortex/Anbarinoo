@@ -5,6 +5,9 @@ import java.util.Set;
 
 import javax.transaction.Transactional;
 
+import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
+import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
+import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +30,12 @@ public class UserRolesService {
     @Transactional
     public ResponseEntity<?> saveRole(UserRoles role) {
         try {
+            if (role.getId() != null) throw new ForbiddenException("Id must be null for a role to save");
             repo.save(role);
+        } catch (ForbiddenException e) {
+            throw new ForbiddenException(e.getLocalizedMessage());
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new InternalServerException(e.getLocalizedMessage());
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -46,7 +52,7 @@ public class UserRolesService {
         try {
             repo.deleteById(id);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new InternalServerException(e.getLocalizedMessage());
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }

@@ -33,7 +33,7 @@ public class ProductController {
     }
 
     @PutMapping("/update/{id}/")
-    public ResponseEntity<?> updateProduct(@ModelAttribute ProductModel product, @PathVariable("id") Long productId,
+    public ResponseEntity<?> updateProduct(@RequestBody ProductModel product, @PathVariable("id") Long productId,
                                            HttpServletRequest request) {
         return ResponseEntity.ok().body(service.updateProduct(product, productId, request));
     }
@@ -45,7 +45,7 @@ public class ProductController {
     }
 
     @PutMapping("/update/delete-images/{id}/")
-    public ResponseEntity<?> updateDeleteProductImages(@ModelAttribute ProductModel product, @PathVariable("id") Long productId,
+    public ResponseEntity<?> updateDeleteProductImages(@RequestBody ProductModel product, @PathVariable("id") Long productId,
                                                        HttpServletRequest request) {
         return service.updateDeleteProductImages(product, productId, request);
     }

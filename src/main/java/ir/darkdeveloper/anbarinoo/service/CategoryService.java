@@ -39,8 +39,11 @@ public class CategoryService {
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
     public CategoryModel saveCategory(CategoryModel model, HttpServletRequest req) {
         try {
+            if (model.getId() != null) throw new ForbiddenException("Id of category must be null to save a category");
             model.setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
             return repo.save(model);
+        } catch (ForbiddenException e) {
+            throw new ForbiddenException(e.getLocalizedMessage());
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
         }
