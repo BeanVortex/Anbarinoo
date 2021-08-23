@@ -29,16 +29,21 @@ public class CategoryController {
         return ResponseEntity.ok().body(service.saveCategory(model, request));
     }
 
-    @PostMapping("/update/")
-    public ResponseEntity<?> updateCategory(@RequestBody CategoryModel model, HttpServletRequest request) {
-        return ResponseEntity.ok().body(service.saveCategory(model, request));
+    @PostMapping("/sub-category/save/{parentId}/")
+    public ResponseEntity<?> saveSubCategory(@RequestBody CategoryModel model, @PathVariable Long parentId, HttpServletRequest request) {
+        return ResponseEntity.ok().body(service.saveSubCategory(model, parentId,request));
     }
+
 
     @GetMapping("/user/{id}/")
     public ResponseEntity<?> getCategoriesByUserId(@PathVariable Long id, HttpServletRequest request) {
         return ResponseEntity.ok().body(service.getCategoriesByUserId(id, request));
     }
 
+    @GetMapping("/{id}/")
+    public ResponseEntity<?> getCategoryById(@PathVariable Long id, HttpServletRequest request) {
+        return ResponseEntity.ok().body(service.getCategoryById(id, request));
+    }
 
     @DeleteMapping("/{id}/")
     public ResponseEntity<?> deleteCategoryById(@PathVariable Long id, HttpServletRequest request) {

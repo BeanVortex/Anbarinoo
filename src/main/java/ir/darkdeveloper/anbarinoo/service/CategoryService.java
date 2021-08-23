@@ -1,19 +1,13 @@
 package ir.darkdeveloper.anbarinoo.service;
 
-import java.util.List;
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
-
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
 import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
-import ir.darkdeveloper.anbarinoo.model.ProductModel;
+import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
+import ir.darkdeveloper.anbarinoo.repository.CategoryRepo;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import ir.darkdeveloper.anbarinoo.util.UserUtils;
 import org.hibernate.exception.DataException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,8 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import ir.darkdeveloper.anbarinoo.model.CategoryModel;
-import ir.darkdeveloper.anbarinoo.repository.CategoryRepo;
+import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 public class CategoryService {
@@ -36,11 +31,32 @@ public class CategoryService {
         this.jwtUtils = jwtUtils;
     }
 
+
+    /**
+     * Only save a category. children will ignored
+     */
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
     public CategoryModel saveCategory(CategoryModel model, HttpServletRequest req) {
         try {
             model.setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
+            return repo.save(model);
+        } catch (Exception e) {
+            throw new InternalServerException(e.getLocalizedMessage());
+        }
+    }
+
+    /**
+     * Saves a category under a parent (children of this sub cat will ignored)
+     */
+    @Transactional
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
+    public CategoryModel saveSubCategory(CategoryModel model, Long parentId, HttpServletRequest req) {
+        try {
+            var fetchedCategory = getCategoryById(parentId, req);
+            model.setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
+            model.setParent(fetchedCategory);
+            fetchedCategory.addChild(model);
             return repo.save(model);
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
@@ -76,8 +92,18 @@ public class CategoryService {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    public CategoryModel getCategoryById(Long id) {
-        return repo.findById(id).orElse(null);
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    public CategoryModel getCategoryById(Long id, HttpServletRequest req) {
+        try {
+            checkUserIsSameUserForRequest(null, id, req, "fetch");
+            return repo.findById(id).orElse(null);
+        } catch (NoContentException n) {
+            throw new NoContentException(n.getLocalizedMessage());
+        } catch (ForbiddenException f) {
+            throw new ForbiddenException(f.getLocalizedMessage());
+        } catch (Exception e) {
+            throw new InternalServerException(e.getLocalizedMessage());
+        }
     }
 
     private void checkUserIsSameUserForRequest(Long userId, Long categoryId, HttpServletRequest req, String operation) {
@@ -93,4 +119,5 @@ public class CategoryService {
         if (!userId.equals(id))
             throw new ForbiddenException("You can't " + operation + " another user's categories");
     }
+
 }

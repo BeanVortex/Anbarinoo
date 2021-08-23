@@ -1,21 +1,22 @@
 package ir.darkdeveloper.anbarinoo.model;
 
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.persistence.*;
-
 import com.fasterxml.jackson.annotation.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+import javax.persistence.*;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 @Data
 @Table(name = "categories")
 @NoArgsConstructor
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name")
+@AllArgsConstructor
+@ToString(exclude = {"children"})
 public class CategoryModel {
 
     @Id
@@ -27,7 +28,7 @@ public class CategoryModel {
 
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
     private UserModel user;
@@ -39,6 +40,9 @@ public class CategoryModel {
     private CategoryModel parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<CategoryModel> children = new LinkedList<>();
 
     @OneToMany(mappedBy = "category")
@@ -61,6 +65,14 @@ public class CategoryModel {
     public void addChild(CategoryModel children) {
         this.children.add(children);
     }
+
+    public CategoryModel(Long id, String name, UserModel user, CategoryModel parent) {
+        this.id = id;
+        this.name = name;
+        this.user = user;
+        this.parent = parent;
+    }
+
 
 }
 

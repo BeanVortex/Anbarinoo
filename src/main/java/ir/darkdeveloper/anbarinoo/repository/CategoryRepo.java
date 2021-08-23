@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
@@ -13,6 +15,7 @@ public interface CategoryRepo extends JpaRepository<CategoryModel, Long> {
 
     List<CategoryModel> findByNameContains(String name);
 
-    List<CategoryModel> findAllByUserId(Long user_id);
+    @Query("SELECT model FROM CategoryModel model WHERE model.user.id = :userId")
+    List<CategoryModel> findAllByUserId(@Param("userId") Long user_id);
 
 }

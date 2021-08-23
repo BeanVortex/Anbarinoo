@@ -97,28 +97,9 @@ public record SellsControllerTest(SellsController sellController,
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void saveCategory() {
         System.out.println("ProductServiceTest.saveCategory");
-        var cat1 = new CategoryModel("Other");
-        cat1.setUser(new UserModel(userId));
-        categoryService.saveCategory(cat1, request);
         var electronics = new CategoryModel("Electronics");
-        electronics.setUser(new UserModel(userId));
-        var mobilePhones = new CategoryModel("Mobile phones", electronics);
-        mobilePhones.setUser(new UserModel(userId));
-        var washingMachines = new CategoryModel("Washing machines", electronics);
-        washingMachines.setUser(new UserModel(userId));
-        electronics.addChild(mobilePhones);
-        electronics.addChild(washingMachines);
-        var iPhone = new CategoryModel("iPhone", mobilePhones);
-        iPhone.setUser(new UserModel(userId));
-        var samsung = new CategoryModel("Samsung", mobilePhones);
-        samsung.setUser(new UserModel(userId));
-        mobilePhones.addChild(iPhone);
-        mobilePhones.addChild(samsung);
-        var galaxy = new CategoryModel("Galaxy", samsung);
-        galaxy.setUser(new UserModel(userId));
-        samsung.addChild(galaxy);
         categoryService.saveCategory(electronics, request);
-        catId = electronics.getChildren().get(0).getId();
+        catId = electronics.getId();
     }
 
     @Test

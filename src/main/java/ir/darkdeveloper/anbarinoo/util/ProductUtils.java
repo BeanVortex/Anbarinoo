@@ -32,7 +32,7 @@ public class ProductUtils {
     @NotNull
     public ProductModel saveProduct(ProductModel product, HttpServletRequest req) throws IOException {
         if (product.getId() != null) throw new BadRequestException("Product id should null, can't update");
-        var fetchedCat = categoryService.getCategoryById(product.getCategory().getId());
+        var fetchedCat = categoryService.getCategoryById(product.getCategory().getId(), req);
         checkUserIsSameUserForRequest(fetchedCat.getUser().getId(), req, "create");
         ioUtils.saveProductImages(product);
         return repo.save(product);

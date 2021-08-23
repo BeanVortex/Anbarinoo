@@ -38,6 +38,5 @@ public class SellsSerialize extends StdSerializer<SellsModel> {
         if (value.getUpdatedAt() != null)
             gen.writeObjectField("updatedAt", value.getUpdatedAt());
         gen.writeEndObject();
-//        gen.get
     }
 }

@@ -11,6 +11,7 @@ import ir.darkdeveloper.anbarinoo.model.Auth.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.Auth.Authority;
 import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.DebtOrDemandModel;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -26,7 +27,7 @@ import lombok.Data;
 @Table(name = "users")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @JsonIgnoreProperties(value = "attributes")
-@DynamicUpdate
+@ToString(exclude = {"categories"})
 public class UserModel implements UserDetails, OAuth2User {
 
     @Id

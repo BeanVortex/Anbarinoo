@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,8 +21,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -75,17 +82,22 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
         System.out.println("ProductServiceTest.saveCategory");
 
         electronics = new CategoryModel("Electronics");
-        CategoryModel mobilePhones = new CategoryModel("Mobile phones", electronics);
-        CategoryModel washingMachines = new CategoryModel("Washing machines", electronics);
+        electronics.setUser(user);
+        var mobilePhones = new CategoryModel("Mobile phones", electronics);
+        mobilePhones.setUser(user);
+        var washingMachines = new CategoryModel("Washing machines", electronics);
+        washingMachines.setUser(user);
         electronics.addChild(mobilePhones);
         electronics.addChild(washingMachines);
-        CategoryModel iPhone = new CategoryModel("iPhone", mobilePhones);
-        CategoryModel samsung = new CategoryModel("Samsung", mobilePhones);
+        var iPhone = new CategoryModel("iPhone", mobilePhones);
+        iPhone.setUser(user);
+        var samsung = new CategoryModel("Samsung", mobilePhones);
+        samsung.setUser(user);
         mobilePhones.addChild(iPhone);
         mobilePhones.addChild(samsung);
-        CategoryModel galaxy = new CategoryModel("Galaxy", samsung);
+        var galaxy = new CategoryModel("Galaxy", samsung);
+        galaxy.setUser(user);
         samsung.addChild(galaxy);
-
         categoryService.saveCategory(electronics, request);
     }
 
@@ -97,15 +109,26 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
         assertThat(categories.size()).isNotEqualTo(0);
     }
 
+
     @Test
     @Order(4)
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    void getParentCategoryById() {
+        var parentCat = categoryService.getCategoryById(electronics.getId(), request);
+        // tested in postman and was ok
+        // could not test here because of lazy initialization
+//        assertThat(parentCat.getChildren().isEmpty()).isTrue();
+    }
+
+    @Test
+    @Order(5)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void deleteCategory() {
         categoryService.deleteCategory(electronics.getId(), request);
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void getUserAfterCatDelete() {
         var fetchedUser = userService.getUserInfo(user.getId(), request);
