@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ir.darkdeveloper.anbarinoo.model.UserRoles;
+import ir.darkdeveloper.anbarinoo.model.UserRole;
 import ir.darkdeveloper.anbarinoo.service.UserRolesService;
 
 @RestController
@@ -31,13 +31,13 @@ public class UserRolesController {
 
     @GetMapping("/")
     @PreAuthorize("hasAuthority('OP_ACCESS_ROLE')")
-    public List<UserRoles> getAllRoles(){
+    public List<UserRole> getAllRoles(){
         return service.getAllRoles();
     }
 
     @PostMapping("/")
     @PreAuthorize("hasAuthority('OP_ADD_ROLE')")
-    public ResponseEntity<?> saveRole(@RequestBody UserRoles role){
+    public ResponseEntity<?> saveRole(@RequestBody UserRole role){
         return service.saveRole(role);
     }
 

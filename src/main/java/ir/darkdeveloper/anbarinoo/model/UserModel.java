@@ -69,7 +69,7 @@ public class UserModel implements UserDetails, OAuth2User {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name")
     @JsonIdentityReference(alwaysAsId = true)
-    private Set<UserRoles> roles;
+    private Set<UserRole> roles;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -190,16 +190,16 @@ public class UserModel implements UserDetails, OAuth2User {
     }
 
     public void update(UserModel other) {
-        id = other.id != null && id != null ? other.id : id;
-        userName = other.userName != null && userName != null ? other.userName : userName;
-        provider = other.provider != null && provider != null ? other.provider : provider;
-        enabled = other.enabled != null && enabled != null ? other.enabled : enabled;
-        shopImage = other.shopImage != null && shopImage != null ? other.shopImage : shopImage;
-        profileImage = other.profileImage != null && profileImage != null ? other.profileImage : profileImage;
-        createdAt = other.createdAt != null && createdAt != null ? other.createdAt : createdAt;
-        updatedAt = other.updatedAt != null && updatedAt != null ? other.updatedAt : updatedAt;
-        shopName = other.shopName != null && shopName != null ? other.shopName : shopName;
-        address = other.address != null && address != null ? other.address : address;
-        description = other.description != null && description != null ? other.description : description;
+        id = other.id != null || id == null ? other.id : id;
+        userName = other.userName != null || userName == null ? other.userName : userName;
+        provider = other.provider != null || provider == null ? other.provider : provider;
+        enabled = other.enabled != null || enabled == null ? other.enabled : enabled;
+        shopImage = other.shopImage != null || shopImage == null ? other.shopImage : shopImage;
+        profileImage = other.profileImage != null || profileImage == null ? other.profileImage : profileImage;
+        createdAt = other.createdAt != null || createdAt == null ? other.createdAt : createdAt;
+        updatedAt = other.updatedAt != null || updatedAt == null ? other.updatedAt : updatedAt;
+        shopName = other.shopName != null || shopName == null ? other.shopName : shopName;
+        address = other.address != null || address == null ? other.address : address;
+        description = other.description != null || description == null ? other.description : description;
     }
 }

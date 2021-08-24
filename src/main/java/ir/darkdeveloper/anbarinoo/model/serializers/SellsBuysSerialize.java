@@ -1,21 +1,19 @@
 package ir.darkdeveloper.anbarinoo.model.serializers;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import ir.darkdeveloper.anbarinoo.model.Financial.SellsModel;
-import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 
-public class SellsSerialize extends StdSerializer<SellsModel> {
+public class SellsBuysSerialize extends StdSerializer<SellsModel> {
 
-    public SellsSerialize() {
+    public SellsBuysSerialize() {
         this(null);
     }
 
-    public SellsSerialize(Class<SellsModel> t) {
+    public SellsBuysSerialize(Class<SellsModel> t) {
         super(t);
     }
 

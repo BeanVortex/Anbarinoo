@@ -5,16 +5,14 @@ import java.util.Set;
 
 import javax.transaction.Transactional;
 
-import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
 import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import ir.darkdeveloper.anbarinoo.model.UserRoles;
+import ir.darkdeveloper.anbarinoo.model.UserRole;
 import ir.darkdeveloper.anbarinoo.repository.UserRolesRepo;
 
 @Service
@@ -28,7 +26,7 @@ public class UserRolesService {
     }
 
     @Transactional
-    public ResponseEntity<?> saveRole(UserRoles role) {
+    public ResponseEntity<?> saveRole(UserRole role) {
         try {
             repo.save(role);
         } catch (ForbiddenException e) {
@@ -39,11 +37,11 @@ public class UserRolesService {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    public List<UserRoles> getAllRoles() {
+    public List<UserRole> getAllRoles() {
         return repo.findAll();
     }
 
-    public Set<UserRoles> findAllByName(String name) {
+    public Set<UserRole> findAllByName(String name) {
         return repo.findAllByName(name);
     }
 

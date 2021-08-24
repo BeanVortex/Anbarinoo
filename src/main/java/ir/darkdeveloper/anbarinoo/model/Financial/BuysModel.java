@@ -1,18 +1,30 @@
 package ir.darkdeveloper.anbarinoo.model.Financial;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
+import ir.darkdeveloper.anbarinoo.model.deserializers.SellsBuysDeserializer;
+import ir.darkdeveloper.anbarinoo.model.serializers.SellsBuysSerialize;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Data
 @Entity
 @Table(name = "buys")
+@JsonDeserialize(using = SellsBuysDeserializer.class)
+@JsonSerialize(using = SellsBuysSerialize.class)
+@AllArgsConstructor
+@NoArgsConstructor
 public class BuysModel {
     @Id
     @GeneratedValue
@@ -31,6 +43,8 @@ public class BuysModel {
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     private ProductModel product;
 
     @CreationTimestamp
@@ -38,4 +52,10 @@ public class BuysModel {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    public void update(BuysModel other) {
+        count = other.count != null || count == null ? other.count : count;
+        price = other.price != null || price == null ? other.price : price;
+        tax = other.tax != null || tax == null ? other.tax : tax;
+    }
 }

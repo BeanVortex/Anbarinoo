@@ -3,27 +3,25 @@ package ir.darkdeveloper.anbarinoo.model.deserializers;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import com.fasterxml.jackson.databind.node.IntNode;
 import ir.darkdeveloper.anbarinoo.model.Financial.SellsModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-public class SellsDeserializer extends StdDeserializer<SellsModel> {
-    public SellsDeserializer() {
+public class SellsBuysDeserializer extends StdDeserializer<SellsModel> {
+    public SellsBuysDeserializer() {
         this(null);
     }
 
-    public SellsDeserializer(Class<SellsModel> t) {
+    public SellsBuysDeserializer(Class<SellsModel> t) {
         super(t);
     }
 
     @Override
-    public SellsModel deserialize(JsonParser p, DeserializationContext context) throws IOException, JsonProcessingException {
+    public SellsModel deserialize(JsonParser p, DeserializationContext context) throws IOException {
 
         JsonNode node = p.getCodec().readTree(p);
         var id = node.get("id") != null ? node.get("id").longValue() : null;
@@ -34,13 +32,13 @@ public class SellsDeserializer extends StdDeserializer<SellsModel> {
         var product = new ProductModel(productId);
 
         var createdAt = (LocalDateTime) null;
-        if (node.get("createdAt") != null){
+        if (node.get("createdAt") != null) {
             var createdAtString = node.get("createdAt").asText();
             createdAt = LocalDateTime.parse(createdAtString);
         }
 
         var updatedAt = (LocalDateTime) null;
-        if (node.get("updatedAt") != null){
+        if (node.get("updatedAt") != null) {
             var updatedAtString = node.get("updatedAt").asText();
             updatedAt = LocalDateTime.parse(updatedAtString);
         }

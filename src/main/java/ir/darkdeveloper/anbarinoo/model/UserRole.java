@@ -10,11 +10,13 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import ir.darkdeveloper.anbarinoo.model.Auth.Authority;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @Table(name = "roles")
-public class UserRoles implements Serializable {
+@NoArgsConstructor
+public class UserRole implements Serializable {
 
 
     @Serial
@@ -38,12 +40,7 @@ public class UserRoles implements Serializable {
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     private List<UserModel> users;
 
-
-    public UserRoles() {
-
-    }
-
-    public UserRoles(Long id, String name, List<Authority> authorities) {
+    public UserRole(Long id, String name, List<Authority> authorities) {
         this.id = id;
         this.name = name;
         this.authorities = authorities;

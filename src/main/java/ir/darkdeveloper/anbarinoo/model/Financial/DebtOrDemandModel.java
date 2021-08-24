@@ -37,4 +37,12 @@ public class DebtOrDemandModel {
 
     private LocalDateTime deadline;
 
+
+    public void update(DebtOrDemandModel other) {
+        id = other.id != null || id == null ? other.id : id;
+        name = other.name != null || name == null ? other.name : name;
+        isDebt = other.isDebt != null || isDebt == null ? other.isDebt : isDebt;
+        amount = other.amount != null || amount == null ? other.amount : amount;
+        deadline = other.deadline != null || deadline == null ? other.deadline : deadline;
+    }
 }
