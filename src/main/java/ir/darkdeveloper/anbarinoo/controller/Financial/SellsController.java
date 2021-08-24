@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/api/product/sell")
+@RequestMapping("/api/category/products/sell")
 public class SellsController {
 
     private final SellsService service;

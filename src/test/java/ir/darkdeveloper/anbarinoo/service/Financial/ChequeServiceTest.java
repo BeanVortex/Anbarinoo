@@ -2,7 +2,6 @@ package ir.darkdeveloper.anbarinoo.service.Financial;
 
 import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
-import ir.darkdeveloper.anbarinoo.service.Financial.ChequeService;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils;
@@ -33,9 +32,9 @@ public record ChequeServiceTest(ChequeService chequeService,
                                 UserService userService,
                                 JwtUtils jwtUtils) {
 
-    private static UserModel user;
     private static HttpServletRequest request;
-    private static ChequeModel cheque;
+    private static Long userId;
+    private static Long chequeId;
 
     @Autowired
     public ChequeServiceTest {
@@ -44,28 +43,10 @@ public record ChequeServiceTest(ChequeService chequeService,
     @BeforeAll
     static void setUp() {
         Authentication authentication = mock(Authentication.class);
-        // Mockito.whens() for your authorization object
         SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
-        user = new UserModel();
-        user.setEmail("email@mail.com");
-        user.setAddress("address");
-        user.setDescription("desc");
-        user.setPassword("pass1");
-        user.setPasswordRepeat("pass1");
-        user.setEnabled(false);
-
-        cheque = new ChequeModel();
-        cheque.setAmount(new BigDecimal("554.55"));
-        cheque.setIsDebt(true);
-        cheque.setNameOf("DD");
-        cheque.setPayTo("GG");
-        cheque.setIssuedAt(LocalDateTime.now());
-        cheque.setValidTill(LocalDateTime.now().plusDays(5));
-
         request = mock(HttpServletRequest.class);
-        System.out.println("BeforeAll");
     }
 
 
@@ -73,33 +54,44 @@ public record ChequeServiceTest(ChequeService chequeService,
     @Order(1)
     @WithMockUser(username = "anonymousUser")
     void saveUser() throws Exception {
-        HttpServletResponse response = mock(HttpServletResponse.class);
+        var user = new UserModel();
+        user.setEmail("email@mail.com");
+        user.setAddress("address");
+        user.setDescription("desc");
+        user.setPassword("pass1");
+        user.setPasswordRepeat("pass1");
+        user.setEnabled(false);
+        var response = mock(HttpServletResponse.class);
         userService.signUpUser(user, response);
-        request = setUpHeader();
-        UserModel fetchedModel = (UserModel) userService.loadUserByUsername(user.getEmail());
+        var fetchedModel = (UserModel) userService.loadUserByUsername(user.getEmail());
         assertThat(fetchedModel.getEmail()).isEqualTo(user.getEmail());
         assertThat(fetchedModel.getEnabled()).isEqualTo(true);
         assertThat(fetchedModel.getUserName()).isEqualTo("email");
-        System.out.println("saveUser");
+        userId = fetchedModel.getId();
+        request = setUpHeader(user.getEmail(), userId);
     }
 
     @Test
     @Order(2)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void saveCheque() {
-        System.out.println("saveCheque");
-        UserModel userModel = new UserModel();
-        userModel.setId(user.getId());
-        cheque.setUser(userModel);
+        var cheque = new ChequeModel();
+        cheque.setAmount(new BigDecimal("554.55"));
+        cheque.setIsDebt(true);
+        cheque.setNameOf("DD");
+        cheque.setPayTo("GG");
+        cheque.setIssuedAt(LocalDateTime.now());
+        cheque.setValidTill(LocalDateTime.now().plusDays(5));
+        cheque.setUser(new UserModel(userId));
         chequeService.saveCheque(cheque, request);
+        chequeId = cheque.getId();
     }
 
     @Test
     @Order(3)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void getCheque() {
-        System.out.println("getCheque");
-        ChequeModel fetchedCheque = chequeService.getCheque(cheque.getId(), request);
+        var fetchedCheque = chequeService.getCheque(chequeId, request);
         assertThat(fetchedCheque).isNotNull();
     }
 
@@ -107,11 +99,10 @@ public record ChequeServiceTest(ChequeService chequeService,
     @Order(4)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void getChequesByUserId() {
-        System.out.println("getChequesByUserId");
-        List<ChequeModel> cheques = chequeService.getChequesByUserId(user.getId(), request);
+        List<ChequeModel> cheques = chequeService.getChequesByUserId(userId, request);
         assertThat(cheques.size()).isNotEqualTo(0);
         for (ChequeModel cheque : cheques)
-            assertThat(cheque.getUser().getId()).isEqualTo(user.getId());
+            assertThat(cheque.getUser().getId()).isEqualTo(userId);
 
     }
 
@@ -119,9 +110,9 @@ public record ChequeServiceTest(ChequeService chequeService,
     @Order(5)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void updateCheque() {
-        System.out.println("updateCheque");
+        var cheque = new ChequeModel();
         cheque.setIsCheckedOut(true);
-        cheque = chequeService.updateCheque(cheque, request);
+        cheque = chequeService.updateCheque(cheque, chequeId, request);
         assertThat(cheque.getIsCheckedOut()).isTrue();
     }
 
@@ -129,8 +120,8 @@ public record ChequeServiceTest(ChequeService chequeService,
     @Order(6)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void findByPayToContains() {
-        System.out.println("findByPayToContains");
-        List<ChequeModel> cheques = chequeService.findByPayToContains(cheque.getPayTo(), request);
+        var fetchedCheque = chequeService.getCheque(chequeId, request);
+        var cheques = chequeService.findByPayToContains(fetchedCheque.getPayTo(), request);
         assertThat(cheques.get(0)).isNotNull();
     }
 
@@ -138,20 +129,19 @@ public record ChequeServiceTest(ChequeService chequeService,
     @Order(7)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void deleteCheque() {
-        System.out.println("deleteCheque");
-        chequeService.deleteCheque(cheque.getId(), request);
+        chequeService.deleteCheque(chequeId, request);
     }
 
 
     //should return the object; data is being removed
-    private HttpServletRequest setUpHeader() {
+    private HttpServletRequest setUpHeader(String email, Long userId) {
 
         Map<String, String> headers = new HashMap<>();
         headers.put(null, "HTTP/1.1 200 OK");
         headers.put("Content-Type", "text/html");
 
-        String refreshToken = jwtUtils.generateRefreshToken(user.getEmail(), user.getId());
-        String accessToken = jwtUtils.generateAccessToken(user.getEmail());
+        String refreshToken = jwtUtils.generateRefreshToken(email, userId);
+        String accessToken = jwtUtils.generateAccessToken(email);
         var refreshDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
         var accessDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
         headers.put("refresh_token", refreshToken);
@@ -166,6 +156,7 @@ public record ChequeServiceTest(ChequeService chequeService,
 
         return request;
     }
+
 
 
 }

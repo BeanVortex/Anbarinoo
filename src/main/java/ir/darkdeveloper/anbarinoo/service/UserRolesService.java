@@ -30,7 +30,6 @@ public class UserRolesService {
     @Transactional
     public ResponseEntity<?> saveRole(UserRoles role) {
         try {
-            if (role.getId() != null) throw new ForbiddenException("Id must be null for a role to save");
             repo.save(role);
         } catch (ForbiddenException e) {
             throw new ForbiddenException(e.getLocalizedMessage());

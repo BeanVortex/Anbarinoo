@@ -1,31 +1,26 @@
 package ir.darkdeveloper.anbarinoo.model;
 
-import java.time.LocalDateTime;
-import java.util.*;
-
-import javax.persistence.*;
-
 import com.fasterxml.jackson.annotation.*;
-
 import ir.darkdeveloper.anbarinoo.model.Auth.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.Auth.Authority;
 import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.DebtOrDemandModel;
+import lombok.Data;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.multipart.MultipartFile;
 
-import lombok.Data;
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Data
 @Entity
 @Table(name = "users")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @JsonIgnoreProperties(value = "attributes")
 @ToString(exclude = {"categories"})
 public class UserModel implements UserDetails, OAuth2User {
@@ -85,7 +80,6 @@ public class UserModel implements UserDetails, OAuth2User {
     private LocalDateTime updatedAt;
 
     private String shopName;
-
 
     private String address;
 

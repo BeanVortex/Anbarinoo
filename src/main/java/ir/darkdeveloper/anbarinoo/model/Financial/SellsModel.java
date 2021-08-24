@@ -21,7 +21,6 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name = "sells")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @JsonDeserialize(using = SellsDeserializer.class)
 @JsonSerialize(using = SellsSerialize.class)
 @AllArgsConstructor

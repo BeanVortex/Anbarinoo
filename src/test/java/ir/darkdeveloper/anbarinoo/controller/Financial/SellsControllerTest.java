@@ -28,6 +28,7 @@ import org.springframework.web.context.WebApplicationContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -96,7 +97,6 @@ public record SellsControllerTest(SellsController sellController,
     @Order(2)
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void saveCategory() {
-        System.out.println("ProductServiceTest.saveCategory");
         var electronics = new CategoryModel("Electronics");
         categoryService.saveCategory(electronics, request);
         catId = electronics.getId();
@@ -126,7 +126,7 @@ public record SellsControllerTest(SellsController sellController,
         sell.setPrice(BigDecimal.valueOf(5000));
         sell.setCount(BigDecimal.valueOf(8));
         System.out.println(mapToJson(sell));
-        mockMvc.perform(post("/api/product/sell/save/")
+        mockMvc.perform(post("/api/category/products/sell/save/")
                 .header("refresh_token", request.getHeader("refresh_token"))
                 .header("access_token", request.getHeader("access_token"))
                 .content(mapToJson(sell))
@@ -137,7 +137,7 @@ public record SellsControllerTest(SellsController sellController,
                 .andExpect(jsonPath("$.product").value(is(productId), Long.class))
                 .andExpect(jsonPath("$").isMap())
                 .andDo(result -> {
-                    JSONObject obj = new JSONObject(result.getResponse().getContentAsString());
+                    var obj = new JSONObject(result.getResponse().getContentAsString());
                     sellId = obj.getLong("id");
                 });
     }
@@ -151,7 +151,7 @@ public record SellsControllerTest(SellsController sellController,
         sell.setProduct(new ProductModel(productId));
         sell.setPrice(BigDecimal.valueOf(9000.568));
         sell.setCount(BigDecimal.valueOf(60.2));
-        mockMvc.perform(put("/api/product/sell/update/{id}/", sellId)
+        mockMvc.perform(put("/api/category/products/sell/update/{id}/", sellId)
                 .header("refresh_token", request.getHeader("refresh_token"))
                 .header("access_token", request.getHeader("access_token"))
                 .content(mapToJson(sell))
@@ -170,7 +170,7 @@ public record SellsControllerTest(SellsController sellController,
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getAllSellRecordsOfProduct() throws Exception {
 
-        mockMvc.perform(get("/api/product/sell/get-by-product/{id}/?page={page}&size={size}",
+        mockMvc.perform(get("/api/category/products/sell/get-by-product/{id}/?page={page}&size={size}",
                 productId, 0, 1)
                 .header("refresh_token", request.getHeader("refresh_token"))
                 .header("access_token", request.getHeader("access_token"))
@@ -190,7 +190,7 @@ public record SellsControllerTest(SellsController sellController,
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getAllSellRecordsOfUser() throws Exception {
 
-        mockMvc.perform(get("/api/product/sell/get-by-user/{id}/?page={page}&size={size}",
+        mockMvc.perform(get("/api/category/products/sell/get-by-user/{id}/?page={page}&size={size}",
                 userId, 0, 2)
                 .header("refresh_token", request.getHeader("refresh_token"))
                 .header("access_token", request.getHeader("access_token"))
@@ -210,7 +210,7 @@ public record SellsControllerTest(SellsController sellController,
     @Order(8)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getSell() throws Exception {
-        mockMvc.perform(get("/api/product/sell/{id}/?page={page}&size={size}",
+        mockMvc.perform(get("/api/category/products/sell/{id}/?page={page}&size={size}",
                 sellId, 0, 2)
                 .header("refresh_token", request.getHeader("refresh_token"))
                 .header("access_token", request.getHeader("access_token"))
@@ -229,7 +229,7 @@ public record SellsControllerTest(SellsController sellController,
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void deleteSell() throws Exception {
 
-        mockMvc.perform(delete("/api/product/sell/{id}/", sellId)
+        mockMvc.perform(delete("/api/category/products/sell/{id}/", sellId)
                 .header("refresh_token", request.getHeader("refresh_token"))
                 .header("access_token", request.getHeader("access_token"))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -238,8 +238,8 @@ public record SellsControllerTest(SellsController sellController,
                 .andDo(print());
     }
 
-    private String mapToJson(SellsModel sell) throws JsonProcessingException {
-        return new ObjectMapper().writeValueAsString(sell);
+    private String mapToJson(Object obj) throws JsonProcessingException {
+        return new ObjectMapper().findAndRegisterModules().writeValueAsString(obj);
     }
 
     //should return the object; data is being removed

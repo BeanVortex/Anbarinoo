@@ -20,9 +20,15 @@ public class ChequeController {
         this.service = service;
     }
 
-    @GetMapping("/user/{id}/")
-    public ResponseEntity<?> getChequesByUserId(@PathVariable Long id, HttpServletRequest req) {
-        return ResponseEntity.ok().body(service.getChequesByUserId(id, req));
+    @PostMapping("/save/")
+    public ResponseEntity<?> saveCheque(@RequestBody ChequeModel cheque, HttpServletRequest req) {
+        return ResponseEntity.ok().body(service.saveCheque(cheque, req));
+    }
+
+    @PostMapping("/update/{id}/")
+    public ResponseEntity<?> updateCheque(@RequestBody ChequeModel cheque, @PathVariable Long id,
+                                          HttpServletRequest req) {
+        return ResponseEntity.ok().body(service.updateCheque(cheque, id, req));
     }
 
     @GetMapping("/{id}/")
@@ -30,23 +36,18 @@ public class ChequeController {
         return ResponseEntity.ok().body(service.getCheque(id, req));
     }
 
-    @PostMapping("/save/")
-    public ResponseEntity<?> saveCheque(@RequestBody ChequeModel cheque, HttpServletRequest req) {
-        return ResponseEntity.ok().body(service.saveCheque(cheque, req));
+    @GetMapping("/user/{id}/")
+    public ResponseEntity<?> getChequesByUserId(@PathVariable Long id, HttpServletRequest req) {
+        return ResponseEntity.ok().body(service.getChequesByUserId(id, req));
     }
 
-    @PostMapping("/update/")
-    public ResponseEntity<?> updateCheque(@RequestBody ChequeModel cheque, HttpServletRequest req) {
-        return ResponseEntity.ok().body(service.updateCheque(cheque, req));
-    }
-
-    @PostMapping("/search/")
+    @GetMapping("/search/")
     public ResponseEntity<?> findByPayToContains(@RequestParam String payTo, HttpServletRequest request) {
         return ResponseEntity.ok().body(service.findByPayToContains(payTo, request));
     }
 
     @DeleteMapping("/{id}/")
-    public ResponseEntity<?> updateCheque(@PathVariable Long id, HttpServletRequest req) {
+    public ResponseEntity<?> deleteCheque(@PathVariable Long id, HttpServletRequest req) {
         return ResponseEntity.ok().body(service.deleteCheque(id, req));
     }
 

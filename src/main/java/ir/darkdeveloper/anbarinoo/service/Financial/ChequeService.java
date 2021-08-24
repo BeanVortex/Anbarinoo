@@ -1,13 +1,12 @@
 package ir.darkdeveloper.anbarinoo.service.Financial;
 
-import java.util.List;
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
-
+import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
+import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
+import ir.darkdeveloper.anbarinoo.exception.NoContentException;
+import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
+import ir.darkdeveloper.anbarinoo.repository.Financial.ChequeRepo;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import org.hibernate.exception.DataException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
-import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
-import ir.darkdeveloper.anbarinoo.exception.NoContentException;
-import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
-import ir.darkdeveloper.anbarinoo.repository.Financial.ChequeRepo;
-import javassist.NotFoundException;
+import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 public class ChequeService {
@@ -51,11 +47,15 @@ public class ChequeService {
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ChequeModel updateCheque(ChequeModel cheque, HttpServletRequest req) {
+    public ChequeModel updateCheque(ChequeModel cheque, Long id, HttpServletRequest req) {
         try {
-            if (cheque.getId() == null) throw new BadRequestException("Cheque id is null, can't update");
-            checkUserIsSameUserForRequest(null, cheque.getId(), null, null, req, "update");
-            return repo.save(cheque);
+            if (cheque.getId() != null) throw new BadRequestException("Cheque id is not null, can't update");
+            var foundCheque = repo.findById(id);
+            if (foundCheque.isPresent()) {
+                checkUserIsSameUserForRequest(foundCheque.get().getUser().getId(), req, "update");
+                foundCheque.get().update(cheque);
+                return repo.save(foundCheque.get());
+            }
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (BadRequestException n) {
@@ -63,16 +63,19 @@ public class ChequeService {
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
         }
+        throw new NoContentException("Cheque does not exist");
     }
 
     @Transactional
-//    @PreAuthorize("authentication.name.equals(@userService.getAdminUser().getUsername()) || #id != null")
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ResponseEntity<?> deleteCheque(Long id, HttpServletRequest req) {
         try {
-            checkUserIsSameUserForRequest(null, id, null, null, req, "delete");
-            repo.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.OK);
+            var foundCheque = repo.findById(id);
+            if (foundCheque.isPresent()) {
+                checkUserIsSameUserForRequest(foundCheque.get().getUser().getId(), req, "delete");
+                repo.deleteById(id);
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (DataException s) {
@@ -80,32 +83,33 @@ public class ChequeService {
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
         }
+        throw new NoContentException("Cheque does not exist");
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public List<ChequeModel> getChequesByUserId(Long userId, HttpServletRequest req) {
         try {
-            checkUserIsSameUserForRequest(userId, null, null, null, req, "fetch");
+            checkUserIsSameUserForRequest(userId, req, "fetch");
             return repo.findChequeModelsByUser_Id(userId);
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (Exception e) {
-            throw new BadRequestException(e.getLocalizedMessage());
+            throw new InternalServerException(e.getLocalizedMessage());
         }
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ChequeModel getCheque(Long id, HttpServletRequest req) {
         try {
-            Optional<ChequeModel> cheque = repo.findById(id);
+            var cheque = repo.findById(id);
             if (cheque.isPresent()) {
-                checkUserIsSameUserForRequest(null, null, cheque.get().getUser().getId(), null, req, "fetch");
+                checkUserIsSameUserForRequest(cheque.get().getUser().getId(), req, "fetch");
                 return cheque.get();
             }
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (Exception e) {
-            throw new BadRequestException(e.getLocalizedMessage());
+            throw new InternalServerException(e.getLocalizedMessage());
         }
         return null;
     }
@@ -114,33 +118,19 @@ public class ChequeService {
     public List<ChequeModel> findByPayToContains(String payTo, HttpServletRequest req) {
         try {
             var fetchedData = repo.findChequeModelByPayToContains(payTo);
-            checkUserIsSameUserForRequest(null, null, null, fetchedData, req, "fetch");
-            return fetchedData;
+            if (fetchedData.size() > 0) {
+                checkUserIsSameUserForRequest(fetchedData.get(0).getUser().getId(), req, "fetch");
+                return fetchedData;
+            }
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (Exception e) {
-            throw new BadRequestException(e.getLocalizedMessage());
+            throw new InternalServerException(e.getLocalizedMessage());
         }
+        throw new NoContentException("Cheque does not exist");
     }
 
-    private void checkUserIsSameUserForRequest(Long userId, Long chequeId, Long fetchedChequeUserId, List<ChequeModel> data, HttpServletRequest req, String operation) {
-        if (userId == null) {
-            if (chequeId != null) {
-                var chequeFound = repo.findById(chequeId);
-                if (chequeFound.isPresent())
-                    userId = chequeFound.get().getUser().getId();
-                else
-                    throw new NoContentException("Cheque does not exist.");
-            } else if (fetchedChequeUserId != null) {
-                userId = fetchedChequeUserId;
-            } else {
-                if (data.size() != 0)
-                    userId = data.get(0).getUser().getId();
-                else
-                    throw new NoContentException("Cheques do not exist.");
-            }
-        }
-
+    private void checkUserIsSameUserForRequest(Long userId, HttpServletRequest req, String operation) {
         var id = jwtUtils.getUserId(req.getHeader("refresh_token"));
         if (!userId.equals(id))
             throw new ForbiddenException("You can't " + operation + " another user's cheques");
