@@ -8,8 +8,8 @@ import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.*;
 
-import ir.darkdeveloper.anbarinoo.model.Financial.BuysModel;
-import ir.darkdeveloper.anbarinoo.model.Financial.SellsModel;
+import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
+import ir.darkdeveloper.anbarinoo.model.Financial.SellModel;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -50,11 +50,11 @@ public class ProductModel {
 
     @OneToMany(mappedBy = "product")
     @JsonIgnore
-    private List<SellsModel> sells;
+    private List<SellModel> sells;
 
     @OneToMany(mappedBy = "product")
     @JsonIgnore
-    private List<BuysModel> buys;
+    private List<BuyModel> buys;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cat_id")

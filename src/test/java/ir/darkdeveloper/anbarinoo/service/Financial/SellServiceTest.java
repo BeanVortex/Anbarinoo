@@ -2,7 +2,7 @@ package ir.darkdeveloper.anbarinoo.service.Financial;
 
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
-import ir.darkdeveloper.anbarinoo.model.Financial.SellsModel;
+import ir.darkdeveloper.anbarinoo.model.Financial.SellModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.CategoryService;
@@ -34,11 +34,11 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public record SellsServiceTest(UserService userService,
-                               JwtUtils jwtUtils,
-                               ProductService productService,
-                               SellsService sellsService,
-                               CategoryService categoryService) {
+public record SellServiceTest(UserService userService,
+                              JwtUtils jwtUtils,
+                              ProductService productService,
+                              SellService sellService,
+                              CategoryService categoryService) {
 
     private static HttpServletRequest request;
     private static Long userId;
@@ -48,7 +48,7 @@ public record SellsServiceTest(UserService userService,
     private static Pageable pageable;
 
     @Autowired
-    public SellsServiceTest {
+    public SellServiceTest {
     }
 
 
@@ -128,15 +128,15 @@ public record SellsServiceTest(UserService userService,
     @Order(4)
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void saveSell() {
-        var sellRecord = new SellsModel();
+        var sellRecord = new SellModel();
         var product = new ProductModel();
         product.setId(productId);
         sellRecord.setCount(BigDecimal.valueOf(20));
         sellRecord.setPrice(BigDecimal.valueOf(50));
         sellRecord.setProduct(product);
-        sellsService.saveSell(sellRecord, request);
+        sellService.saveSell(sellRecord, request);
         sellId = sellRecord.getId();
-        var fetchedSell = sellsService.getSell(sellId, request);
+        var fetchedSell = sellService.getSell(sellId, request);
         assertThat(fetchedSell.getProduct()).isNotNull();
         assertThat(fetchedSell.getProduct().getCategory().getUser().getId()).isEqualTo(userId);
     }
@@ -145,14 +145,14 @@ public record SellsServiceTest(UserService userService,
     @Order(5)
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void updateSellWithNullUpdatableValues() {
-        var sellRecord = new SellsModel();
+        var sellRecord = new SellModel();
         var product = new ProductModel();
         product.setId(productId);
         sellRecord.setCount(null);
         sellRecord.setPrice(null);
         sellRecord.setProduct(product);
-        sellsService.updateSell(sellRecord, sellId, request);
-        var fetchedSell = sellsService.getSell(sellId, request);
+        sellService.updateSell(sellRecord, sellId, request);
+        var fetchedSell = sellService.getSell(sellId, request);
         assertThat(fetchedSell.getCount()).isEqualTo(BigDecimal.valueOf(200000, 4));
         assertThat(fetchedSell.getPrice()).isEqualTo(BigDecimal.valueOf(500000, 4));
     }
@@ -161,14 +161,14 @@ public record SellsServiceTest(UserService userService,
     @Order(6)
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void updateSell() {
-        var sellRecord = new SellsModel();
+        var sellRecord = new SellModel();
         var product = new ProductModel();
         product.setId(productId);
         sellRecord.setCount(BigDecimal.valueOf(26.502));
         sellRecord.setPrice(BigDecimal.valueOf(60.505));
         sellRecord.setProduct(product);
-        sellsService.updateSell(sellRecord, sellId, request);
-        var fetchedSell = sellsService.getSell(sellId, request);
+        sellService.updateSell(sellRecord, sellId, request);
+        var fetchedSell = sellService.getSell(sellId, request);
         assertThat(fetchedSell.getCount()).isEqualTo(BigDecimal.valueOf(265020, 4));
         assertThat(fetchedSell.getPrice()).isEqualTo(BigDecimal.valueOf(605050, 4));
     }
@@ -177,7 +177,7 @@ public record SellsServiceTest(UserService userService,
     @Order(7)
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void getAllSellRecordsOfProduct() {
-        var fetchedRecords = sellsService.getAllSellRecordsOfProduct(productId, request, pageable);
+        var fetchedRecords = sellService.getAllSellRecordsOfProduct(productId, request, pageable);
         assertThat(fetchedRecords.getContent().get(0).getId()).isEqualTo(sellId);
         assertThat(fetchedRecords.getContent().get(0).getPrice()).isEqualTo(BigDecimal.valueOf(605050, 4));
     }
@@ -186,7 +186,7 @@ public record SellsServiceTest(UserService userService,
     @Order(8)
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void getAllSellRecordsOfUser() {
-        var fetchedRecords = sellsService.getAllSellRecordsOfUser(userId, request, pageable);
+        var fetchedRecords = sellService.getAllSellRecordsOfUser(userId, request, pageable);
         assertThat(fetchedRecords.getContent().get(0).getId()).isEqualTo(sellId);
         assertThat(fetchedRecords.getContent().get(0).getPrice()).isEqualTo(BigDecimal.valueOf(605050, 4));
     }
@@ -195,8 +195,8 @@ public record SellsServiceTest(UserService userService,
     @Order(9)
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void deleteSell() {
-        sellsService.deleteSell(sellId, request);
-        assertThrows(NoContentException.class, () -> sellsService.getSell(sellId, request));
+        sellService.deleteSell(sellId, request);
+        assertThrows(NoContentException.class, () -> sellService.getSell(sellId, request));
         var product = productService.getProduct(productId, request);
         assertThat(product.getId()).isEqualTo(productId);
     }

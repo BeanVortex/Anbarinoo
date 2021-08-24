@@ -1,27 +1,27 @@
 package ir.darkdeveloper.anbarinoo.model.deserializers;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import ir.darkdeveloper.anbarinoo.model.Financial.SellsModel;
+import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
+import ir.darkdeveloper.anbarinoo.model.Financial.SellModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-public class SellsBuysDeserializer extends StdDeserializer<SellsModel> {
-    public SellsBuysDeserializer() {
+public class SellDeserializer extends StdDeserializer<SellModel> {
+    public SellDeserializer() {
         this(null);
     }
 
-    public SellsBuysDeserializer(Class<SellsModel> t) {
+    public SellDeserializer(Class<BuyModel> t) {
         super(t);
     }
 
     @Override
-    public SellsModel deserialize(JsonParser p, DeserializationContext context) throws IOException {
+    public SellModel deserialize(JsonParser p, DeserializationContext context) throws IOException {
 
         JsonNode node = p.getCodec().readTree(p);
         var id = node.get("id") != null ? node.get("id").longValue() : null;
@@ -43,7 +43,7 @@ public class SellsBuysDeserializer extends StdDeserializer<SellsModel> {
             updatedAt = LocalDateTime.parse(updatedAtString);
         }
 
-        return new SellsModel(id, count, price, tax, product, createdAt, updatedAt);
+        return new SellModel(id, count, price, tax, product, createdAt, updatedAt);
 
     }
 }

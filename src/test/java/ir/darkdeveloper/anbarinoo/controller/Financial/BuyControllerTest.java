@@ -3,7 +3,7 @@ package ir.darkdeveloper.anbarinoo.controller.Financial;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
-import ir.darkdeveloper.anbarinoo.model.Financial.SellsModel;
+import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.CategoryService;
@@ -28,7 +28,6 @@ import org.springframework.web.context.WebApplicationContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,22 +41,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public record SellsControllerTest(SellsController sellController,
-                                  UserService userService,
-                                  ProductService productService,
-                                  JwtUtils jwtUtils,
-                                  WebApplicationContext webApplicationContext,
-                                  CategoryService categoryService) {
+public record BuyControllerTest(UserService userService,
+                                ProductService productService,
+                                JwtUtils jwtUtils,
+                                WebApplicationContext webApplicationContext,
+                                CategoryService categoryService) {
 
     private static Long userId;
+    private static String refresh;
+    private static String access;
     private static Long productId;
-    private static Long sellId;
+    private static Long buyId;
     private static Long catId;
     private static HttpServletRequest request;
     private static MockMvc mockMvc;
 
     @Autowired
-    public SellsControllerTest {
+    public BuyControllerTest {
     }
 
     @BeforeAll
@@ -120,16 +120,16 @@ public record SellsControllerTest(SellsController sellController,
     @Test
     @Order(4)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void saveSell() throws Exception {
-        var sell = new SellsModel();
-        sell.setProduct(new ProductModel(productId));
-        sell.setPrice(BigDecimal.valueOf(5000));
-        sell.setCount(BigDecimal.valueOf(8));
-        System.out.println(mapToJson(sell));
-        mockMvc.perform(post("/api/category/products/sell/save/")
-                .header("refresh_token", request.getHeader("refresh_token"))
-                .header("access_token", request.getHeader("access_token"))
-                .content(mapToJson(sell))
+    void saveBuy() throws Exception {
+        var buy = new BuyModel();
+        buy.setProduct(new ProductModel(productId));
+        buy.setPrice(BigDecimal.valueOf(5000));
+        buy.setCount(BigDecimal.valueOf(8));
+        System.out.println(mapToJson(buy));
+        mockMvc.perform(post("/api/category/products/buy/save/")
+                .header("refresh_token", refresh)
+                .header("access_token", access)
+                .content(mapToJson(buy))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -138,23 +138,23 @@ public record SellsControllerTest(SellsController sellController,
                 .andExpect(jsonPath("$").isMap())
                 .andDo(result -> {
                     var obj = new JSONObject(result.getResponse().getContentAsString());
-                    sellId = obj.getLong("id");
+                    buyId = obj.getLong("id");
                 });
     }
 
     @Test
     @Order(5)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void updateSell() throws Exception {
+    void updateBuy() throws Exception {
 
-        var sell = new SellsModel();
-        sell.setProduct(new ProductModel(productId));
-        sell.setPrice(BigDecimal.valueOf(9000.568));
-        sell.setCount(BigDecimal.valueOf(60.2));
-        mockMvc.perform(put("/api/category/products/sell/update/{id}/", sellId)
-                .header("refresh_token", request.getHeader("refresh_token"))
-                .header("access_token", request.getHeader("access_token"))
-                .content(mapToJson(sell))
+        var buy = new BuyModel();
+        buy.setProduct(new ProductModel(productId));
+        buy.setPrice(BigDecimal.valueOf(9000.568));
+        buy.setCount(BigDecimal.valueOf(60.2));
+        mockMvc.perform(put("/api/category/products/buy/update/{id}/", buyId)
+                .header("refresh_token", refresh)
+                .header("access_token", access)
+                .content(mapToJson(buy))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -168,12 +168,12 @@ public record SellsControllerTest(SellsController sellController,
     @Test
     @Order(6)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getAllSellRecordsOfProduct() throws Exception {
+    void getAllBuyRecordsOfProduct() throws Exception {
 
-        mockMvc.perform(get("/api/category/products/sell/get-by-product/{id}/?page={page}&size={size}",
+        mockMvc.perform(get("/api/category/products/buy/get-by-product/{id}/?page={page}&size={size}",
                 productId, 0, 1)
-                .header("refresh_token", request.getHeader("refresh_token"))
-                .header("access_token", request.getHeader("access_token"))
+                .header("refresh_token", refresh)
+                .header("access_token", access)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -188,12 +188,12 @@ public record SellsControllerTest(SellsController sellController,
     @Test
     @Order(7)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getAllSellRecordsOfUser() throws Exception {
+    void getAllBuyRecordsOfUser() throws Exception {
 
-        mockMvc.perform(get("/api/category/products/sell/get-by-user/{id}/?page={page}&size={size}",
+        mockMvc.perform(get("/api/category/products/buy/get-by-user/{id}/?page={page}&size={size}",
                 userId, 0, 2)
-                .header("refresh_token", request.getHeader("refresh_token"))
-                .header("access_token", request.getHeader("access_token"))
+                .header("refresh_token", refresh)
+                .header("access_token", access)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -209,17 +209,17 @@ public record SellsControllerTest(SellsController sellController,
     @Test
     @Order(8)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getSell() throws Exception {
-        mockMvc.perform(get("/api/category/products/sell/{id}/?page={page}&size={size}",
-                sellId, 0, 2)
-                .header("refresh_token", request.getHeader("refresh_token"))
-                .header("access_token", request.getHeader("access_token"))
+    void getBuy() throws Exception {
+        mockMvc.perform(get("/api/category/products/buy/{id}/?page={page}&size={size}",
+                buyId, 0, 2)
+                .header("refresh_token", refresh)
+                .header("access_token", access)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.product").value(is(productId), Long.class))
-                .andExpect(jsonPath("$.id").value(is(sellId), Long.class))
+                .andExpect(jsonPath("$.id").value(is(buyId), Long.class))
                 .andExpect(jsonPath("$.count").value(is(BigDecimal.valueOf(60.2)), BigDecimal.class))
                 .andDo(print());
     }
@@ -227,11 +227,11 @@ public record SellsControllerTest(SellsController sellController,
     @Test
     @Order(9)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void deleteSell() throws Exception {
+    void deleteBuy() throws Exception {
 
-        mockMvc.perform(delete("/api/category/products/sell/{id}/", sellId)
-                .header("refresh_token", request.getHeader("refresh_token"))
-                .header("access_token", request.getHeader("access_token"))
+        mockMvc.perform(delete("/api/category/products/buy/{id}/", buyId)
+                .header("refresh_token", refresh)
+                .header("access_token", access)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -249,12 +249,12 @@ public record SellsControllerTest(SellsController sellController,
         headers.put(null, "HTTP/1.1 200 OK");
         headers.put("Content-Type", "text/html");
 
-        String refreshToken = jwtUtils.generateRefreshToken(email, userId);
-        String accessToken = jwtUtils.generateAccessToken(email);
-        var refreshDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
-        var accessDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
-        headers.put("refresh_token", refreshToken);
-        headers.put("access_token", accessToken);
+        refresh = jwtUtils.generateRefreshToken(email, userId);
+        access = jwtUtils.generateAccessToken(email);
+        var refreshDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refresh));
+        var accessDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(access));
+        headers.put("refresh_token", refresh);
+        headers.put("access_token", access);
         headers.put("refresh_expiration", refreshDate);
         headers.put("access_expiration", accessDate);
 

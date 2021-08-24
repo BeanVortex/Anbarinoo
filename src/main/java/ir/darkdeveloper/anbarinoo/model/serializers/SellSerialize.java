@@ -3,22 +3,22 @@ package ir.darkdeveloper.anbarinoo.model.serializers;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import ir.darkdeveloper.anbarinoo.model.Financial.SellsModel;
+import ir.darkdeveloper.anbarinoo.model.Financial.SellModel;
 
 import java.io.IOException;
 
-public class SellsBuysSerialize extends StdSerializer<SellsModel> {
+public class SellSerialize extends StdSerializer<SellModel> {
 
-    public SellsBuysSerialize() {
+    public SellSerialize() {
         this(null);
     }
 
-    public SellsBuysSerialize(Class<SellsModel> t) {
+    public SellSerialize(Class<SellModel> t) {
         super(t);
     }
 
     @Override
-    public void serialize(SellsModel value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+    public void serialize(SellModel value, JsonGenerator gen, SerializerProvider provider) throws IOException {
 
         gen.writeStartObject();
         if (value.getId() != null)

@@ -6,8 +6,8 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
-import ir.darkdeveloper.anbarinoo.model.deserializers.SellsBuysDeserializer;
-import ir.darkdeveloper.anbarinoo.model.serializers.SellsBuysSerialize;
+import ir.darkdeveloper.anbarinoo.model.deserializers.SellDeserializer;
+import ir.darkdeveloper.anbarinoo.model.serializers.SellSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,12 +20,13 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "buys")
-@JsonDeserialize(using = SellsBuysDeserializer.class)
-@JsonSerialize(using = SellsBuysSerialize.class)
+@Table(name = "sells")
+@JsonDeserialize(using = SellDeserializer.class)
+@JsonSerialize(using = SellSerialize.class)
 @AllArgsConstructor
 @NoArgsConstructor
-public class BuysModel {
+public class SellModel {
+
     @Id
     @GeneratedValue
     private Long id;
@@ -53,7 +54,7 @@ public class BuysModel {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public void update(BuysModel other) {
+    public void update(SellModel other) {
         count = other.count != null || count == null ? other.count : count;
         price = other.price != null || price == null ? other.price : price;
         tax = other.tax != null || tax == null ? other.tax : tax;

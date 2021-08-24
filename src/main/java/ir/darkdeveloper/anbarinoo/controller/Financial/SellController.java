@@ -1,8 +1,7 @@
 package ir.darkdeveloper.anbarinoo.controller.Financial;
 
-import ir.darkdeveloper.anbarinoo.model.Financial.SellsModel;
-import ir.darkdeveloper.anbarinoo.model.ProductModel;
-import ir.darkdeveloper.anbarinoo.service.Financial.SellsService;
+import ir.darkdeveloper.anbarinoo.model.Financial.SellModel;
+import ir.darkdeveloper.anbarinoo.service.Financial.SellService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -13,23 +12,23 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/category/products/sell")
-public class SellsController {
+public class SellController {
 
-    private final SellsService service;
+    private final SellService service;
 
     @Autowired
-    public SellsController(SellsService service) {
+    public SellController(SellService service) {
         this.service = service;
     }
 
 
     @PostMapping("/save/")
-    public ResponseEntity<?> saveSell(@RequestBody SellsModel sell, HttpServletRequest request) {
+    public ResponseEntity<?> saveSell(@RequestBody SellModel sell, HttpServletRequest request) {
         return ResponseEntity.ok().body(service.saveSell(sell, request));
     }
 
     @PutMapping("/update/{id}/")
-    public ResponseEntity<?> updateSell(@RequestBody SellsModel sell, @PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<?> updateSell(@RequestBody SellModel sell, @PathVariable Long id, HttpServletRequest request) {
         return ResponseEntity.ok().body(service.updateSell(sell, id, request));
     }
 
