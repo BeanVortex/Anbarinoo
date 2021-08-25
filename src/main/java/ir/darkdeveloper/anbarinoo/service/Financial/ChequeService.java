@@ -31,6 +31,7 @@ public class ChequeService {
         this.jwtUtils = jwtUtils;
     }
 
+    // TODO: also save, update, delte in debt or demand
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ChequeModel saveCheque(ChequeModel cheque, HttpServletRequest req) {

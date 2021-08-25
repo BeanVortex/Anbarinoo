@@ -4,39 +4,34 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
+import ir.darkdeveloper.anbarinoo.model.Financial.DebtOrDemandModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-public class ChequeDeserializer extends StdDeserializer<ChequeModel> {
+public class DebtOrDemandDeserializer extends StdDeserializer<DebtOrDemandModel> {
 
-    public ChequeDeserializer() {
+    public DebtOrDemandDeserializer() {
         this(null);
     }
 
-    public ChequeDeserializer(Class<ChequeModel> t) {
+    public DebtOrDemandDeserializer(Class<DebtOrDemandModel> t) {
         super(t);
     }
 
-
     @Override
-    public ChequeModel deserialize(JsonParser p, DeserializationContext context) throws IOException {
+    public DebtOrDemandModel deserialize(JsonParser p, DeserializationContext context) throws IOException {
+
 
         JsonNode node = p.getCodec().readTree(p);
-
         var id = node.get("id") != null ? node.get("id").longValue() : null;
         var nameOf = node.get("nameOf") != null ? node.get("nameOf").asText() : null;
         var payTo = node.get("payTo") != null ? node.get("payTo").asText() : null;
-        var amount = node.get("amount") != null ? node.get("amount").decimalValue() : null;
         var isDebt = node.get("isDebt") != null ? node.get("isDebt").booleanValue() : null;
-        var isCheckedOut = node.get("isCheckedOut") != null ? node.get("isCheckedOut").booleanValue() : null;
+        var amount = node.get("amount") != null ? node.get("amount").decimalValue() : null;
         var userId = node.get("user") != null ? node.get("user").longValue() : null;
         var user = new UserModel(userId);
-
-
-
 
 
         var issuedAt = (LocalDateTime) null;
@@ -62,7 +57,11 @@ public class ChequeDeserializer extends StdDeserializer<ChequeModel> {
             var updatedAtString = node.get("updatedAt").asText();
             updatedAt = LocalDateTime.parse(updatedAtString);
         }
-        return new ChequeModel(id, nameOf, payTo, amount, isDebt, isCheckedOut, user, issuedAt, validTill,
+
+        return new DebtOrDemandModel(id, nameOf, payTo, isDebt, amount, user, issuedAt, validTill,
                 createdAt, updatedAt);
+
     }
+
+
 }
