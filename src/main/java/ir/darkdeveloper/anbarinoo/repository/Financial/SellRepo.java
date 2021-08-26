@@ -6,11 +6,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+
 @Repository
 public interface SellRepo extends PagingAndSortingRepository<SellModel, Long> {
 
-    Page<SellModel> findAllByProductId(Long product_id, Pageable pageable);
+    Page<SellModel> findAllByProductId(Long productId, Pageable pageable);
 
-    Page<SellModel> findAllByProductCategoryUserId(Long product_category_user_id, Pageable pageable);
+    Page<SellModel> findAllByProductCategoryUserId(Long userId, Pageable pageable);
 
+    Page<SellModel> findAllByProductCategoryUserIdAndCreatedAtAfterAndCreatedAtBefore(
+            Long userId,
+            LocalDateTime from,
+            LocalDateTime to,
+            Pageable pageable);
 }

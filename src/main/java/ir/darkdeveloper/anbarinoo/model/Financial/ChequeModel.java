@@ -41,8 +41,10 @@ public class ChequeModel {
     @Column(nullable = false)
     private BigDecimal amount;
 
+    @Column(nullable = false)
     private Boolean isDebt = false;
 
+    @Column(nullable = false)
     private Boolean isCheckedOut = false;
 
     @ManyToOne

@@ -29,7 +29,9 @@ public class DebtOrDemandDeserializer extends StdDeserializer<DebtOrDemandModel>
         var nameOf = node.get("nameOf") != null ? node.get("nameOf").asText() : null;
         var payTo = node.get("payTo") != null ? node.get("payTo").asText() : null;
         var isDebt = node.get("isDebt") != null ? node.get("isDebt").booleanValue() : null;
+        var isCheckedOut = node.get("isCheckedOut") != null ? node.get("isCheckedOut").booleanValue() : null;
         var amount = node.get("amount") != null ? node.get("amount").decimalValue() : null;
+        var chequeId = node.get("chequeId") != null ? node.get("chequeId").longValue() : null;
         var userId = node.get("user") != null ? node.get("user").longValue() : null;
         var user = new UserModel(userId);
 
@@ -58,8 +60,8 @@ public class DebtOrDemandDeserializer extends StdDeserializer<DebtOrDemandModel>
             updatedAt = LocalDateTime.parse(updatedAtString);
         }
 
-        return new DebtOrDemandModel(id, nameOf, payTo, isDebt, amount, user, issuedAt, validTill,
-                createdAt, updatedAt);
+        return new DebtOrDemandModel(id, nameOf, payTo, isDebt, isCheckedOut, amount, chequeId, user,
+                issuedAt, validTill, createdAt, updatedAt);
 
     }
 

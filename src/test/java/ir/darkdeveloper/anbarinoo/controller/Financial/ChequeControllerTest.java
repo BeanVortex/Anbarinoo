@@ -27,8 +27,10 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -147,7 +149,8 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
     @Test
     @Order(4)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getCheque() throws Exception {
+    void getChequeAndDod() throws Exception {
+        var cheque = new AtomicReference<ChequeModel>();
         mockMvc.perform(get("/api/user/financial/cheque/{id}/", chequeId)
                 .accept(MediaType.APPLICATION_JSON)
                 .header("refresh_token", refresh)
@@ -158,6 +161,27 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
                 .andExpect(jsonPath("$.amount").value(is(750.06)))
                 .andExpect(jsonPath("$.isCheckedOut").value(is(true)))
                 .andExpect(jsonPath("$.nameOf").value(is("Me2")))
+                .andDo(result -> {
+                    var om = new ObjectMapper();
+                    cheque.set(om.readValue(result.getResponse().getContentAsString(), ChequeModel.class));
+                })
+        ;
+
+        mockMvc.perform(get("/api/user/financial/debt-demand/get-by-user/{id}/", userId)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("refresh_token", refresh)
+                .header("access_token", access)
+        )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].amount").value(is(cheque.get().getAmount()), BigDecimal.class))
+                .andExpect(jsonPath("$.content[0].isDebt").value(is(cheque.get().getIsDebt())))
+                .andExpect(jsonPath("$.content[0].isCheckedOut").value(is(cheque.get().getIsCheckedOut())))
+                .andExpect(jsonPath("$.content[0].nameOf").value(is(cheque.get().getNameOf())))
+                .andExpect(jsonPath("$.content[0].payTo").value(is(cheque.get().getPayTo())))
+                .andExpect(jsonPath("$.content[0].user").value(is(cheque.get().getUser().getId()), Long.class))
+                .andExpect(jsonPath("$.content[0].issuedAt").value(is(cheque.get().getIssuedAt().toString())))
+                .andExpect(jsonPath("$.content[0].validTill").value(is(cheque.get().getValidTill().toString())))
         ;
 
     }
@@ -214,6 +238,20 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
         ;
     }
 
+    @Test
+    @Order(8)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void getDODAfterChequeDelete() throws Exception {
+        mockMvc.perform(get("/api/user/financial/debt-demand/get-by-user/{id}/", userId)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("refresh_token", refresh)
+                .header("access_token", access)
+        )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(0)))
+        ;
+    }
 
     private String mapToJson(Object obj) throws JsonProcessingException {
         return new ObjectMapper().writeValueAsString(obj);

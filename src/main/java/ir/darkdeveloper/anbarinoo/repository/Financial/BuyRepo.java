@@ -6,13 +6,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+
 @Repository
 public interface BuyRepo extends JpaRepository<BuyModel, Long> {
 
 
-    Page<BuyModel> findAllByProductId(Long product_id, Pageable pageable);
+    Page<BuyModel> findAllByProductId(Long userId, Pageable pageable);
 
-    Page<BuyModel> findAllByProductCategoryUserId(Long product_category_user_id, Pageable pageable);
+    Page<BuyModel> findAllByProductCategoryUserId(Long userId, Pageable pageable);
+
+    Page<BuyModel> findAllByProductCategoryUserIdAndCreatedAtAfterAndCreatedAtBefore(
+            Long userId,
+            LocalDateTime from,
+            LocalDateTime to,
+            Pageable pageable);
 
 
 }

@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
@@ -97,9 +98,9 @@ public class BuyService {
     public BuyModel getBuy(Long buyId, HttpServletRequest req) {
         try {
             checkUserIsSameUserForRequest(null, buyId, null, req, "fetch");
-            var foundSellRecord = repo.findById(buyId);
-            if (foundSellRecord.isPresent())
-                return foundSellRecord.get();
+            var foundBuyRecord = repo.findById(buyId);
+            if (foundBuyRecord.isPresent())
+                return foundBuyRecord.get();
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (BadRequestException n) {
@@ -125,6 +126,24 @@ public class BuyService {
             throw new InternalServerException(e.getLocalizedMessage());
         }
     }
+
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
+    public Page<BuyModel> getBuysFromToDate(Long userId, LocalDateTime from, LocalDateTime to,
+                                            HttpServletRequest req, Pageable pageable) {
+        try {
+            checkUserIsSameUserForRequest(null, null, userId, req, "fetch");
+            return repo.findAllByProductCategoryUserIdAndCreatedAtAfterAndCreatedAtBefore(userId, from, to, pageable);
+        } catch (ForbiddenException f) {
+            throw new ForbiddenException(f.getLocalizedMessage());
+        } catch (BadRequestException n) {
+            throw new BadRequestException(n.getLocalizedMessage());
+        } catch (NoContentException n) {
+            throw new NoContentException(n.getLocalizedMessage());
+        } catch (Exception e) {
+            throw new InternalServerException(e.getLocalizedMessage());
+        }
+    }
+
 
     private void checkUserIsSameUserForRequest(Long productId, Long buyId, Long userId, HttpServletRequest req,
                                                String operation) {

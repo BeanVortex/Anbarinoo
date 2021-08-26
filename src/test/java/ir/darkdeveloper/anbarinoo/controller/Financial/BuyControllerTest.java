@@ -4,9 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
+import ir.darkdeveloper.anbarinoo.model.Financial.FinancialModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.CategoryService;
+import ir.darkdeveloper.anbarinoo.service.Financial.FinancialService;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -28,9 +31,11 @@ import org.springframework.web.context.WebApplicationContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -45,8 +50,10 @@ public record BuyControllerTest(UserService userService,
                                 ProductService productService,
                                 JwtUtils jwtUtils,
                                 WebApplicationContext webApplicationContext,
-                                CategoryService categoryService) {
+                                CategoryService categoryService,
+                                FinancialService financialService) {
 
+    private static int saveBuyCounter = 0;
     private static Long userId;
     private static String refresh;
     private static String access;
@@ -55,6 +62,8 @@ public record BuyControllerTest(UserService userService,
     private static Long catId;
     private static HttpServletRequest request;
     private static MockMvc mockMvc;
+    private static LocalDateTime fromDate = null;
+    private static LocalDateTime toDate = null;
 
     @Autowired
     public BuyControllerTest {
@@ -116,8 +125,7 @@ public record BuyControllerTest(UserService userService,
         productId = product.getId();
     }
 
-
-    @Test
+    @RepeatedTest(5)
     @Order(4)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void saveBuy() throws Exception {
@@ -132,14 +140,22 @@ public record BuyControllerTest(UserService userService,
                 .content(mapToJson(buy))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
                 .andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.product").value(is(productId), Long.class))
                 .andExpect(jsonPath("$").isMap())
                 .andDo(result -> {
                     var obj = new JSONObject(result.getResponse().getContentAsString());
                     buyId = obj.getLong("id");
+                    if (fromDate == null)
+                        fromDate = LocalDateTime.parse(obj.getString("createdAt"));
+                    if (saveBuyCounter == 3) {
+                        Thread.sleep(5000);
+                        toDate = LocalDateTime.parse(obj.getString("createdAt"));
+                    }
+                    saveBuyCounter++;
                 });
+        Thread.sleep(3000);
     }
 
     @Test
@@ -181,7 +197,7 @@ public record BuyControllerTest(UserService userService,
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.pageable.pageSize").value(is(1)))
                 .andExpect(jsonPath("$.pageable.pageNumber").value(is(0)))
-                .andExpect(jsonPath("$.totalPages").value(is(1)))
+                .andExpect(jsonPath("$.totalElements").value(is(5)))
                 .andDo(print());
     }
 
@@ -189,7 +205,6 @@ public record BuyControllerTest(UserService userService,
     @Order(7)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getAllBuyRecordsOfUser() throws Exception {
-
         mockMvc.perform(get("/api/category/products/buy/get-by-user/{id}/?page={page}&size={size}",
                 userId, 0, 2)
                 .header("refresh_token", refresh)
@@ -197,12 +212,14 @@ public record BuyControllerTest(UserService userService,
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andDo(print())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.content").isNotEmpty())
                 .andExpect(jsonPath("$.pageable.pageSize").value(is(2)))
                 .andExpect(jsonPath("$.pageable.pageNumber").value(is(0)))
-                .andExpect(jsonPath("$.totalPages").value(is(1)))
-                .andDo(print());
+                .andExpect(jsonPath("$.totalElements").value(is(5)))
+        ;
+
 
     }
 
@@ -226,6 +243,25 @@ public record BuyControllerTest(UserService userService,
 
     @Test
     @Order(9)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void getCosts() {
+        var financial = new FinancialModel();
+        financial.setFromDate(fromDate);
+        financial.setToDate(toDate);
+        var pageable = PageRequest.of(0, 8);
+        var costs = financialService.getCosts(financial, request, pageable);
+
+        var cost = BigDecimal.valueOf(5000).multiply(BigDecimal.valueOf(8));
+        var tax = cost.multiply(BigDecimal.valueOf(9, 2));
+        var finalCost = cost.add(tax).multiply(BigDecimal.valueOf(3));
+
+
+
+        assertThat(costs.getCosts()).isEqualTo(finalCost);
+    }
+
+    @Test
+    @Order(10)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void deleteBuy() throws Exception {
 

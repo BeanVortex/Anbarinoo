@@ -44,8 +44,14 @@ public class DebtOrDemandModel {
     @Column(nullable = false)
     private Boolean isDebt = false;
 
+    @Column(nullable = false)
+    private Boolean isCheckedOut = false;
+
+
     @Column(nullable = false, precision = 19, scale = 4)
     private BigDecimal amount;
+
+    private Long chequeId;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -68,6 +74,7 @@ public class DebtOrDemandModel {
         nameOf = other.nameOf != null || nameOf == null ? other.nameOf : nameOf;
         payTo = other.payTo != null || payTo == null ? other.payTo : payTo;
         isDebt = other.isDebt != null || isDebt == null ? other.isDebt : isDebt;
+        isCheckedOut = other.isCheckedOut != null || isCheckedOut == null ? other.isCheckedOut : isCheckedOut;
         amount = other.amount != null || amount == null ? other.amount : amount;
         issuedAt = other.issuedAt != null || issuedAt == null ? other.issuedAt : issuedAt;
         validTill = other.validTill != null || validTill == null ? other.validTill : validTill;

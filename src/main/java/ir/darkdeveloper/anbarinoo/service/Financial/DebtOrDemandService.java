@@ -5,6 +5,7 @@ import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
 import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.Financial.DebtOrDemandModel;
+import ir.darkdeveloper.anbarinoo.model.Financial.SellModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.Financial.DebtOrDemandRepo;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
@@ -15,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
@@ -63,6 +65,45 @@ public class DebtOrDemandService {
             throw new InternalServerException(e.getLocalizedMessage());
         }
         throw new NoContentException("Debt or Demand record do not exist");
+    }
+
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
+    public void updateDODByChequeId(DebtOrDemandModel dod, HttpServletRequest req) {
+        try {
+            if (dod.getId() != null)
+                throw new BadRequestException("Body id must be null to update the Debt or Demand record");
+            var foundDod = repo.findByChequeId(dod.getChequeId());
+            if (foundDod.isPresent()) {
+                checkUserIsSameUserForRequest(foundDod.get().getUser().getId(), req, "update Debt or Demand record");
+                foundDod.get().update(dod);
+                repo.save(foundDod.get());
+            } else throw new NoContentException("Debt or Demand record do not exist");
+
+        } catch (ForbiddenException f) {
+            throw new ForbiddenException(f.getLocalizedMessage());
+        } catch (BadRequestException n) {
+            throw new BadRequestException(n.getLocalizedMessage());
+        } catch (Exception e) {
+            throw new InternalServerException(e.getLocalizedMessage());
+        }
+    }
+
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
+    public void deleteDODByChequeId(Long chequeId, HttpServletRequest req) {
+        try {
+            var foundDod = repo.findByChequeId(chequeId);
+            if (foundDod.isPresent()) {
+                checkUserIsSameUserForRequest(foundDod.get().getUser().getId(), req,
+                        "delete Debt or Demand record");
+                repo.deleteById(foundDod.get().getId());
+            }
+        } catch (ForbiddenException f) {
+            throw new ForbiddenException(f.getLocalizedMessage());
+        } catch (BadRequestException n) {
+            throw new BadRequestException(n.getLocalizedMessage());
+        } catch (Exception e) {
+            throw new InternalServerException(e.getLocalizedMessage());
+        }
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
@@ -119,10 +160,28 @@ public class DebtOrDemandService {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
+    public Page<DebtOrDemandModel> getDODFromToDate(Long userId, Boolean isDebt, Boolean isCheckedOut, LocalDateTime from, LocalDateTime to,
+                                                    HttpServletRequest req, Pageable pageable) {
+        try {
+            checkUserIsSameUserForRequest(userId, req, "fetch");
+            return repo.findAllByUserIdAndIsDebtAndIsCheckedOutAndCreatedAtAfterAndCreatedAtBefore(
+                    userId, isDebt, isCheckedOut, from, to, pageable);
+        } catch (ForbiddenException f) {
+            throw new ForbiddenException(f.getLocalizedMessage());
+        } catch (BadRequestException n) {
+            throw new BadRequestException(n.getLocalizedMessage());
+        } catch (NoContentException n) {
+            throw new NoContentException(n.getLocalizedMessage());
+        } catch (Exception e) {
+            throw new InternalServerException(e.getLocalizedMessage());
+        }
+    }
+
+
     private void checkUserIsSameUserForRequest(Long userId, HttpServletRequest req, String operation) {
         var id = jwtUtils.getUserId(req.getHeader("refresh_token"));
         if (!userId.equals(id))
             throw new ForbiddenException("You can't " + operation + " of another user");
     }
-
 }

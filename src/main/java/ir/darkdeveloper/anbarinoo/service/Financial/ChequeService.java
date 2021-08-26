@@ -5,11 +5,12 @@ import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
 import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
+import ir.darkdeveloper.anbarinoo.model.Financial.DebtOrDemandModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.Financial.ChequeRepo;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
+import lombok.AllArgsConstructor;
 import org.hibernate.exception.DataException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,32 +21,41 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class ChequeService {
 
     private final ChequeRepo repo;
     private final JwtUtils jwtUtils;
+    private final DebtOrDemandService dodService;
 
-    @Autowired
-    public ChequeService(ChequeRepo repo, JwtUtils jwtUtils) {
-        this.repo = repo;
-        this.jwtUtils = jwtUtils;
-    }
-
-    // TODO: also save, update, delte in debt or demand
+    /**
+     * Saving a new cheque will save in debt or demand model too
+     */
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ChequeModel saveCheque(ChequeModel cheque, HttpServletRequest req) {
         try {
             if (cheque.getId() != null) throw new ForbiddenException("Id of cheque must be null");
             cheque.setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
-            return repo.save(cheque);
+            var savedCheque = repo.save(cheque);
+            var dod = new DebtOrDemandModel(null, savedCheque.getNameOf(), savedCheque.getPayTo(),
+                    savedCheque.getIsDebt(), savedCheque.getIsCheckedOut(), savedCheque.getAmount(),
+                    savedCheque.getId(), null, savedCheque.getIssuedAt(), savedCheque.getValidTill(),
+                    null, null);
+            dodService.saveDOD(dod, req);
+            return savedCheque;
         } catch (ForbiddenException e) {
             throw new ForbiddenException(e.getLocalizedMessage());
+        } catch (BadRequestException e) {
+            throw new BadRequestException(e.getLocalizedMessage());
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
         }
     }
 
+    /**
+     * Updating a cheque will update in debt or demand model too
+     */
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ChequeModel updateCheque(ChequeModel cheque, Long id, HttpServletRequest req) {
@@ -55,18 +65,28 @@ public class ChequeService {
             if (foundCheque.isPresent()) {
                 checkUserIsSameUserForRequest(foundCheque.get().getUser().getId(), req, "update");
                 foundCheque.get().update(cheque);
-                return repo.save(foundCheque.get());
+                var savedCheque = repo.save(foundCheque.get());
+                var dod = new DebtOrDemandModel(null, savedCheque.getNameOf(), savedCheque.getPayTo(),
+                        savedCheque.getIsDebt(), savedCheque.getIsCheckedOut(), savedCheque.getAmount(), savedCheque.getId(), null,
+                        savedCheque.getIssuedAt(), savedCheque.getValidTill(), null, null);
+                dodService.updateDODByChequeId(dod, req);
+                return savedCheque;
             }
+            throw new NoContentException("Cheque does not exist");
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (BadRequestException n) {
             throw new BadRequestException(n.getLocalizedMessage());
+        } catch (NoContentException n) {
+            throw new NoContentException(n.getLocalizedMessage());
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
         }
-        throw new NoContentException("Cheque does not exist");
     }
 
+    /**
+     * Deleting a cheque will delete in debt or demand model too
+     */
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ResponseEntity<?> deleteCheque(Long id, HttpServletRequest req) {
@@ -75,16 +95,18 @@ public class ChequeService {
             if (foundCheque.isPresent()) {
                 checkUserIsSameUserForRequest(foundCheque.get().getUser().getId(), req, "delete");
                 repo.deleteById(id);
+                dodService.deleteDODByChequeId(id, req);
                 return new ResponseEntity<>(HttpStatus.OK);
-            }
+            } else throw new NoContentException("Cheque does not exist");
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
+        } catch (NoContentException n) {
+            throw new NoContentException(n.getLocalizedMessage());
         } catch (DataException s) {
             throw new BadRequestException(s.getLocalizedMessage());
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
         }
-        throw new NoContentException("Cheque does not exist");
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")

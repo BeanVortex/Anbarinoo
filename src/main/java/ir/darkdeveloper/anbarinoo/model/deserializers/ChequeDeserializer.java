@@ -38,7 +38,6 @@ public class ChequeDeserializer extends StdDeserializer<ChequeModel> {
 
 
 
-
         var issuedAt = (LocalDateTime) null;
         if (node.get("issuedAt") != null) {
             var issuedAtStr = node.get("issuedAt").asText();

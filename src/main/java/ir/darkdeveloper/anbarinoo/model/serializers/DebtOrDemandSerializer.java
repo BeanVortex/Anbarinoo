@@ -28,8 +28,12 @@ public class DebtOrDemandSerializer extends StdSerializer<DebtOrDemandModel> {
             gen.writeStringField("payTo", value.getPayTo());
         if (value.getIsDebt() != null)
             gen.writeBooleanField("isDebt", value.getIsDebt());
+        if (value.getIsCheckedOut() != null)
+            gen.writeBooleanField("isCheckedOut", value.getIsCheckedOut());
         if (value.getAmount() != null)
             gen.writeNumberField("amount", value.getAmount());
+        if (value.getChequeId() != null)
+            gen.writeNumberField("chequeId", value.getChequeId());
         if (value.getUser() != null)
             gen.writeNumberField("user", value.getUser().getId());
         if (value.getIssuedAt() != null)
