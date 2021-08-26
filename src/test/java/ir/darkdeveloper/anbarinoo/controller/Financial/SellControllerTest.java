@@ -107,7 +107,7 @@ public record SellControllerTest(UserService userService,
         var product = new ProductModel();
         product.setName("name");
         product.setDescription("description");
-        product.setTotalCount(50);
+        product.setTotalCount(BigDecimal.valueOf(50));
         product.setPrice(BigDecimal.valueOf(500));
         product.setCategory(new CategoryModel(catId));
         productService.saveProduct(product, request);
@@ -130,8 +130,8 @@ public record SellControllerTest(UserService userService,
                 .content(mapToJson(sell))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
                 .andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.product").value(is(productId), Long.class))
                 .andExpect(jsonPath("$").isMap())
                 .andDo(result -> {

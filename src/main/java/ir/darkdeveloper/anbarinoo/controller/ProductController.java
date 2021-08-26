@@ -1,15 +1,13 @@
 package ir.darkdeveloper.anbarinoo.controller;
 
-import javax.servlet.http.HttpServletRequest;
-
+import ir.darkdeveloper.anbarinoo.model.ProductModel;
+import ir.darkdeveloper.anbarinoo.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import ir.darkdeveloper.anbarinoo.model.ProductModel;
-import ir.darkdeveloper.anbarinoo.service.ProductService;
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/category/products")
@@ -35,7 +33,7 @@ public class ProductController {
     @PutMapping("/update/{id}/")
     public ResponseEntity<?> updateProduct(@RequestBody ProductModel product, @PathVariable("id") Long productId,
                                            HttpServletRequest request) {
-        return ResponseEntity.ok().body(service.updateProduct(product, productId, request));
+        return ResponseEntity.ok().body(service.updateProduct(product, null, productId, request));
     }
 
     @PutMapping("/update/images/{id}/")

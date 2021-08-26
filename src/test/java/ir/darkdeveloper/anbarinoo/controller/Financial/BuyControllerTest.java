@@ -31,6 +31,7 @@ import org.springframework.web.context.WebApplicationContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -118,7 +119,7 @@ public record BuyControllerTest(UserService userService,
         var product = new ProductModel();
         product.setName("name");
         product.setDescription("description");
-        product.setTotalCount(50);
+        product.setTotalCount(BigDecimal.valueOf(50));
         product.setPrice(BigDecimal.valueOf(500));
         product.setCategory(new CategoryModel(catId));
         productService.saveProduct(product, request);
@@ -173,11 +174,12 @@ public record BuyControllerTest(UserService userService,
                 .content(mapToJson(buy))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.price").value(is(BigDecimal.valueOf(9000.568)), BigDecimal.class))
                 .andExpect(jsonPath("$.count").value(is(BigDecimal.valueOf(60.2)), BigDecimal.class))
-                .andDo(print());
+        ;
 
     }
 
@@ -244,20 +246,18 @@ public record BuyControllerTest(UserService userService,
     @Test
     @Order(9)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getCosts() {
+    void getCosts() throws InterruptedException {
         var financial = new FinancialModel();
         financial.setFromDate(fromDate);
         financial.setToDate(toDate);
         var pageable = PageRequest.of(0, 8);
+        Thread.sleep(1000);
         var costs = financialService.getCosts(financial, request, pageable);
 
         var cost = BigDecimal.valueOf(5000).multiply(BigDecimal.valueOf(8));
         var tax = cost.multiply(BigDecimal.valueOf(9, 2));
         var finalCost = cost.add(tax).multiply(BigDecimal.valueOf(3));
-
-
-
-        assertThat(costs.getCosts()).isEqualTo(finalCost);
+        assertThat(costs.getCosts().setScale(2, RoundingMode.UP)).isEqualTo(finalCost);
     }
 
     @Test

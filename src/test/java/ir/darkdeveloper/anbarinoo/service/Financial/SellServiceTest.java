@@ -85,7 +85,6 @@ public record SellServiceTest(UserService userService,
     @Order(2)
     @WithMockUser( authorities = {"OP_ACCESS_USER"})
     void saveCategory() {
-        System.out.println("ProductServiceTest.saveCategory");
         var cat1 = new CategoryModel("Other");
         cat1.setUser(new UserModel(userId));
         categoryService.saveCategory(cat1, request);
@@ -117,7 +116,7 @@ public record SellServiceTest(UserService userService,
         var product = new ProductModel();
         product.setName("name");
         product.setDescription("description");
-        product.setTotalCount(50);
+        product.setTotalCount(BigDecimal.valueOf(50));
         product.setPrice(BigDecimal.valueOf(56));
         product.setCategory(new CategoryModel(catId));
         productService.saveProduct(product, request);
@@ -129,8 +128,7 @@ public record SellServiceTest(UserService userService,
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void saveSell() {
         var sellRecord = new SellModel();
-        var product = new ProductModel();
-        product.setId(productId);
+        var product = new ProductModel(productId);
         sellRecord.setCount(BigDecimal.valueOf(20));
         sellRecord.setPrice(BigDecimal.valueOf(50));
         sellRecord.setProduct(product);

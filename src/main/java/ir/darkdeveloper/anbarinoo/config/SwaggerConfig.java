@@ -28,7 +28,7 @@ public class SwaggerConfig {
     public Docket swaggerConfiguration(){
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
-                .securityContexts(Arrays.asList(securityContext()))
+                .securityContexts(Collections.singletonList(securityContext()))
                 .securitySchemes(Arrays.asList(apiKey("refresh","refresh_token"), apiKey("access","access_token")))
                 .select()
                 .paths(PathSelectors.ant("/api/**"))

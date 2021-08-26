@@ -16,10 +16,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 
 @Service
@@ -98,21 +100,31 @@ public class ProductService {
 
     /**
      * For regular update with no images: another users can't update not owned products
+     * If images and files and id provided, then they will be ignored
      *
-     * @param product   should files and id and images and user be null
+     * @param product   should files and id and user be null
      * @param productId should not to be null
      * @param req       should contain refresh token
      * @return updated product with kept images
      */
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ProductModel updateProduct(ProductModel product, Long productId, HttpServletRequest req) {
+    public ProductModel updateProduct(ProductModel product, ProductModel preProduct, Long productId, HttpServletRequest req) {
         try {
-            if (product.getId() != null) throw new BadRequestException("Product id should null, can't update");
-            var foundProduct = repo.findById(productId);
-            if (foundProduct.isPresent()) {
-                productUtils.checkUserIsSameUserForRequest(foundProduct.get().getCategory().getUser().getId(), req, "update");
-                return productUtils.updateProduct(product, foundProduct.get());
+            if (product.getId() != null) product.setId(null);
+
+            var foundProduct = Optional.<ProductModel>empty();
+            if (preProduct == null) {
+                foundProduct = repo.findById(productId);
+                if (foundProduct.isPresent()) {
+                    productUtils.checkUserIsSameUserForRequest(foundProduct.get().getCategory().getUser().getId(),
+                            req, "update");
+                    return productUtils.updateProduct(product, foundProduct.get());
+                }
+            } else {
+                productUtils.checkUserIsSameUserForRequest(preProduct.getCategory().getUser().getId(), req,
+                        "update");
+                return productUtils.updateProduct(product, preProduct);
             }
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());

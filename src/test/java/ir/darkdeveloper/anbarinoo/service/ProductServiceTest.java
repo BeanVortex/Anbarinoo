@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.BIG_DECIMAL;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -40,8 +39,8 @@ public record ProductServiceTest(ProductService productService,
 
 
     private static HttpServletRequest request;
-    private static CategoryModel cat1;
-    private static CategoryModel electronics;
+    private static Long catId;
+    private static Long electronicsCatId;
     private static Long userId;
     private static Long userId2;
     private static Long productId;
@@ -90,22 +89,29 @@ public record ProductServiceTest(ProductService productService,
     @Order(2)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void saveCategory() {
-        System.out.println("ProductServiceTest.saveCategory");
-        cat1 = new CategoryModel("Other");
+        var cat1 = new CategoryModel("Other");
+        cat1.setUser(new UserModel(userId));
         categoryService.saveCategory(cat1, request);
-        electronics = new CategoryModel("Electronics");
-        CategoryModel mobilePhones = new CategoryModel("Mobile phones", electronics);
-        CategoryModel washingMachines = new CategoryModel("Washing machines", electronics);
+        var electronics = new CategoryModel("Electronics");
+        electronics.setUser(new UserModel(userId));
+        var mobilePhones = new CategoryModel("Mobile phones", electronics);
+        mobilePhones.setUser(new UserModel(userId));
+        var washingMachines = new CategoryModel("Washing machines", electronics);
+        washingMachines.setUser(new UserModel(userId));
         electronics.addChild(mobilePhones);
         electronics.addChild(washingMachines);
-        CategoryModel iPhone = new CategoryModel("iPhone", mobilePhones);
-        CategoryModel samsung = new CategoryModel("Samsung", mobilePhones);
+        var iPhone = new CategoryModel("iPhone", mobilePhones);
+        iPhone.setUser(new UserModel(userId));
+        var samsung = new CategoryModel("Samsung", mobilePhones);
+        samsung.setUser(new UserModel(userId));
         mobilePhones.addChild(iPhone);
         mobilePhones.addChild(samsung);
-        CategoryModel galaxy = new CategoryModel("Galaxy", samsung);
+        var galaxy = new CategoryModel("Galaxy", samsung);
+        galaxy.setUser(new UserModel(userId));
         samsung.addChild(galaxy);
-
         categoryService.saveCategory(electronics, request);
+        catId = electronics.getChildren().get(0).getId();
+        electronicsCatId = electronics.getId();
     }
 
     @Test
@@ -116,14 +122,14 @@ public record ProductServiceTest(ProductService productService,
         var product = new ProductModel();
         product.setName("name");
         product.setDescription("description");
-        product.setTotalCount(50);
+        product.setTotalCount(BigDecimal.valueOf(50));
         product.setPrice(BigDecimal.valueOf(500));
         MockMultipartFile file3 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
                 "Hello, World!".getBytes());
         MockMultipartFile file4 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
                 "Hello, World!".getBytes());
         product.setFiles(Arrays.asList(file3, file4));
-        product.setCategory(cat1);
+        product.setCategory(new CategoryModel(catId));
         productService.saveProduct(product, request);
         productId = product.getId();
     }
@@ -144,13 +150,13 @@ public record ProductServiceTest(ProductService productService,
         var product = new ProductModel();
         product.setName("updatedName");
         product.setDescription("updatedDescription");
-        product.setTotalCount(10);
-        product.setCategory(electronics);
+        product.setTotalCount(BigDecimal.valueOf(10));
+        product.setCategory(new CategoryModel(electronicsCatId));
 
-        productService.updateProduct(product, productId, request);
+        productService.updateProduct(product, null, productId, request);
         var fetchedProduct = productService.getProduct(productId, request);
         assertThat(fetchedProduct.getCategory().getName())
-                .isEqualTo(product.getCategory().getName());
+                .isEqualTo("Electronics");
 
     }
 
@@ -166,9 +172,8 @@ public record ProductServiceTest(ProductService productService,
                 "Hello, World!".getBytes());
         MockMultipartFile file5 = new MockMultipartFile("file", "heladsflo.jpg", MediaType.IMAGE_JPEG_VALUE,
                 "Hello, World!".getBytes());
-//        MockMultipartFile file6 = new MockMultipartFile("file", "heladsflo.jpg", MediaType.IMAGE_JPEG_VALUE,
-//                "Hello, World!".getBytes());
-        product.setFiles(Arrays.asList(file3, file4, file5/*, file6*/));
+
+        product.setFiles(Arrays.asList(file3, file4, file5));
 
         productService.updateProductImages(product, productId, request);
 

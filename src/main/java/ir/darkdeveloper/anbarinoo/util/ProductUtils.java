@@ -39,9 +39,6 @@ public class ProductUtils {
     }
 
     public ProductModel updateProduct(ProductModel product, ProductModel preProduct) {
-        if (product.getImages() != null || product.getFiles() != null)
-            throw new ForbiddenException("You can't update images with other data for a product. update images in another way");
-
         preProduct.update(product);
         return repo.save(preProduct);
     }

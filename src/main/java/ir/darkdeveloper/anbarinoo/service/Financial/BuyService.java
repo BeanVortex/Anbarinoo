@@ -33,8 +33,10 @@ public class BuyService {
                 throw new BadRequestException("Product id is null, Can't sell");
             if (buy.getId() != null)
                 throw new BadRequestException("Id must be null to save a buy record");
-            checkUserIsSameUserForRequest(buy.getProduct().getId(), null, null, req, "update buy record of ");
+            addProductCount(buy, req);
             return repo.save(buy);
+        } catch (NoContentException f) {
+            throw new NoContentException(f.getLocalizedMessage());
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (BadRequestException n) {
@@ -49,13 +51,17 @@ public class BuyService {
         try {
             if (buy.getId() != null)
                 throw new BadRequestException("Buy id should null for body");
-            checkUserIsSameUserForRequest(buy.getProduct().getId(), null, null, req,
-                    "update buy record of");
+
             var preBuyOpt = repo.findById(buyId);
             if (preBuyOpt.isPresent()) {
                 preBuyOpt.get().update(buy);
+                addProductCount(preBuyOpt.get(), req);
                 return repo.save(preBuyOpt.get());
             }
+
+            throw new NoContentException("Buy record do not exist.");
+        } catch (NoContentException f) {
+            throw new NoContentException(f.getLocalizedMessage());
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (BadRequestException n) {
@@ -63,14 +69,14 @@ public class BuyService {
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
         }
-        throw new NoContentException("Buy record do not exist.");
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public Page<BuyModel> getAllBuyRecordsOfProduct(Long productId, HttpServletRequest req, Pageable pageable) {
         try {
-            checkUserIsSameUserForRequest(productId, null, null, req, "fetch");
-            return repo.findAllByProductId(productId, pageable);
+            // checked the user is same user in this method
+            var product = productService.getProduct(productId, req);
+            return repo.findAllByProductId(product.getId(), pageable);
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (BadRequestException n) {
@@ -83,7 +89,7 @@ public class BuyService {
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public Page<BuyModel> getAllBuyRecordsOfUser(Long userId, HttpServletRequest req, Pageable pageable) {
         try {
-            checkUserIsSameUserForRequest(null, null, userId, req, "fetch");
+            checkUserIsSameUserForRequest(null, userId, req, "fetch");
             return repo.findAllByProductCategoryUserId(userId, pageable);
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
@@ -97,10 +103,12 @@ public class BuyService {
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public BuyModel getBuy(Long buyId, HttpServletRequest req) {
         try {
-            checkUserIsSameUserForRequest(null, buyId, null, req, "fetch");
+
             var foundBuyRecord = repo.findById(buyId);
-            if (foundBuyRecord.isPresent())
+            if (foundBuyRecord.isPresent()) {
+                checkUserIsSameUserForRequest(foundBuyRecord.get().getProduct(), null, req, "fetch");
                 return foundBuyRecord.get();
+            }
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (BadRequestException n) {
@@ -116,8 +124,15 @@ public class BuyService {
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public void deleteBuy(Long buyId, HttpServletRequest req) {
         try {
-            checkUserIsSameUserForRequest(null, buyId, null, req, "delete buy record of");
-            repo.deleteById(buyId);
+            var buy = repo.findById(buyId);
+            if (buy.isPresent()) {
+                checkUserIsSameUserForRequest(buy.get().getProduct(), null, req, "delete buy record of");
+                repo.deleteById(buyId);
+            } else {
+                throw new NoContentException("Buy record does not exist");
+            }
+        } catch (NoContentException f) {
+            throw new NoContentException(f.getLocalizedMessage());
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (BadRequestException n) {
@@ -131,7 +146,7 @@ public class BuyService {
     public Page<BuyModel> getBuysFromToDate(Long userId, LocalDateTime from, LocalDateTime to,
                                             HttpServletRequest req, Pageable pageable) {
         try {
-            checkUserIsSameUserForRequest(null, null, userId, req, "fetch");
+            checkUserIsSameUserForRequest(null, userId, req, "fetch");
             return repo.findAllByProductCategoryUserIdAndCreatedAtAfterAndCreatedAtBefore(userId, from, to, pageable);
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
@@ -145,26 +160,25 @@ public class BuyService {
     }
 
 
-    private void checkUserIsSameUserForRequest(Long productId, Long buyId, Long userId, HttpServletRequest req,
+    private void checkUserIsSameUserForRequest(ProductModel product, Long userId, HttpServletRequest req,
                                                String operation) {
         var id = jwtUtils.getUserId(req.getHeader("refresh_token"));
         if (userId == null) {
-            var product = new ProductModel();
-            // for delete
-            if (productId == null) {
-                var sell = repo.findById(buyId);
-                if (sell.isPresent()) {
-                    product = sell.get().getProduct();
-                } else {
-                    throw new NoContentException("Buy record do not exist.");
-                }
-            } else {
-                product = productService.getProduct(productId, req);
-            }
             if (!product.getCategory().getUser().getId().equals(id))
                 throw new ForbiddenException("You can't " + operation + " another user's products");
+
         } else if (!userId.equals(id))
             throw new ForbiddenException("You can't " + operation + " another user's products");
 
     }
+
+    private void addProductCount(BuyModel buy, HttpServletRequest req) {
+        var preProduct = productService.getProduct(buy.getProduct().getId(), req);
+        var product = new ProductModel();
+        checkUserIsSameUserForRequest(preProduct, null, req, "save buy record of");
+        product.setTotalCount(preProduct.getTotalCount().add(buy.getCount()));
+        var productId = preProduct.getId();
+        productService.updateProduct(product, preProduct, productId, req);
+    }
+
 }

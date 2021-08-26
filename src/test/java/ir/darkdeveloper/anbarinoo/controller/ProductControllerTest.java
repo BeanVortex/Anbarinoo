@@ -226,7 +226,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
         product.setPrice(BigDecimal.valueOf(50.05));
         product.setName("product1Updated");
         product.setDescription("desc1Updated");
-        product.setTotalCount(50500);
+        product.setTotalCount(BigDecimal.valueOf(50500));
 
 
         mockMvc.perform(put("/api/category/products/update/{id}/", productId)

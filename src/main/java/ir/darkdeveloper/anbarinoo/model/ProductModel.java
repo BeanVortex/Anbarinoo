@@ -64,7 +64,7 @@ public class ProductModel {
 
 
     @Column(name = "total_count")
-    private Integer totalCount;
+    private BigDecimal totalCount;
 
     @Column(name = "created_at", updatable = false)
     @CreationTimestamp
