@@ -114,7 +114,6 @@ public record SellControllerTest(UserService userService,
         productId = product.getId();
     }
 
-
     @Test
     @Order(4)
     @WithMockUser(authorities = "OP_ACCESS_USER")

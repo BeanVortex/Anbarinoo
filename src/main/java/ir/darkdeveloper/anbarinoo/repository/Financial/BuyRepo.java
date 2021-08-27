@@ -23,4 +23,5 @@ public interface BuyRepo extends JpaRepository<BuyModel, Long> {
             Pageable pageable);
 
 
+
 }

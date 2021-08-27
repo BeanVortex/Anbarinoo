@@ -48,11 +48,11 @@ public class ProductModel {
     @Column(nullable = false, precision = 19, scale = 4)
     private BigDecimal price;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<SellModel> sells;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<BuyModel> buys;
 
@@ -63,7 +63,7 @@ public class ProductModel {
     private CategoryModel category;
 
 
-    @Column(name = "total_count")
+    @Column(nullable = false, precision = 19, scale = 4)
     private BigDecimal totalCount;
 
     @Column(name = "created_at", updatable = false)

@@ -24,7 +24,7 @@ public class BuyController {
 
     @PostMapping("/save/")
     public ResponseEntity<?> saveBuy(@RequestBody BuyModel buy, HttpServletRequest request) {
-        return ResponseEntity.ok().body(service.saveBuy(buy, request));
+        return ResponseEntity.ok().body(service.saveBuy(buy, false, request));
     }
 
     @PutMapping("/update/{id}/")
@@ -35,13 +35,13 @@ public class BuyController {
 
     @GetMapping("/get-by-product/{id}/")
     public ResponseEntity<?> getAllBuyRecordsOfProduct(@PathVariable("id") Long productId,
-                                                        HttpServletRequest request, Pageable pageable) {
+                                                       HttpServletRequest request, Pageable pageable) {
         return ResponseEntity.ok().body(service.getAllBuyRecordsOfProduct(productId, request, pageable));
     }
 
     @GetMapping("/get-by-user/{id}/")
     public ResponseEntity<?> getAllBuyRecordsOfUser(@PathVariable("id") Long userId, HttpServletRequest request,
-                                                     Pageable pageable) {
+                                                    Pageable pageable) {
         return ResponseEntity.ok().body(service.getAllBuyRecordsOfUser(userId, request, pageable));
     }
 

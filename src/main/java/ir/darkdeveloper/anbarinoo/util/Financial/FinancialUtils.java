@@ -4,7 +4,6 @@ import ir.darkdeveloper.anbarinoo.model.Financial.FinancialModel;
 import ir.darkdeveloper.anbarinoo.service.Financial.BuyService;
 import ir.darkdeveloper.anbarinoo.service.Financial.DebtOrDemandService;
 import ir.darkdeveloper.anbarinoo.service.Financial.SellService;
-import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Pageable;
@@ -74,7 +73,7 @@ public class FinancialUtils {
         sells.forEach(sell -> {
             var initCost = sell.getCount().multiply(sell.getPrice());
             var tax = initCost.multiply(BigDecimal.valueOf(sell.getTax(), 2));
-            incomes.set(incomes.get().add(initCost.add(tax)));
+            incomes.set(incomes.get().add(initCost.subtract(tax)));
         });
         return incomes;
     }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
-import ir.darkdeveloper.anbarinoo.model.Financial.FinancialModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.CategoryService;
@@ -18,7 +17,6 @@ import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -31,12 +29,9 @@ import org.springframework.web.context.WebApplicationContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -54,7 +49,6 @@ public record BuyControllerTest(UserService userService,
                                 CategoryService categoryService,
                                 FinancialService financialService) {
 
-    private static int saveBuyCounter = 0;
     private static Long userId;
     private static String refresh;
     private static String access;
@@ -63,8 +57,6 @@ public record BuyControllerTest(UserService userService,
     private static Long catId;
     private static HttpServletRequest request;
     private static MockMvc mockMvc;
-    private static LocalDateTime fromDate = null;
-    private static LocalDateTime toDate = null;
 
     @Autowired
     public BuyControllerTest {
@@ -126,7 +118,7 @@ public record BuyControllerTest(UserService userService,
         productId = product.getId();
     }
 
-    @RepeatedTest(5)
+    @Test
     @Order(4)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void saveBuy() throws Exception {
@@ -148,15 +140,7 @@ public record BuyControllerTest(UserService userService,
                 .andDo(result -> {
                     var obj = new JSONObject(result.getResponse().getContentAsString());
                     buyId = obj.getLong("id");
-                    if (fromDate == null)
-                        fromDate = LocalDateTime.parse(obj.getString("createdAt"));
-                    if (saveBuyCounter == 3) {
-                        Thread.sleep(5000);
-                        toDate = LocalDateTime.parse(obj.getString("createdAt"));
-                    }
-                    saveBuyCounter++;
                 });
-        Thread.sleep(3000);
     }
 
     @Test
@@ -189,18 +173,19 @@ public record BuyControllerTest(UserService userService,
     void getAllBuyRecordsOfProduct() throws Exception {
 
         mockMvc.perform(get("/api/category/products/buy/get-by-product/{id}/?page={page}&size={size}",
-                productId, 0, 1)
+                productId, 0, 2)
                 .header("refresh_token", refresh)
                 .header("access_token", access)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.pageable.pageSize").value(is(1)))
+                .andExpect(jsonPath("$.pageable.pageSize").value(is(2)))
                 .andExpect(jsonPath("$.pageable.pageNumber").value(is(0)))
-                .andExpect(jsonPath("$.totalElements").value(is(5)))
-                .andDo(print());
+                .andExpect(jsonPath("$.totalElements").value(is(2)))
+        ;
     }
 
     @Test
@@ -213,13 +198,13 @@ public record BuyControllerTest(UserService userService,
                 .header("access_token", access)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
                 .andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.content").isNotEmpty())
                 .andExpect(jsonPath("$.pageable.pageSize").value(is(2)))
                 .andExpect(jsonPath("$.pageable.pageNumber").value(is(0)))
-                .andExpect(jsonPath("$.totalElements").value(is(5)))
+                .andExpect(jsonPath("$.totalElements").value(is(2)))
         ;
 
 
@@ -246,23 +231,6 @@ public record BuyControllerTest(UserService userService,
     @Test
     @Order(9)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getCosts() throws InterruptedException {
-        var financial = new FinancialModel();
-        financial.setFromDate(fromDate);
-        financial.setToDate(toDate);
-        var pageable = PageRequest.of(0, 8);
-        Thread.sleep(1000);
-        var costs = financialService.getCosts(financial, request, pageable);
-
-        var cost = BigDecimal.valueOf(5000).multiply(BigDecimal.valueOf(8));
-        var tax = cost.multiply(BigDecimal.valueOf(9, 2));
-        var finalCost = cost.add(tax).multiply(BigDecimal.valueOf(3));
-        assertThat(costs.getCosts().setScale(2, RoundingMode.UP)).isEqualTo(finalCost);
-    }
-
-    @Test
-    @Order(10)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
     void deleteBuy() throws Exception {
 
         mockMvc.perform(delete("/api/category/products/buy/{id}/", buyId)
@@ -272,6 +240,27 @@ public record BuyControllerTest(UserService userService,
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print());
+    }
+
+    @Test
+    @Order(10)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void getAllBuyRecordsOfProductAfterBuyDelete() throws Exception {
+
+        mockMvc.perform(get("/api/category/products/buy/get-by-product/{id}/?page={page}&size={size}",
+                productId, 0, 2)
+                .header("refresh_token", refresh)
+                .header("access_token", access)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.pageable.pageSize").value(is(2)))
+                .andExpect(jsonPath("$.pageable.pageNumber").value(is(0)))
+                .andExpect(jsonPath("$.totalElements").value(is(1)))
+        ;
     }
 
     private String mapToJson(Object obj) throws JsonProcessingException {

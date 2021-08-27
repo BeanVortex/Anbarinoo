@@ -34,6 +34,7 @@ public class ProductUtils {
         if (product.getId() != null) throw new BadRequestException("Product id should null, can't update");
         var fetchedCat = categoryService.getCategoryById(product.getCategory().getId(), req);
         checkUserIsSameUserForRequest(fetchedCat.getUser().getId(), req, "create");
+        product.setCategory(fetchedCat);
         ioUtils.saveProductImages(product);
         return repo.save(product);
     }

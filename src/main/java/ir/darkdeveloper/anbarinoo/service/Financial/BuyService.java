@@ -9,31 +9,41 @@ import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.repository.Financial.BuyRepo;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
-@AllArgsConstructor
 public class BuyService {
 
     private final BuyRepo repo;
     private final JwtUtils jwtUtils;
     private final ProductService productService;
 
+    public BuyService(BuyRepo repo, JwtUtils jwtUtils, @Lazy ProductService productService) {
+        this.repo = repo;
+        this.jwtUtils = jwtUtils;
+        this.productService = productService;
+    }
+
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
-    public BuyModel saveBuy(BuyModel buy, HttpServletRequest req) {
+    public BuyModel saveBuy(BuyModel buy, Boolean isSaveProduct, HttpServletRequest req) {
         try {
             if (buy.getProduct() == null || buy.getProduct().getId() == null)
                 throw new BadRequestException("Product id is null, Can't sell");
             if (buy.getId() != null)
                 throw new BadRequestException("Id must be null to save a buy record");
-            addProductCount(buy, req);
+            if (buy.getCount() == null || buy.getPrice() == null)
+                throw new BadRequestException("Count or Price can't be null");
+
+            if (!isSaveProduct)
+                saveProductCount(buy, req);
             return repo.save(buy);
         } catch (NoContentException f) {
             throw new NoContentException(f.getLocalizedMessage());
@@ -51,11 +61,13 @@ public class BuyService {
         try {
             if (buy.getId() != null)
                 throw new BadRequestException("Buy id should null for body");
+            if (buy.getCount() == null || buy.getPrice() == null)
+                throw new BadRequestException("Count or Price can't be null");
 
             var preBuyOpt = repo.findById(buyId);
             if (preBuyOpt.isPresent()) {
+                updateProductCount(buy, preBuyOpt.get(), req);
                 preBuyOpt.get().update(buy);
-                addProductCount(preBuyOpt.get(), req);
                 return repo.save(preBuyOpt.get());
             }
 
@@ -128,6 +140,7 @@ public class BuyService {
             if (buy.isPresent()) {
                 checkUserIsSameUserForRequest(buy.get().getProduct(), null, req, "delete buy record of");
                 repo.deleteById(buyId);
+                deleteProductCount(buy.get(), req);
             } else {
                 throw new NoContentException("Buy record does not exist");
             }
@@ -172,13 +185,40 @@ public class BuyService {
 
     }
 
-    private void addProductCount(BuyModel buy, HttpServletRequest req) {
+    private void saveProductCount(BuyModel buy, HttpServletRequest req) {
         var preProduct = productService.getProduct(buy.getProduct().getId(), req);
         var product = new ProductModel();
         checkUserIsSameUserForRequest(preProduct, null, req, "save buy record of");
-        product.setTotalCount(preProduct.getTotalCount().add(buy.getCount()));
         var productId = preProduct.getId();
+        product.setTotalCount(preProduct.getTotalCount().add(buy.getCount()));
         productService.updateProduct(product, preProduct, productId, req);
+
     }
 
+    private void updateProductCount(BuyModel buy, BuyModel preBuy, HttpServletRequest req) {
+        var preProduct = productService.getProduct(buy.getProduct().getId(), req);
+        var product = new ProductModel();
+        checkUserIsSameUserForRequest(preProduct, null, req, "save buy record of");
+        var productId = preProduct.getId();
+        var difference = (BigDecimal) null;
+        product.setPrice(buy.getPrice());
+        if (buy.getCount().compareTo(preBuy.getCount()) > 0) {
+            difference = buy.getCount().subtract(preBuy.getCount());
+            product.setTotalCount(preProduct.getTotalCount().add(difference));
+            productService.updateProduct(product, preProduct, productId, req);
+        } else if (buy.getCount().compareTo(preBuy.getCount()) < 0) {
+            difference = preBuy.getCount().subtract(buy.getCount());
+            product.setTotalCount(preProduct.getTotalCount().subtract(difference));
+            productService.updateProduct(product, preProduct, productId, req);
+        }
+    }
+
+    private void deleteProductCount(BuyModel buy, HttpServletRequest req) {
+        var preProduct = productService.getProduct(buy.getProduct().getId(), req);
+        var product = new ProductModel();
+        var productId = preProduct.getId();
+        product.setTotalCount(preProduct.getTotalCount().subtract(buy.getCount()));
+        productService.updateProduct(product, preProduct, productId, req);
+    }
 }
+

@@ -39,13 +39,13 @@ public class CategoryModel {
     @JsonIdentityReference(alwaysAsId = true)
     private CategoryModel parent;
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE)
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<CategoryModel> children = new LinkedList<>();
 
-    @OneToMany(mappedBy = "category")
+    @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<ProductModel> products;
 

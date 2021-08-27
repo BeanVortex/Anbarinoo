@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
+import ir.darkdeveloper.anbarinoo.model.Financial.FinancialModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.SellModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
@@ -19,6 +20,8 @@ import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,13 +33,19 @@ import org.springframework.web.context.WebApplicationContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -117,6 +126,7 @@ public record FinancialControllerTest(UserService userService,
         product.setTotalCount(BigDecimal.valueOf(50));
         product.setPrice(BigDecimal.valueOf(500));
         product.setCategory(new CategoryModel(catId));
+        fromDate = LocalDateTime.now();
         productService.saveProduct(product, request);
         productId = product.getId();
     }
@@ -129,15 +139,10 @@ public record FinancialControllerTest(UserService userService,
         buy.setProduct(new ProductModel(productId));
         buy.setPrice(BigDecimal.valueOf(5000));
         buy.setCount(BigDecimal.valueOf(8));
-        buyService.saveBuy(buy, request);
+        buyService.saveBuy(buy, false, request);
         assertThat(buy.getId()).isNotNull();
-        if (fromDate == null) {
-            fromDate = LocalDateTime.now();
-            Thread.sleep(3000);
-        }
         Thread.sleep(1000);
     }
-
 
     @RepeatedTest(5)
     @Order(5)
@@ -149,9 +154,6 @@ public record FinancialControllerTest(UserService userService,
         sell.setCount(BigDecimal.valueOf(4));
         sellService.saveSell(sell, request);
         assertThat(sell.getId()).isNotNull();
-        if (fromDate == null)
-            fromDate = LocalDateTime.now();
-
         Thread.sleep(1000);
     }
 
@@ -160,12 +162,41 @@ public record FinancialControllerTest(UserService userService,
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getProductsAfterSells() {
         var product = productService.getProduct(productId, request);
-        assertThat(product.getTotalCount()).isEqualTo(BigDecimal.valueOf(7000, 2));
+        assertThat(product.getTotalCount()).isEqualTo(BigDecimal.valueOf(700000, 4));
     }
 
 
     @Test
-    void getCosts() {
+    @Order(9)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void getCosts() throws Exception {
+        var financial = new FinancialModel();
+        financial.setFromDate(fromDate);
+        toDate = LocalDateTime.now();
+        financial.setToDate(toDate);
+
+        var cost1 = BigDecimal.valueOf(50).multiply(BigDecimal.valueOf(500));
+        var cost2 = BigDecimal.valueOf(5000).multiply(BigDecimal.valueOf(8));
+//        var income1 = BigDecimal.valueOf(6000).multiply(BigDecimal.valueOf(4));
+        var tax1 = cost1.multiply(BigDecimal.valueOf(9, 2));
+        var tax2 = cost2.multiply(BigDecimal.valueOf(9, 2));
+//        var tax3 = income1.multiply(BigDecimal.valueOf(9, 2));
+        var finalCost1 = cost1.add(tax1);
+        var finalCost2 = cost2.add(tax2).multiply(BigDecimal.valueOf(5));
+//        var finalIncome1 = income1.subtract(tax3).multiply(BigDecimal.valueOf(5));
+        var finalCost = finalCost1.add(finalCost2).setScale(1, RoundingMode.CEILING);
+
+        mockMvc.perform(post("/api/user/financial/costs/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("refresh_token", refresh)
+                .header("access_token", access)
+                .content(mapToJson(financial))
+        )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.costs").value(is(finalCost), BigDecimal.class))
+        ;
     }
 
     @Test
