@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
-import java.util.Optional;
 
 
 @Service
@@ -63,8 +62,6 @@ public class ProductService {
         }
     }
 
-
-
     /**
      * For regular update with no images: another users can't update not owned products
      * If images and files and id provided, then they will be ignored
@@ -86,7 +83,8 @@ public class ProductService {
             if (foundProduct.isPresent()) {
                 productUtils.checkUserIsSameUserForRequest(foundProduct.get().getCategory().getUser().getId(),
                         req, "update");
-                productUtils.updateBuyWithProductUpdate(product, foundProduct.get(), buyService, req);
+                if (foundProduct.get().getCanUpdate())
+                    productUtils.updateBuyWithProductUpdate(product, foundProduct.get(), buyService, req);
                 return productUtils.updateProduct(product, foundProduct.get());
             }
             throw new NoContentException("This product does not exist");
@@ -165,7 +163,6 @@ public class ProductService {
             throw new InternalServerException(e.getLocalizedMessage());
         }
     }
-
 
     /**
      * For Images update only: another users can't update not owned products

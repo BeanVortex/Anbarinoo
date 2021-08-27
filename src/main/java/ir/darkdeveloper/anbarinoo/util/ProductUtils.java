@@ -102,7 +102,7 @@ public class ProductUtils {
 
             if (!isPriceUpdated)
                 buy.setPrice(preProduct.getPrice());
-
+            preProduct.setCanUpdate(false);
             buyRepo.save(buy);
         }
 

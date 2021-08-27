@@ -194,6 +194,7 @@ public class BuyService {
         var product = new ProductModel();
         checkUserIsSameUserForRequest(preProduct, null, req, "save buy record of");
         product.setTotalCount(preProduct.getTotalCount().add(buy.getCount()));
+        preProduct.setCanUpdate(false);
         productService.updateProductFromBuyOrSell(product, preProduct, req);
 
     }

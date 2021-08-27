@@ -177,11 +177,13 @@ public class SellService {
 
     }
 
+    //TODO: don't save a sell if product amount is less than requested sell amount
     private void subtractProductCount(SellModel sell, HttpServletRequest req) {
         var preProduct = productService.getProduct(sell.getProduct().getId(), req);
         var product = new ProductModel();
         checkUserIsSameUserForRequest(preProduct, null, req, "save buy record of");
         product.setTotalCount(preProduct.getTotalCount().subtract(sell.getCount()));
+        preProduct.setCanUpdate(false);
         productService.updateProductFromBuyOrSell(product, preProduct,  req);
     }
 }

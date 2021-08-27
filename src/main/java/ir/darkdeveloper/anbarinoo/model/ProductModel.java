@@ -34,6 +34,8 @@ public class ProductModel {
 
     private Long firstBuyId;
 
+    private Boolean canUpdate = true;
+
     @Column(length = 50, nullable = false)
     private String name;
 

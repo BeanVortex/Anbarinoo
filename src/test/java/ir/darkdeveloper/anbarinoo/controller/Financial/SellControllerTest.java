@@ -50,6 +50,9 @@ public record SellControllerTest(UserService userService,
     private static Long userId;
     private static Long productId;
     private static Long sellId;
+    private static Long sellId2;
+    private static String refresh;
+    private static String access;
     private static Long catId;
     private static HttpServletRequest request;
     private static MockMvc mockMvc;
@@ -124,8 +127,8 @@ public record SellControllerTest(UserService userService,
         sell.setCount(BigDecimal.valueOf(8));
         System.out.println(mapToJson(sell));
         mockMvc.perform(post("/api/category/products/sell/save/")
-                .header("refresh_token", request.getHeader("refresh_token"))
-                .header("access_token", request.getHeader("access_token"))
+                .header("refresh_token", refresh)
+                .header("access_token", access)
                 .content(mapToJson(sell))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -142,6 +145,31 @@ public record SellControllerTest(UserService userService,
     @Test
     @Order(5)
     @WithMockUser(authorities = "OP_ACCESS_USER")
+    void saveSell2() throws Exception {
+        var sell = new SellModel();
+        sell.setProduct(new ProductModel(productId));
+        sell.setPrice(BigDecimal.valueOf(500));
+        sell.setCount(BigDecimal.valueOf(80));
+        System.out.println(mapToJson(sell));
+        mockMvc.perform(post("/api/category/products/sell/save/")
+                .header("refresh_token", refresh)
+                .header("access_token", access)
+                .content(mapToJson(sell))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.product").value(is(productId), Long.class))
+                .andExpect(jsonPath("$").isMap())
+                .andDo(result -> {
+                    var obj = new JSONObject(result.getResponse().getContentAsString());
+                    sellId2 = obj.getLong("id");
+                });
+    }
+
+    @Test
+    @Order(6)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
     void updateSell() throws Exception {
 
         var sell = new SellModel();
@@ -149,8 +177,8 @@ public record SellControllerTest(UserService userService,
         sell.setPrice(BigDecimal.valueOf(9000.568));
         sell.setCount(BigDecimal.valueOf(60.2));
         mockMvc.perform(put("/api/category/products/sell/update/{id}/", sellId)
-                .header("refresh_token", request.getHeader("refresh_token"))
-                .header("access_token", request.getHeader("access_token"))
+                .header("refresh_token", refresh)
+                .header("access_token", access)
                 .content(mapToJson(sell))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -163,14 +191,14 @@ public record SellControllerTest(UserService userService,
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getAllSellRecordsOfProduct() throws Exception {
 
         mockMvc.perform(get("/api/category/products/sell/get-by-product/{id}/?page={page}&size={size}",
                 productId, 0, 1)
-                .header("refresh_token", request.getHeader("refresh_token"))
-                .header("access_token", request.getHeader("access_token"))
+                .header("refresh_token", refresh)
+                .header("access_token", access)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -178,19 +206,19 @@ public record SellControllerTest(UserService userService,
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.pageable.pageSize").value(is(1)))
                 .andExpect(jsonPath("$.pageable.pageNumber").value(is(0)))
-                .andExpect(jsonPath("$.totalPages").value(is(1)))
+                .andExpect(jsonPath("$.totalPages").value(is(2)))
                 .andDo(print());
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getAllSellRecordsOfUser() throws Exception {
 
         mockMvc.perform(get("/api/category/products/sell/get-by-user/{id}/?page={page}&size={size}",
                 userId, 0, 2)
-                .header("refresh_token", request.getHeader("refresh_token"))
-                .header("access_token", request.getHeader("access_token"))
+                .header("refresh_token", refresh)
+                .header("access_token", access)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -204,13 +232,13 @@ public record SellControllerTest(UserService userService,
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getSell() throws Exception {
         mockMvc.perform(get("/api/category/products/sell/{id}/?page={page}&size={size}",
                 sellId, 0, 2)
-                .header("refresh_token", request.getHeader("refresh_token"))
-                .header("access_token", request.getHeader("access_token"))
+                .header("refresh_token", refresh)
+                .header("access_token", access)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -222,18 +250,57 @@ public record SellControllerTest(UserService userService,
     }
 
     @Test
-    @Order(9)
+    @Order(10)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void deleteSell() throws Exception {
 
         mockMvc.perform(delete("/api/category/products/sell/{id}/", sellId)
-                .header("refresh_token", request.getHeader("refresh_token"))
-                .header("access_token", request.getHeader("access_token"))
+                .header("refresh_token", refresh)
+                .header("access_token", access)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
+
+    @Test
+    @Order(11)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void getAllSellRecordsOfProductAfterSellDelete() throws Exception {
+
+        mockMvc.perform(get("/api/category/products/sell/get-by-product/{id}/?page={page}&size={size}",
+                productId, 0, 2)
+                .header("refresh_token", refresh)
+                .header("access_token", access)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.pageable.pageSize").value(is(2)))
+                .andExpect(jsonPath("$.pageable.pageNumber").value(is(0)))
+                .andExpect(jsonPath("$.totalElements").value(is(1)))
+        ;
+    }
+
+    @Test
+    @Order(12)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void getSellRecordOfAProductAfterProductDelete() throws Exception {
+
+        productService.deleteProduct(productId, request);
+
+        mockMvc.perform(get("/api/category/products/sell/{id}/",
+                sellId2)
+                .header("refresh_token", refresh)
+                .header("access_token", access)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+    }
+
 
     private String mapToJson(Object obj) throws JsonProcessingException {
         return new ObjectMapper().findAndRegisterModules().writeValueAsString(obj);
@@ -246,12 +313,12 @@ public record SellControllerTest(UserService userService,
         headers.put(null, "HTTP/1.1 200 OK");
         headers.put("Content-Type", "text/html");
 
-        String refreshToken = jwtUtils.generateRefreshToken(email, userId);
-        String accessToken = jwtUtils.generateAccessToken(email);
-        var refreshDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
-        var accessDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
-        headers.put("refresh_token", refreshToken);
-        headers.put("access_token", accessToken);
+        refresh = jwtUtils.generateRefreshToken(email, userId);
+        access = jwtUtils.generateAccessToken(email);
+        var refreshDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refresh));
+        var accessDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(access));
+        headers.put("refresh_token", refresh);
+        headers.put("access_token", access);
         headers.put("refresh_expiration", refreshDate);
         headers.put("access_expiration", accessDate);
 
