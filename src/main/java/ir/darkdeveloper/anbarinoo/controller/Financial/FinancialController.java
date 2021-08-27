@@ -22,7 +22,7 @@ public class FinancialController {
         return ResponseEntity.ok(service.getCosts(financial, req, pageable));
     }
 
-    @GetMapping("/incomes/")
+    @PostMapping("/incomes/")
     public ResponseEntity<?> getIncomes(@RequestBody FinancialModel financial,
                                         HttpServletRequest req, Pageable pageable) {
         return ResponseEntity.ok(service.getIncomes(financial, req, pageable));

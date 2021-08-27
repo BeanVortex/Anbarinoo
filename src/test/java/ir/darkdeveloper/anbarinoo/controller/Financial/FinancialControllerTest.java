@@ -177,13 +177,10 @@ public record FinancialControllerTest(UserService userService,
 
         var cost1 = BigDecimal.valueOf(50).multiply(BigDecimal.valueOf(500));
         var cost2 = BigDecimal.valueOf(5000).multiply(BigDecimal.valueOf(8));
-//        var income1 = BigDecimal.valueOf(6000).multiply(BigDecimal.valueOf(4));
         var tax1 = cost1.multiply(BigDecimal.valueOf(9, 2));
         var tax2 = cost2.multiply(BigDecimal.valueOf(9, 2));
-//        var tax3 = income1.multiply(BigDecimal.valueOf(9, 2));
         var finalCost1 = cost1.add(tax1);
         var finalCost2 = cost2.add(tax2).multiply(BigDecimal.valueOf(5));
-//        var finalIncome1 = income1.subtract(tax3).multiply(BigDecimal.valueOf(5));
         var finalCost = finalCost1.add(finalCost2).setScale(1, RoundingMode.CEILING);
 
         mockMvc.perform(post("/api/user/financial/costs/")
@@ -200,7 +197,30 @@ public record FinancialControllerTest(UserService userService,
     }
 
     @Test
-    void getIncomes() {
+    @Order(10)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void getIncomes() throws Exception {
+        var financial = new FinancialModel();
+        financial.setFromDate(fromDate);
+        financial.setToDate(toDate);
+        var income = BigDecimal.valueOf(6000).multiply(BigDecimal.valueOf(4));
+
+        var tax = income.multiply(BigDecimal.valueOf(9, 2));
+
+        var finalIncome = income.subtract(tax).multiply(BigDecimal.valueOf(5))
+                .setScale(1, RoundingMode.CEILING);
+
+        mockMvc.perform(post("/api/user/financial/incomes/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("refresh_token", refresh)
+                .header("access_token", access)
+                .content(mapToJson(financial))
+        )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.incomes").value(is(finalIncome), BigDecimal.class))
+        ;
     }
 
 
