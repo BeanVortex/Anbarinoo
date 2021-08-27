@@ -40,7 +40,6 @@ public record ProductServiceTest(ProductService productService,
 
     private static HttpServletRequest request;
     private static Long catId;
-    private static Long electronicsCatId;
     private static Long userId;
     private static Long userId2;
     private static Long productId;
@@ -89,29 +88,9 @@ public record ProductServiceTest(ProductService productService,
     @Order(2)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void saveCategory() {
-        var cat1 = new CategoryModel("Other");
-        cat1.setUser(new UserModel(userId));
-        categoryService.saveCategory(cat1, request);
         var electronics = new CategoryModel("Electronics");
-        electronics.setUser(new UserModel(userId));
-        var mobilePhones = new CategoryModel("Mobile phones", electronics);
-        mobilePhones.setUser(new UserModel(userId));
-        var washingMachines = new CategoryModel("Washing machines", electronics);
-        washingMachines.setUser(new UserModel(userId));
-        electronics.addChild(mobilePhones);
-        electronics.addChild(washingMachines);
-        var iPhone = new CategoryModel("iPhone", mobilePhones);
-        iPhone.setUser(new UserModel(userId));
-        var samsung = new CategoryModel("Samsung", mobilePhones);
-        samsung.setUser(new UserModel(userId));
-        mobilePhones.addChild(iPhone);
-        mobilePhones.addChild(samsung);
-        var galaxy = new CategoryModel("Galaxy", samsung);
-        galaxy.setUser(new UserModel(userId));
-        samsung.addChild(galaxy);
         categoryService.saveCategory(electronics, request);
-        catId = electronics.getChildren().get(0).getId();
-        electronicsCatId = electronics.getId();
+        catId = electronics.getId();
     }
 
     @Test
@@ -151,9 +130,9 @@ public record ProductServiceTest(ProductService productService,
         product.setName("updatedName");
         product.setDescription("updatedDescription");
         product.setTotalCount(BigDecimal.valueOf(10));
-        product.setCategory(new CategoryModel(electronicsCatId));
+        product.setCategory(new CategoryModel(catId));
 
-        productService.updateProduct(product, null, productId, request);
+        productService.updateProduct(product, productId, request);
         var fetchedProduct = productService.getProduct(productId, request);
         assertThat(fetchedProduct.getCategory().getName())
                 .isEqualTo("Electronics");
@@ -186,23 +165,6 @@ public record ProductServiceTest(ProductService productService,
     @Test
     @Order(7)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
-    @Disabled
-    void deleteAllUpdateProductImages() {
-        var product = new ProductModel();
-        var fetchedProduct = productService.getProduct(productId, request);
-        product.setImages(fetchedProduct.getImages());
-
-        productService.updateDeleteProductImages(product, productId, request);
-
-        var fetchedProduct2 = productService.getProduct(productId, request);
-        assertThat(fetchedProduct2.getImages().size()).isNotEqualTo(0);
-        for (var image : fetchedProduct2.getImages())
-            assertThat(image).isEqualTo("noImage.png");
-    }
-
-    @Test
-    @Order(8)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void delete3UpdateProductImages() {
         var product = new ProductModel();
         var fetchedProduct = productService.getProduct(productId, request);
@@ -217,6 +179,22 @@ public record ProductServiceTest(ProductService productService,
         assertThat(fetchedProduct2.getImages().size()).isEqualTo(2);
         for (var image : fetchedProduct2.getImages())
             assertThat(image).isNotEqualTo("noImage.png");
+    }
+
+    @Test
+    @Order(8)
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    void deleteAllUpdateProductImages() {
+        var product = new ProductModel();
+        var fetchedProduct = productService.getProduct(productId, request);
+        product.setImages(fetchedProduct.getImages());
+
+        productService.updateDeleteProductImages(product, productId, request);
+
+        var fetchedProduct2 = productService.getProduct(productId, request);
+        assertThat(fetchedProduct2.getImages().size()).isNotEqualTo(0);
+        for (var image : fetchedProduct2.getImages())
+            assertThat(image).isEqualTo("noImage.png");
     }
 
 

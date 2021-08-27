@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -32,6 +33,7 @@ public class BuyService {
         this.productService = productService;
     }
 
+    @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public BuyModel saveBuy(BuyModel buy, Boolean isSaveProduct, HttpServletRequest req) {
         try {
@@ -56,6 +58,7 @@ public class BuyService {
         }
     }
 
+    @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public BuyModel updateBuy(BuyModel buy, Long buyId, HttpServletRequest req) {
         try {
@@ -133,6 +136,7 @@ public class BuyService {
         throw new NoContentException("Buy record do not exist.");
     }
 
+    @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public void deleteBuy(Long buyId, HttpServletRequest req) {
         try {
@@ -189,9 +193,8 @@ public class BuyService {
         var preProduct = productService.getProduct(buy.getProduct().getId(), req);
         var product = new ProductModel();
         checkUserIsSameUserForRequest(preProduct, null, req, "save buy record of");
-        var productId = preProduct.getId();
         product.setTotalCount(preProduct.getTotalCount().add(buy.getCount()));
-        productService.updateProduct(product, preProduct, productId, req);
+        productService.updateProductFromBuyOrSell(product, preProduct, req);
 
     }
 
@@ -199,26 +202,24 @@ public class BuyService {
         var preProduct = productService.getProduct(buy.getProduct().getId(), req);
         var product = new ProductModel();
         checkUserIsSameUserForRequest(preProduct, null, req, "save buy record of");
-        var productId = preProduct.getId();
         var difference = (BigDecimal) null;
         product.setPrice(buy.getPrice());
         if (buy.getCount().compareTo(preBuy.getCount()) > 0) {
             difference = buy.getCount().subtract(preBuy.getCount());
             product.setTotalCount(preProduct.getTotalCount().add(difference));
-            productService.updateProduct(product, preProduct, productId, req);
+            productService.updateProductFromBuyOrSell(product, preProduct, req);
         } else if (buy.getCount().compareTo(preBuy.getCount()) < 0) {
             difference = preBuy.getCount().subtract(buy.getCount());
             product.setTotalCount(preProduct.getTotalCount().subtract(difference));
-            productService.updateProduct(product, preProduct, productId, req);
+            productService.updateProductFromBuyOrSell(product, preProduct, req);
         }
     }
 
     private void deleteProductCount(BuyModel buy, HttpServletRequest req) {
         var preProduct = productService.getProduct(buy.getProduct().getId(), req);
         var product = new ProductModel();
-        var productId = preProduct.getId();
         product.setTotalCount(preProduct.getTotalCount().subtract(buy.getCount()));
-        productService.updateProduct(product, preProduct, productId, req);
+        productService.updateProductFromBuyOrSell(product, preProduct, req);
     }
 }
 

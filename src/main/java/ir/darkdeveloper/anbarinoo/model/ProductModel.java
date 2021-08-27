@@ -32,6 +32,8 @@ public class ProductModel {
     @GeneratedValue
     private Long id;
 
+    private Long firstBuyId;
+
     @Column(length = 50, nullable = false)
     private String name;
 

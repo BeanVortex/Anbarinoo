@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 
 @Service
@@ -26,6 +27,7 @@ public class SellService {
     private final JwtUtils jwtUtils;
     private final ProductService productService;
 
+    @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public SellModel saveSell(SellModel sell, HttpServletRequest req) {
         try {
@@ -47,6 +49,7 @@ public class SellService {
     }
 
 
+    @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public SellModel updateSell(SellModel sell, Long sellId, HttpServletRequest req) {
         try {
@@ -120,6 +123,7 @@ public class SellService {
         throw new NoContentException("Sell record do not exist.");
     }
 
+    @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public void deleteSell(Long sellId, HttpServletRequest req) {
         try {
@@ -178,7 +182,6 @@ public class SellService {
         var product = new ProductModel();
         checkUserIsSameUserForRequest(preProduct, null, req, "save buy record of");
         product.setTotalCount(preProduct.getTotalCount().subtract(sell.getCount()));
-        var productId = preProduct.getId();
-        productService.updateProduct(product, preProduct, productId, req);
+        productService.updateProductFromBuyOrSell(product, preProduct,  req);
     }
 }
