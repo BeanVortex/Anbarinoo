@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -35,7 +36,9 @@ public class SellService {
                 throw new BadRequestException("Product id is null, Can't sell");
             if (sell.getId() != null)
                 throw new BadRequestException("Id must be null to save a sell record");
-            subtractProductCount(sell, req);
+            if (sell.getCount() == null || sell.getPrice() == null)
+                throw new BadRequestException("Count or Price for sell save, can't be null");
+            saveProductCount(sell, req);
             return repo.save(sell);
         } catch (NoContentException f) {
             throw new NoContentException(f.getLocalizedMessage());
@@ -55,10 +58,12 @@ public class SellService {
         try {
             if (sell.getId() != null)
                 throw new BadRequestException("sell id should null for body");
+            if (sell.getCount() == null || sell.getPrice() == null)
+                throw new BadRequestException("Count or Price for sell update, can't be null");
             var preSellOpt = repo.findById(sellId);
             if (preSellOpt.isPresent()) {
+                updateProductCount(sell, preSellOpt.get(), req);
                 preSellOpt.get().update(sell);
-                subtractProductCount(preSellOpt.get(), req);
                 return repo.save(preSellOpt.get());
             }
             throw new NoContentException("Sell record do not exist.");
@@ -132,6 +137,7 @@ public class SellService {
                 checkUserIsSameUserForRequest(sell.get().getProduct(), null, req,
                         "delete sell record of");
                 repo.deleteById(sellId);
+                deleteProductCount(sell.get(), req);
             } else {
                 throw new NoContentException("Sell record does not exist");
             }
@@ -177,13 +183,42 @@ public class SellService {
 
     }
 
-    //TODO: don't save a sell if product amount is less than requested sell amount
-    private void subtractProductCount(SellModel sell, HttpServletRequest req) {
+    private void saveProductCount(SellModel sell, HttpServletRequest req) {
         var preProduct = productService.getProduct(sell.getProduct().getId(), req);
         var product = new ProductModel();
         checkUserIsSameUserForRequest(preProduct, null, req, "save buy record of");
-        product.setTotalCount(preProduct.getTotalCount().subtract(sell.getCount()));
-        preProduct.setCanUpdate(false);
-        productService.updateProductFromBuyOrSell(product, preProduct,  req);
+        if (preProduct.getTotalCount().compareTo(sell.getCount()) >= 0) {
+            product.setTotalCount(preProduct.getTotalCount().subtract(sell.getCount()));
+            preProduct.setCanUpdate(false);
+            productService.updateProductFromBuyOrSell(product, preProduct, req);
+        } else throw new BadRequestException("Not enough product left in stuck to sell!");
     }
+
+    private void updateProductCount(SellModel sell, SellModel preSell, HttpServletRequest req) {
+        var preProduct = productService.getProduct(sell.getProduct().getId(), req);
+        var product = new ProductModel();
+        checkUserIsSameUserForRequest(preProduct, null, req, "save buy record of");
+        var difference = (BigDecimal) null;
+        product.setPrice(sell.getPrice());
+        if (preProduct.getTotalCount().compareTo(sell.getCount()) >= 0) {
+
+            if (sell.getCount().compareTo(preSell.getCount()) > 0) {
+                difference = sell.getCount().subtract(preSell.getCount());
+                product.setTotalCount(preProduct.getTotalCount().add(difference));
+                productService.updateProductFromBuyOrSell(product, preProduct, req);
+            } else if (sell.getCount().compareTo(preSell.getCount()) < 0) {
+                difference = preSell.getCount().subtract(sell.getCount());
+                product.setTotalCount(preProduct.getTotalCount().subtract(difference));
+                productService.updateProductFromBuyOrSell(product, preProduct, req);
+            }
+        } else throw new BadRequestException("Not enough product left in stuck to sell!");
+    }
+
+    private void deleteProductCount(SellModel sell, HttpServletRequest req) {
+        var preProduct = productService.getProduct(sell.getProduct().getId(), req);
+        var product = new ProductModel();
+        product.setTotalCount(preProduct.getTotalCount().subtract(sell.getCount()));
+        productService.updateProductFromBuyOrSell(product, preProduct, req);
+    }
+
 }

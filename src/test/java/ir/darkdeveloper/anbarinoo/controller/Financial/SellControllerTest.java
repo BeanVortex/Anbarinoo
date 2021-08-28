@@ -149,7 +149,7 @@ public record SellControllerTest(UserService userService,
         var sell = new SellModel();
         sell.setProduct(new ProductModel(productId));
         sell.setPrice(BigDecimal.valueOf(500));
-        sell.setCount(BigDecimal.valueOf(80));
+        sell.setCount(BigDecimal.valueOf(20));
         System.out.println(mapToJson(sell));
         mockMvc.perform(post("/api/category/products/sell/save/")
                 .header("refresh_token", refresh)
@@ -175,18 +175,19 @@ public record SellControllerTest(UserService userService,
         var sell = new SellModel();
         sell.setProduct(new ProductModel(productId));
         sell.setPrice(BigDecimal.valueOf(9000.568));
-        sell.setCount(BigDecimal.valueOf(60.2));
+        sell.setCount(BigDecimal.valueOf(15));
         mockMvc.perform(put("/api/category/products/sell/update/{id}/", sellId)
                 .header("refresh_token", refresh)
                 .header("access_token", access)
                 .content(mapToJson(sell))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.price").value(is(BigDecimal.valueOf(9000.568)), BigDecimal.class))
-                .andExpect(jsonPath("$.count").value(is(BigDecimal.valueOf(60.2)), BigDecimal.class))
-                .andDo(print());
+                .andExpect(jsonPath("$.count").value(is(BigDecimal.valueOf(15)), BigDecimal.class))
+        ;
 
     }
 
@@ -245,7 +246,7 @@ public record SellControllerTest(UserService userService,
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.product").value(is(productId), Long.class))
                 .andExpect(jsonPath("$.id").value(is(sellId), Long.class))
-                .andExpect(jsonPath("$.count").value(is(BigDecimal.valueOf(60.2)), BigDecimal.class))
+                .andExpect(jsonPath("$.count").value(is(BigDecimal.valueOf(15.0)), BigDecimal.class))
                 .andDo(print());
     }
 
