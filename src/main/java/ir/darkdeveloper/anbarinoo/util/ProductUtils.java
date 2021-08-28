@@ -79,32 +79,39 @@ public class ProductUtils {
      */
     public void updateBuyWithProductUpdate(ProductModel product, ProductModel preProduct,
                                            BuyService buyService, HttpServletRequest req) {
-        var buy = (BuyModel) null;
-        var firstBuyId = preProduct.getFirstBuyId();
-        var isPriceUpdated = false;
-        var isCountUpdated = false;
-        if (product.getPrice() != null && product.getPrice().compareTo(preProduct.getPrice()) != 0) {
-            buy = buyService.getBuy(firstBuyId, req);
-            buy.setPrice(product.getPrice());
-            isPriceUpdated = true;
-        }
-
-        if (product.getTotalCount() != null && product.getTotalCount().compareTo(preProduct.getTotalCount()) != 0) {
-            if (buy == null)
+        if (preProduct.getCanUpdate()) {
+            var buy = (BuyModel) null;
+            var firstBuyId = preProduct.getFirstBuyId();
+            var isPriceUpdated = false;
+            var isCountUpdated = false;
+            if (product.getPrice() != null && product.getPrice().compareTo(preProduct.getPrice()) != 0) {
                 buy = buyService.getBuy(firstBuyId, req);
-            buy.setCount(product.getTotalCount());
-            isCountUpdated = true;
-        }
+                buy.setPrice(product.getPrice());
+                isPriceUpdated = true;
+            }
 
-        if (buy != null) {
-            if (!isCountUpdated)
-                buy.setCount(preProduct.getTotalCount());
+            if (product.getTotalCount() != null && product.getTotalCount().compareTo(preProduct.getTotalCount()) != 0) {
+                if (buy == null) {
+                    buy = buyService.getBuy(firstBuyId, req);
+                }
+                buy.setCount(product.getTotalCount());
+                isCountUpdated = true;
+            }
 
-            if (!isPriceUpdated)
-                buy.setPrice(preProduct.getPrice());
-            preProduct.setCanUpdate(false);
-            buyRepo.save(buy);
-        }
+            if (buy != null) {
+                if (!isCountUpdated) {
+                    buy.setCount(preProduct.getTotalCount());
+                }
 
+                if (!isPriceUpdated) {
+                    buy.setPrice(preProduct.getPrice());
+                }
+                preProduct.setCanUpdate(false);
+                buyRepo.save(buy);
+            }
+        } else
+            throw new BadRequestException("You can't update the product's totalCount or Price. You have already" +
+                    " updated these once or you are updating after selling or buying this product." +
+                    " You can only update product's totalCount or price for once right after saving product");
     }
 }

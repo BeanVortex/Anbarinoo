@@ -83,7 +83,7 @@ public class ProductService {
             if (foundProduct.isPresent()) {
                 productUtils.checkUserIsSameUserForRequest(foundProduct.get().getCategory().getUser().getId(),
                         req, "update");
-                if (foundProduct.get().getCanUpdate())
+                if (product.getPrice() != null || product.getTotalCount() != null)
                     productUtils.updateBuyWithProductUpdate(product, foundProduct.get(), buyService, req);
                 return productUtils.updateProduct(product, foundProduct.get());
             }

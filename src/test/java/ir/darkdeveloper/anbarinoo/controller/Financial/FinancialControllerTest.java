@@ -165,11 +165,10 @@ public record FinancialControllerTest(UserService userService,
         assertThat(product.getTotalCount()).isEqualTo(BigDecimal.valueOf(700000, 4));
     }
 
-
     @Test
     @Order(9)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getCosts() throws Exception {
+    void getCosts1() throws Exception {
         var financial = new FinancialModel();
         financial.setFromDate(fromDate);
         toDate = LocalDateTime.now();
@@ -199,7 +198,7 @@ public record FinancialControllerTest(UserService userService,
     @Test
     @Order(10)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getIncomes() throws Exception {
+    void getIncomes1() throws Exception {
         var financial = new FinancialModel();
         financial.setFromDate(fromDate);
         financial.setToDate(toDate);
@@ -222,6 +221,8 @@ public record FinancialControllerTest(UserService userService,
                 .andExpect(jsonPath("$.incomes").value(is(finalIncome), BigDecimal.class))
         ;
     }
+
+
 
 
     private String mapToJson(Object obj) throws JsonProcessingException {

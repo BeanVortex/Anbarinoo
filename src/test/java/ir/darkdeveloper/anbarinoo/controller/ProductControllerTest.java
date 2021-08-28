@@ -249,6 +249,54 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     @Test
     @Order(9)
     @WithMockUser(authorities = "OP_ACCESS_USER")
+    void updateProduct2() throws Exception {
+
+        var product = new ProductModel();
+        product.setPrice(BigDecimal.valueOf(16.5));
+        product.setName("product1Updated");
+        product.setDescription("desc1Updated");
+        product.setTotalCount(BigDecimal.valueOf(6953546));
+
+
+        mockMvc.perform(put("/api/category/products/update/{id}/", productId)
+                .content(mapToJson(product))
+                .header("refresh_token", user1Refresh)
+                .header("access_token", user1Access)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    @Order(10)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void updateProduct3() throws Exception {
+        var product = new ProductModel();
+        product.setName("product1Updated2");
+        product.setDescription("desc1Updated2");
+
+        mockMvc.perform(put("/api/category/products/update/{id}/", productId)
+                .content(mapToJson(product))
+                .header("refresh_token", user1Refresh)
+                .header("access_token", user1Access)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(is("product1Updated2")))
+                .andExpect(jsonPath("$.description").value(is("desc1Updated2")))
+        ;
+
+    }
+
+
+    @Test
+    @Order(11)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
     void updateProductImages() throws Exception {
 
         // these should be ignored to save
@@ -285,13 +333,13 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
                 .andExpect(jsonPath("$.category").value(is(catId), Long.class))
                 .andExpect(jsonPath("$.price").value(is(50.05)))
                 .andExpect(jsonPath("$.totalCount").value(is(50500), Integer.class))
-                .andExpect(jsonPath("$.name").value(is("product1Updated")))
-                .andExpect(jsonPath("$.description").value(is("desc1Updated")));
+                .andExpect(jsonPath("$.name").value(is("product1Updated2")))
+                .andExpect(jsonPath("$.description").value(is("desc1Updated2")));
 
     }
 
     @Test
-    @Order(10)
+    @Order(12)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void updateDelete2ProductImages() throws Exception {
         var product = new ProductModel();
@@ -328,7 +376,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     }
 
     @Test
-    @Order(11)
+    @Order(13)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getProduct() throws Exception {
 
@@ -345,7 +393,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     }
 
     @Test
-    @Order(12)
+    @Order(14)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getOneUserProducts() throws Exception {
 
@@ -363,7 +411,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     }
 
     @Test
-    @Order(13)
+    @Order(15)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getOneUserProductsWithNonMatchedUserIdAndRefreshToken() throws Exception {
 
@@ -379,7 +427,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     }
 
     @Test
-    @Order(14)
+    @Order(16)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void deleteProductWithNonMatchedUserIdAndRefreshToken() throws Exception {
         mockMvc.perform(delete("/api/category/products/{id}/", productId)
@@ -392,7 +440,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     }
 
     @Test
-    @Order(15)
+    @Order(17)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void deleteProduct() throws Exception {
         mockMvc.perform(delete("/api/category/products/{id}/", productId)
