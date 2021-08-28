@@ -65,7 +65,9 @@ public class BuyService {
             if (buy.getId() != null)
                 throw new BadRequestException("Buy id should null for body");
             if (buy.getCount() == null || buy.getPrice() == null)
-                throw new BadRequestException("Count or Price to buy, can't be null");
+                throw new BadRequestException("Count or Price to update a buy, can't be null");
+            if (buy.getProduct() == null || buy.getProduct().getId() == null)
+                throw new BadRequestException("Product id to update a buy, can't be null");
 
             var preBuyOpt = repo.findById(buyId);
             if (preBuyOpt.isPresent()) {

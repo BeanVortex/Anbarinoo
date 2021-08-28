@@ -2,6 +2,7 @@ package ir.darkdeveloper.anbarinoo.controller.Financial;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.FinancialModel;
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -40,6 +40,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -58,12 +59,11 @@ public record FinancialControllerTest(UserService userService,
                                       SellService sellService,
                                       DebtOrDemandService dodService) {
 
-    private static int saveBuyCounter = 0;
-    private static Long userId;
     private static String refresh;
     private static String access;
     private static Long productId;
     private static Long buyId;
+    private static Long sellId;
     private static Long catId;
     private static HttpServletRequest request;
     private static MockMvc mockMvc;
@@ -102,8 +102,7 @@ public record FinancialControllerTest(UserService userService,
         user.setPasswordRepeat("pass1");
         user.setEnabled(true);
         userService.signUpUser(user, response);
-        userId = user.getId();
-        request = setUpHeader(user.getEmail(), userId);
+        request = setUpHeader(user.getEmail(), user.getId());
     }
 
 
@@ -141,6 +140,7 @@ public record FinancialControllerTest(UserService userService,
         buy.setCount(BigDecimal.valueOf(8));
         buyService.saveBuy(buy, false, request);
         assertThat(buy.getId()).isNotNull();
+        buyId = buy.getId();
         Thread.sleep(1000);
     }
 
@@ -153,6 +153,7 @@ public record FinancialControllerTest(UserService userService,
         sell.setPrice(BigDecimal.valueOf(6000));
         sell.setCount(BigDecimal.valueOf(4));
         sellService.saveSell(sell, request);
+        sellId = sell.getId();
         assertThat(sell.getId()).isNotNull();
         Thread.sleep(1000);
     }
@@ -160,15 +161,25 @@ public record FinancialControllerTest(UserService userService,
     @Test
     @Order(6)
     @WithMockUser(authorities = "OP_ACCESS_USER")
+    void badProductUpdate() {
+        var product = new ProductModel();
+        product.setTotalCount(BigDecimal.valueOf(9850));
+        product.setPrice(BigDecimal.valueOf(564));
+        assertThrows(BadRequestException.class, () -> productService.updateProduct(product, productId, request));
+    }
+
+    @Test
+    @Order(7)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
     void getProductsAfterSells() {
         var product = productService.getProduct(productId, request);
         assertThat(product.getTotalCount()).isEqualTo(BigDecimal.valueOf(700000, 4));
     }
 
     @Test
-    @Order(9)
+    @Order(8)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getCosts1() throws Exception {
+    void getCosts() throws Exception {
         var financial = new FinancialModel();
         financial.setFromDate(fromDate);
         toDate = LocalDateTime.now();
@@ -196,9 +207,9 @@ public record FinancialControllerTest(UserService userService,
     }
 
     @Test
-    @Order(10)
+    @Order(9)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getIncomes1() throws Exception {
+    void getIncomes() throws Exception {
         var financial = new FinancialModel();
         financial.setFromDate(fromDate);
         financial.setToDate(toDate);
@@ -208,6 +219,122 @@ public record FinancialControllerTest(UserService userService,
 
         var finalIncome = income.subtract(tax).multiply(BigDecimal.valueOf(5))
                 .setScale(1, RoundingMode.CEILING);
+
+        mockMvc.perform(post("/api/user/financial/incomes/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("refresh_token", refresh)
+                .header("access_token", access)
+                .content(mapToJson(financial))
+        )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.incomes").value(is(finalIncome), BigDecimal.class))
+        ;
+    }
+
+    @Test
+    @Order(10)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void updateABuyWithBiggerCountThanPrevious() {
+        var buy = new BuyModel();
+        buy.setPrice(BigDecimal.valueOf(6000));
+        buy.setCount(BigDecimal.valueOf(20));
+        buy.setProduct(new ProductModel(productId));
+        buyService.updateBuy(buy, buyId, request);
+    }
+
+    @Test
+    @Order(11)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void updateASellWithBiggerCountThanPrevious() {
+        var sell = new SellModel();
+        sell.setPrice(BigDecimal.valueOf(9000));
+        sell.setCount(BigDecimal.valueOf(6));
+        sell.setProduct(new ProductModel(productId));
+        sellService.updateSell(sell, sellId, request);
+    }
+
+    @Test
+    @Order(12)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void updateABuyWithLessCountThanPrevious() {
+        var buy = new BuyModel();
+        buy.setPrice(BigDecimal.valueOf(6000));
+        buy.setCount(BigDecimal.valueOf(2));
+        buy.setProduct(new ProductModel(productId));
+        buyService.updateBuy(buy, buyId, request);
+    }
+
+    @Test
+    @Order(13)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void updateASellWithLessCountThanPrevious() {
+        var sell = new SellModel();
+        sell.setPrice(BigDecimal.valueOf(9000));
+        sell.setCount(BigDecimal.valueOf(3));
+        sell.setProduct(new ProductModel(productId));
+        sellService.updateSell(sell, sellId, request);
+    }
+
+    @Test
+    @Order(14)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void getProductsAfterSellAndBuyUpdate() {
+        var product = productService.getProduct(productId, request);
+        assertThat(product.getTotalCount()).isEqualTo(BigDecimal.valueOf(650000, 4));
+    }
+
+    @Test
+    @Order(15)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void getCostsAfterBuyAndSellUpdates() throws Exception {
+        var financial = new FinancialModel();
+        financial.setFromDate(fromDate);
+        toDate = LocalDateTime.now();
+        financial.setToDate(toDate);
+
+        var cost1 = BigDecimal.valueOf(50).multiply(BigDecimal.valueOf(500));
+        var cost2 = BigDecimal.valueOf(5000).multiply(BigDecimal.valueOf(8));
+        var cost3 = BigDecimal.valueOf(6000).multiply(BigDecimal.valueOf(2));
+        var tax1 = cost1.multiply(BigDecimal.valueOf(9, 2));
+        var tax2 = cost2.multiply(BigDecimal.valueOf(9, 2));
+        var tax3 = cost3.multiply(BigDecimal.valueOf(9, 2));
+        var finalCost1 = cost1.add(tax1);
+        var finalCost2 = cost2.add(tax2).multiply(BigDecimal.valueOf(4));
+        var finalCost3 = cost3.add(tax3);
+        var finalCost = finalCost1.add(finalCost2).add(finalCost3)
+                .setScale(1, RoundingMode.CEILING);
+
+        mockMvc.perform(post("/api/user/financial/costs/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("refresh_token", refresh)
+                .header("access_token", access)
+                .content(mapToJson(financial))
+        )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.costs").value(is(finalCost), BigDecimal.class))
+        ;
+    }
+
+    @Test
+    @Order(16)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void getIncomesAfterBuyAndSellUpdates() throws Exception {
+        var financial = new FinancialModel();
+        financial.setFromDate(fromDate);
+        financial.setToDate(toDate);
+
+        var income1 = BigDecimal.valueOf(6000).multiply(BigDecimal.valueOf(4));
+        var income2 = BigDecimal.valueOf(9000).multiply(BigDecimal.valueOf(3));
+
+        var tax1 = income1.multiply(BigDecimal.valueOf(9, 2));
+        var tax2 = income2.multiply(BigDecimal.valueOf(9, 2));
+        var finalIncome1 = income1.subtract(tax1).multiply(BigDecimal.valueOf(4));
+        var finalIncome2 = income2.subtract(tax2);
+        var finalIncome = finalIncome1.add(finalIncome2).setScale(1, RoundingMode.CEILING);
 
         mockMvc.perform(post("/api/user/financial/incomes/")
                 .contentType(MediaType.APPLICATION_JSON)

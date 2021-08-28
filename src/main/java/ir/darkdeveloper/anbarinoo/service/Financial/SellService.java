@@ -59,7 +59,10 @@ public class SellService {
             if (sell.getId() != null)
                 throw new BadRequestException("sell id should null for body");
             if (sell.getCount() == null || sell.getPrice() == null)
-                throw new BadRequestException("Count or Price for sell update, can't be null");
+                throw new BadRequestException("Count or Price to update a sell, can't be null");
+            if (sell.getProduct() == null || sell.getProduct().getId() == null)
+                throw new BadRequestException("Product id to update a sell, can't be null");
+
             var preSellOpt = repo.findById(sellId);
             if (preSellOpt.isPresent()) {
                 updateProductCount(sell, preSellOpt.get(), req);
@@ -204,11 +207,11 @@ public class SellService {
 
             if (sell.getCount().compareTo(preSell.getCount()) > 0) {
                 difference = sell.getCount().subtract(preSell.getCount());
-                product.setTotalCount(preProduct.getTotalCount().add(difference));
+                product.setTotalCount(preProduct.getTotalCount().subtract(difference));
                 productService.updateProductFromBuyOrSell(product, preProduct, req);
             } else if (sell.getCount().compareTo(preSell.getCount()) < 0) {
                 difference = preSell.getCount().subtract(sell.getCount());
-                product.setTotalCount(preProduct.getTotalCount().subtract(difference));
+                product.setTotalCount(preProduct.getTotalCount().add(difference));
                 productService.updateProductFromBuyOrSell(product, preProduct, req);
             }
         } else throw new BadRequestException("Not enough product left in stuck to sell!");
