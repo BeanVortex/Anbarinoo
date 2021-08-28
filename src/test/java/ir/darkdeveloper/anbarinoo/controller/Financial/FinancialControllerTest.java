@@ -17,6 +17,8 @@ import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils;
+import netscape.javascript.JSObject;
+import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +43,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -350,6 +351,66 @@ public record FinancialControllerTest(UserService userService,
     }
 
 
+    @Test
+    @Order(17)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void getProfitAndLoss() throws Exception {
+        var financial = new FinancialModel();
+        financial.setFromDate(fromDate);
+        financial.setToDate(toDate);
+
+        var income1 = BigDecimal.valueOf(6000).multiply(BigDecimal.valueOf(4));
+        var income2 = BigDecimal.valueOf(9000).multiply(BigDecimal.valueOf(3));
+
+        var tax1 = income1.multiply(BigDecimal.valueOf(9, 2));
+        var tax2 = income2.multiply(BigDecimal.valueOf(9, 2));
+        var finalIncome1 = income1.subtract(tax1).multiply(BigDecimal.valueOf(4));
+        var finalIncome2 = income2.subtract(tax2);
+        var finalIncome = finalIncome1.add(finalIncome2).setScale(1, RoundingMode.CEILING);
+
+        var cost1 = BigDecimal.valueOf(50).multiply(BigDecimal.valueOf(500));
+        var cost2 = BigDecimal.valueOf(5000).multiply(BigDecimal.valueOf(8));
+        var cost3 = BigDecimal.valueOf(6000).multiply(BigDecimal.valueOf(2));
+        var tax1c = cost1.multiply(BigDecimal.valueOf(9, 2));
+        var tax2c = cost2.multiply(BigDecimal.valueOf(9, 2));
+        var tax3c = cost3.multiply(BigDecimal.valueOf(9, 2));
+        var finalCost1 = cost1.add(tax1c);
+        var finalCost2 = cost2.add(tax2c).multiply(BigDecimal.valueOf(4));
+        var finalCost3 = cost3.add(tax3c);
+        var finalCost = finalCost1.add(finalCost2).add(finalCost3)
+                .setScale(1, RoundingMode.CEILING);
+
+        var profitOrLoss = finalIncome.multiply(BigDecimal.valueOf(100)).divide(finalCost, 2, RoundingMode.CEILING);
+
+        var finalProfitOrLoss = (BigDecimal) null;
+
+        if (profitOrLoss.compareTo(BigDecimal.valueOf(100)) > 0)
+            finalProfitOrLoss = profitOrLoss.subtract(BigDecimal.valueOf(100));
+        else
+            finalProfitOrLoss = BigDecimal.valueOf(100).subtract(profitOrLoss);
+
+
+        var finalProfitOrLoss1 = finalProfitOrLoss;
+        mockMvc.perform(post("/api/user/financial/profit-loss/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("refresh_token", refresh)
+                .header("access_token", access)
+                .content(mapToJson(financial))
+        )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(result -> {
+                    var jObject = new JSONObject(result.getResponse().getContentAsString());
+                    var fetchedProfitOrLoss = (BigDecimal) null;
+                    if (jObject.get("loss")!= null)
+                        fetchedProfitOrLoss = BigDecimal.valueOf(jObject.getDouble("loss"))
+                                .setScale(2, RoundingMode.HALF_DOWN);
+
+                    assertThat(fetchedProfitOrLoss).isEqualTo(finalProfitOrLoss1);
+                })
+        ;
+    }
 
 
     private String mapToJson(Object obj) throws JsonProcessingException {

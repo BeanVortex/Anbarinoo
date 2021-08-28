@@ -28,7 +28,7 @@ public class FinancialController {
         return ResponseEntity.ok(service.getIncomes(financial, req, pageable));
     }
 
-    @PostMapping("/profit-or-loss/")
+    @PostMapping("/profit-loss/")
     public ResponseEntity<?> getProfitOrLoss(@RequestBody FinancialModel financial,
                                         HttpServletRequest req, Pageable pageable) {
         return ResponseEntity.ok(service.getProfitOrLoss(financial, req, pageable));
