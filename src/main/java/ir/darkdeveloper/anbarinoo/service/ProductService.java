@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
-import java.util.Optional;
 
 
 @Service
@@ -52,8 +51,8 @@ public class ProductService {
             buy.setCount(savedProduct.getTotalCount());
             buy.setPrice(savedProduct.getPrice());
             buyService.saveBuy(buy, true, req);
-
-            return savedProduct;
+            savedProduct.setFirstBuyId(buy.getId());
+            return repo.save(savedProduct);
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (BadRequestException b) {
@@ -63,10 +62,10 @@ public class ProductService {
         }
     }
 
-
     /**
      * For regular update with no images: another users can't update not owned products
      * If images and files and id provided, then they will be ignored
+     * If price or count value is going to update, it will also update the first buy record of product
      *
      * @param product   should files and id and user be null
      * @param productId should not to be null
@@ -75,24 +74,23 @@ public class ProductService {
      */
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ProductModel updateProduct(ProductModel product, ProductModel preProduct, Long productId,
+    public ProductModel updateProduct(ProductModel product, Long productId,
                                       HttpServletRequest req) {
         try {
             if (product.getId() != null) product.setId(null);
 
-            var foundProduct = Optional.<ProductModel>empty();
-            if (preProduct == null) {
-                foundProduct = repo.findById(productId);
-                if (foundProduct.isPresent()) {
-                    productUtils.checkUserIsSameUserForRequest(foundProduct.get().getCategory().getUser().getId(),
-                            req, "update");
-                    return productUtils.updateProduct(product, foundProduct.get());
-                }
-            } else {
-                productUtils.checkUserIsSameUserForRequest(preProduct.getCategory().getUser().getId(), req,
-                        "update");
-                return productUtils.updateProduct(product, preProduct);
+            var foundProduct = repo.findById(productId);
+            if (foundProduct.isPresent()) {
+                productUtils.checkUserIsSameUserForRequest(foundProduct.get().getCategory().getUser().getId(),
+                        req, "update");
+                if (product.getPrice() != null || product.getTotalCount() != null)
+                    productUtils.updateBuyWithProductUpdate(product, foundProduct.get(), buyService, req);
+                return productUtils.updateProduct(product, foundProduct.get());
             }
+            throw new NoContentException("This product does not exist");
+
+        } catch (NoContentException f) {
+            throw new NoContentException(f.getLocalizedMessage());
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (BadRequestException n) {
@@ -100,7 +98,27 @@ public class ProductService {
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
         }
-        throw new NoContentException("This product does not exist");
+    }
+
+    /**
+     * If a sell or buy record gets updated, product model of that will be updated to
+     */
+    @Transactional
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    public void updateProductFromBuyOrSell(ProductModel product, ProductModel preProduct, HttpServletRequest req) {
+        try {
+            if (product.getId() != null) product.setId(null);
+            productUtils.checkUserIsSameUserForRequest(preProduct.getCategory().getUser().getId(), req,
+                    "update");
+            productUtils.updateProduct(product, preProduct);
+
+        } catch (ForbiddenException f) {
+            throw new ForbiddenException(f.getLocalizedMessage());
+        } catch (BadRequestException n) {
+            throw new BadRequestException(n.getLocalizedMessage());
+        } catch (Exception e) {
+            throw new InternalServerException(e.getLocalizedMessage());
+        }
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
@@ -145,7 +163,6 @@ public class ProductService {
             throw new InternalServerException(e.getLocalizedMessage());
         }
     }
-
 
     /**
      * For Images update only: another users can't update not owned products

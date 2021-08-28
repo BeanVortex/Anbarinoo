@@ -33,7 +33,7 @@ public class ProductController {
     @PutMapping("/update/{id}/")
     public ResponseEntity<?> updateProduct(@RequestBody ProductModel product, @PathVariable("id") Long productId,
                                            HttpServletRequest request) {
-        return ResponseEntity.ok().body(service.updateProduct(product, null, productId, request));
+        return ResponseEntity.ok().body(service.updateProduct(product, productId, request));
     }
 
     @PutMapping("/update/images/{id}/")

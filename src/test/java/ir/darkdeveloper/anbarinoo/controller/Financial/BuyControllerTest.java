@@ -214,8 +214,8 @@ public record BuyControllerTest(UserService userService,
     @Order(8)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getBuy() throws Exception {
-        mockMvc.perform(get("/api/category/products/buy/{id}/?page={page}&size={size}",
-                buyId, 0, 2)
+        mockMvc.perform(get("/api/category/products/buy/{id}/",
+                buyId)
                 .header("refresh_token", refresh)
                 .header("access_token", access)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -261,6 +261,24 @@ public record BuyControllerTest(UserService userService,
                 .andExpect(jsonPath("$.pageable.pageNumber").value(is(0)))
                 .andExpect(jsonPath("$.totalElements").value(is(1)))
         ;
+    }
+
+    @Test
+    @Order(11)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void getBuyRecordOfAProductAfterProductDelete() throws Exception {
+
+        var firstBuyId = productService.getProduct(productId, request).getFirstBuyId();
+        productService.deleteProduct(productId, request);
+
+        mockMvc.perform(get("/api/category/products/buy/{id}/",
+                firstBuyId)
+                .header("refresh_token", refresh)
+                .header("access_token", access)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andDo(print());
     }
 
     private String mapToJson(Object obj) throws JsonProcessingException {
