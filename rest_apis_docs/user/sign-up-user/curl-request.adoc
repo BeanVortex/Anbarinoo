@@ -1,0 +1,20 @@
+[source,bash]
+----
+$ curl 'http://localhost:8080/api/user/signup/' -i -X POST \
+    -H 'Content-Type: multipart/form-data' \
+    -H 'Accept: application/json' \
+    -F 'email=email@mail.com' \
+    -F 'description=desc' \
+    -F 'userName=user n' \
+    -F 'address=address' \
+    -F 'passwordRepeat=pass1' \
+    -F 'password=pass1' \
+    -F 'profileFile=@hello.jpg;type=image/jpeg' \
+    -F 'shopFile=@hello.jpg;type=image/jpeg' \
+    -F 'email=email@mail.com' \
+    -F 'description=desc' \
+    -F 'userName=user n' \
+    -F 'address=address' \
+    -F 'passwordRepeat=pass1' \
+    -F 'password=pass1'
+----
