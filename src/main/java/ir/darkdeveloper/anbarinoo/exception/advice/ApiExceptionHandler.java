@@ -45,8 +45,8 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(EmailNotValidException.class)
     public ResponseEntity<?> handleEmailValidation(EmailNotValidException e) {
-        var em = new ExceptionModel(e.getLocalizedMessage(), HttpStatus.UNAUTHORIZED, LocalDateTime.now());
-        return new ResponseEntity<>(em, HttpStatus.UNAUTHORIZED);
+        var em = new ExceptionModel(e.getLocalizedMessage(), HttpStatus.BAD_REQUEST, LocalDateTime.now());
+        return new ResponseEntity<>(em, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(NoContentException.class)

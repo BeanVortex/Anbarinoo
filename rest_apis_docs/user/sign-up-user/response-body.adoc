@@ -1,4 +1,0 @@
-[source,options="nowrap"]
-----
-{"id":2,"email":"email@mail.com","userName":"user n","provider":"LOCAL","enabled":true,"shopImage":"9abeb840-f1b7-4e04-9981-f4c4cc36402a.jpeg","profileImage":"da3d815d-79e8-4370-9c1c-5498a686848b.jpeg","roles":["USER"],"createdAt":"2021-08-31T16:27:26.521715263","updatedAt":"2021-08-31T16:27:26.521753238","shopName":null,"address":"address","description":"desc","debtOrDemand":null,"cheques":null,"categories":null,"name":"user n","username":"email@mail.com","accountNonExpired":true,"accountNonLocked":true,"credentialsNonExpired":true}
-----

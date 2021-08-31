@@ -123,7 +123,7 @@ public class UserService implements UserDetailsService {
             if (userOpt.isPresent()) {
                 checkUserIsSameUserForRequest(userOpt.get().getId(), req, "delete");
                 userUtils.deleteUser(userOpt.get());
-                return new ResponseEntity<>("Successfully deleted user",HttpStatus.OK);
+                return new ResponseEntity<>("Successfully deleted user", HttpStatus.OK);
             }
         } catch (NotFoundException n) {
             throw new BadRequestException(n.getLocalizedMessage());
@@ -161,6 +161,8 @@ public class UserService implements UserDetailsService {
             return new ResponseEntity<>(repo.findByEmailOrUsername(model.getUsername()), HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             throw new DataExistsException("User exists!");
+        } catch (EmailNotValidException e) {
+            throw new EmailNotValidException(e.getLocalizedMessage());
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
         }

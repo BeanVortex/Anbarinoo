@@ -21,10 +21,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -79,10 +85,11 @@ public record UserControllerTest(UserController controller,
         var password = new MockPart("password", "pass1".getBytes());
         var passwordRepeat = new MockPart("passwordRepeat", "pass1".getBytes());
         var email = new MockPart("email", "email@mail.com".getBytes());
+        MockPart[] parts = {email, des, username, address, passwordRepeat, password};
         mockMvc.perform(multipart("/api/user/signup/")
+                .part(parts)
                 .file(file1)
                 .file(file2)
-                .part(email, des, username, address, passwordRepeat, password)
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andDo(result -> {
@@ -96,7 +103,8 @@ public record UserControllerTest(UserController controller,
                 })
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.id").isNotEmpty());
+                .andExpect(jsonPath("$.id").isNotEmpty())
+        ;
     }
 
 
