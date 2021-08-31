@@ -1,0 +1,8 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 66
+
+{"id":4,"name":"Electronics","user":2,"parent":null,"children":[]}
+----

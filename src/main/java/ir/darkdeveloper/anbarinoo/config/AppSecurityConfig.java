@@ -68,11 +68,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
                                 "/api/post/all/",
                                 "/oauth2/**",
                                 "/api/user/verify/**",
-                                "/swagger-resources/**",
                                 "/webjars/**",
-                                "/forbidden",
-                                "/v2/api-docs",
-                                "/swagger-ui/**") 
+                                "/forbidden")
                         .permitAll()
                     .anyRequest()
                         .authenticated()

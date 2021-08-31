@@ -1,0 +1,12 @@
+[source,http,options="nowrap"]
+----
+PUT /api/category/products/update/7/ HTTP/1.1
+Content-Type: application/json
+refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA0MTEwMTQsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyMjI1NDE0fQ.RirUll725uYvKiS3YpocoHBBn8Sa9SB3KHYEkPmhUVM
+access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDQxMTAxNCwiZXhwIjoxNjMwNDExMDc0fQ.Q0U58m5uky2i11SX3hsIK9XgSD_lcnqkvNQsc53e174
+Accept: application/json
+Content-Length: 198
+Host: localhost:8080
+
+{"id":null,"firstBuyId":null,"canUpdate":true,"name":"product1Updated","description":"desc1Updated","images":null,"price":16.5,"category":null,"totalCount":6953546,"createdAt":null,"updatedAt":null}
+----

@@ -1,7 +1,6 @@
 package ir.darkdeveloper.anbarinoo.model;
 
 import com.fasterxml.jackson.annotation.*;
-import io.swagger.annotations.ApiModelProperty;
 import ir.darkdeveloper.anbarinoo.model.Auth.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.Auth.Authority;
 import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
@@ -89,19 +88,16 @@ public class UserModel implements UserDetails, OAuth2User {
     @OneToMany(mappedBy = "user")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
-    @ApiModelProperty(hidden = true)
     private List<DebtOrDemandModel> debtOrDemand;
 
     @OneToMany(mappedBy = "user")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
-    @ApiModelProperty(hidden = true)
     private List<ChequeModel> cheques;
 
     @OneToMany(mappedBy = "user")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
-    @ApiModelProperty(hidden = true)
     private List<CategoryModel> categories;
 
     // For saving products I need it

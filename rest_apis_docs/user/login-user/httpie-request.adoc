@@ -1,0 +1,6 @@
+[source,bash]
+----
+$ echo '{"username":"user n","password":"pass1"}' | http POST 'http://localhost:8080/api/user/login/' \
+    'Content-Type:application/json' \
+    'Accept:application/json'
+----

@@ -1,0 +1,8 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 265
+
+{"id":4,"nameOf":"Other","payTo":"Me","isDebt":false,"isCheckedOut":false,"amount":1564.0000,"user":2,"issuedAt":"2021-08-31T16:28:46.236973","validTill":"2021-09-08T16:28:46.348675","createdAt":"2021-08-31T16:28:46.294812","updatedAt":"2021-08-31T16:28:46.364204"}
+----

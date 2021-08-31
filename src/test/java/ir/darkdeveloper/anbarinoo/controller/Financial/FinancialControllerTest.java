@@ -21,8 +21,10 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,6 +46,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -51,6 +55,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@AutoConfigureRestDocs(outputDir = "rest_apis_docs/financial")
 public record FinancialControllerTest(UserService userService,
                                       ProductService productService,
                                       JwtUtils jwtUtils,
@@ -58,6 +63,7 @@ public record FinancialControllerTest(UserService userService,
                                       CategoryService categoryService,
                                       BuyService buyService,
                                       SellService sellService,
+                                      RestDocumentationContextProvider restDocumentation,
                                       DebtOrDemandService dodService) {
 
     private static String refresh;
@@ -86,7 +92,10 @@ public record FinancialControllerTest(UserService userService,
 
     @BeforeEach
     void setUp2() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .apply(documentationConfiguration(restDocumentation))
+                .alwaysDo(document("{method-name}"))
+                .build();
     }
 
     @Test
@@ -403,7 +412,7 @@ public record FinancialControllerTest(UserService userService,
                 .andExpect(result -> {
                     var jObject = new JSONObject(result.getResponse().getContentAsString());
                     var fetchedProfitOrLoss = (BigDecimal) null;
-                    if (jObject.get("loss")!= null)
+                    if (jObject.get("loss") != null)
                         fetchedProfitOrLoss = BigDecimal.valueOf(jObject.getDouble("loss"))
                                 .setScale(2, RoundingMode.HALF_DOWN);
 

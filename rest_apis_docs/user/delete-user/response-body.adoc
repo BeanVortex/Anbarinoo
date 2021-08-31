@@ -1,0 +1,4 @@
+[source,options="nowrap"]
+----
+Successfully deleted user
+----

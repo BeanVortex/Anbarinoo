@@ -1,0 +1,9 @@
+[source,http,options="nowrap"]
+----
+DELETE /api/category/products/7/ HTTP/1.1
+refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA0MTEwMTQsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyMjI1NDE0fQ.RirUll725uYvKiS3YpocoHBBn8Sa9SB3KHYEkPmhUVM
+access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDQxMTAxNCwiZXhwIjoxNjMwNDExMDc0fQ.Q0U58m5uky2i11SX3hsIK9XgSD_lcnqkvNQsc53e174
+Accept: application/json
+Host: localhost:8080
+
+----

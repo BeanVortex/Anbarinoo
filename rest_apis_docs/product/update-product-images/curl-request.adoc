@@ -1,0 +1,21 @@
+[source,bash]
+----
+$ curl 'http://localhost:8080/api/category/products/update/images/7/' -i -X PUT \
+    -H 'Content-Type: multipart/form-data' \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA0MTEwMTQsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyMjI1NDE0fQ.RirUll725uYvKiS3YpocoHBBn8Sa9SB3KHYEkPmhUVM' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDQxMTAxNCwiZXhwIjoxNjMwNDExMDc0fQ.Q0U58m5uky2i11SX3hsIK9XgSD_lcnqkvNQsc53e174' \
+    -H 'Accept: application/json' \
+    -F 'id=' \
+    -F 'name=ignoredNameUpdate' \
+    -F 'price=65.56' \
+    -F 'description=ignoredDescriptionUpdate' \
+    -F 'totalCount=854684' \
+    -F 'files=@hello.jpg;type=image/jpeg' \
+    -F 'files=@hello.jpg;type=image/jpeg' \
+    -F 'files=@hello.jpg;type=image/jpeg' \
+    -F 'id=' \
+    -F 'name=ignoredNameUpdate' \
+    -F 'price=65.56' \
+    -F 'description=ignoredDescriptionUpdate' \
+    -F 'totalCount=854684'
+----

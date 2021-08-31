@@ -1,0 +1,8 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Content-Length: 315
+
+{"message":"You can't update the product's totalCount or Price. You have already updated these once or you are updating after selling or buying this product. You can only update product's totalCount or price for once right after saving product","httpStatus":"BAD_REQUEST","timestamp":"2021-08-31T16:26:55.71462082"}
+----

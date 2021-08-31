@@ -1,0 +1,4 @@
+[source,options="nowrap"]
+----
+{"message":"This product does not exist","httpStatus":"NO_CONTENT","timestamp":"2021-08-31T16:26:55.601506261"}
+----

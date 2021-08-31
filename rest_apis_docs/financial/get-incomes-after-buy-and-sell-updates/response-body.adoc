@@ -1,0 +1,4 @@
+[source,options="nowrap"]
+----
+{"costs":null,"incomes":111930.0000000000,"profit":null,"loss":null,"fromDate":"2021-08-31T16:28:22.737555532","toDate":"2021-08-31T16:28:33.541411081"}
+----

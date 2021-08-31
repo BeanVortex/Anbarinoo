@@ -1,0 +1,9 @@
+[source,http,options="nowrap"]
+----
+GET /api/user/all/ HTTP/1.1
+refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA0MTEwNDcsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzMjIyNTQ0N30.mW7mA2l5CZzORWoNE3nYnEFh1zhwp4W7o3LdM-h9pk0
+access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzA0MTEwNDcsImV4cCI6MTYzMDQxMTEwN30.T-saN12x7sgqmv3P_iNEy4DCRpTWgA_PPVqXI7cUQvA
+Accept: application/json
+Host: localhost:8080
+
+----

@@ -1,0 +1,9 @@
+[source,bash]
+----
+$ curl 'http://localhost:8080/api/category/products/sell/get-by-user/date/2/' -i -X POST \
+    -H 'Content-Type: application/json' \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA0MTEwNzYsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyMjI1NDc2fQ.dSIGDGNSYs1WXzwmWTb_S76P1NqP6wCT4wk12WQqIs4' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDQxMTA3NiwiZXhwIjoxNjMwNDExMTM2fQ.zs3lDga7Xmd8lPyWn7ccGz6wDrqTaeCMLDMExPTC16Q' \
+    -H 'Accept: application/json' \
+    -d '{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2021,8,31,16,27,56,843476634],"toDate":[2021,8,31,16,27,57,213801538]}'
+----

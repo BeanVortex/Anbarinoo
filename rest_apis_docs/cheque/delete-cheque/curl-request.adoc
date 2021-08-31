@@ -1,0 +1,7 @@
+[source,bash]
+----
+$ curl 'http://localhost:8080/api/user/financial/cheque/4/' -i -X DELETE \
+    -H 'Accept: application/json' \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA0MTExNTQsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyMjI1NTU0fQ.ArIpZFzXnHa4TSMd8qocB72H_hdoYuKSUREkun_wwAU' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDQxMTE1NCwiZXhwIjoxNjMwNDExMjE0fQ.hmft8nwAhUzA1hnUqMbQ-Bbrz4SafkDDIhqARgXV5wk'
+----

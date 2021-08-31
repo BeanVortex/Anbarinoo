@@ -32,13 +32,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-configuration-processor:2.5.2'
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation "com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3"
-    implementation "io.springfox:springfox-boot-starter:3.0.0"
     implementation 'org.springframework.security:spring-security-oauth2-jose:5.5.0'
     implementation 'org.springframework.security:spring-security-oauth2-client:5.5.0'
     implementation "org.springframework.boot:spring-boot-starter-mail:2.5.0"
-    implementation "io.springfox:springfox-boot-starter:3.0.0"
-    implementation "io.springfox:springfox-swagger2:3.0.0"
-    implementation 'io.springfox:springfox-swagger-ui:3.0.0'
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.4"
 
     compileOnly 'org.projectlombok:lombok'
@@ -47,6 +43,8 @@ dependencies {
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc:2.0.5.RELEASE'
     testImplementation 'com.google.code.gson:gson:2.8.8'
     testImplementation "org.assertj:assertj-core:3.20.2"
     testImplementation "com.h2database:h2:1.4.200"

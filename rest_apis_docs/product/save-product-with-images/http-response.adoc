@@ -1,0 +1,8 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 308
+
+{"id":7,"firstBuyId":8,"canUpdate":true,"name":"product1","description":"desc1","images":["466085dd-178b-4cac-b668-38a6a0fa8bb6.jpeg","9a0db3ae-45cf-467d-acf2-753078c34e9d.jpeg"],"price":10,"category":6,"totalCount":500,"createdAt":"2021-08-31T16:26:55.375136075","updatedAt":"2021-08-31T16:26:55.376538725"}
+----

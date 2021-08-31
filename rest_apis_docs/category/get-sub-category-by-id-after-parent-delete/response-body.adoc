@@ -1,0 +1,4 @@
+[source,options="nowrap"]
+----
+{"message":"Category does not exist.","httpStatus":"NO_CONTENT","timestamp":"2021-08-31T16:28:08.217384063"}
+----

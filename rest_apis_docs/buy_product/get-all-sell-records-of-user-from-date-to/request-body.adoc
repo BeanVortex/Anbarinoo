@@ -1,0 +1,4 @@
+[source,options="nowrap"]
+----
+{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2021,8,31,16,29,49,985618280],"toDate":[2021,8,31,16,29,50,276529950]}
+----

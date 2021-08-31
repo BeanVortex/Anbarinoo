@@ -1,0 +1,4 @@
+[source,options="nowrap"]
+----
+{"message":"You can't fetch another user's products","httpStatus":"FORBIDDEN","timestamp":"2021-08-31T16:26:55.965973819"}
+----
