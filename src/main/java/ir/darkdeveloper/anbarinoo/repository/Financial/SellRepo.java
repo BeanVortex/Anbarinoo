@@ -1,5 +1,6 @@
 package ir.darkdeveloper.anbarinoo.repository.Financial;
 
+import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.SellModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,9 +16,18 @@ public interface SellRepo extends PagingAndSortingRepository<SellModel, Long> {
 
     Page<SellModel> findAllByProductCategoryUserId(Long userId, Pageable pageable);
 
+
     Page<SellModel> findAllByProductCategoryUserIdAndCreatedAtAfterAndCreatedAtBefore(
             Long userId,
             LocalDateTime from,
             LocalDateTime to,
             Pageable pageable);
+
+    Page<SellModel> findAllByProductIdAndCreatedAtAfterAndCreatedAtBefore(
+            Long productId,
+            LocalDateTime from,
+            LocalDateTime to,
+            Pageable pageable);
+
+
 }

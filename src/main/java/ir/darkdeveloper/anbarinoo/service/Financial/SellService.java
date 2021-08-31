@@ -4,6 +4,7 @@ import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
 import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
+import ir.darkdeveloper.anbarinoo.model.Financial.FinancialModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.SellModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.repository.Financial.SellRepo;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
@@ -50,7 +50,6 @@ public class SellService {
             throw new InternalServerException(e.getLocalizedMessage());
         }
     }
-
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
@@ -157,11 +156,35 @@ public class SellService {
 
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
-    public Page<SellModel> getSellsFromToDate(Long userId, LocalDateTime from, LocalDateTime to,
-                                              HttpServletRequest req, Pageable pageable) {
+    public Page<SellModel> getAllSellRecordsOfUserFromDateTo(Long userId, FinancialModel financial,
+                                                             HttpServletRequest req, Pageable pageable) {
         try {
+            if (financial.getFromDate() == null || financial.getToDate() == null)
+                throw new BadRequestException("fromDate and toDate date must not be null");
             checkUserIsSameUserForRequest(null, userId, req, "fetch");
-            return repo.findAllByProductCategoryUserIdAndCreatedAtAfterAndCreatedAtBefore(userId, from, to, pageable);
+            return repo.findAllByProductCategoryUserIdAndCreatedAtAfterAndCreatedAtBefore(userId,
+                    financial.getFromDate(), financial.getToDate(), pageable);
+        } catch (ForbiddenException f) {
+            throw new ForbiddenException(f.getLocalizedMessage());
+        } catch (BadRequestException n) {
+            throw new BadRequestException(n.getLocalizedMessage());
+        } catch (NoContentException n) {
+            throw new NoContentException(n.getLocalizedMessage());
+        } catch (Exception e) {
+            throw new InternalServerException(e.getLocalizedMessage());
+        }
+    }
+
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
+    public Page<SellModel> getAllSellRecordsOfProductFromDateTo(Long productId, FinancialModel financial,
+                                                                HttpServletRequest req, Pageable pageable) {
+        try {
+            if (financial.getFromDate() == null || financial.getToDate() == null)
+                throw new BadRequestException("fromDate and toDate date must not be null");
+            var product = productService.getProduct(productId, req);
+            checkUserIsSameUserForRequest(product, null, req, "fetch");
+            return repo.findAllByProductIdAndCreatedAtAfterAndCreatedAtBefore(productId,
+                    financial.getFromDate(), financial.getToDate(), pageable);
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (BadRequestException n) {

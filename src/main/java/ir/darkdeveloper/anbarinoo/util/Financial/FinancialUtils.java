@@ -50,8 +50,8 @@ public class FinancialUtils {
     @NotNull
     public AtomicReference<BigDecimal> getBuyCosts(FinancialModel financial, HttpServletRequest req,
                                                    Pageable pageable, Long userId) {
-        var buys = buyService.getBuysFromToDate(userId, financial.getFromDate(),
-                financial.getToDate(), req, pageable).getContent();
+        var buys = buyService.getAllBuyRecordsOfUserFromDateTo(userId, financial,
+                req, pageable).getContent();
         var buyCosts = new AtomicReference<>(new BigDecimal(0));
 
         buys.forEach(buy -> {
@@ -65,8 +65,8 @@ public class FinancialUtils {
     @NotNull
     public AtomicReference<BigDecimal> getSellIncomes(FinancialModel financial, HttpServletRequest req,
                                                       Pageable pageable, Long userId) {
-        var sells = sellService.getSellsFromToDate(userId, financial.getFromDate(),
-                financial.getToDate(), req, pageable).getContent();
+        var sells = sellService.getAllSellRecordsOfUserFromDateTo(userId, financial,
+                req, pageable).getContent();
 
         var incomes = new AtomicReference<>(new BigDecimal(0));
 

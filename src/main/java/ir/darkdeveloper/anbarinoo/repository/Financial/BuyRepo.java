@@ -22,6 +22,12 @@ public interface BuyRepo extends JpaRepository<BuyModel, Long> {
             LocalDateTime to,
             Pageable pageable);
 
+    Page<BuyModel> findAllByProductIdAndCreatedAtAfterAndCreatedAtBefore(
+            Long productId,
+            LocalDateTime from,
+            LocalDateTime to,
+            Pageable pageable);
+
 
 
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
+import ir.darkdeveloper.anbarinoo.model.Financial.FinancialModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.CategoryService;
@@ -29,6 +30,7 @@ import org.springframework.web.context.WebApplicationContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,6 +57,7 @@ public record BuyControllerTest(UserService userService,
     private static Long productId;
     private static Long buyId;
     private static Long catId;
+    private static LocalDateTime from, to;
     private static HttpServletRequest request;
     private static MockMvc mockMvc;
 
@@ -126,7 +129,7 @@ public record BuyControllerTest(UserService userService,
         buy.setProduct(new ProductModel(productId));
         buy.setPrice(BigDecimal.valueOf(5000));
         buy.setCount(BigDecimal.valueOf(8));
-        System.out.println(mapToJson(buy));
+        from = LocalDateTime.now();
         mockMvc.perform(post("/api/category/products/buy/save/")
                 .header("refresh_token", refresh)
                 .header("access_token", access)
@@ -213,6 +216,58 @@ public record BuyControllerTest(UserService userService,
     @Test
     @Order(8)
     @WithMockUser(authorities = "OP_ACCESS_USER")
+    void getAllSellRecordsOfProductFromDateTo() throws Exception {
+        to = LocalDateTime.now();
+        var financial = new FinancialModel();
+        financial.setFromDate(from);
+        financial.setToDate(to);
+        mockMvc.perform(post("/api/category/products/buy/get-by-product/date/{id}/",
+                productId)
+                .header("refresh_token", refresh)
+                .header("access_token", access)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(mapToJson(financial))
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].product").value(is(productId), Long.class))
+                .andExpect(jsonPath("$.totalElements").value(is(1)))
+                .andDo(print())
+        ;
+    }
+
+    @Test
+    @Order(9)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void getAllSellRecordsOfUserFromDateTo() throws Exception {
+        to = LocalDateTime.now();
+        var financial = new FinancialModel();
+        financial.setFromDate(from);
+        financial.setToDate(to);
+        mockMvc.perform(post("/api/category/products/buy/get-by-user/date/{id}/",
+                userId)
+                .header("refresh_token", refresh)
+                .header("access_token", access)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(mapToJson(financial))
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].product").value(is(productId), Long.class))
+                .andExpect(jsonPath("$.totalElements").value(is(1)))
+                .andDo(print())
+        ;
+
+    }
+
+
+    @Test
+    @Order(10)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
     void getBuy() throws Exception {
         mockMvc.perform(get("/api/category/products/buy/{id}/",
                 buyId)
@@ -229,7 +284,7 @@ public record BuyControllerTest(UserService userService,
     }
 
     @Test
-    @Order(9)
+    @Order(11)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void deleteBuy() throws Exception {
 
@@ -243,7 +298,7 @@ public record BuyControllerTest(UserService userService,
     }
 
     @Test
-    @Order(10)
+    @Order(12)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getAllBuyRecordsOfProductAfterBuyDelete() throws Exception {
 
@@ -264,7 +319,7 @@ public record BuyControllerTest(UserService userService,
     }
 
     @Test
-    @Order(11)
+    @Order(13)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getBuyRecordOfAProductAfterProductDelete() throws Exception {
 
