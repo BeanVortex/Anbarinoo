@@ -1,9 +1,0 @@
-[source,http,options="nowrap"]
-----
-GET /api/user/financial/debt-demand/get-by-user/2/ HTTP/1.1
-Accept: application/json
-refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA0MTExMjYsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyMjI1NTI2fQ.YvdCzm3w8NVmZ21UxCyl685ylZmWFT27nmgwWC3vA0U
-access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDQxMTEyNiwiZXhwIjoxNjMwNDExMTg2fQ.bESoaf-ZhNgV0YgbFL3wMZpSPr49laS8mZIQLM0_xgE
-Host: localhost:8080
-
-----

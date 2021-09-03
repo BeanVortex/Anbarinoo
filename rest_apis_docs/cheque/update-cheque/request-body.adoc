@@ -1,4 +1,0 @@
-[source,options="nowrap"]
-----
-{"nameOf":"Me2","isDebt":false,"isCheckedOut":true,"validTill":"2021-09-10T16:29:14.762311675"}
-----

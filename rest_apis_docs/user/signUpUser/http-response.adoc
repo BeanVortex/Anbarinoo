@@ -1,0 +1,12 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA0NzcwODIsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyMjkxNDgyfQ.sDgRe6MUpPILczRfM0jCuD8ah9ieX8xuq-paqMkjvsg
+access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDQ3NzA4MiwiZXhwIjoxNjMwNDc3MTQyfQ.QItsQLWtbLcTHTYQpjRTW71eaFsPUtH4gtclZhY6yTc
+refresh_expiration: Wed Sep 22 2021 09:48:02
+access_expiration: Wed Sep 01 2021 10:49:02
+Content-Type: application/json
+Content-Length: 539
+
+{"id":2,"email":"email@mail.com","userName":"user n","provider":"LOCAL","enabled":true,"shopImage":"e8fcf8dc-7ccb-48dc-afd9-30cdaf3ecdbe.jpeg","profileImage":"2baff345-7488-485a-aa6e-05343371d449.jpeg","roles":["USER"],"createdAt":"2021-09-01T10:48:02.299036205","updatedAt":"2021-09-01T10:48:02.299066311","shopName":null,"address":"address","description":"desc","debtOrDemand":null,"cheques":null,"categories":null,"name":"user n","username":"email@mail.com","accountNonExpired":true,"accountNonLocked":true,"credentialsNonExpired":true}
+----

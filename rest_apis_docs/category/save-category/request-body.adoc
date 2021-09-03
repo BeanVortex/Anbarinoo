@@ -1,4 +1,0 @@
-[source,options="nowrap"]
-----
-{"id":null,"name":"Electronics","user":null,"parent":null,"children":[]}
-----

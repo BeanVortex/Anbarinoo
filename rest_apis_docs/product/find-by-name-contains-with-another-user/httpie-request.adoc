@@ -1,7 +1,0 @@
-[source,bash]
-----
-$ http GET 'http://localhost:8080/api/category/products/search/?name=' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA0MTEwMTUsInN1YiI6ImVtYWlsMkBtYWlsLmNvbSIsInVzZXJfaWQiOjQsImV4cCI6MTYzMjIyNTQxNX0.7koYgfcB_mv-3Unp_pNexkkbdvvrgEkSMBV3AMduglE' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbDJAbWFpbC5jb20iLCJpYXQiOjE2MzA0MTEwMTUsImV4cCI6MTYzMDQxMTA3NX0.L3UcqYUlsg6hyezsBIyKPjp15bhOUfYlJTuwdg3jMC8' \
-    'Accept:application/json'
-----

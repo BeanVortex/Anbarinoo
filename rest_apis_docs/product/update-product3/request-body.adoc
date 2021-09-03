@@ -1,4 +1,0 @@
-[source,options="nowrap"]
-----
-{"id":null,"firstBuyId":null,"canUpdate":true,"name":"product1Updated2","description":"desc1Updated2","images":null,"price":null,"category":null,"totalCount":null,"createdAt":null,"updatedAt":null}
-----

@@ -1,0 +1,15 @@
+[source,bash]
+----
+$ http --form PUT 'http://localhost:8080/api/user/update/2/' \
+    'description'@<(echo 'UpdatedDesc') \
+    'userName'@<(echo 'UpdatedUser n') \
+    'address'@<(echo 'UpdatedAddress') \
+    'id'@<(echo '') \
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA0NzcwODMsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzMjI5MTQ4M30.SkcD9-vLLnmxZAGkWkJftqfCTRyyWWRiF0hBxE00lvw' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzA0NzcwODMsImV4cCI6MTYzMDQ3NzE0M30.XMaIDj2ncQYc1ObxicIQ3sS53tR9DJ_OxodvqZ91iK4' \
+    'Accept:application/json' \
+    'description=UpdatedDesc' \
+    'userName=UpdatedUser n' \
+    'address=UpdatedAddress' \
+    'id='
+----

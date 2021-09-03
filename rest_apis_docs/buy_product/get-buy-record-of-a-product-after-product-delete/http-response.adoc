@@ -1,8 +1,0 @@
-[source,http,options="nowrap"]
-----
-HTTP/1.1 204 No Content
-Content-Type: application/json
-Content-Length: 108
-
-{"message":"Buy record do not exist.","httpStatus":"NO_CONTENT","timestamp":"2021-08-31T16:29:50.382268456"}
-----

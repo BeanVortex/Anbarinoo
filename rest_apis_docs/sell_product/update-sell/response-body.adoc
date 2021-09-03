@@ -1,4 +1,0 @@
-[source,options="nowrap"]
-----
-{"id":7,"count":15,"price":9000.568,"tax":9,"product":5,"createdAt":"2021-08-31T16:27:56.909168","updatedAt":"2021-08-31T16:27:57.011082746"}
-----

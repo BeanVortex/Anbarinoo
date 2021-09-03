@@ -1,4 +1,0 @@
-[source,options="nowrap"]
-----
-{"message":"You can't delete another user's products","httpStatus":"FORBIDDEN","timestamp":"2021-08-31T16:26:56.026722519"}
-----

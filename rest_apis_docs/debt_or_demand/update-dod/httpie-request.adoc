@@ -1,8 +1,0 @@
-[source,bash]
-----
-$ echo '{"nameOf":"Other","payTo":"Me","isDebt":false,"isCheckedOut":false,"amount":1564,"validTill":"2021-09-08T16:28:46.348675318"}' | http PUT 'http://localhost:8080/api/user/financial/debt-demand/update/4/' \
-    'Content-Type:application/json' \
-    'Accept:application/json' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA0MTExMjYsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyMjI1NTI2fQ.YvdCzm3w8NVmZ21UxCyl685ylZmWFT27nmgwWC3vA0U' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDQxMTEyNiwiZXhwIjoxNjMwNDExMTg2fQ.bESoaf-ZhNgV0YgbFL3wMZpSPr49laS8mZIQLM0_xgE'
-----

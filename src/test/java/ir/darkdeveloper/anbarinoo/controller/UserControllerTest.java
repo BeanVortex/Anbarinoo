@@ -21,16 +21,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Arrays;
-import java.util.List;
+import javax.servlet.http.Part;
+
+import java.io.ByteArrayInputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -57,8 +57,8 @@ public record UserControllerTest(UserController controller,
 
     @BeforeAll
     static void setUp() {
-        Authentication authentication = Mockito.mock(Authentication.class);
-        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
     }
@@ -67,7 +67,7 @@ public record UserControllerTest(UserController controller,
     void setUp2() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .apply(documentationConfiguration(restDocumentation))
-                .alwaysDo(document("{method-name}"))
+                .alwaysDo(document("{methodName}"))
                 .build();
     }
 
@@ -75,17 +75,18 @@ public record UserControllerTest(UserController controller,
     @Order(1)
     @WithMockUser(username = "anonymousUser")
     void signUpUser() throws Exception {
-        var file1 = new MockMultipartFile("profileFile", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!".getBytes());
-        var file2 = new MockMultipartFile("shopFile", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!".getBytes());
         var address = new MockPart("address", "address".getBytes());
         var des = new MockPart("description", "desc".getBytes());
         var username = new MockPart("userName", "user n".getBytes());
         var password = new MockPart("password", "pass1".getBytes());
         var passwordRepeat = new MockPart("passwordRepeat", "pass1".getBytes());
         var email = new MockPart("email", "email@mail.com".getBytes());
-        MockPart[] parts = {email, des, username, address, passwordRepeat, password};
+        Part[] parts = {email, des, username, address, passwordRepeat, password};
+        var file1 = new MockMultipartFile("profileFile", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!".getBytes());
+        var file2 = new MockMultipartFile("shopFile", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!".getBytes());
+
         mockMvc.perform(multipart("/api/user/signup/")
                 .part(parts)
                 .file(file1)

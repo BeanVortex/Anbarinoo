@@ -1,8 +1,0 @@
-[source,http,options="nowrap"]
-----
-HTTP/1.1 200 OK
-Content-Type: application/json
-Content-Length: 602
-
-{"content":[{"id":6,"count":50.0000,"price":500.0000,"tax":9,"product":5,"createdAt":"2021-08-31T16:29:49.975524","updatedAt":"2021-08-31T16:29:49.975543"},{"id":7,"count":60.2000,"price":9000.5680,"tax":9,"product":5,"createdAt":"2021-08-31T16:29:50.031497","updatedAt":"2021-08-31T16:29:50.098153"}],"pageable":{"sort":{"sorted":false,"unsorted":true,"empty":true},"offset":0,"pageNumber":0,"pageSize":2,"paged":true,"unpaged":false},"totalPages":1,"totalElements":2,"last":true,"size":2,"number":0,"sort":{"sorted":false,"unsorted":true,"empty":true},"numberOfElements":2,"first":true,"empty":false}
-----

@@ -1,4 +1,0 @@
-[source,options="nowrap"]
-----
-{"headers":{},"body":null,"statusCode":"OK","statusCodeValue":200}
-----

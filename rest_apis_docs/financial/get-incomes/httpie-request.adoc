@@ -1,8 +1,0 @@
-[source,bash]
-----
-$ echo '{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2021,8,31,16,28,22,737555532],"toDate":[2021,8,31,16,28,33,317706076]}' | http POST 'http://localhost:8080/api/user/financial/incomes/' \
-    'Content-Type:application/json' \
-    'Accept:application/json' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA0MTExMDIsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyMjI1NTAyfQ.fUjEn4evFQUcGgUNGpZOMDcwkdD2IiwVt7YJ5GbVMxY' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDQxMTEwMiwiZXhwIjoxNjMwNDExMTYyfQ.eiFwbhnEJqt6-Z1OZURLT3JV66vFi2QU70aEZy6Ifjc'
-----

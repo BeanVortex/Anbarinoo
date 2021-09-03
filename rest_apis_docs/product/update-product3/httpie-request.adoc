@@ -1,8 +1,0 @@
-[source,bash]
-----
-$ echo '{"id":null,"firstBuyId":null,"canUpdate":true,"name":"product1Updated2","description":"desc1Updated2","images":null,"price":null,"category":null,"totalCount":null,"createdAt":null,"updatedAt":null}' | http PUT 'http://localhost:8080/api/category/products/update/7/' \
-    'Content-Type:application/json' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA0MTEwMTQsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyMjI1NDE0fQ.RirUll725uYvKiS3YpocoHBBn8Sa9SB3KHYEkPmhUVM' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDQxMTAxNCwiZXhwIjoxNjMwNDExMDc0fQ.Q0U58m5uky2i11SX3hsIK9XgSD_lcnqkvNQsc53e174' \
-    'Accept:application/json'
-----

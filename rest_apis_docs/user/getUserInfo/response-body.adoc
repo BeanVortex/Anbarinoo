@@ -1,0 +1,4 @@
+[source,options="nowrap"]
+----
+{"id":2,"email":"email@mail.com","userName":"UpdatedUser n","provider":"LOCAL","enabled":true,"shopImage":"noImage.png","profileImage":"noProfile.jpeg","roles":["USER"],"createdAt":"2021-09-01T10:48:02.299036","updatedAt":"2021-09-01T10:48:03.341185","shopName":null,"address":"UpdatedAddress","description":"UpdatedDesc","debtOrDemand":[],"cheques":[],"categories":[],"name":"UpdatedUser n","username":"email@mail.com","accountNonExpired":true,"accountNonLocked":true,"credentialsNonExpired":true}
+----

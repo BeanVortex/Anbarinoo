@@ -121,7 +121,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Collections.singletonList("*"));
         configuration.addExposedHeader("refresh_token, access_token, access_expiration, refresh_expiration");
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
