@@ -1,0 +1,4 @@
+[source,options="nowrap"]
+----
+{"id":null,"firstBuyId":null,"canUpdate":true,"name":null,"description":null,"images":["cccdd802-20cd-47fc-9c6f-582d6ad9ce9a.jpeg","dff74f89-35ed-4dbc-aa4f-dbe297d33e3b.jpeg"],"price":null,"category":null,"totalCount":null,"createdAt":null,"updatedAt":null}
+----

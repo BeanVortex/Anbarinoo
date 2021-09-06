@@ -1,0 +1,9 @@
+[source,bash]
+----
+$ curl 'http://localhost:8080/api/user/financial/costs/' -i -X POST \
+    -H 'Content-Type: application/json' \
+    -H 'Accept: application/json' \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwMzgsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NDM4fQ.VbqanE1tyY_cAOuDe4SUel8FqeYzjbgquVt209Ci-Dg' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTAzOCwiZXhwIjoxNjMwOTU1MDk4fQ.5jnU6lp-VM_GtlJ7vVkxDmjRh5zMmt-RZHoLuogkPmk' \
+    -d '{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2021,9,6,23,33,58,269766644],"toDate":[2021,9,6,23,34,8,505829368]}'
+----

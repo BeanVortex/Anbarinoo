@@ -1,0 +1,4 @@
+[source,options="nowrap"]
+----
+{"id":7,"firstBuyId":null,"canUpdate":true,"name":"product1Updated2","description":"desc1Updated2","images":["cccdd802-20cd-47fc-9c6f-582d6ad9ce9a.jpeg","dff74f89-35ed-4dbc-aa4f-dbe297d33e3b.jpeg","65b2e474-1a31-44c7-84b6-8c19b6a33f1d.jpeg","8360632f-17f0-479e-9203-4a8664f09ea6.jpeg","9eb43281-d4f0-4f3c-86c3-47103de30920.jpeg"],"price":50.0500,"category":6,"totalCount":50500.0000,"createdAt":null,"updatedAt":"2021-09-06T23:34:14.753037739"}
+----

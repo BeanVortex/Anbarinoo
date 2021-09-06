@@ -1,0 +1,8 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 152
+
+{"costs":null,"incomes":111930.0000000000,"profit":null,"loss":null,"fromDate":"2021-09-06T23:33:58.269766644","toDate":"2021-09-06T23:34:08.505829368"}
+----

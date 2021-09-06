@@ -1,0 +1,12 @@
+[source,http,options="nowrap"]
+----
+PUT /api/category/products/buy/update/7/ HTTP/1.1
+Content-Type: application/json
+refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwNTIsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NDUyfQ.-7jCoFNzlWWeEXAgb7dbdqki50AAm3R0Ebe4_RQ0Pzs
+access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTA1MiwiZXhwIjoxNjMwOTU1MTEyfQ.PZnjZq5QVlNzdfvbnQsFGeHCRyeRCndaLeBV4tXhxqs
+Accept: application/json
+Content-Length: 51
+Host: localhost:8080
+
+{"count":60.2,"price":9000.568,"tax":9,"product":5}
+----

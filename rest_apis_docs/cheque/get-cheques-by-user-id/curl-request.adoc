@@ -1,0 +1,7 @@
+[source,bash]
+----
+$ curl 'http://localhost:8080/api/user/financial/cheque/user/2/' -i -X GET \
+    -H 'Accept: application/json' \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwNTAsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NDUwfQ.JJUfGXWINgWlnErtcN8zhy2HGkqmUBCp41FvrKN3BQc' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTA1MCwiZXhwIjoxNjMwOTU1MTEwfQ.kx6tCB891lLO9v_DwbGUwiqk-ngcUYPi96kyi1YHOxM'
+----

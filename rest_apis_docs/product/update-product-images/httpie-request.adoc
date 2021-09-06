@@ -1,0 +1,20 @@
+[source,bash]
+----
+$ http --form PUT 'http://localhost:8080/api/category/products/update/images/7/' \
+    'id'@<(echo '') \
+    'name'@<(echo 'ignoredNameUpdate') \
+    'price'@<(echo '65.56') \
+    'description'@<(echo 'ignoredDescriptionUpdate') \
+    'totalCount'@<(echo '854684') \
+    'files'@'hello.jpg' \
+    'files'@'hello.jpg' \
+    'files'@'hello.jpg' \
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwNTQsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NDU0fQ.eiSB73MQSJrLwMei-76AKSVyGZ0QZVbcsEuY3m8-gkU' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTA1NCwiZXhwIjoxNjMwOTU1MTE0fQ.VvVF6wrtIaZ7iY7Iy5aQ5ZMFd7FfU9jIbnkDNAW5SNc' \
+    'Accept:application/json' \
+    'id=' \
+    'name=ignoredNameUpdate' \
+    'price=65.56' \
+    'description=ignoredDescriptionUpdate' \
+    'totalCount=854684'
+----

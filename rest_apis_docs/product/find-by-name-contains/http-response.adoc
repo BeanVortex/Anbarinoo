@@ -1,0 +1,8 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 868
+
+{"content":[{"id":7,"firstBuyId":8,"canUpdate":true,"name":"product1","description":"desc1","images":["8360632f-17f0-479e-9203-4a8664f09ea6.jpeg","9eb43281-d4f0-4f3c-86c3-47103de30920.jpeg"],"price":10.0000,"category":6,"totalCount":500.0000,"createdAt":"2021-09-06T23:34:14.645843","updatedAt":"2021-09-06T23:34:14.646278"},{"id":9,"firstBuyId":10,"canUpdate":true,"name":"product2","description":"desc2","images":["noImage.png"],"price":10.0000,"category":6,"totalCount":500.0000,"createdAt":"2021-09-06T23:34:14.662956","updatedAt":"2021-09-06T23:34:14.663299"}],"pageable":{"sort":{"sorted":false,"unsorted":true,"empty":true},"pageNumber":0,"pageSize":20,"offset":0,"paged":true,"unpaged":false},"totalPages":1,"totalElements":2,"last":true,"numberOfElements":2,"sort":{"sorted":false,"unsorted":true,"empty":true},"first":true,"number":0,"size":20,"empty":false}
+----

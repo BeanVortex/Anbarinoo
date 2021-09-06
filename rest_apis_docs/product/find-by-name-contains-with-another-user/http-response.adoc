@@ -1,0 +1,8 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 204 No Content
+Content-Type: application/json
+Content-Length: 111
+
+{"message":"This product does not exist","httpStatus":"NO_CONTENT","timestamp":"2021-09-06T23:34:14.675206294"}
+----

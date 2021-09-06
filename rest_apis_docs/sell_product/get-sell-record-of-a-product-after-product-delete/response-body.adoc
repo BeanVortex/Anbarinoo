@@ -1,0 +1,4 @@
+[source,options="nowrap"]
+----
+{"message":"Sell record do not exist.","httpStatus":"NO_CONTENT","timestamp":"2021-09-06T23:33:56.477394493"}
+----

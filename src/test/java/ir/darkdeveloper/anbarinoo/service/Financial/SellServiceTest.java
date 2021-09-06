@@ -1,5 +1,6 @@
 package ir.darkdeveloper.anbarinoo.service.Financial;
 
+import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.SellModel;
@@ -20,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,11 +36,12 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
 public record SellServiceTest(UserService userService,
-                              JwtUtils jwtUtils,
-                              ProductService productService,
-                              SellService sellService,
-                              CategoryService categoryService) {
+                       JwtUtils jwtUtils,
+                       ProductService productService,
+                       SellService sellService,
+                       CategoryService categoryService) {
 
     private static HttpServletRequest request;
     private static Long userId;
@@ -83,30 +86,11 @@ public record SellServiceTest(UserService userService,
 
     @Test
     @Order(2)
-    @WithMockUser( authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void saveCategory() {
-        var cat1 = new CategoryModel("Other");
-        cat1.setUser(new UserModel(userId));
-        categoryService.saveCategory(cat1, request);
         var electronics = new CategoryModel("Electronics");
-        electronics.setUser(new UserModel(userId));
-        var mobilePhones = new CategoryModel("Mobile phones", electronics);
-        mobilePhones.setUser(new UserModel(userId));
-        var washingMachines = new CategoryModel("Washing machines", electronics);
-        washingMachines.setUser(new UserModel(userId));
-        electronics.addChild(mobilePhones);
-        electronics.addChild(washingMachines);
-        var iPhone = new CategoryModel("iPhone", mobilePhones);
-        iPhone.setUser(new UserModel(userId));
-        var samsung = new CategoryModel("Samsung", mobilePhones);
-        samsung.setUser(new UserModel(userId));
-        mobilePhones.addChild(iPhone);
-        mobilePhones.addChild(samsung);
-        var galaxy = new CategoryModel("Galaxy", samsung);
-        galaxy.setUser(new UserModel(userId));
-        samsung.addChild(galaxy);
         categoryService.saveCategory(electronics, request);
-        catId = electronics.getChildren().get(0).getId();
+        catId = electronics.getId();
     }
 
     @Test
@@ -149,10 +133,12 @@ public record SellServiceTest(UserService userService,
         sellRecord.setCount(null);
         sellRecord.setPrice(null);
         sellRecord.setProduct(product);
-        sellService.updateSell(sellRecord, sellId, request);
-        var fetchedSell = sellService.getSell(sellId, request);
-        assertThat(fetchedSell.getCount()).isEqualTo(BigDecimal.valueOf(200000, 4));
-        assertThat(fetchedSell.getPrice()).isEqualTo(BigDecimal.valueOf(500000, 4));
+        assertThrows(BadRequestException.class, () -> {
+            sellService.updateSell(sellRecord, sellId, request);
+            var fetchedSell = sellService.getSell(sellId, request);
+            assertThat(fetchedSell.getCount()).isEqualTo(BigDecimal.valueOf(200000, 4));
+            assertThat(fetchedSell.getPrice()).isEqualTo(BigDecimal.valueOf(500000, 4));
+        });
     }
 
     @Test

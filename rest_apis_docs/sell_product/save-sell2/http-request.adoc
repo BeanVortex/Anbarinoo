@@ -1,0 +1,12 @@
+[source,http,options="nowrap"]
+----
+POST /api/category/products/sell/save/ HTTP/1.1
+Content-Type: application/json
+refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwMzYsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NDM2fQ.U3qZTv2eAmgAZaOb0QzgCROzISxXDpIRpYygreABrBc
+access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTAzNiwiZXhwIjoxNjMwOTU1MDk2fQ.G8siSDaeEb94fr1bzfxZHkBAa0C65Pc4JTuGd0oP1VI
+Accept: application/json
+Content-Length: 44
+Host: localhost:8080
+
+{"count":20,"price":500,"tax":9,"product":5}
+----

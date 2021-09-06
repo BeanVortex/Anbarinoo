@@ -1,0 +1,9 @@
+[source,http,options="nowrap"]
+----
+GET /api/category/products/search/?name= HTTP/1.1
+refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwNTQsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NDU0fQ.eiSB73MQSJrLwMei-76AKSVyGZ0QZVbcsEuY3m8-gkU
+access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTA1NCwiZXhwIjoxNjMwOTU1MTE0fQ.VvVF6wrtIaZ7iY7Iy5aQ5ZMFd7FfU9jIbnkDNAW5SNc
+Accept: application/json
+Host: localhost:8080
+
+----

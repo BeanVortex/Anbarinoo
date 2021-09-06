@@ -1,0 +1,9 @@
+[source,bash]
+----
+$ curl 'http://localhost:8080/api/user/financial/cheque/update/4/' -i -X POST \
+    -H 'Content-Type: application/json' \
+    -H 'Accept: application/json' \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwNTAsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NDUwfQ.JJUfGXWINgWlnErtcN8zhy2HGkqmUBCp41FvrKN3BQc' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTA1MCwiZXhwIjoxNjMwOTU1MTEwfQ.kx6tCB891lLO9v_DwbGUwiqk-ngcUYPi96kyi1YHOxM' \
+    -d '{"nameOf":"Me2","isDebt":false,"isCheckedOut":true,"validTill":"2021-09-16T23:34:10.347231681"}'
+----

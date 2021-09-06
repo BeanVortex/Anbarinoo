@@ -1,0 +1,4 @@
+[source,options="nowrap"]
+----
+{"id":7,"firstBuyId":8,"canUpdate":true,"name":"product1","description":"desc1","images":["8360632f-17f0-479e-9203-4a8664f09ea6.jpeg","9eb43281-d4f0-4f3c-86c3-47103de30920.jpeg"],"price":10,"category":6,"totalCount":500,"createdAt":"2021-09-06T23:34:14.645843466","updatedAt":"2021-09-06T23:34:14.646278415"}
+----

@@ -1,0 +1,9 @@
+[source,bash]
+----
+$ curl 'http://localhost:8080/api/category/save/' -i -X POST \
+    -H 'Content-Type: application/json' \
+    -H 'Accept: application/json' \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwMzIsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NDMyfQ.LOcP6-H18Y4K8Gx0BBDc1k40sH8K7cXvFamRmmXEcfE' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTAzMiwiZXhwIjoxNjMwOTU1MDkyfQ.2aGufvawh94O8UvJQDzaYWQnTRW9mEi5rLo571G-sqQ' \
+    -d '{"id":null,"name":"Electronics","user":null,"parent":null,"children":[]}'
+----

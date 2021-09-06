@@ -1,0 +1,12 @@
+[source,http,options="nowrap"]
+----
+POST /api/user/financial/incomes/ HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwMzgsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NDM4fQ.VbqanE1tyY_cAOuDe4SUel8FqeYzjbgquVt209Ci-Dg
+access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTAzOCwiZXhwIjoxNjMwOTU1MDk4fQ.5jnU6lp-VM_GtlJ7vVkxDmjRh5zMmt-RZHoLuogkPmk
+Content-Length: 134
+Host: localhost:8080
+
+{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2021,9,6,23,33,58,269766644],"toDate":[2021,9,6,23,34,8,505829368]}
+----

@@ -1,0 +1,8 @@
+[source,bash]
+----
+$ curl 'http://localhost:8080/api/category/products/sell/7/?page=0&size=2' -i -X GET \
+    -H 'Content-Type: application/json' \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwMzYsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NDM2fQ.U3qZTv2eAmgAZaOb0QzgCROzISxXDpIRpYygreABrBc' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTAzNiwiZXhwIjoxNjMwOTU1MDk2fQ.G8siSDaeEb94fr1bzfxZHkBAa0C65Pc4JTuGd0oP1VI' \
+    -H 'Accept: application/json'
+----

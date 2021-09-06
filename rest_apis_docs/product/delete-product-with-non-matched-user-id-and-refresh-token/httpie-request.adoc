@@ -1,0 +1,7 @@
+[source,bash]
+----
+$ http DELETE 'http://localhost:8080/api/category/products/7/' \
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwNTQsInN1YiI6ImVtYWlsMkBtYWlsLmNvbSIsInVzZXJfaWQiOjQsImV4cCI6MTYzMjc2OTQ1NH0.q4nrg2szSOX66EOu-5ZQDIPm3Clzf3gnaDEgM420uuc' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbDJAbWFpbC5jb20iLCJpYXQiOjE2MzA5NTUwNTQsImV4cCI6MTYzMDk1NTExNH0.TETLQKi5d5MG1g4t42hEll-edYn1dYToORTiSouN1xw' \
+    'Accept:application/json'
+----

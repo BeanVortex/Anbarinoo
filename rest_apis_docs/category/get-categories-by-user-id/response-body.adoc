@@ -1,0 +1,4 @@
+[source,options="nowrap"]
+----
+[{"id":4,"name":"Electronics","user":2,"parent":null,"children":[5]},{"id":5,"name":"Mobiles","user":2,"parent":4,"children":[]}]
+----

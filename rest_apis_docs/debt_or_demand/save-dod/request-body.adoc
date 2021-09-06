@@ -1,0 +1,4 @@
+[source,options="nowrap"]
+----
+{"nameOf":"Me","payTo":"Other","isDebt":true,"isCheckedOut":false,"amount":115.56,"issuedAt":"2021-09-06T23:33:54.389616615","validTill":"2021-09-11T23:33:54.389628976"}
+----

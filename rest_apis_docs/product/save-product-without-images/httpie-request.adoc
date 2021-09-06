@@ -1,0 +1,17 @@
+[source,bash]
+----
+$ http --form POST 'http://localhost:8080/api/category/products/save/' \
+    'name'@<(echo 'product2') \
+    'price'@<(echo '10') \
+    'description'@<(echo 'desc2') \
+    'category'@<(echo '6') \
+    'totalCount'@<(echo '500') \
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwNTQsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NDU0fQ.eiSB73MQSJrLwMei-76AKSVyGZ0QZVbcsEuY3m8-gkU' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTA1NCwiZXhwIjoxNjMwOTU1MTE0fQ.VvVF6wrtIaZ7iY7Iy5aQ5ZMFd7FfU9jIbnkDNAW5SNc' \
+    'Accept:application/json' \
+    'name=product2' \
+    'price=10' \
+    'description=desc2' \
+    'category=6' \
+    'totalCount=500'
+----

@@ -1,0 +1,18 @@
+[source,bash]
+----
+$ curl 'http://localhost:8080/api/category/products/save/' -i -X POST \
+    -H 'Content-Type: multipart/form-data' \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwNTQsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NDU0fQ.eiSB73MQSJrLwMei-76AKSVyGZ0QZVbcsEuY3m8-gkU' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTA1NCwiZXhwIjoxNjMwOTU1MTE0fQ.VvVF6wrtIaZ7iY7Iy5aQ5ZMFd7FfU9jIbnkDNAW5SNc' \
+    -H 'Accept: application/json' \
+    -F 'name=product2' \
+    -F 'price=10' \
+    -F 'description=desc2' \
+    -F 'category=6' \
+    -F 'totalCount=500' \
+    -F 'name=product2' \
+    -F 'price=10' \
+    -F 'description=desc2' \
+    -F 'category=6' \
+    -F 'totalCount=500'
+----

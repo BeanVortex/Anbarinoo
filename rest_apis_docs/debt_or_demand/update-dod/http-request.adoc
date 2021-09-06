@@ -1,0 +1,12 @@
+[source,http,options="nowrap"]
+----
+PUT /api/user/financial/debt-demand/update/4/ HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwMzQsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NDM0fQ.-7tBgtx9ENcJoAhmpKLkA0Ik6Ut5CD0g53kKSQ93aAM
+access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTAzNCwiZXhwIjoxNjMwOTU1MDk0fQ.ZXqmh__wy0-P53o41bLi2IYscyZrvI_rkOuqsqrjlIs
+Content-Length: 125
+Host: localhost:8080
+
+{"nameOf":"Other","payTo":"Me","isDebt":false,"isCheckedOut":false,"amount":1564,"validTill":"2021-09-14T23:33:54.424704802"}
+----

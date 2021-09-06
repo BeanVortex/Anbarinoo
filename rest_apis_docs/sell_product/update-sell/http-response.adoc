@@ -1,0 +1,8 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 141
+
+{"id":7,"count":15,"price":9000.568,"tax":9,"product":5,"createdAt":"2021-09-06T23:33:56.309577","updatedAt":"2021-09-06T23:33:56.337986998"}
+----

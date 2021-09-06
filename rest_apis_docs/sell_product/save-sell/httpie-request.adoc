@@ -1,0 +1,8 @@
+[source,bash]
+----
+$ echo '{"count":8,"price":5000,"tax":9,"product":5}' | http POST 'http://localhost:8080/api/category/products/sell/save/' \
+    'Content-Type:application/json' \
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwMzYsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NDM2fQ.U3qZTv2eAmgAZaOb0QzgCROzISxXDpIRpYygreABrBc' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTAzNiwiZXhwIjoxNjMwOTU1MDk2fQ.G8siSDaeEb94fr1bzfxZHkBAa0C65Pc4JTuGd0oP1VI' \
+    'Accept:application/json'
+----

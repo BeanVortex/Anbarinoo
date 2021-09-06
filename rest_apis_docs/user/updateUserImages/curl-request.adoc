@@ -2,8 +2,8 @@
 ----
 $ curl 'http://localhost:8080/api/user/update/images/2/' -i -X PUT \
     -H 'Content-Type: multipart/form-data' \
-    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA0NzcwODMsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzMjI5MTQ4M30.SkcD9-vLLnmxZAGkWkJftqfCTRyyWWRiF0hBxE00lvw' \
-    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzA0NzcwODMsImV4cCI6MTYzMDQ3NzE0M30.XMaIDj2ncQYc1ObxicIQ3sS53tR9DJ_OxodvqZ91iK4' \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwNTYsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzMjc2OTQ1Nn0.emwCI1OwRiwDDOMtdSrvK2GUzsIulZ9ZmA-o3QFhis0' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzA5NTUwNTYsImV4cCI6MTYzMDk1NTExNn0.pwn6672WcorXFIc328-PA6hj5CEUm5JR_-HSv80o_pA' \
     -H 'Accept: application/json' \
     -F 'id=' \
     -F 'profileFile=@hello.jpg;type=image/jpeg' \

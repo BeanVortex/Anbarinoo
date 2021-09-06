@@ -1,0 +1,8 @@
+[source,bash]
+----
+$ echo '{"nameOf":"Me","payTo":"Other","isDebt":true,"isCheckedOut":false,"amount":115.56,"issuedAt":"2021-09-06T23:33:54.389616615","validTill":"2021-09-11T23:33:54.389628976"}' | http POST 'http://localhost:8080/api/user/financial/debt-demand/save/' \
+    'Content-Type:application/json' \
+    'Accept:application/json' \
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwMzQsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NDM0fQ.-7tBgtx9ENcJoAhmpKLkA0Ik6Ut5CD0g53kKSQ93aAM' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTAzNCwiZXhwIjoxNjMwOTU1MDk0fQ.ZXqmh__wy0-P53o41bLi2IYscyZrvI_rkOuqsqrjlIs'
+----

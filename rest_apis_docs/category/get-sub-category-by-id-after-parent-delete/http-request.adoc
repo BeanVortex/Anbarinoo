@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+GET /api/category/5/ HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwMzIsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NDMyfQ.LOcP6-H18Y4K8Gx0BBDc1k40sH8K7cXvFamRmmXEcfE
+access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTAzMiwiZXhwIjoxNjMwOTU1MDkyfQ.2aGufvawh94O8UvJQDzaYWQnTRW9mEi5rLo571G-sqQ
+Host: localhost:8080
+
+----
