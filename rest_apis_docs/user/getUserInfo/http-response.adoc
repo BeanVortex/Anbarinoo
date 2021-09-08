@@ -2,7 +2,7 @@
 ----
 HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 498
+Content-Length: 497
 
-{"id":2,"email":"email@mail.com","userName":"UpdatedUser n","provider":"LOCAL","enabled":true,"shopImage":"noImage.png","profileImage":"noProfile.jpeg","roles":["USER"],"createdAt":"2021-09-06T23:34:16.093041","updatedAt":"2021-09-06T23:34:16.907395","shopName":null,"address":"UpdatedAddress","description":"UpdatedDesc","debtOrDemand":[],"cheques":[],"categories":[],"username":"email@mail.com","accountNonExpired":true,"accountNonLocked":true,"credentialsNonExpired":true,"name":"UpdatedUser n"}
+{"id":2,"email":"email@mail.com","userName":"UpdatedUser n","provider":"LOCAL","enabled":true,"shopImage":"noImage.png","profileImage":"noProfile.jpeg","roles":["USER"],"createdAt":"2021-09-06T23:38:33.499941","updatedAt":"2021-09-06T23:38:34.29567","shopName":null,"address":"UpdatedAddress","description":"UpdatedDesc","debtOrDemand":[],"cheques":[],"categories":[],"name":"UpdatedUser n","accountNonExpired":true,"accountNonLocked":true,"credentialsNonExpired":true,"username":"email@mail.com"}
 ----

@@ -1,4 +1,4 @@
 [source,options="nowrap"]
 ----
-{"message":"You can't fetch another user's products","httpStatus":"FORBIDDEN","timestamp":"2021-09-06T23:34:14.804496472"}
+{"message":"You can't fetch another user's products","httpStatus":"FORBIDDEN","timestamp":"2021-09-06T23:38:31.756546411"}
 ----

@@ -2,6 +2,6 @@
 ----
 $ curl 'http://localhost:8080/api/user/financial/debt-demand/4/' -i -X GET \
     -H 'Accept: application/json' \
-    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwMzQsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NDM0fQ.-7tBgtx9ENcJoAhmpKLkA0Ik6Ut5CD0g53kKSQ93aAM' \
-    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTAzNCwiZXhwIjoxNjMwOTU1MDk0fQ.ZXqmh__wy0-P53o41bLi2IYscyZrvI_rkOuqsqrjlIs'
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUyODksInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5Njg5fQ.C-rjnZ2fUe8FBsKKRI1maLtPlIoQKHCJIDxAXB2y3ck' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTI4OSwiZXhwIjoxNjMwOTU1MzQ5fQ.mQ1DhwICsFr9AaCWnxzTv8LCaTiVpZ6UXUSUzTnQEXY'
 ----

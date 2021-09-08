@@ -1,4 +1,4 @@
 [source,options="nowrap"]
 ----
-{"id":2,"email":"email@mail.com","userName":"UpdatedUser n","provider":"LOCAL","enabled":true,"shopImage":"7028dc0c-330e-4cc7-8872-d97bc89888da.jpeg","profileImage":"a3748688-246c-4d8d-8a70-f7c9eb4659e3.jpeg","roles":["USER"],"createdAt":"2021-09-06T23:34:16.093041","updatedAt":"2021-09-06T23:34:16.883985056","shopName":null,"address":"UpdatedAddress","description":"UpdatedDesc","debtOrDemand":[],"cheques":[],"categories":[],"username":"email@mail.com","accountNonExpired":true,"accountNonLocked":true,"credentialsNonExpired":true,"name":"UpdatedUser n"}
+{"id":2,"email":"email@mail.com","userName":"UpdatedUser n","provider":"LOCAL","enabled":true,"shopImage":"9fbdce55-0b7c-41c6-a965-7ee328cf32d0.jpeg","profileImage":"bab8cc17-c2aa-4b98-9819-15b3d45eb065.jpeg","roles":["USER"],"createdAt":"2021-09-06T23:38:33.499941","updatedAt":"2021-09-06T23:38:34.272556011","shopName":null,"address":"UpdatedAddress","description":"UpdatedDesc","debtOrDemand":[],"cheques":[],"categories":[],"name":"UpdatedUser n","accountNonExpired":true,"accountNonLocked":true,"credentialsNonExpired":true,"username":"email@mail.com"}
 ----

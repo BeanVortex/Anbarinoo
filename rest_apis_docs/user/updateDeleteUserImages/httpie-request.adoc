@@ -1,13 +1,13 @@
 [source,bash]
 ----
 $ http --form PUT 'http://localhost:8080/api/user/update/delete-images/2/' \
-    'shopImage'@<(echo '0d532d5b-fd9c-4bcd-ab46-b9b2eabe8581.jpeg') \
-    'profileImage'@<(echo '076994dd-5ee8-4bb6-879f-c7530935cb4c.jpeg') \
+    'shopImage'@<(echo 'f0273a55-2f2d-4e08-81ab-6b99d40832fa.jpeg') \
+    'profileImage'@<(echo 'a4aaaba6-ff88-4a92-ad52-536863d249b6.jpeg') \
     'id'@<(echo '') \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwNTYsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzMjc2OTQ1Nn0.emwCI1OwRiwDDOMtdSrvK2GUzsIulZ9ZmA-o3QFhis0' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzA5NTUwNTYsImV4cCI6MTYzMDk1NTExNn0.pwn6672WcorXFIc328-PA6hj5CEUm5JR_-HSv80o_pA' \
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUzMTQsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzMjc2OTcxNH0.x6CjZCsqrHVrDWLyGAxNrLe-KU-gOA4vORLk7D7xY8s' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzA5NTUzMTQsImV4cCI6MTYzMDk1NTM3NH0.4OQ3NfQ6Cq6k58Gajqoq3Z6b67elvQDBe8BPTI3DMH4' \
     'Accept:application/json' \
-    'shopImage=0d532d5b-fd9c-4bcd-ab46-b9b2eabe8581.jpeg' \
-    'profileImage=076994dd-5ee8-4bb6-879f-c7530935cb4c.jpeg' \
+    'shopImage=f0273a55-2f2d-4e08-81ab-6b99d40832fa.jpeg' \
+    'profileImage=a4aaaba6-ff88-4a92-ad52-536863d249b6.jpeg' \
     'id='
 ----

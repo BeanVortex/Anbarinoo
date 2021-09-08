@@ -2,7 +2,7 @@
 ----
 HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 814
+Content-Length: 813
 
-{"content":[{"id":2,"email":"email@mail.com","userName":"UpdatedUser n","provider":"LOCAL","enabled":true,"shopImage":"noImage.png","profileImage":"noProfile.jpeg","roles":["USER"],"createdAt":"2021-09-06T23:34:16.093041","updatedAt":"2021-09-06T23:34:16.907395","shopName":null,"address":"UpdatedAddress","description":"UpdatedDesc","debtOrDemand":[],"cheques":[],"categories":[],"username":"email@mail.com","accountNonExpired":true,"accountNonLocked":true,"credentialsNonExpired":true,"name":"UpdatedUser n"}],"pageable":{"sort":{"sorted":false,"unsorted":true,"empty":true},"pageNumber":0,"pageSize":20,"offset":0,"paged":true,"unpaged":false},"totalPages":1,"totalElements":1,"last":true,"numberOfElements":1,"sort":{"sorted":false,"unsorted":true,"empty":true},"first":true,"number":0,"size":20,"empty":false}
+{"content":[{"id":2,"email":"email@mail.com","userName":"UpdatedUser n","provider":"LOCAL","enabled":true,"shopImage":"noImage.png","profileImage":"noProfile.jpeg","roles":["USER"],"createdAt":"2021-09-06T23:38:33.499941","updatedAt":"2021-09-06T23:38:34.29567","shopName":null,"address":"UpdatedAddress","description":"UpdatedDesc","debtOrDemand":[],"cheques":[],"categories":[],"name":"UpdatedUser n","accountNonExpired":true,"accountNonLocked":true,"credentialsNonExpired":true,"username":"email@mail.com"}],"pageable":{"sort":{"sorted":false,"unsorted":true,"empty":true},"offset":0,"pageNumber":0,"pageSize":20,"paged":true,"unpaged":false},"totalPages":1,"totalElements":1,"last":true,"size":20,"number":0,"sort":{"sorted":false,"unsorted":true,"empty":true},"numberOfElements":1,"first":true,"empty":false}
 ----

@@ -2,6 +2,6 @@
 ----
 $ curl 'http://localhost:8080/api/user/financial/cheque/4/' -i -X DELETE \
     -H 'Accept: application/json' \
-    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUwNTAsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NDUwfQ.JJUfGXWINgWlnErtcN8zhy2HGkqmUBCp41FvrKN3BQc' \
-    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTA1MCwiZXhwIjoxNjMwOTU1MTEwfQ.kx6tCB891lLO9v_DwbGUwiqk-ngcUYPi96kyi1YHOxM'
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUzMDYsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NzA2fQ.TUXlQvY4qxvGsELgn2ZpbOqnP9YC_34RS2BWO_GZBAY' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTMwNiwiZXhwIjoxNjMwOTU1MzY2fQ.DC2EMuu-f5_dmd1coDGxXmDepiENyI-0uuOQEODKX4o'
 ----

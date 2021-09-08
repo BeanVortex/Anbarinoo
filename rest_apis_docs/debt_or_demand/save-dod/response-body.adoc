@@ -1,4 +1,4 @@
 [source,options="nowrap"]
 ----
-{"id":4,"nameOf":"Me","payTo":"Other","isDebt":true,"isCheckedOut":false,"amount":115.56,"user":2,"issuedAt":"2021-09-06T23:33:54.389616615","validTill":"2021-09-11T23:33:54.389628976","createdAt":"2021-09-06T23:33:54.399381058","updatedAt":"2021-09-06T23:33:54.399398256"}
+{"id":4,"nameOf":"Me","payTo":"Other","isDebt":true,"isCheckedOut":false,"amount":115.56,"user":2,"issuedAt":"2021-09-06T23:38:09.869542379","validTill":"2021-09-11T23:38:09.869553616","createdAt":"2021-09-06T23:38:09.931853057","updatedAt":"2021-09-06T23:38:09.931869311"}
 ----

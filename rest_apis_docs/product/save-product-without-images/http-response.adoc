@@ -4,5 +4,5 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 Content-Length: 235
 
-{"id":9,"firstBuyId":10,"canUpdate":true,"name":"product2","description":"desc2","images":["noImage.png"],"price":10,"category":6,"totalCount":500,"createdAt":"2021-09-06T23:34:14.662956093","updatedAt":"2021-09-06T23:34:14.663298821"}
+{"id":9,"firstBuyId":10,"canUpdate":true,"name":"product2","description":"desc2","images":["noImage.png"],"price":10,"category":6,"totalCount":500,"createdAt":"2021-09-06T23:38:31.567367749","updatedAt":"2021-09-06T23:38:31.567710746"}
 ----
