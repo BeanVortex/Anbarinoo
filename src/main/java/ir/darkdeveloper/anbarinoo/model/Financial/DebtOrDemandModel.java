@@ -13,6 +13,7 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import ir.darkdeveloper.anbarinoo.model.UpdateModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.model.deserializers.DebtOrDemandDeserializer;
 import ir.darkdeveloper.anbarinoo.model.serializers.DebtOrDemandSerializer;
@@ -29,7 +30,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @JsonSerialize(using = DebtOrDemandSerializer.class)
 @AllArgsConstructor
 @NoArgsConstructor
-public class DebtOrDemandModel {
+public class DebtOrDemandModel implements UpdateModel<DebtOrDemandModel> {
 
     @Id
     @GeneratedValue
@@ -69,14 +70,15 @@ public class DebtOrDemandModel {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public void update(DebtOrDemandModel other) {
-        id = other.id != null || id == null ? other.id : id;
-        nameOf = other.nameOf != null || nameOf == null ? other.nameOf : nameOf;
-        payTo = other.payTo != null || payTo == null ? other.payTo : payTo;
-        isDebt = other.isDebt != null || isDebt == null ? other.isDebt : isDebt;
-        isCheckedOut = other.isCheckedOut != null || isCheckedOut == null ? other.isCheckedOut : isCheckedOut;
-        amount = other.amount != null || amount == null ? other.amount : amount;
-        issuedAt = other.issuedAt != null || issuedAt == null ? other.issuedAt : issuedAt;
-        validTill = other.validTill != null || validTill == null ? other.validTill : validTill;
+    @Override
+    public void update(DebtOrDemandModel model) {
+        id = model.id != null || id == null ? model.id : id;
+        nameOf = model.nameOf != null || nameOf == null ? model.nameOf : nameOf;
+        payTo = model.payTo != null || payTo == null ? model.payTo : payTo;
+        isDebt = model.isDebt != null || isDebt == null ? model.isDebt : isDebt;
+        isCheckedOut = model.isCheckedOut != null || isCheckedOut == null ? model.isCheckedOut : isCheckedOut;
+        amount = model.amount != null || amount == null ? model.amount : amount;
+        issuedAt = model.issuedAt != null || issuedAt == null ? model.issuedAt : issuedAt;
+        validTill = model.validTill != null || validTill == null ? model.validTill : validTill;
     }
 }

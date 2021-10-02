@@ -23,7 +23,7 @@ import java.util.*;
 @Table(name = "users")
 @JsonIgnoreProperties(value = "attributes")
 @ToString(exclude = {"categories"})
-public class UserModel implements UserDetails, OAuth2User {
+public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel> {
 
     @Id
     @GeneratedValue
@@ -172,7 +172,7 @@ public class UserModel implements UserDetails, OAuth2User {
         return userName;
     }
 
-    public void merge(UserModel other) {
+/*    public void merge(UserModel other) {
         id = other.id == null ? id : other.id;
         userName = other.userName == null ? userName : other.userName;
         password = other.password == null ? password : other.password;
@@ -187,19 +187,20 @@ public class UserModel implements UserDetails, OAuth2User {
         shopName = other.shopName == null ? shopName : other.shopName;
         address = other.address == null ? address : other.address;
         description = other.description == null ? description : other.description;
-    }
+    }*/
 
-    public void update(UserModel other) {
-        id = other.id != null || id == null ? other.id : id;
-        userName = other.userName != null || userName == null ? other.userName : userName;
-        provider = other.provider != null || provider == null ? other.provider : provider;
-        enabled = other.enabled != null || enabled == null ? other.enabled : enabled;
-        shopImage = other.shopImage != null || shopImage == null ? other.shopImage : shopImage;
-        profileImage = other.profileImage != null || profileImage == null ? other.profileImage : profileImage;
-        createdAt = other.createdAt != null || createdAt == null ? other.createdAt : createdAt;
-        updatedAt = other.updatedAt != null || updatedAt == null ? other.updatedAt : updatedAt;
-        shopName = other.shopName != null || shopName == null ? other.shopName : shopName;
-        address = other.address != null || address == null ? other.address : address;
-        description = other.description != null || description == null ? other.description : description;
+    @Override
+    public void update(UserModel model) {
+        id = model.id != null || id == null ? model.id : id;
+        userName = model.userName != null || userName == null ? model.userName : userName;
+        provider = model.provider != null || provider == null ? model.provider : provider;
+        enabled = model.enabled != null || enabled == null ? model.enabled : enabled;
+        shopImage = model.shopImage != null || shopImage == null ? model.shopImage : shopImage;
+        profileImage = model.profileImage != null || profileImage == null ? model.profileImage : profileImage;
+        createdAt = model.createdAt != null || createdAt == null ? model.createdAt : createdAt;
+        updatedAt = model.updatedAt != null || updatedAt == null ? model.updatedAt : updatedAt;
+        shopName = model.shopName != null || shopName == null ? model.shopName : shopName;
+        address = model.address != null || address == null ? model.address : address;
+        description = model.description != null || description == null ? model.description : description;
     }
 }

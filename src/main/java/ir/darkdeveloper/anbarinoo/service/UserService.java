@@ -163,6 +163,8 @@ public class UserService implements UserDetailsService {
             throw new DataExistsException("User exists!");
         } catch (EmailNotValidException e) {
             throw new EmailNotValidException(e.getLocalizedMessage());
+        } catch (PasswordException e) {
+            throw new PasswordException(e.getLocalizedMessage());
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
         }

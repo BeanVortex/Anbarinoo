@@ -161,7 +161,7 @@ public class UserUtils {
             throw new EmailNotValidException("Email is not verified! Check your emails");
 
         ioUtils.deleteUserImages(user);
-        for (var cat: user.getCategories())
+        for (var cat : user.getCategories())
             ioUtils.deleteProductImagesOfUser(cat.getProducts());
 
         refreshService.deleteTokenByUserId(user.getId());
@@ -206,7 +206,7 @@ public class UserUtils {
         var foundUser = repo.findUserById(id);
         if (foundUser.isPresent()) {
             ioUtils.updateUserImages(user, foundUser.get());
-            foundUser.get().merge(user);
+            foundUser.get().update(user);
             return foundUser.get();
         }
         throw new NoContentException("User not found");
@@ -231,10 +231,13 @@ public class UserUtils {
             if (rawPassRep.isBlank())
                 throw new PasswordException("Password repeat can't be empty");
 
-            if (!rawPass.equals(rawPassRep))
+            if (!rawPass.equals(rawPassRep)) {
                 throw new PasswordException("Passwords do not match");
+            }
+            return rawPass;
         }
-        return rawPass;
+        throw new PasswordException("Passwords are null");
+
     }
 
     private void sendEmail(UserModel user) {

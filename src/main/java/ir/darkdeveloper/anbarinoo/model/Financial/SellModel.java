@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
+import ir.darkdeveloper.anbarinoo.model.UpdateModel;
 import ir.darkdeveloper.anbarinoo.model.deserializers.SellDeserializer;
 import ir.darkdeveloper.anbarinoo.model.serializers.SellSerialize;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,7 @@ import java.time.LocalDateTime;
 @JsonSerialize(using = SellSerialize.class)
 @AllArgsConstructor
 @NoArgsConstructor
-public class SellModel {
+public class SellModel implements UpdateModel<SellModel> {
 
     @Id
     @GeneratedValue
@@ -54,9 +55,10 @@ public class SellModel {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public void update(SellModel other) {
-        count = other.count != null || count == null ? other.count : count;
-        price = other.price != null || price == null ? other.price : price;
-        tax = other.tax != null || tax == null ? other.tax : tax;
+    @Override
+    public void update(SellModel model) {
+        count = model.count != null || count == null ? model.count : count;
+        price = model.price != null || price == null ? model.price : price;
+        tax = model.tax != null || tax == null ? model.tax : tax;
     }
 }

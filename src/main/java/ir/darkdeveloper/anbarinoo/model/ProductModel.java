@@ -26,7 +26,7 @@ import lombok.Data;
 @ToString(exclude = "category")
 @EqualsAndHashCode(exclude = "category")
 @NoArgsConstructor
-public class ProductModel {
+public class ProductModel implements UpdateModel<ProductModel> {
 
     @Id
     @GeneratedValue
@@ -82,13 +82,14 @@ public class ProductModel {
         this.id = id;
     }
 
-    public void update(ProductModel other) {
-        id = other.id != null || id == null ? other.id : id;
-        name = other.name != null || name == null ? other.name : name;
-        price = other.price != null || price == null ? other.price : price;
-        description = other.description != null || description == null ? other.description : description;
-        category = other.category != null || category == null ? other.category : category;
-        totalCount = other.totalCount != null || totalCount == null ? other.totalCount : totalCount;
+    @Override
+    public void update(ProductModel model) {
+        id = model.id != null || id == null ? model.id : id;
+        name = model.name != null || name == null ? model.name : name;
+        price = model.price != null || price == null ? model.price : price;
+        description = model.description != null || description == null ? model.description : description;
+        category = model.category != null || category == null ? model.category : category;
+        totalCount = model.totalCount != null || totalCount == null ? model.totalCount : totalCount;
     }
 }
 

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import ir.darkdeveloper.anbarinoo.model.UpdateModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.model.deserializers.ChequeDeserializer;
 import ir.darkdeveloper.anbarinoo.model.serializers.ChequeSerializer;
@@ -26,7 +27,7 @@ import java.time.LocalDateTime;
 @JsonSerialize(using = ChequeSerializer.class)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChequeModel {
+public class ChequeModel implements UpdateModel<ChequeModel> {
 
     @Id
     @GeneratedValue
@@ -66,15 +67,16 @@ public class ChequeModel {
     private LocalDateTime updatedAt;
 
 
-    public void update(ChequeModel other) {
-        id = other.id != null || id == null ? other.id : id;
-        nameOf = other.nameOf != null || nameOf == null ? other.nameOf : nameOf;
-        payTo = other.payTo != null || payTo == null ? other.payTo : payTo;
-        amount = other.amount != null || amount == null ? other.amount : amount;
-        isDebt = other.isDebt != null || isDebt == null ? other.isDebt : isDebt;
-        isCheckedOut = other.isCheckedOut != null || isCheckedOut == null ? other.isCheckedOut : isCheckedOut;
-        issuedAt = other.issuedAt != null || issuedAt == null ? other.issuedAt : issuedAt;
-        validTill = other.validTill != null || validTill == null ? other.validTill : validTill;
+    @Override
+    public void update(ChequeModel mode) {
+        id = mode.id != null || id == null ? mode.id : id;
+        nameOf = mode.nameOf != null || nameOf == null ? mode.nameOf : nameOf;
+        payTo = mode.payTo != null || payTo == null ? mode.payTo : payTo;
+        amount = mode.amount != null || amount == null ? mode.amount : amount;
+        isDebt = mode.isDebt != null || isDebt == null ? mode.isDebt : isDebt;
+        isCheckedOut = mode.isCheckedOut != null || isCheckedOut == null ? mode.isCheckedOut : isCheckedOut;
+        issuedAt = mode.issuedAt != null || issuedAt == null ? mode.issuedAt : issuedAt;
+        validTill = mode.validTill != null || validTill == null ? mode.validTill : validTill;
     }
 
 }

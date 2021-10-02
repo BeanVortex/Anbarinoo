@@ -2,7 +2,7 @@
 ----
 HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 558
+Content-Length: 557
 
-{"id":2,"email":"email@mail.com","userName":"UpdatedUser n","provider":"LOCAL","enabled":true,"shopImage":"9fbdce55-0b7c-41c6-a965-7ee328cf32d0.jpeg","profileImage":"bab8cc17-c2aa-4b98-9819-15b3d45eb065.jpeg","roles":["USER"],"createdAt":"2021-09-06T23:38:33.499941","updatedAt":"2021-09-06T23:38:34.272556011","shopName":null,"address":"UpdatedAddress","description":"UpdatedDesc","debtOrDemand":[],"cheques":[],"categories":[],"name":"UpdatedUser n","accountNonExpired":true,"accountNonLocked":true,"credentialsNonExpired":true,"username":"email@mail.com"}
+{"id":2,"email":"email@mail.com","userName":"UpdatedUser n","provider":"LOCAL","enabled":true,"shopImage":"72870e8b-075d-41e1-86de-3a573a22a16b.jpeg","profileImage":"c34ad601-d623-4561-8550-8db1a68084f5.jpeg","roles":["USER"],"createdAt":"2021-10-02T20:34:51.300686","updatedAt":"2021-10-02T20:34:52.32977663","shopName":null,"address":"UpdatedAddress","description":"UpdatedDesc","debtOrDemand":[],"cheques":[],"categories":[],"name":"UpdatedUser n","username":"email@mail.com","accountNonExpired":true,"accountNonLocked":true,"credentialsNonExpired":true}
 ----
