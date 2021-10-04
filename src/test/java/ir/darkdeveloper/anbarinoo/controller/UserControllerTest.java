@@ -24,11 +24,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.http.Part;
 
-import java.io.ByteArrayInputStream;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
@@ -247,6 +244,23 @@ public record UserControllerTest(UserController controller,
 
     @Test
     @Order(7)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void getCurrentUserInfo() throws Exception {
+
+        mockMvc.perform(get("/api/user/", userId)
+                .header("refresh_token", signupRefreshToken)
+                .header("access_token", signupAccessToken)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.shopImage").value(is("noImage.png")))
+                .andExpect(jsonPath("$.profileImage").value(is("noProfile.jpeg")))
+                .andExpect(jsonPath("$.id").value(is(userId), Long.class));
+    }
+
+    @Test
+    @Order(8)
     @WithMockUser(authorities = "OP_ACCESS_ADMIN")
     void getAllUsers() throws Exception {
         mockMvc.perform(get("/api/user/all/")
@@ -263,7 +277,7 @@ public record UserControllerTest(UserController controller,
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     @WithMockUser(authorities = "OP_DELETE_USER")
     void deleteUser() throws Exception {
         mockMvc.perform(delete("/api/user/{id}/", userId)

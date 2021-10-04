@@ -1,11 +1,7 @@
 [source,bash]
 ----
-$ http --form PUT 'http://localhost:8080/api/user/update/images/2/' \
-    'id'@<(echo '') \
-    'profileFile'@'hello.jpg' \
-    'shopFile'@'hello.jpg' \
+$ http GET 'http://localhost:8080/api/user/' \
     'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzMzMjcxNTgsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzNTE0MTU1OH0.GIQP2TzzZP3xL__pPcOMzrYPMUhMiJ48l3nn05RKbyk' \
     'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzMzMjcxNTgsImV4cCI6MTYzMzMyNzIxOH0.orBvExTjxDUhr1MDGFMQjiuSLR2FSlWOHZ9_442JNcg' \
-    'Accept:application/json' \
-    'id='
+    'Accept:application/json'
 ----

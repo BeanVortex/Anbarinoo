@@ -206,6 +206,7 @@ public class UserUtils {
         var foundUser = repo.findUserById(id);
         if (foundUser.isPresent()) {
             ioUtils.updateUserImages(user, foundUser.get());
+            //changed merge to update
             foundUser.get().update(user);
             return foundUser.get();
         }

@@ -71,4 +71,9 @@ public class UserController {
     public UserModel getUserInfo(@PathVariable Long id, HttpServletRequest req) {
         return userService.getUserInfo(id, req);
     }
+
+    @GetMapping("/")
+    public UserModel getCurrentUserInfo(HttpServletRequest req) {
+        return userService.getCurrentUserInfo(req);
+    }
 }

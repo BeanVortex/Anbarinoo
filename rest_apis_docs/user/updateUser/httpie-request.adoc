@@ -5,8 +5,8 @@ $ http --form PUT 'http://localhost:8080/api/user/update/2/' \
     'userName'@<(echo 'UpdatedUser n') \
     'address'@<(echo 'UpdatedAddress') \
     'id'@<(echo '') \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzMxOTQyOTIsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzNTAwODY5Mn0.cippJWdSW8XT1f4ytdnGsAbgYJaQ7BMX73AJMgZbwWM' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzMxOTQyOTIsImV4cCI6MTYzMzE5NDM1Mn0.zFZihcOkMsOcCANWsSpzCGZSOASNIdYSj7Mn1q_nmF8' \
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzMzMjcxNTgsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzNTE0MTU1OH0.GIQP2TzzZP3xL__pPcOMzrYPMUhMiJ48l3nn05RKbyk' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzMzMjcxNTgsImV4cCI6MTYzMzMyNzIxOH0.orBvExTjxDUhr1MDGFMQjiuSLR2FSlWOHZ9_442JNcg' \
     'Accept:application/json' \
     'description=UpdatedDesc' \
     'userName=UpdatedUser n' \

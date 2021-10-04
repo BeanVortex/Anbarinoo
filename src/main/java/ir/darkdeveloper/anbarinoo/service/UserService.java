@@ -185,6 +185,21 @@ public class UserService implements UserDetailsService {
         throw new NoContentException("User does not exist");
     }
 
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
+    public UserModel getCurrentUserInfo(HttpServletRequest req) {
+        try {
+            var id = jwtUtils.getUserId(req.getHeader("refresh_token"));
+            var userOpt = repo.findUserById(id);
+            if (userOpt.isPresent()) {
+                return userOpt.get();
+            }
+        } catch (ForbiddenException f) {
+            throw new ForbiddenException(f.getLocalizedMessage());
+        }
+        throw new NoContentException("User does not exist");
+    }
+
+
     @Transactional
     public ResponseEntity<?> verifyUserEmail(String token) {
 

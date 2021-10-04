@@ -2,13 +2,13 @@
 ----
 $ curl 'http://localhost:8080/api/user/update/delete-images/2/' -i -X PUT \
     -H 'Content-Type: multipart/form-data' \
-    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzMxOTQyOTIsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzNTAwODY5Mn0.cippJWdSW8XT1f4ytdnGsAbgYJaQ7BMX73AJMgZbwWM' \
-    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzMxOTQyOTIsImV4cCI6MTYzMzE5NDM1Mn0.zFZihcOkMsOcCANWsSpzCGZSOASNIdYSj7Mn1q_nmF8' \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzMzMjcxNTgsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzNTE0MTU1OH0.GIQP2TzzZP3xL__pPcOMzrYPMUhMiJ48l3nn05RKbyk' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzMzMjcxNTgsImV4cCI6MTYzMzMyNzIxOH0.orBvExTjxDUhr1MDGFMQjiuSLR2FSlWOHZ9_442JNcg' \
     -H 'Accept: application/json' \
-    -F 'shopImage=27d8cc6a-c103-4397-8084-80037f74ea6c.jpeg' \
-    -F 'profileImage=e6f2890a-9c1b-44b3-9d04-b04b8454d000.jpeg' \
+    -F 'shopImage=b5cbe5bb-bf7c-4e5a-be04-03101bf59b3a.jpeg' \
+    -F 'profileImage=663f9ee7-a011-455f-8cad-2ccae9b952f3.jpeg' \
     -F 'id=' \
-    -F 'shopImage=27d8cc6a-c103-4397-8084-80037f74ea6c.jpeg' \
-    -F 'profileImage=e6f2890a-9c1b-44b3-9d04-b04b8454d000.jpeg' \
+    -F 'shopImage=b5cbe5bb-bf7c-4e5a-be04-03101bf59b3a.jpeg' \
+    -F 'profileImage=663f9ee7-a011-455f-8cad-2ccae9b952f3.jpeg' \
     -F 'id='
 ----
