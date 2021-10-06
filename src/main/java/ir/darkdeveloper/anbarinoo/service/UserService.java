@@ -186,10 +186,10 @@ public class UserService implements UserDetailsService {
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
-    public UserModel getCurrentUserInfo(HttpServletRequest req) {
+    public UserModel getSimpleCurrentUserInfo(HttpServletRequest req) {
         try {
             var id = jwtUtils.getUserId(req.getHeader("refresh_token"));
-            var userOpt = repo.findUserById(id);
+            var userOpt = repo.getSimpleUserInfo(id);
             if (userOpt.isPresent()) {
                 return userOpt.get();
             }

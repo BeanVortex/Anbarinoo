@@ -33,5 +33,10 @@ public interface UserRepo extends PagingAndSortingRepository<UserModel, Long> {
     @Query("UPDATE UserModel m SET m.enabled = true WHERE m.id = :id")
     void trueEnabledById(@Param("id") Long id);
 
+    @Query("SELECT new UserModel (model.id, model.email, model.userName, model.enabled, model.shopImage," +
+            " model.profileImage, model.shopName, model.createdAt, model.updatedAt, model.address," +
+            " model.description, model.provider)" +
+            " FROM UserModel as model WHERE model.id = :id")
+    Optional<UserModel> getSimpleUserInfo(@Param("id") Long id);
 
 }

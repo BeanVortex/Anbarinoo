@@ -1,7 +1,7 @@
 [source,bash]
 ----
-$ curl 'http://localhost:8080/api/user/' -i -X GET \
-    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzMzMjcxNTgsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzNTE0MTU1OH0.GIQP2TzzZP3xL__pPcOMzrYPMUhMiJ48l3nn05RKbyk' \
-    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzMzMjcxNTgsImV4cCI6MTYzMzMyNzIxOH0.orBvExTjxDUhr1MDGFMQjiuSLR2FSlWOHZ9_442JNcg' \
+$ curl 'http://localhost:8080/api/user/info/' -i -X GET \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzM1MDI1NTgsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzNTMxNjk1OH0.8FyIyjbjA6UkIRCRA0VwXJabTG1UvpChpCt_zt9In-Y' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzM1MDI1NTgsImV4cCI6MTYzMzUwMjYxOH0.T76wujj56EIrOcRbcTx-Fiiz03dTeZYVAEH3UTx0MmY' \
     -H 'Accept: application/json'
 ----

@@ -1,5 +1,6 @@
 package ir.darkdeveloper.anbarinoo.service;
 
+import ir.darkdeveloper.anbarinoo.model.Auth.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils;
@@ -176,6 +177,27 @@ public record UserServiceTest(UserService service,
 
     @Test
     @Order(7)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void getCurrentUserInfo() {
+        var model = service.getSimpleCurrentUserInfo(request);
+        assertThat(model.getId()).isNotNull();
+        assertThat(model.getUserName()).isEqualTo("user n");
+        assertThat(model.getEmail()).isEqualTo("email@mail.com");
+        assertThat(model.getShopImage()).isEqualTo("noImage.png");
+        assertThat(model.getProfileImage()).isEqualTo("noProfile.jpeg");
+        assertThat(model.getDescription()).isNotNull();
+        assertThat(model.getShopName()).isNotNull();
+        assertThat(model.getAddress()).isNotNull();
+        assertThat(model.getEnabled()).isEqualTo(true);
+        assertThat(model.getCreatedAt()).isNotNull();
+        assertThat(model.getUpdatedAt()).isNotNull();
+        assertThat(model.getProvider()).isEqualTo(AuthProvider.LOCAL);
+        System.out.println(model);
+    }
+
+
+    @Test
+    @Order(8)
     @WithMockUser(authorities = "OP_DELETE_USER")
     void deleteUser() {
         service.deleteUser(userId, request);
@@ -183,14 +205,14 @@ public record UserServiceTest(UserService service,
 
     @Test
     @WithMockUser(authorities = "OP_ACCESS_ROLE")
-    @Order(8)
+    @Order(9)
     void getRoles() {
         var roles = rolesService.getAllRoles();
         assertThat(roles.size()).isNotEqualTo(0);
     }
 
     @Test
-    @Order(9)
+    @Order(10)
     void verifyUserEmail() {
     }
 

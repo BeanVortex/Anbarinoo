@@ -72,8 +72,8 @@ public class UserController {
         return userService.getUserInfo(id, req);
     }
 
-    @GetMapping("/")
-    public UserModel getCurrentUserInfo(HttpServletRequest req) {
-        return userService.getCurrentUserInfo(req);
+    @GetMapping("/info/")
+    public UserModel getSimpleCurrentUserInfo(HttpServletRequest req) {
+        return userService.getSimpleCurrentUserInfo(req);
     }
 }

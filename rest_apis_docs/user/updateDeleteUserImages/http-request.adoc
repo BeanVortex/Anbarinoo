@@ -2,19 +2,19 @@
 ----
 PUT /api/user/update/delete-images/2/ HTTP/1.1
 Content-Type: multipart/form-data; boundary=6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
-refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzMzMjcxNTgsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzNTE0MTU1OH0.GIQP2TzzZP3xL__pPcOMzrYPMUhMiJ48l3nn05RKbyk
-access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzMzMjcxNTgsImV4cCI6MTYzMzMyNzIxOH0.orBvExTjxDUhr1MDGFMQjiuSLR2FSlWOHZ9_442JNcg
+refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzM1MDI1NTgsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzNTMxNjk1OH0.8FyIyjbjA6UkIRCRA0VwXJabTG1UvpChpCt_zt9In-Y
+access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzM1MDI1NTgsImV4cCI6MTYzMzUwMjYxOH0.T76wujj56EIrOcRbcTx-Fiiz03dTeZYVAEH3UTx0MmY
 Accept: application/json
 Host: localhost:8080
 
 --6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
 Content-Disposition: form-data; name=shopImage
 
-b5cbe5bb-bf7c-4e5a-be04-03101bf59b3a.jpeg
+ad80330b-f59f-4e19-9937-c5c49385a362.jpeg
 --6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
 Content-Disposition: form-data; name=profileImage
 
-663f9ee7-a011-455f-8cad-2ccae9b952f3.jpeg
+4d2e8656-fa44-4d05-8453-0ce6bd688c6d.jpeg
 --6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
 Content-Disposition: form-data; name=id
 
@@ -22,11 +22,11 @@ Content-Disposition: form-data; name=id
 --6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
 Content-Disposition: form-data; name=shopImage
 
-b5cbe5bb-bf7c-4e5a-be04-03101bf59b3a.jpeg
+ad80330b-f59f-4e19-9937-c5c49385a362.jpeg
 --6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
 Content-Disposition: form-data; name=profileImage
 
-663f9ee7-a011-455f-8cad-2ccae9b952f3.jpeg
+4d2e8656-fa44-4d05-8453-0ce6bd688c6d.jpeg
 --6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
 Content-Disposition: form-data; name=id
 

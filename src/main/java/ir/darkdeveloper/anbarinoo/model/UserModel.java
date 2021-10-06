@@ -22,7 +22,7 @@ import java.util.*;
 @Entity
 @Table(name = "users")
 @JsonIgnoreProperties(value = "attributes")
-@ToString(exclude = {"categories"})
+@ToString(exclude = {"categories"}, doNotUseGetters = true)
 public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel> {
 
     @Id
@@ -103,6 +103,24 @@ public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel
     // For saving products I need it
     public UserModel(Long id) {
         this.id = id;
+    }
+
+
+    public UserModel(Long id, String email, String userName, Boolean enabled, String shopImage,
+                     String profileImage, String shopName, LocalDateTime createdAt, LocalDateTime updatedAt,
+                     String address, String description, AuthProvider provider) {
+        this.id = id;
+        this.email = email;
+        this.userName = userName;
+        this.enabled = enabled;
+        this.shopImage = shopImage;
+        this.profileImage = profileImage;
+        this.shopName = shopName;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.address = address;
+        this.description = description;
+        this.provider = provider;
     }
 
     public UserModel() {

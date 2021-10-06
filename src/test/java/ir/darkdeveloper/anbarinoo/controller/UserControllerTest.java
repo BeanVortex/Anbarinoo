@@ -245,9 +245,9 @@ public record UserControllerTest(UserController controller,
     @Test
     @Order(7)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getCurrentUserInfo() throws Exception {
+    void getSimpleCurrentUserInfo() throws Exception {
 
-        mockMvc.perform(get("/api/user/", userId)
+        mockMvc.perform(get("/api/user/info/", userId)
                 .header("refresh_token", signupRefreshToken)
                 .header("access_token", signupAccessToken)
                 .accept(MediaType.APPLICATION_JSON))
