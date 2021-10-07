@@ -98,11 +98,11 @@ public class UserUtils {
 
     public void setupHeader(HttpServletResponse response, String accessToken, String refreshToken) {
         var refreshDate = TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
-        var accessDate = TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
+//        var accessDate = TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
         response.addHeader("refresh_token", refreshToken);
         response.addHeader("access_token", accessToken);
         response.addHeader("refresh_expiration", refreshDate);
-        response.addHeader("access_expiration", accessDate);
+//        response.addHeader("access_expiration", accessDate);
     }
 
     public void signupValidation(UserModel user, HttpServletResponse response) throws Exception {

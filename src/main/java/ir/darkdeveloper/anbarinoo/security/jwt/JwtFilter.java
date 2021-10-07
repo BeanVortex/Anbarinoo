@@ -85,9 +85,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 refreshModel.setId(refreshService.getIdByUserId(userId));
                 // db query
                 refreshService.saveToken(refreshModel);
-                var accessExpiration = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(newAccessToken));
-
-                response.addHeader("access_expiration", accessExpiration);
                 response.addHeader("access_token", newAccessToken);
             } else
                 //if stored token is not equal with user send token, it will return 403

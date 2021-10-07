@@ -47,7 +47,8 @@ public class JwtUtils {
     // generates a unique jwt token
     public String generateRefreshToken(String username, Long userId) {
         // expires in 21 days
-        Date date = new Date(System.currentTimeMillis() + 60 * 60 * 24 * 7 * 3 * 1000);
+        var expireIn = (long) 60 * 60 * 24 * 7 * 3 * 1000;
+        var date = new Date(System.currentTimeMillis() + expireIn);
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .setIssuedAt(new Date())
