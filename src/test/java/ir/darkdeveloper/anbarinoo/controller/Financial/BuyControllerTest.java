@@ -12,7 +12,7 @@ import ir.darkdeveloper.anbarinoo.service.Financial.FinancialService;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import ir.darkdeveloper.anbarinoo.util.UserUtils;
+import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -365,8 +365,8 @@ public record BuyControllerTest(UserService userService,
 
         refresh = jwtUtils.generateRefreshToken(email, userId);
         access = jwtUtils.generateAccessToken(email);
-        var refreshDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refresh));
-        var accessDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(access));
+        var refreshDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refresh));
+        var accessDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(access));
         headers.put("refresh_token", refresh);
         headers.put("access_token", access);
         headers.put("refresh_expiration", refreshDate);

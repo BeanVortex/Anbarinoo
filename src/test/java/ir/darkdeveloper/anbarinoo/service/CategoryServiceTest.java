@@ -3,7 +3,7 @@ package ir.darkdeveloper.anbarinoo.service;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import ir.darkdeveloper.anbarinoo.util.UserUtils;
+import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,8 +139,8 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
 
         String refreshToken = jwtUtils.generateRefreshToken(user.getEmail(), user.getId());
         String accessToken = jwtUtils.generateAccessToken(user.getEmail());
-        var refreshDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
-        var accessDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
+        var refreshDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
+        var accessDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
         headers.put("refresh_token", refreshToken);
         headers.put("access_token", accessToken);
         headers.put("refresh_expiration", refreshDate);

@@ -6,7 +6,8 @@ import ir.darkdeveloper.anbarinoo.repository.UserRepo;
 import ir.darkdeveloper.anbarinoo.security.jwt.JwtAuth;
 import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import ir.darkdeveloper.anbarinoo.util.UserUtils;
+import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
+import ir.darkdeveloper.anbarinoo.util.UserUtils.Operations;
 import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -31,19 +32,21 @@ import java.time.LocalDateTime;
 public class UserService implements UserDetailsService {
 
     private final UserRepo repo;
-    private final UserUtils userUtils;
+    private final UserAuthUtils userAuthUtils;
+    private final Operations userOP;
     private final AdminUserProperties adminUser;
     private final VerificationService verificationService;
     private final JwtUtils jwtUtils;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userUtils.loadUserByUsername(username);
+        return userAuthUtils.loadUserByUsername(username);
     }
 
 
     /**
-     * #model.getId() == null should be null. if wasn't other users can change other users data due to implementation of this method!!
+     * #model.getId() == null should be null. if wasn't other users can change other users data due to
+     * implementation of this method!!
      */
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_EDIT_USER') && #id != null")
@@ -51,7 +54,7 @@ public class UserService implements UserDetailsService {
         try {
             if (model.getId() != null) throw new BadRequestException("User id should null, can't update");
             checkUserIsSameUserForRequest(id, req, "update");
-            var updatedUser = userUtils.updateUser(model, id);
+            var updatedUser = userOP.updateUser(model, id);
             return repo.save(updatedUser);
         } catch (BadRequestException n) {
             throw new BadRequestException(n.getLocalizedMessage());
@@ -75,7 +78,7 @@ public class UserService implements UserDetailsService {
         try {
             if (user.getId() != null) throw new BadRequestException("User id should null, can't update");
             checkUserIsSameUserForRequest(id, req, "update images");
-            var updatedUser = userUtils.updateUserImages(user, id);
+            var updatedUser = userOP.updateUserImages(user, id);
             return repo.save(updatedUser);
         } catch (BadRequestException n) {
             throw new BadRequestException(n.getLocalizedMessage());
@@ -101,7 +104,7 @@ public class UserService implements UserDetailsService {
         try {
             if (user.getId() != null) throw new BadRequestException("User id should null, can't update");
             checkUserIsSameUserForRequest(id, req, "delete images");
-            var updatedUser = userUtils.updateDeleteUserImages(user, id);
+            var updatedUser = userOP.updateDeleteUserImages(user, id);
             return repo.save(updatedUser);
         } catch (BadRequestException n) {
             throw new BadRequestException(n.getLocalizedMessage());
@@ -122,7 +125,7 @@ public class UserService implements UserDetailsService {
             var userOpt = repo.findById(id);
             if (userOpt.isPresent()) {
                 checkUserIsSameUserForRequest(userOpt.get().getId(), req, "delete");
-                userUtils.deleteUser(userOpt.get());
+                userOP.deleteUser(userOpt.get());
                 return new ResponseEntity<>("Successfully deleted user", HttpStatus.OK);
             }
         } catch (NotFoundException n) {
@@ -144,9 +147,9 @@ public class UserService implements UserDetailsService {
     public ResponseEntity<?> loginUser(JwtAuth model, HttpServletResponse response) {
 
         if (model.getUsername().equals(adminUser.getUsername()))
-            userUtils.authenticateUser(model, null, null, response);
+            userAuthUtils.authenticateUser(model, null, null, response);
         else
-            userUtils.authenticateUser(model, userUtils.getUserIdByUsernameOrEmail(model.getUsername()), null,
+            userAuthUtils.authenticateUser(model, userAuthUtils.getUserIdByUsernameOrEmail(model.getUsername()), null,
                     response);
         return new ResponseEntity<>(repo.findByEmailOrUsername(model.getUsername()), HttpStatus.OK);
 
@@ -157,7 +160,7 @@ public class UserService implements UserDetailsService {
             "|| authentication.name.equals('anonymousUser')")
     public ResponseEntity<?> signUpUser(UserModel model, HttpServletResponse response) throws Exception {
         try {
-            userUtils.signupValidation(model, response);
+            userAuthUtils.signup(model, response);
             return new ResponseEntity<>(repo.findByEmailOrUsername(model.getUsername()), HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             throw new DataExistsException("User exists!");
