@@ -1,8 +1,8 @@
 [source,http,options="nowrap"]
 ----
 GET /api/user/2/ HTTP/1.1
-refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzM4OTc2OTUsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzNTcxMjA5NX0.cYgLBx-E4T-F038QLB0nCUTbkp84oOdlazXzvZiLZxI
-access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzM4OTc2OTUsImV4cCI6MTYzMzg5Nzc1NX0.ti4ZD6o3tvHldubtH_0IvWo_TMNfCZf-XVY81QUKYNQ
+refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzM4OTc5MzMsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzNTcxMjMzM30.JzjFkvLruNvkWVfa-mO71Gg_hRtuNClPyBU9tua9nq0
+access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzM4OTc5MzMsImV4cCI6MTYzMzg5Nzk5M30._A9G-PJNHIXKcS1sBzMEA6F_81ZTYYlm_H8-tPzRVPI
 Accept: application/json
 Host: localhost:8080
 
