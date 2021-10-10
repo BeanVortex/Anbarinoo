@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -20,21 +21,17 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 import ir.darkdeveloper.anbarinoo.service.RefreshService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import ir.darkdeveloper.anbarinoo.util.UserUtils;
+import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 
 @Service
+@AllArgsConstructor(onConstructor = @__(@Lazy))
 public class JwtFilter extends OncePerRequestFilter {
 
+    @Lazy
     private final JwtUtils jwtUtils;
-    private final UserUtils userUtils;
+    private final UserAuthUtils userAuthUtils;
     private final RefreshService refreshService;
 
-    @Autowired
-    public JwtFilter(@Lazy JwtUtils jwtUtils, @Lazy UserUtils userUtils, RefreshService refreshService) {
-        this.jwtUtils = jwtUtils;
-        this.userUtils = userUtils;
-        this.refreshService = refreshService;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain)
@@ -59,7 +56,7 @@ public class JwtFilter extends OncePerRequestFilter {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (username != null && auth == null) {
             //db query
-            UserDetails userDetails = userUtils.loadUserByUsername(username);
+            UserDetails userDetails = userAuthUtils.loadUserByUsername(username);
             UsernamePasswordAuthenticationToken upToken = new UsernamePasswordAuthenticationToken(userDetails, null,
                     userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(upToken);

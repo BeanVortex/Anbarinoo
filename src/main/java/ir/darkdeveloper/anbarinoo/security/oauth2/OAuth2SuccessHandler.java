@@ -1,47 +1,39 @@
 package ir.darkdeveloper.anbarinoo.security.oauth2;
 
-import static ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2RequestRepo.REDIRECT_URI_PARAM_COOKIE_NAME;
-
-import java.io.IOException;
-import java.net.URI;
-import java.util.Optional;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import ir.darkdeveloper.anbarinoo.util.UserUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-import org.springframework.stereotype.Component;
-
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.CookieUtils;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
+import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
+import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Optional;
+
+import static ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2RequestRepo.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Component
+@AllArgsConstructor(onConstructor = @__(@Lazy))
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
+    @Lazy
     private final JwtUtils jwtUtils;
-    private final OAuth2RequestRepo oAuth2RequestRepo;
+    @Lazy
     private final UserService userService;
+    @Lazy
+    private final UserAuthUtils userAuthUtils;
     private final OAuth2Properties oAuth2Properties;
-    private final UserUtils userUtils;
+    private final OAuth2RequestRepo oAuth2RequestRepo;
 
-    @Autowired
-    public OAuth2SuccessHandler(@Lazy JwtUtils jwtUtils, OAuth2RequestRepo oAuth2RequestRepo,
-                                @Lazy UserService userService, OAuth2Properties oAuth2Properties,
-                                @Lazy UserUtils userUtils) {
-        this.jwtUtils = jwtUtils;
-        this.oAuth2RequestRepo = oAuth2RequestRepo;
-        this.userService = userService;
-        this.oAuth2Properties = oAuth2Properties;
-        this.userUtils = userUtils;
-    }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -81,7 +73,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String refreshToken = jwtUtils.generateRefreshToken(user.getEmail(), user.getId());
         String accessToken = jwtUtils.generateAccessToken(user.getEmail());
 
-        userUtils.setupHeader(response, accessToken, refreshToken);
+        userAuthUtils.setupHeader(response, accessToken, refreshToken);
     }
 
     private void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {

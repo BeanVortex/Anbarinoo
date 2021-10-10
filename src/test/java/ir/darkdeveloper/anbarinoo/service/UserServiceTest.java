@@ -3,7 +3,7 @@ package ir.darkdeveloper.anbarinoo.service;
 import ir.darkdeveloper.anbarinoo.model.Auth.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import ir.darkdeveloper.anbarinoo.util.UserUtils;
+import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,8 +87,8 @@ public record UserServiceTest(UserService service,
                 "Hello, World!".getBytes());
         user.setProfileFile(file1);
         user.setShopFile(file2);
-        user.setPassword("pass1");
-        user.setPasswordRepeat("pass1");
+        user.setPassword("pass12B~");
+        user.setPasswordRepeat("pass12B~");
         service.signUpUser(user, response);
         request = setUpHeader(user);
         userId = user.getId();
@@ -115,12 +115,12 @@ public record UserServiceTest(UserService service,
     void updateUserWithKeepImagesAndNewPasswords() {
         var fetchedUser = service.getUserInfo(userId, request);
         var user = new UserModel();
-        user.setPrevPassword("pass1");
-        user.setPassword("pass4321");
-        user.setPasswordRepeat("pass4321");
+        user.setPrevPassword("pass12B~");
+        user.setPassword("pass4321B~");
+        user.setPasswordRepeat("pass4321B~");
         service.updateUser(user, userId, request);
         var fetchedUser2 = service.getUserInfo(userId, request);
-        assertThat(encoder.matches("pass4321", fetchedUser2.getPassword())).isTrue();
+        assertThat(encoder.matches("pass4321B~", fetchedUser2.getPassword())).isTrue();
         assertThat(fetchedUser2.getShopImage()).isEqualTo(fetchedUser.getShopImage());
         assertThat(fetchedUser2.getProfileImage()).isEqualTo(fetchedUser.getProfileImage());
     }
@@ -169,7 +169,7 @@ public record UserServiceTest(UserService service,
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void getUserInfo() {
         var model = service.getUserInfo(userId, request);
-        assertThat(encoder.matches("pass4321", model.getPassword())).isTrue();
+        assertThat(encoder.matches("pass4321B~", model.getPassword())).isTrue();
         assertThat(model.getEmail()).isEqualTo("email@mail.com");
         assertThat(model.getShopImage()).isEqualTo("noImage.png");
         assertThat(model.getProfileImage()).isEqualTo("noProfile.jpeg");
@@ -225,8 +225,8 @@ public record UserServiceTest(UserService service,
 
         String refreshToken = jwtUtils.generateRefreshToken(user.getEmail(), user.getId());
         String accessToken = jwtUtils.generateAccessToken(user.getEmail());
-        var refreshDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
-        var accessDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
+        var refreshDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
+        var accessDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
         headers.put("refresh_token", refreshToken);
         headers.put("access_token", accessToken);
         headers.put("refresh_expiration", refreshDate);

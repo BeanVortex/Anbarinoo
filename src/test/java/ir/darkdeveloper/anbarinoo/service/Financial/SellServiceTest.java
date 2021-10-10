@@ -10,7 +10,7 @@ import ir.darkdeveloper.anbarinoo.service.CategoryService;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import ir.darkdeveloper.anbarinoo.util.UserUtils;
+import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -195,8 +195,8 @@ public record SellServiceTest(UserService userService,
 
         String refreshToken = jwtUtils.generateRefreshToken(email, userId);
         String accessToken = jwtUtils.generateAccessToken(email);
-        var refreshDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
-        var accessDate = UserUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
+        var refreshDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
+        var accessDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
         headers.put("refresh_token", refreshToken);
         headers.put("access_token", accessToken);
         headers.put("refresh_expiration", refreshDate);
