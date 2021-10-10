@@ -24,11 +24,11 @@ address
 --6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
 Content-Disposition: form-data; name=passwordRepeat
 
-pass1
+pass12B!
 --6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
 Content-Disposition: form-data; name=password
 
-pass1
+pass12B!
 --6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
 Content-Disposition: form-data; name=email
 
@@ -48,11 +48,11 @@ address
 --6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
 Content-Disposition: form-data; name=passwordRepeat
 
-pass1
+pass12B!
 --6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
 Content-Disposition: form-data; name=password
 
-pass1
+pass12B!
 --6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
 Content-Disposition: form-data; name=profileFile; filename=hello.jpg
 Content-Type: image/jpeg

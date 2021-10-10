@@ -7,14 +7,14 @@ $ curl 'http://localhost:8080/api/user/signup/' -i -X POST \
     -F 'description=desc' \
     -F 'userName=user n' \
     -F 'address=address' \
-    -F 'passwordRepeat=pass1' \
-    -F 'password=pass1' \
+    -F 'passwordRepeat=pass12B!' \
+    -F 'password=pass12B!' \
     -F 'profileFile=@hello.jpg;type=image/jpeg' \
     -F 'shopFile=@hello.jpg;type=image/jpeg' \
     -F 'email=email@mail.com' \
     -F 'description=desc' \
     -F 'userName=user n' \
     -F 'address=address' \
-    -F 'passwordRepeat=pass1' \
-    -F 'password=pass1'
+    -F 'passwordRepeat=pass12B!' \
+    -F 'password=pass12B!'
 ----

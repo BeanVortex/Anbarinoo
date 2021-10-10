@@ -4,8 +4,8 @@ $ http --form PUT 'http://localhost:8080/api/user/update/images/2/' \
     'id'@<(echo '') \
     'profileFile'@'hello.jpg' \
     'shopFile'@'hello.jpg' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzM1MDI1NTgsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzNTMxNjk1OH0.8FyIyjbjA6UkIRCRA0VwXJabTG1UvpChpCt_zt9In-Y' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzM1MDI1NTgsImV4cCI6MTYzMzUwMjYxOH0.T76wujj56EIrOcRbcTx-Fiiz03dTeZYVAEH3UTx0MmY' \
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzM4OTc2OTUsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzNTcxMjA5NX0.cYgLBx-E4T-F038QLB0nCUTbkp84oOdlazXzvZiLZxI' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzM4OTc2OTUsImV4cCI6MTYzMzg5Nzc1NX0.ti4ZD6o3tvHldubtH_0IvWo_TMNfCZf-XVY81QUKYNQ' \
     'Accept:application/json' \
     'id='
 ----

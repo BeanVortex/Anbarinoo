@@ -77,8 +77,8 @@ public record UserControllerTest(UserController controller,
         var address = new MockPart("address", "address".getBytes());
         var des = new MockPart("description", "desc".getBytes());
         var username = new MockPart("userName", "user n".getBytes());
-        var password = new MockPart("password", "pass1".getBytes());
-        var passwordRepeat = new MockPart("passwordRepeat", "pass1".getBytes());
+        var password = new MockPart("password", "pass12B!".getBytes());
+        var passwordRepeat = new MockPart("passwordRepeat", "pass12B!".getBytes());
         var email = new MockPart("email", "email@mail.com".getBytes());
         Part[] parts = {email, des, username, address, passwordRepeat, password};
         var file1 = new MockMultipartFile("profileFile", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
@@ -113,7 +113,7 @@ public record UserControllerTest(UserController controller,
     void loginUser() throws Exception {
         var auth = new JwtAuth();
         auth.setUsername("user n");
-        auth.setPassword("pass1");
+        auth.setPassword("pass12B!");
         System.out.println(mapToJson(auth));
         mockMvc.perform(post("/api/user/login/")
                 .contentType(MediaType.APPLICATION_JSON)

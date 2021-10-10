@@ -28,7 +28,6 @@ public class Operations {
     private final UserRepo repo;
     private final Validations validations;
 
-
     public void deleteUser(UserModel user) throws IOException {
         if (!user.isEnabled())
             throw new EmailNotValidException("Email is not verified! Check your emails");

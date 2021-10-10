@@ -1,12 +1,7 @@
 [source,bash]
 ----
-$ curl 'http://localhost:8080/api/user/update/images/2/' -i -X PUT \
-    -H 'Content-Type: multipart/form-data' \
+$ curl 'http://localhost:8080/api/user/info/' -i -X GET \
     -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzM4OTc2OTUsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzNTcxMjA5NX0.cYgLBx-E4T-F038QLB0nCUTbkp84oOdlazXzvZiLZxI' \
     -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzM4OTc2OTUsImV4cCI6MTYzMzg5Nzc1NX0.ti4ZD6o3tvHldubtH_0IvWo_TMNfCZf-XVY81QUKYNQ' \
-    -H 'Accept: application/json' \
-    -F 'id=' \
-    -F 'profileFile=@hello.jpg;type=image/jpeg' \
-    -F 'shopFile=@hello.jpg;type=image/jpeg' \
-    -F 'id='
+    -H 'Accept: application/json'
 ----

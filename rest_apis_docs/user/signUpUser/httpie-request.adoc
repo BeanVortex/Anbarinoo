@@ -5,8 +5,8 @@ $ http --form POST 'http://localhost:8080/api/user/signup/' \
     'description'@<(echo 'desc') \
     'userName'@<(echo 'user n') \
     'address'@<(echo 'address') \
-    'passwordRepeat'@<(echo 'pass1') \
-    'password'@<(echo 'pass1') \
+    'passwordRepeat'@<(echo 'pass12B!') \
+    'password'@<(echo 'pass12B!') \
     'profileFile'@'hello.jpg' \
     'shopFile'@'hello.jpg' \
     'Accept:application/json' \
@@ -14,6 +14,6 @@ $ http --form POST 'http://localhost:8080/api/user/signup/' \
     'description=desc' \
     'userName=user n' \
     'address=address' \
-    'passwordRepeat=pass1' \
-    'password=pass1'
+    'passwordRepeat=pass12B!' \
+    'password=pass12B!'
 ----
