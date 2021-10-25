@@ -53,10 +53,10 @@ public class ProductController {
         return ResponseEntity.ok().body(service.getProduct(id, request));
     }
 
-    @GetMapping("/user/{id}/")
-    public ResponseEntity<?> getOneUserProducts(@PathVariable("id") Long userId, Pageable pageable,
+    @GetMapping("/user/")
+    public ResponseEntity<?> getAllProducts(Pageable pageable,
                                                 HttpServletRequest request) {
-        return ResponseEntity.ok().body(service.getOneUserProducts(userId, pageable, request));
+        return ResponseEntity.ok().body(service.getAllProducts(pageable, request));
     }
 
     @DeleteMapping("/{id}/")

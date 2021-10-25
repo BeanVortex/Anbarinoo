@@ -60,8 +60,8 @@ public record ChequeServiceTest(ChequeService chequeService,
         user.setEmail("email@mail.com");
         user.setAddress("address");
         user.setDescription("desc");
-        user.setPassword("pass1");
-        user.setPasswordRepeat("pass1");
+        user.setPassword("pass12P+");
+        user.setPasswordRepeat("pass12P+");
         user.setEnabled(false);
         var response = mock(HttpServletResponse.class);
         userService.signUpUser(user, response);

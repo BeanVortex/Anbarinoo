@@ -88,8 +88,8 @@ public record CategoryControllerTest(UserService userService,
         user.setAddress("address");
         user.setDescription("desc");
         user.setUserName("user n");
-        user.setPassword("pass1");
-        user.setPasswordRepeat("pass1");
+        user.setPassword("pass12P+");
+        user.setPasswordRepeat("pass12P+");
         user.setEnabled(true);
         userService.signUpUser(user, response);
         userId = user.getId();
@@ -161,8 +161,8 @@ public record CategoryControllerTest(UserService userService,
     @Test
     @Order(5)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getCategoriesByUserId() throws Exception {
-        mockMvc.perform(get("/api/category/user/{userId}/", userId)
+    void getCategoriesByUser() throws Exception {
+        mockMvc.perform(get("/api/category/user/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .header("refresh_token", request.getHeader("refresh_token"))

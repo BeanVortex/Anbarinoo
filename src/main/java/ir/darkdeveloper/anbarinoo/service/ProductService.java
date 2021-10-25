@@ -153,9 +153,9 @@ public class ProductService {
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public Page<ProductModel> getOneUserProducts(Long userId, Pageable pageable, HttpServletRequest req) {
+    public Page<ProductModel> getAllProducts(Pageable pageable, HttpServletRequest req) {
         try {
-            productUtils.checkUserIsSameUserForRequest(userId, req, "fetch");
+            var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
             return repo.findAllByCategoryUserId(userId, pageable);
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());

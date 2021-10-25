@@ -2,7 +2,7 @@
 ----
 $ http GET 'http://localhost:8080/api/category/products/sell/8/' \
     'Content-Type:application/json' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUyOTEsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NjkxfQ.DTuWiBCK0-X_sY0YE4TLJ1j33-UTsYm9oBJZGtbbxy0' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTI5MSwiZXhwIjoxNjMwOTU1MzUxfQ.AgMBaOc5f6GA3IjiUMY58fFhKUlVbvgDSPQEkAHL_eQ' \
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzUxNDIzODUsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM2OTU2Nzg1fQ.lZe8ROEDRdmXolP3SuSl-EBU2Xhnl-8vdL08M1fJ3nE' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNTE0MjM4NSwiZXhwIjoxNjM1MTQyNDQ1fQ.oIEVsO__1UoKoH2Um3P8TKv9szoxZLdTKXOkkQksPP4' \
     'Accept:application/json'
 ----

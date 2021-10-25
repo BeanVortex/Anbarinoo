@@ -1,16 +1,19 @@
 package ir.darkdeveloper.anbarinoo.controller;
 
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.service.CategoryService;
-
-import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/category")
@@ -35,9 +38,9 @@ public class CategoryController {
     }
 
 
-    @GetMapping("/user/{id}/")
-    public ResponseEntity<?> getCategoriesByUserId(@PathVariable Long id, HttpServletRequest request) {
-        return ResponseEntity.ok().body(service.getCategoriesByUserId(id, request));
+    @GetMapping("/user/")
+    public ResponseEntity<?> getCategoriesByUserId( HttpServletRequest request) {
+        return ResponseEntity.ok().body(service.getCategoriesByUser(request));
     }
 
     @GetMapping("/{id}/")

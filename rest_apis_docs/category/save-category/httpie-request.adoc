@@ -3,6 +3,6 @@
 $ echo '{"id":null,"name":"Electronics","user":null,"parent":null,"children":[]}' | http POST 'http://localhost:8080/api/category/save/' \
     'Content-Type:application/json' \
     'Accept:application/json' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUyODcsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5Njg3fQ.xrBu0yrbtGJIwkZz_54YYQPq4J9pb8gx5vE6-LmpsHk' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTI4NywiZXhwIjoxNjMwOTU1MzQ3fQ.7PvICbxBvDprKc3isOWpqsqd1SXM978D2sfX4Sc9etc'
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzUxNDIzNjMsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM2OTU2NzYzfQ.0gzygnVS5r89CSQxEew2R-Co5GcoofdA497vChjfg20' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNTE0MjM2MywiZXhwIjoxNjM1MTQyNDIzfQ.wx7jC556bOB2OZxjl8lN5kcy2KAu1RQeOD9Zrh5JtRY'
 ----

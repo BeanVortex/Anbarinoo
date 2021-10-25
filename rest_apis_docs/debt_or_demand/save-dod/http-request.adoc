@@ -3,10 +3,10 @@
 POST /api/user/financial/debt-demand/save/ HTTP/1.1
 Content-Type: application/json
 Accept: application/json
-refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUyODksInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5Njg5fQ.C-rjnZ2fUe8FBsKKRI1maLtPlIoQKHCJIDxAXB2y3ck
-access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTI4OSwiZXhwIjoxNjMwOTU1MzQ5fQ.mQ1DhwICsFr9AaCWnxzTv8LCaTiVpZ6UXUSUzTnQEXY
+refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzUxNDIzODcsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM2OTU2Nzg3fQ.5E8rPjVyzcxvxjFGJUkaJ61u1n4TSsg0B6cEHZ6hbbs
+access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNTE0MjM4NywiZXhwIjoxNjM1MTQyNDQ3fQ.V6pnNQGkaw58CeRNNpU0iqhh_tUTX8_hasakkFCmww0
 Content-Length: 169
 Host: localhost:8080
 
-{"nameOf":"Me","payTo":"Other","isDebt":true,"isCheckedOut":false,"amount":115.56,"issuedAt":"2021-09-06T23:38:09.869542379","validTill":"2021-09-11T23:38:09.869553616"}
+{"nameOf":"Me","payTo":"Other","isDebt":true,"isCheckedOut":false,"amount":115.56,"issuedAt":"2021-10-25T09:43:07.289009201","validTill":"2021-10-30T09:43:07.289019868"}
 ----

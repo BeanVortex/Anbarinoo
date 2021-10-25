@@ -43,7 +43,7 @@ public record ProductServiceTest(ProductService productService,
     private static HttpServletRequest request;
     private static Long catId;
     private static Long userId;
-    private static Long userId2;
+//    private static Long userId2;
     private static Long productId;
 
     @Autowired
@@ -71,18 +71,18 @@ public record ProductServiceTest(ProductService productService,
         user.setAddress("address");
         user.setDescription("desc");
         user.setUserName("user n");
-        user.setPassword("pass1");
-        user.setPasswordRepeat("pass1");
+        user.setPassword("pass12P+");
+        user.setPasswordRepeat("pass12P+");
         user.setEnabled(true);
         userService.signUpUser(user, response);
         userId = user.getId();
         request = setUpHeader(user.getEmail(), userId);
         var user2 = new UserModel();
         user2.setEmail("email2@mail.com");
-        user2.setPassword("pass1");
-        user2.setPasswordRepeat("pass1");
+        user2.setPassword("pass12P+");
+        user2.setPasswordRepeat("pass12P+");
         userService.signUpUser(user2, response);
-        userId2 = user2.getId();
+//        userId2 = user2.getId();
         System.out.println("ProductServiceTest.saveUser");
     }
 
@@ -214,19 +214,6 @@ public record ProductServiceTest(ProductService productService,
 
     @Test
     @Order(10)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
-    void getOneUserProducts() {
-        var pageable = PageRequest.of(0, 8);
-        var product = new ProductModel();
-        product.setName("updatedName");
-        assertThrows(ForbiddenException.class, () -> {
-            var products = productService.getOneUserProducts(userId2, pageable, request);
-            products.getContent().forEach(p -> assertThat(p.getName()).isEqualTo(product.getName()));
-        });
-    }
-
-    @Test
-    @Order(11)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void deleteProduct() {
         productService.deleteProduct(productId, request);

@@ -39,7 +39,7 @@ user:
   email-verification-disabled: true
 
 jwt:
-  secretkey: RandomSecret
+  secretKey: RandomSecret
 
 server.domain_name: https://www.anbarinoo.ir
 

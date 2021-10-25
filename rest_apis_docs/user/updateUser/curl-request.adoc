@@ -2,8 +2,8 @@
 ----
 $ curl 'http://localhost:8080/api/user/update/2/' -i -X PUT \
     -H 'Content-Type: multipart/form-data' \
-    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzM4OTc5MzMsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzNTcxMjMzM30.JzjFkvLruNvkWVfa-mO71Gg_hRtuNClPyBU9tua9nq0' \
-    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzM4OTc5MzMsImV4cCI6MTYzMzg5Nzk5M30._A9G-PJNHIXKcS1sBzMEA6F_81ZTYYlm_H8-tPzRVPI' \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzUxNDIzODksInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzNjk1Njc4OX0.ef2RyjH-95PX_BRlJE3Xf_E1hXGYVblL_uvSMLVRbok' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzUxNDIzODksImV4cCI6MTYzNTE0MjQ0OX0.QMpKN4YiRHS4obvu08mq792lwwQmttWjwDyiVnjRua8' \
     -H 'Accept: application/json' \
     -F 'description=UpdatedDesc' \
     -F 'userName=UpdatedUser n' \

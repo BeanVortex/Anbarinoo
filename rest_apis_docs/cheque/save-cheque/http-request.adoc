@@ -3,10 +3,10 @@
 POST /api/user/financial/cheque/save/ HTTP/1.1
 Content-Type: application/json
 Accept: application/json
-refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUzMDYsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NzA2fQ.TUXlQvY4qxvGsELgn2ZpbOqnP9YC_34RS2BWO_GZBAY
-access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTMwNiwiZXhwIjoxNjMwOTU1MzY2fQ.DC2EMuu-f5_dmd1coDGxXmDepiENyI-0uuOQEODKX4o
+refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzUxNDIzNjgsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM2OTU2NzY4fQ._nImbtGnK5fqLc24TGn1tBNa1E6cKlE-xzmfBkjv-5Y
+access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNTE0MjM2OCwiZXhwIjoxNjM1MTQyNDI4fQ.eA00t9ntwfD14GHz5FV7lByY8t1GBurwdRygJ9QQ54s
 Content-Length: 170
 Host: localhost:8080
 
-{"nameOf":"Me","payTo":"Other","amount":750.06,"isDebt":false,"isCheckedOut":false,"issuedAt":"2021-09-06T23:38:26.634497395","validTill":"2021-09-11T23:38:26.634506041"}
+{"nameOf":"Me","payTo":"Other","amount":750.06,"isDebt":false,"isCheckedOut":false,"issuedAt":"2021-10-25T09:42:48.565675297","validTill":"2021-10-30T09:42:48.565688084"}
 ----

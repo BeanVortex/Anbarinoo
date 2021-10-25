@@ -2,8 +2,8 @@
 ----
 $ curl 'http://localhost:8080/api/category/products/update/7/' -i -X PUT \
     -H 'Content-Type: application/json' \
-    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUzMTAsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NzEwfQ.Cy53jqdyoJzYCktBKegCVbE-rF8-KrakeqPIo3ehLQY' \
-    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTMxMCwiZXhwIjoxNjMwOTU1MzcwfQ.YWUMIfKgWz89eMBarqUc7VYssNOWDkdMHQQAvZCj2zs' \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzUxNDIzNjUsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM2OTU2NzY1fQ.DrdQSfQcw3QZtuGiwI43dw35aycXAC2wcbgBYgNCnkk' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNTE0MjM2NSwiZXhwIjoxNjM1MTQyNDI1fQ.pcLM7eqFdz9cnQUE-0nzinAcpcA8e2Z0vWYNzPh4t-k' \
     -H 'Accept: application/json' \
     -d '{"id":null,"firstBuyId":null,"canUpdate":true,"name":"product1Updated","description":"desc1Updated","images":null,"price":16.5,"category":null,"totalCount":6953546,"createdAt":null,"updatedAt":null}'
 ----

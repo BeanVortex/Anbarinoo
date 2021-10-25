@@ -9,11 +9,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class MainController {
-    
+
     @GetMapping("/")
     public String landingPage(){
         return "index.html";
     }
+
     @GetMapping("/info")
     @ResponseBody
     public Principal p(Principal principal){

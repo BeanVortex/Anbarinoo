@@ -1,10 +1,20 @@
 package ir.darkdeveloper.anbarinoo.service;
 
-import ir.darkdeveloper.anbarinoo.model.CategoryModel;
-import ir.darkdeveloper.anbarinoo.model.UserModel;
-import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
-import org.junit.jupiter.api.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,21 +24,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import ir.darkdeveloper.anbarinoo.model.CategoryModel;
+import ir.darkdeveloper.anbarinoo.model.UserModel;
+import ir.darkdeveloper.anbarinoo.util.JwtUtils;
+import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext
-public record CategoryServiceTest(JwtUtils jwtUtils,
-                                  UserService userService,
-                                  CategoryService categoryService) {
+public record CategoryServiceTest(JwtUtils jwtUtils, UserService userService, CategoryService categoryService) {
 
     private static UserModel user;
     private static HttpServletRequest request;
@@ -37,7 +41,6 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
     @Autowired
     public CategoryServiceTest {
     }
-
 
     @BeforeAll
     static void setUp() {
@@ -50,14 +53,13 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
         user.setAddress("address");
         user.setDescription("desc");
         user.setUserName("user n");
-        user.setPassword("pass1");
-        user.setPasswordRepeat("pass1");
+        user.setPassword("pass12P+");
+        user.setPasswordRepeat("pass12P+");
         user.setEnabled(true);
 
         request = mock(HttpServletRequest.class);
         System.out.println("ProductServiceTest.setUp");
     }
-
 
     @Test
     @Order(1)
@@ -71,7 +73,7 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
 
     @Test
     @Order(2)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(username = "email@mail.com", authorities = { "OP_ACCESS_USER" })
     void saveCategory() {
         System.out.println("ProductServiceTest.saveCategory");
 
@@ -97,38 +99,37 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
 
     @Test
     @Order(3)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
-    void getCategoriesByUserId() {
-        var categories = categoryService.getCategoriesByUserId(user.getId(), request);
+    @WithMockUser(username = "email@mail.com", authorities = { "OP_ACCESS_USER" })
+    void getCategoriesByUser() {
+        var categories = categoryService.getCategoriesByUser(request);
         assertThat(categories.size()).isNotEqualTo(0);
     }
 
-
     @Test
     @Order(4)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(username = "email@mail.com", authorities = { "OP_ACCESS_USER" })
     void getParentCategoryById() {
-        var parentCat = categoryService.getCategoryById(electronics.getId(), request);
+        /* var parentCat =  */
+        categoryService.getCategoryById(electronics.getId(), request);
         // tested in postman and was ok
         // could not test here because of lazy initialization
-//        assertThat(parentCat.getChildren().isEmpty()).isTrue();
+        //        assertThat(parentCat.getChildren().isEmpty()).isTrue();
     }
 
     @Test
     @Order(5)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(username = "email@mail.com", authorities = { "OP_ACCESS_USER" })
     void deleteCategory() {
         categoryService.deleteCategory(electronics.getId(), request);
     }
 
     @Test
     @Order(6)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(username = "email@mail.com", authorities = { "OP_ACCESS_USER" })
     void getUserAfterCatDelete() {
         var fetchedUser = userService.getUserInfo(user.getId(), request);
         assertThat(fetchedUser).isNotNull();
     }
-
 
     //should return the object; data is being removed
     private HttpServletRequest setUpHeader() {
@@ -146,7 +147,6 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
         headers.put("refresh_expiration", refreshDate);
         headers.put("access_expiration", accessDate);
 
-
         HttpServletRequest request = mock(HttpServletRequest.class);
         for (String key : headers.keySet())
             when(request.getHeader(key)).thenReturn(headers.get(key));
@@ -155,4 +155,3 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
     }
 
 }
-

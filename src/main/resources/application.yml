@@ -7,7 +7,7 @@ spring:
     - server
 ---
 jwt:
-  secretkey: RandomSecret
+  secretKey: RandomSecret
 jasypt:
   encryptor:
     password: ChangeMe

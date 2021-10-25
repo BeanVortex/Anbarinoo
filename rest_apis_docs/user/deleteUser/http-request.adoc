@@ -1,8 +1,8 @@
 [source,http,options="nowrap"]
 ----
 DELETE /api/user/2/ HTTP/1.1
-refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzM4OTc5MzMsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzNTcxMjMzM30.JzjFkvLruNvkWVfa-mO71Gg_hRtuNClPyBU9tua9nq0
-access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzM4OTc5MzMsImV4cCI6MTYzMzg5Nzk5M30._A9G-PJNHIXKcS1sBzMEA6F_81ZTYYlm_H8-tPzRVPI
+refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzUxNDIzODksInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzNjk1Njc4OX0.ef2RyjH-95PX_BRlJE3Xf_E1hXGYVblL_uvSMLVRbok
+access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzUxNDIzODksImV4cCI6MTYzNTE0MjQ0OX0.QMpKN4YiRHS4obvu08mq792lwwQmttWjwDyiVnjRua8
 Accept: application/json
 Host: localhost:8080
 

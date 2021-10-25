@@ -67,9 +67,10 @@ public class CategoryService {
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public List<CategoryModel> getCategoriesByUserId(Long userId, HttpServletRequest req) {
+    public List<CategoryModel> getCategoriesByUser(HttpServletRequest req) {
         try {
-            checkUserIsSameUserForRequest(userId, null, req, "fetch");
+//            checkUserIsSameUserForRequest(userId, null, req, "fetch");
+            var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
             return repo.findAllByUserId(userId);
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());

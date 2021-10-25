@@ -2,8 +2,8 @@
 ----
 $ curl 'http://localhost:8080/api/category/products/sell/get-by-product/date/5/' -i -X POST \
     -H 'Content-Type: application/json' \
-    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUyOTEsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NjkxfQ.DTuWiBCK0-X_sY0YE4TLJ1j33-UTsYm9oBJZGtbbxy0' \
-    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTI5MSwiZXhwIjoxNjMwOTU1MzUxfQ.AgMBaOc5f6GA3IjiUMY58fFhKUlVbvgDSPQEkAHL_eQ' \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzUxNDIzODUsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM2OTU2Nzg1fQ.lZe8ROEDRdmXolP3SuSl-EBU2Xhnl-8vdL08M1fJ3nE' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNTE0MjM4NSwiZXhwIjoxNjM1MTQyNDQ1fQ.oIEVsO__1UoKoH2Um3P8TKv9szoxZLdTKXOkkQksPP4' \
     -H 'Accept: application/json' \
-    -d '{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2021,9,6,23,38,12,1711474],"toDate":[2021,9,6,23,38,12,108970721]}'
+    -d '{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2021,10,25,9,43,5,233663870],"toDate":[2021,10,25,9,43,5,339583919]}'
 ----

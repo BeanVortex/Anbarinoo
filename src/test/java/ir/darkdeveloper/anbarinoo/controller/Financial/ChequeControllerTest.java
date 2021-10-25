@@ -91,8 +91,8 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
         user.setAddress("address");
         user.setDescription("desc");
         user.setUserName("user n");
-        user.setPassword("pass1");
-        user.setPasswordRepeat("pass1");
+        user.setPassword("pass12P+");
+        user.setPasswordRepeat("pass12P+");
         user.setEnabled(true);
         userService.signUpUser(user, response);
         userId = user.getId();

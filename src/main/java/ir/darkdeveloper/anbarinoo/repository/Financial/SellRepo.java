@@ -1,13 +1,13 @@
 package ir.darkdeveloper.anbarinoo.repository.Financial;
 
-import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
-import ir.darkdeveloper.anbarinoo.model.Financial.SellModel;
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import ir.darkdeveloper.anbarinoo.model.Financial.SellModel;
 
 @Repository
 public interface SellRepo extends PagingAndSortingRepository<SellModel, Long> {

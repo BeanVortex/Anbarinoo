@@ -3,7 +3,7 @@
 $ curl 'http://localhost:8080/api/user/financial/cheque/update/4/' -i -X POST \
     -H 'Content-Type: application/json' \
     -H 'Accept: application/json' \
-    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUzMDYsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NzA2fQ.TUXlQvY4qxvGsELgn2ZpbOqnP9YC_34RS2BWO_GZBAY' \
-    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTMwNiwiZXhwIjoxNjMwOTU1MzY2fQ.DC2EMuu-f5_dmd1coDGxXmDepiENyI-0uuOQEODKX4o' \
-    -d '{"nameOf":"Me2","isDebt":false,"isCheckedOut":true,"validTill":"2021-09-16T23:38:26.654111931"}'
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzUxNDIzNjgsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM2OTU2NzY4fQ._nImbtGnK5fqLc24TGn1tBNa1E6cKlE-xzmfBkjv-5Y' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNTE0MjM2OCwiZXhwIjoxNjM1MTQyNDI4fQ.eA00t9ntwfD14GHz5FV7lByY8t1GBurwdRygJ9QQ54s' \
+    -d '{"nameOf":"Me2","isDebt":false,"isCheckedOut":true,"validTill":"2021-11-04T09:42:48.593915581"}'
 ----

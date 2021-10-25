@@ -1,7 +1,7 @@
 [source,bash]
 ----
 $ http GET 'http://localhost:8080/api/category/products/user/2/' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUzMTAsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NzEwfQ.Cy53jqdyoJzYCktBKegCVbE-rF8-KrakeqPIo3ehLQY' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTMxMCwiZXhwIjoxNjMwOTU1MzcwfQ.YWUMIfKgWz89eMBarqUc7VYssNOWDkdMHQQAvZCj2zs' \
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzUxNDIzNjUsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM2OTU2NzY1fQ.DrdQSfQcw3QZtuGiwI43dw35aycXAC2wcbgBYgNCnkk' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNTE0MjM2NSwiZXhwIjoxNjM1MTQyNDI1fQ.pcLM7eqFdz9cnQUE-0nzinAcpcA8e2Z0vWYNzPh4t-k' \
     'Accept:application/json'
 ----

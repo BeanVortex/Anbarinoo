@@ -5,15 +5,18 @@ services:
     image: 'anbarinoo:latest'
     build: ./app
     container_name: app
+    ports:
+      - "8080:8080"
     restart: always
     depends_on:
       - db
+      - nginx
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/compose-postgres
       - SPRING_DATASOURCE_USERNAME=compose-postgres
       - SPRING_DATASOURCE_PASSWORD=compose-postgres
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-          
+
   db:
     image: 'postgres:13.1-alpine'
     container_name: db
@@ -28,9 +31,7 @@ services:
     build: ./webServer
     restart: always
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/spring.conf:/etc/nginx/conf.d/default.conf
     ports:
       - "80:80"
       - "443:443"
-    links:
-      - app

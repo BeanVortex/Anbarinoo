@@ -2,8 +2,8 @@
 ----
 $ curl 'http://localhost:8080/api/category/products/sell/save/' -i -X POST \
     -H 'Content-Type: application/json' \
-    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzA5NTUyOTEsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjMyNzY5NjkxfQ.DTuWiBCK0-X_sY0YE4TLJ1j33-UTsYm9oBJZGtbbxy0' \
-    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzMDk1NTI5MSwiZXhwIjoxNjMwOTU1MzUxfQ.AgMBaOc5f6GA3IjiUMY58fFhKUlVbvgDSPQEkAHL_eQ' \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzUxNDIzODUsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM2OTU2Nzg1fQ.lZe8ROEDRdmXolP3SuSl-EBU2Xhnl-8vdL08M1fJ3nE' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNTE0MjM4NSwiZXhwIjoxNjM1MTQyNDQ1fQ.oIEVsO__1UoKoH2Um3P8TKv9szoxZLdTKXOkkQksPP4' \
     -H 'Accept: application/json' \
     -d '{"count":8,"price":5000,"tax":9,"product":5}'
 ----

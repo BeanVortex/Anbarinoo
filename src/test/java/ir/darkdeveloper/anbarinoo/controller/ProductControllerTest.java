@@ -100,8 +100,8 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
         user.setAddress("address");
         user.setDescription("desc");
         user.setUserName("user n");
-        user.setPassword("pass1");
-        user.setPasswordRepeat("pass1");
+        user.setPassword("pass12P+");
+        user.setPasswordRepeat("pass12P+");
         user.setEnabled(true);
         userService.signUpUser(user, response);
         userId = user.getId();
@@ -121,8 +121,8 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
         user.setAddress("address");
         user.setDescription("desc");
         user.setUserName("user n2");
-        user.setPassword("pass1");
-        user.setPasswordRepeat("pass1");
+        user.setPassword("pass12P+");
+        user.setPasswordRepeat("pass12P+");
         user.setEnabled(true);
         userService.signUpUser(user, response);
         userId2 = user.getId();
