@@ -9,8 +9,8 @@ $ http --form PUT 'http://localhost:8080/api/category/products/update/images/7/'
     'files'@'hello.jpg' \
     'files'@'hello.jpg' \
     'files'@'hello.jpg' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzUxNDIzNjUsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM2OTU2NzY1fQ.DrdQSfQcw3QZtuGiwI43dw35aycXAC2wcbgBYgNCnkk' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNTE0MjM2NSwiZXhwIjoxNjM1MTQyNDI1fQ.pcLM7eqFdz9cnQUE-0nzinAcpcA8e2Z0vWYNzPh4t-k' \
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzY1MzczMTcsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM4MzUxNzE3fQ.IepaZ4giFfAScNhMSoFYuYAlY3szVU4FfTKQVbGXhFA' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNjUzNzMxNywiZXhwIjoxNjM2NTM3Mzc3fQ.ICHnxEh8IkGRCyMFugFX92FjjVD2awNKAH1FXEj5A6I' \
     'Accept:application/json' \
     'id=' \
     'name=ignoredNameUpdate' \

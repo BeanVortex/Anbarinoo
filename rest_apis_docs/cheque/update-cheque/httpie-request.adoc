@@ -1,8 +1,8 @@
 [source,bash]
 ----
-$ echo '{"nameOf":"Me2","isDebt":false,"isCheckedOut":true,"validTill":"2021-11-04T09:42:48.593915581"}' | http POST 'http://localhost:8080/api/user/financial/cheque/update/4/' \
+$ echo '{"nameOf":"Me2","isDebt":false,"isCheckedOut":true,"validTill":"2021-11-20T13:12:00.444959616"}' | http POST 'http://localhost:8080/api/user/financial/cheque/update/4/' \
     'Content-Type:application/json' \
     'Accept:application/json' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzUxNDIzNjgsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM2OTU2NzY4fQ._nImbtGnK5fqLc24TGn1tBNa1E6cKlE-xzmfBkjv-5Y' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNTE0MjM2OCwiZXhwIjoxNjM1MTQyNDI4fQ.eA00t9ntwfD14GHz5FV7lByY8t1GBurwdRygJ9QQ54s'
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzY1MzczMjAsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM4MzUxNzIwfQ.wRrx3sMo92JLmksFcz1cF5-V8Dr5WRruVYXl7ROv86w' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNjUzNzMyMCwiZXhwIjoxNjM2NTM3MzgwfQ.qqEljLJV5a4KU9awQMOJnhuDxVMuaVEWNNcvfUxd-8s'
 ----

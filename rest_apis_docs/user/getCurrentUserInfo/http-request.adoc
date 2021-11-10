@@ -1,9 +1,0 @@
-[source,http,options="nowrap"]
-----
-GET /api/user/info/ HTTP/1.1
-refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzM1MDI1NTgsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTYzNTMxNjk1OH0.8FyIyjbjA6UkIRCRA0VwXJabTG1UvpChpCt_zt9In-Y
-access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2MzM1MDI1NTgsImV4cCI6MTYzMzUwMjYxOH0.T76wujj56EIrOcRbcTx-Fiiz03dTeZYVAEH3UTx0MmY
-Accept: application/json
-Host: localhost:8080
-
-----

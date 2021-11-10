@@ -1,6 +1,7 @@
 package ir.darkdeveloper.anbarinoo.controller;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import ir.darkdeveloper.anbarinoo.security.jwt.JwtAuth;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import org.json.JSONObject;
@@ -77,10 +78,10 @@ public record UserControllerTest(UserController controller,
         var address = new MockPart("address", "address".getBytes());
         var des = new MockPart("description", "desc".getBytes());
         var username = new MockPart("userName", "user n".getBytes());
-        var password = new MockPart("password", "pass12B!".getBytes());
-        var passwordRepeat = new MockPart("passwordRepeat", "pass12B!".getBytes());
+        var password = new MockPart("password", "Pass!12".getBytes());
+        var passwordRepeat = new MockPart("passwordRepeat", "Pass!12".getBytes());
         var email = new MockPart("email", "email@mail.com".getBytes());
-        Part[] parts = {email, des, username, address, passwordRepeat, password};
+        Part[] parts = {email, des, username, address, password, passwordRepeat};
         var file1 = new MockMultipartFile("profileFile", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
                 "Hello, World!".getBytes());
         var file2 = new MockMultipartFile("shopFile", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
@@ -113,7 +114,7 @@ public record UserControllerTest(UserController controller,
     void loginUser() throws Exception {
         var auth = new JwtAuth();
         auth.setUsername("user n");
-        auth.setPassword("pass12B!");
+        auth.setPassword("Pass!12");
         System.out.println(mapToJson(auth));
         mockMvc.perform(post("/api/user/login/")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -290,8 +291,8 @@ public record UserControllerTest(UserController controller,
     }
 
 
-    private String mapToJson(Object obj) {
-        return new Gson().toJson(obj);
+    private String mapToJson(Object obj) throws JsonProcessingException {
+        return new ObjectMapper().writeValueAsString(obj);
     }
 
 }

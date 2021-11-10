@@ -3,6 +3,7 @@ package ir.darkdeveloper.anbarinoo.util.UserUtils;
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.EmailNotValidException;
 import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
+import ir.darkdeveloper.anbarinoo.exception.PasswordException;
 import ir.darkdeveloper.anbarinoo.model.Auth.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
@@ -38,10 +39,10 @@ public class UserAuthUtils {
     private final PasswordEncoder encoder;
     private final AdminUserProperties adminUser;
     private final IOUtils ioUtils;
-    private final Validations validations;
     private final UserRolesService roleService;
     private final Boolean userEnabled;
     private final Operations operations;
+    private PasswordUtils passwordUtils;
 
     public static final SimpleDateFormat TOKEN_EXPIRATION_FORMAT = new SimpleDateFormat("EE MMM dd yyyy HH:mm:ss");
 
@@ -50,17 +51,17 @@ public class UserAuthUtils {
         if (user.getId() != null)
             throw new ForbiddenException("You are not allowed to sign up! :|");
 
-        var username = user.getUsername();
-        validations.validateUsername(username);
+        var rawPass = user.getPassword();
 
-        var rawPass = validations.validatePassword(user);
+        if (user.getEmail() != null)
+            if (user.getUserName() == null || user.getUserName().trim().equals(""))
+                user.setUserName(user.getEmail().split("@")[0]);
 
-        validations.validateEmail(user);
+        passwordUtils.passEqualityChecker(user);
 
         user.setRoles(roleService.findAllByName("USER"));
         ioUtils.saveUserImages(user);
         user.setPassword(encoder.encode(user.getPassword()));
-        user.setPasswordRepeat("");
         user.setProvider(AuthProvider.LOCAL);
         user.setEnabled(userEnabled);
         repo.save(user);

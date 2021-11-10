@@ -4,5 +4,5 @@ HTTP/1.1 204 No Content
 Content-Type: application/json
 Content-Length: 109
 
-{"message":"Sell record do not exist.","httpStatus":"NO_CONTENT","timestamp":"2021-10-25T09:43:05.422502536"}
+{"message":"Sell record do not exist.","httpStatus":"NO_CONTENT","timestamp":"2021-11-10T13:12:17.303935731"}
 ----

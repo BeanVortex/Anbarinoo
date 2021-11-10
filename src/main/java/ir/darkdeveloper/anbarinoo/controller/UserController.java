@@ -3,16 +3,22 @@ package ir.darkdeveloper.anbarinoo.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
+import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.security.jwt.JwtAuth;
 import ir.darkdeveloper.anbarinoo.service.UserService;
+
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/user")
@@ -26,9 +32,13 @@ public class UserController {
     }
 
     @PostMapping("/signup/")
-    public ResponseEntity<?> signUpUser(@ModelAttribute UserModel user, HttpServletResponse response)
-            throws Exception {
-        return userService.signUpUser(user, response);
+    public ResponseEntity<?> signUpUser(@ModelAttribute @Valid UserModel user, BindingResult bindingResult,
+                                        HttpServletResponse response) throws Exception {
+        if (!bindingResult.hasErrors())
+            return userService.signUpUser(user, response);
+        var errors = bindingResult.getFieldErrors().stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.toList());
+        throw new BadRequestException(errors.toString());
     }
 
     @PostMapping("/login/")

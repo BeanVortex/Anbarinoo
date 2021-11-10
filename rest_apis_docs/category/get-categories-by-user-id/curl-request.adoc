@@ -1,8 +1,0 @@
-[source,bash]
-----
-$ curl 'http://localhost:8080/api/category/user/' -i -X GET \
-    -H 'Content-Type: application/json' \
-    -H 'Accept: application/json' \
-    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzUxNDIyMzIsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM2OTU2NjMyfQ.YxuhtP1T00KCk-CAvwnfYDTUA2FFJ60HnsIC8TSHTRE' \
-    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNTE0MjIzMiwiZXhwIjoxNjM1MTQyMjkyfQ.pVBu6pssMBzp_d9SRoz0riofdP3tZsh6tT0-BPi-CbA'
-----

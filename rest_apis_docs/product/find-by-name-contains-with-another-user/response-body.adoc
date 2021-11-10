@@ -1,4 +1,4 @@
 [source,options="nowrap"]
 ----
-{"message":"This product does not exist","httpStatus":"NO_CONTENT","timestamp":"2021-10-25T09:42:46.382504447"}
+{"message":"This product does not exist","httpStatus":"NO_CONTENT","timestamp":"2021-11-10T13:11:58.207750013"}
 ----

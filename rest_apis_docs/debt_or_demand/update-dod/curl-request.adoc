@@ -3,7 +3,7 @@
 $ curl 'http://localhost:8080/api/user/financial/debt-demand/update/4/' -i -X PUT \
     -H 'Content-Type: application/json' \
     -H 'Accept: application/json' \
-    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzUxNDIzODcsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM2OTU2Nzg3fQ.5E8rPjVyzcxvxjFGJUkaJ61u1n4TSsg0B6cEHZ6hbbs' \
-    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNTE0MjM4NywiZXhwIjoxNjM1MTQyNDQ3fQ.V6pnNQGkaw58CeRNNpU0iqhh_tUTX8_hasakkFCmww0' \
-    -d '{"nameOf":"Other","payTo":"Me","isDebt":false,"isCheckedOut":false,"amount":1564,"validTill":"2021-11-02T09:43:07.307563398"}'
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzY1MzczMzksInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM4MzUxNzM5fQ.eZ0jpt-carD41YXEH8ON8PfhaN2vdzmNFSFrwqfNZZA' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNjUzNzMzOSwiZXhwIjoxNjM2NTM3Mzk5fQ.GssteT7fLLSpUfLObl21W_0RqXhCH17kUUemCBNXgrQ' \
+    -d '{"nameOf":"Other","payTo":"Me","isDebt":false,"isCheckedOut":false,"amount":1564,"validTill":"2021-11-18T13:12:19.228434828"}'
 ----

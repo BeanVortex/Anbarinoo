@@ -3,8 +3,8 @@
 POST /api/user/login/ HTTP/1.1
 Content-Type: application/json
 Accept: application/json
-Content-Length: 43
+Content-Length: 42
 Host: localhost:8080
 
-{"username":"user n","password":"pass12B!"}
+{"username":"user n","password":"Pass!12"}
 ----

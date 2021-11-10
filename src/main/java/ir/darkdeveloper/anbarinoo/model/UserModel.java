@@ -15,6 +15,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -30,16 +31,22 @@ public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel
     private Long id;
 
     @Column(nullable = false, unique = true, updatable = false)
+    @NotEmpty
+    @Email
     private String email;
 
     @Column(unique = true)
     private String userName;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Pattern(regexp = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9\\s]).+", message = "Bad password")
+    @Size(min = 6, message = "Password length must be at least 6")
     private String password;
 
     @Transient
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Pattern(regexp = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9\\s]).+", message = "Bad repeat password")
+    @Size(min = 6, message = "Password length must be at least 6")
     private String passwordRepeat;
 
     @Transient
@@ -189,23 +196,6 @@ public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel
     public String getName() {
         return userName;
     }
-
-/*    public void merge(UserModel other) {
-        id = other.id == null ? id : other.id;
-        userName = other.userName == null ? userName : other.userName;
-        password = other.password == null ? password : other.password;
-        passwordRepeat = other.passwordRepeat == null ? passwordRepeat : other.passwordRepeat;
-        prevPassword = other.prevPassword == null ? prevPassword : other.prevPassword;
-        provider = other.provider == null ? provider : other.provider;
-        enabled = other.enabled == null ? enabled : other.enabled;
-        shopImage = other.shopImage == null ? shopImage : other.shopImage;
-        profileImage = other.profileImage == null ? profileImage : other.profileImage;
-        createdAt = other.createdAt == null ? createdAt : other.createdAt;
-        updatedAt = other.updatedAt == null ? updatedAt : other.updatedAt;
-        shopName = other.shopName == null ? shopName : other.shopName;
-        address = other.address == null ? address : other.address;
-        description = other.description == null ? description : other.description;
-    }*/
 
     @Override
     public void update(UserModel model) {

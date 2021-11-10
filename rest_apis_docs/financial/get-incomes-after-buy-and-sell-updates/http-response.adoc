@@ -4,5 +4,5 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 Content-Length: 152
 
-{"costs":null,"incomes":111930.0000000000,"profit":null,"loss":null,"fromDate":"2021-10-25T09:42:52.735696555","toDate":"2021-10-25T09:43:03.257138259"}
+{"costs":null,"incomes":111930.0000000000,"profit":null,"loss":null,"fromDate":"2021-11-10T13:12:04.681538209","toDate":"2021-11-10T13:12:15.117507857"}
 ----

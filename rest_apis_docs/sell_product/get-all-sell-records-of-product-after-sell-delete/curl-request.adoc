@@ -2,7 +2,7 @@
 ----
 $ curl 'http://localhost:8080/api/category/products/sell/get-by-product/5/?page=0&size=2' -i -X GET \
     -H 'Content-Type: application/json' \
-    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzUxNDIzODUsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM2OTU2Nzg1fQ.lZe8ROEDRdmXolP3SuSl-EBU2Xhnl-8vdL08M1fJ3nE' \
-    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNTE0MjM4NSwiZXhwIjoxNjM1MTQyNDQ1fQ.oIEVsO__1UoKoH2Um3P8TKv9szoxZLdTKXOkkQksPP4' \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzY1MzczMzcsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM4MzUxNzM3fQ.-Gh6nfHCbq2InbrrnWOllZvHyEiuzgZUFFXABCQBn18' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNjUzNzMzNywiZXhwIjoxNjM2NTM3Mzk3fQ.gsNpagmHKQp9aIJBNfuMN4Xx6q8psWdRudONwiYUGDg' \
     -H 'Accept: application/json'
 ----

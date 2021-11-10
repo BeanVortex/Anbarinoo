@@ -4,5 +4,5 @@ HTTP/1.1 204 No Content
 Content-Type: application/json
 Content-Length: 108
 
-{"message":"Category does not exist.","httpStatus":"NO_CONTENT","timestamp":"2021-10-25T09:42:43.738375524"}
+{"message":"Category does not exist.","httpStatus":"NO_CONTENT","timestamp":"2021-11-10T13:11:55.417233833"}
 ----

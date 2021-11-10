@@ -26,7 +26,7 @@ public class Operations {
     private final String domainName;
     private final RefreshService refreshService;
     private final UserRepo repo;
-    private final Validations validations;
+    private final PasswordUtils passwordUtils;
 
     public void deleteUser(UserModel user) throws IOException {
         if (!user.isEnabled())
@@ -50,7 +50,7 @@ public class Operations {
         }
         var foundUser = repo.findUserById(id);
         if (foundUser.isPresent()) {
-            validations.updatePasswordUsingPrevious(user, foundUser.get());
+            passwordUtils.updatePasswordUsingPrevious(user, foundUser.get());
             foundUser.get().update(user);
             return foundUser.get();
         }

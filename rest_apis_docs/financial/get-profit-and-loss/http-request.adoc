@@ -3,10 +3,10 @@
 POST /api/user/financial/profit-loss/ HTTP/1.1
 Content-Type: application/json
 Accept: application/json
-refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzUxNDIzNzIsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM2OTU2NzcyfQ.Oju9Fuu5kIDF5kCOeQPRR8KGns1DBiT0Axga8P-E7Ek
-access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNTE0MjM3MiwiZXhwIjoxNjM1MTQyNDMyfQ.oLYrum-0pkiNeF7AMwCerwW0Lle5t7w7rPCDD1V8iPk
-Content-Length: 136
+refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzY1MzczMjQsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM4MzUxNzI0fQ.EEEZ6_alXtphRyxf8w-CbXfIn0rqy5oiPhOCY-RuEX4
+access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNjUzNzMyNCwiZXhwIjoxNjM2NTM3Mzg0fQ.gxIroyCTA8-FTY1t-fkAPOLu8ZxcCz8v0MixPzw7cJY
+Content-Length: 138
 Host: localhost:8080
 
-{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2021,10,25,9,42,52,735696555],"toDate":[2021,10,25,9,43,3,257138259]}
+{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2021,11,10,13,12,4,681538209],"toDate":[2021,11,10,13,12,15,117507857]}
 ----

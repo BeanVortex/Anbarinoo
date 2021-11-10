@@ -4,5 +4,5 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 Content-Length: 139
 
-{"id":7,"count":8,"price":5000,"tax":9,"product":5,"createdAt":"2021-10-25T09:42:50.640636517","updatedAt":"2021-10-25T09:42:50.640648278"}
+{"id":7,"count":8,"price":5000,"tax":9,"product":5,"createdAt":"2021-11-10T13:12:02.534551785","updatedAt":"2021-11-10T13:12:02.534565227"}
 ----

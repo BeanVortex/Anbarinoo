@@ -406,40 +406,6 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     @Test
     @Order(14)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getOneUserProducts() throws Exception {
-
-        mockMvc.perform(get("/api/category/products/user/{id}/", userId)
-                .header("refresh_token", user1Refresh)
-                .header("access_token", user1Access)
-                .accept(MediaType.APPLICATION_JSON)
-        )
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content", hasSize(2)));
-
-
-    }
-
-    @Test
-    @Order(15)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getOneUserProductsWithNonMatchedUserIdAndRefreshToken() throws Exception {
-
-        mockMvc.perform(get("/api/category/products/user/{id}/", userId2)
-                .header("refresh_token", user1Refresh)
-                .header("access_token", user1Access)
-                .accept(MediaType.APPLICATION_JSON)
-        )
-                .andDo(print())
-                .andExpect(status().isForbidden());
-
-
-    }
-
-    @Test
-    @Order(16)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
     void deleteProductWithNonMatchedUserIdAndRefreshToken() throws Exception {
         mockMvc.perform(delete("/api/category/products/{id}/", productId)
                 .header("refresh_token", user2Refresh)
@@ -451,7 +417,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     }
 
     @Test
-    @Order(17)
+    @Order(15)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void deleteProduct() throws Exception {
         mockMvc.perform(delete("/api/category/products/{id}/", productId)
