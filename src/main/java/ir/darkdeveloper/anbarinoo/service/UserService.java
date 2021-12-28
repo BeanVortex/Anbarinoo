@@ -8,9 +8,9 @@ import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.Operations;
-import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -121,14 +121,14 @@ public class UserService implements UserDetailsService {
     @PreAuthorize("hasAnyAuthority('OP_DELETE_USER')")
     public ResponseEntity<?> deleteUser(Long id, HttpServletRequest req) {
         try {
-            if (id == null) throw new NotFoundException("User id is null, can't update");
+            if (id == null) throw new NoContentException("User id is null, can't update");
             var userOpt = repo.findById(id);
             if (userOpt.isPresent()) {
                 checkUserIsSameUserForRequest(userOpt.get().getId(), req, "delete");
                 userOP.deleteUser(userOpt.get());
                 return new ResponseEntity<>("Successfully deleted user", HttpStatus.OK);
             }
-        } catch (NotFoundException n) {
+        } catch (NoContentException n) {
             throw new BadRequestException(n.getLocalizedMessage());
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());

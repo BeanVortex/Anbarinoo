@@ -68,6 +68,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
                                 "/api/user/login/",
                                 "/api/post/all/",
                                 "/oauth2/**",
+                                "/api/export/excel/**",
                                 "/api/user/verify/**",
                                 "/webjars/**",
                                 "/forbidden")

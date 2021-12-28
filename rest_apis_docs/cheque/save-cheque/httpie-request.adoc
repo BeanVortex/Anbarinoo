@@ -1,8 +1,8 @@
 [source,bash]
 ----
-$ echo '{"nameOf":"Me","payTo":"Other","amount":750.06,"isDebt":false,"isCheckedOut":false,"issuedAt":"2021-11-10T13:12:00.413520731","validTill":"2021-11-15T13:12:00.413534248"}' | http POST 'http://localhost:8080/api/user/financial/cheque/save/' \
+$ echo '{"nameOf":"Me","payTo":"Other","amount":750.06,"isDebt":false,"isCheckedOut":false,"issuedAt":"2021-12-28T13:42:12.588513792","validTill":"2022-01-02T13:42:12.588526300"}' | http POST 'http://localhost:8080/api/user/financial/cheque/save/' \
     'Content-Type:application/json' \
     'Accept:application/json' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzY1MzczMjAsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM4MzUxNzIwfQ.wRrx3sMo92JLmksFcz1cF5-V8Dr5WRruVYXl7ROv86w' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNjUzNzMyMCwiZXhwIjoxNjM2NTM3MzgwfQ.qqEljLJV5a4KU9awQMOJnhuDxVMuaVEWNNcvfUxd-8s'
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA2ODYzMzIsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQyNTAwNzMyfQ.FpBfUgT_YFnYkML8rxv8GpAyD12_4f1HyZu2_DHKzJE' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MDY4NjMzMiwiZXhwIjoxNjQwNjg2MzkyfQ.EuGX8O4CXBdmrToP2ZFfDZLOJLjMMUQM7tZ-g7Vjpqo'
 ----

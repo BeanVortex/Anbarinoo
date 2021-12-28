@@ -1,4 +1,4 @@
 [source,options="nowrap"]
 ----
-{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2021,11,10,13,12,2,524167935],"toDate":[2021,11,10,13,12,2,663805070]}
+{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2021,12,28,13,42,10,553441790],"toDate":[2021,12,28,13,42,10,660467748]}
 ----

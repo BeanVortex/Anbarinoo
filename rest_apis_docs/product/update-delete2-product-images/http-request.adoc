@@ -2,11 +2,11 @@
 ----
 PUT /api/category/products/update/delete-images/7/ HTTP/1.1
 Content-Type: application/json
-refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzY1MzczMTcsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjM4MzUxNzE3fQ.IepaZ4giFfAScNhMSoFYuYAlY3szVU4FfTKQVbGXhFA
-access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTYzNjUzNzMxNywiZXhwIjoxNjM2NTM3Mzc3fQ.ICHnxEh8IkGRCyMFugFX92FjjVD2awNKAH1FXEj5A6I
+refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA2ODYzMjUsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQyNTAwNzI1fQ.yR7ac3lxdX3FUZ03iY04lDi2m9NTq7QvGWhdhHxR51k
+access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MDY4NjMyNSwiZXhwIjoxNjQwNjg2Mzg1fQ.MyImtB-DifuIcMrMIM12RNmbihq2dffS1L_G9QmgPPw
 Accept: application/json
 Content-Length: 257
 Host: localhost:8080
 
-{"id":null,"firstBuyId":null,"canUpdate":true,"name":null,"description":null,"images":["758cc7af-6905-4cc1-8f94-67cf43e4ba2d.jpeg","eb9d0103-5007-4d35-9705-e50a0f0b2c28.jpeg"],"price":null,"category":null,"totalCount":null,"createdAt":null,"updatedAt":null}
+{"id":null,"firstBuyId":null,"canUpdate":true,"name":null,"description":null,"images":["d88ea12b-d953-4d1f-ba2e-7973604c71d5.jpeg","e88a5b35-276f-410c-9875-967239d7fadd.jpeg"],"price":null,"category":null,"totalCount":null,"createdAt":null,"updatedAt":null}
 ----

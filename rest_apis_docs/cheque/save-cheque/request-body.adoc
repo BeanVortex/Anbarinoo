@@ -1,4 +1,4 @@
 [source,options="nowrap"]
 ----
-{"nameOf":"Me","payTo":"Other","amount":750.06,"isDebt":false,"isCheckedOut":false,"issuedAt":"2021-11-10T13:12:00.413520731","validTill":"2021-11-15T13:12:00.413534248"}
+{"nameOf":"Me","payTo":"Other","amount":750.06,"isDebt":false,"isCheckedOut":false,"issuedAt":"2021-12-28T13:42:12.588513792","validTill":"2022-01-02T13:42:12.588526300"}
 ----

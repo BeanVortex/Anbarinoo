@@ -93,7 +93,7 @@ public record SellControllerTest(UserService userService,
     @Order(1)
     @WithMockUser(username = "anonymousUser")
     void saveUser() throws Exception {
-        HttpServletResponse response = mock(HttpServletResponse.class);
+        var response = mock(HttpServletResponse.class);
         var user = new UserModel();
         user.setEmail("email@mail.com");
         user.setAddress("address");

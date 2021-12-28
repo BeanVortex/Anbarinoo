@@ -1,7 +1,7 @@
 [source,bash]
 ----
 $ curl 'http://localhost:8080/api/category/products/7/' -i -X DELETE \
-    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MzY1MzczMTgsInN1YiI6ImVtYWlsMkBtYWlsLmNvbSIsInVzZXJfaWQiOjQsImV4cCI6MTYzODM1MTcxOH0.7wVZZYfpIjzv5uFlQntrh5IY7dUWLg78dK5WKxFMixQ' \
-    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbDJAbWFpbC5jb20iLCJpYXQiOjE2MzY1MzczMTgsImV4cCI6MTYzNjUzNzM3OH0.gu1huvLyCiaNgLoV2VY0OVEoKDkYPKuXGAqh4OTizkg' \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA2ODYzMjUsInN1YiI6ImVtYWlsMkBtYWlsLmNvbSIsInVzZXJfaWQiOjQsImV4cCI6MTY0MjUwMDcyNX0.21F1_y5Tpzl-HMYEnT5Yu7nmJdYc2XROglbPw353DxQ' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbDJAbWFpbC5jb20iLCJpYXQiOjE2NDA2ODYzMjUsImV4cCI6MTY0MDY4NjM4NX0.UG-io4EhftzHzypinIdLgBjKz4ji-Ia5MsC6WyaQvXA' \
     -H 'Accept: application/json'
 ----

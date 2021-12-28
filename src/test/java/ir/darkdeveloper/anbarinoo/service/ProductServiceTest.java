@@ -57,7 +57,6 @@ public record ProductServiceTest(ProductService productService,
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         request = mock(HttpServletRequest.class);
-        System.out.println("ProductServiceTest.setUp");
     }
 
 
@@ -65,7 +64,7 @@ public record ProductServiceTest(ProductService productService,
     @Order(1)
     @WithMockUser(username = "anonymousUser")
     void saveUser() throws Exception {
-        HttpServletResponse response = mock(HttpServletResponse.class);
+        var response = mock(HttpServletResponse.class);
         var user = new UserModel();
         user.setEmail("email@mail.com");
         user.setAddress("address");
@@ -83,7 +82,6 @@ public record ProductServiceTest(ProductService productService,
         user2.setPasswordRepeat("pass12P+");
         userService.signUpUser(user2, response);
 //        userId2 = user2.getId();
-        System.out.println("ProductServiceTest.saveUser");
     }
 
     @Test
@@ -99,7 +97,6 @@ public record ProductServiceTest(ProductService productService,
     @Order(3)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void saveProduct() {
-        System.out.println("ProductServiceTest.saveProduct");
         var product = new ProductModel();
         product.setName("name");
         product.setDescription("description");
@@ -119,7 +116,6 @@ public record ProductServiceTest(ProductService productService,
     @Order(4)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void getProduct() {
-        System.out.println("ProductServiceTest.getProduct");
         var fetchedProduct = productService.getProduct(productId, request);
         assertThat(fetchedProduct.getCategory().getUser().getId()).isEqualTo(userId);
     }
@@ -204,7 +200,6 @@ public record ProductServiceTest(ProductService productService,
     @Order(9)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void findByNameContains() {
-        System.out.println("ProductServiceTest. findByNameContains");
         var pageable = PageRequest.of(0, 8);
         var product = new ProductModel();
         product.setName("updatedName");

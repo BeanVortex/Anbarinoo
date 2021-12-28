@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ApplicationServerConfig {
 
+
+    // Used in UserUtils.Operations
     @Value("${server.domain_name}")
     private String domainName;
 
