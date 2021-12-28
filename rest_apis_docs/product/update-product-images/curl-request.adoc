@@ -2,8 +2,8 @@
 ----
 $ curl 'http://localhost:8080/api/category/products/update/images/7/' -i -X PUT \
     -H 'Content-Type: multipart/form-data' \
-    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA2ODYzMjUsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQyNTAwNzI1fQ.yR7ac3lxdX3FUZ03iY04lDi2m9NTq7QvGWhdhHxR51k' \
-    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MDY4NjMyNSwiZXhwIjoxNjQwNjg2Mzg1fQ.MyImtB-DifuIcMrMIM12RNmbihq2dffS1L_G9QmgPPw' \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA3MTkyOTcsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQyNTMzNjk3fQ.c5SKGjrHxpzFsFOtoJQSTdp8qOz7qR37HlJ4XtzXB54' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MDcxOTI5NywiZXhwIjoxNjQwNzE5MzU3fQ.lC8Sfed7me4bMA9U8uLgJKjcJavFdbXeFzH3-83tlMU' \
     -H 'Accept: application/json' \
     -F 'id=' \
     -F 'name=ignoredNameUpdate' \

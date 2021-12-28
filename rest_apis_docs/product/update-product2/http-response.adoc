@@ -4,5 +4,5 @@ HTTP/1.1 400 Bad Request
 Content-Type: application/json
 Content-Length: 316
 
-{"message":"You can't update the product's totalCount or Price. You have already updated these once or you are updating after selling or buying this product. You can only update product's totalCount or price for once right after saving product","httpStatus":"BAD_REQUEST","timestamp":"2021-12-28T13:42:06.094924661"}
+{"message":"You can't update the product's totalCount or Price. You have already updated these once or you are updating after selling or buying this product. You can only update product's totalCount or price for once right after saving product","httpStatus":"BAD_REQUEST","timestamp":"2021-12-28T22:51:37.922406743"}
 ----

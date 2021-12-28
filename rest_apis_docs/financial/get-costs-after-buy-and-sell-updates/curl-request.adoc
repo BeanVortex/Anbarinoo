@@ -3,7 +3,7 @@
 $ curl 'http://localhost:8080/api/user/financial/costs/' -i -X POST \
     -H 'Content-Type: application/json' \
     -H 'Accept: application/json' \
-    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA2ODYzMzYsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQyNTAwNzM2fQ.HcR1UOfZLhsvT4PrNzCT87giq3oqcVxVMhGt995B-xU' \
-    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MDY4NjMzNiwiZXhwIjoxNjQwNjg2Mzk2fQ.ic4g_rlxzkagKxwEMj9mF-H3URrO1m6aEp0vjF7ZBzE' \
-    -d '{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2021,12,28,13,42,16,590314654],"toDate":[2021,12,28,13,42,26,779224247]}'
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA3MTkzMDgsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQyNTMzNzA4fQ.PN4nWJi4CNovhG4AhvmldYa6Pqxlru0Cw61Gbu_aqts' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MDcxOTMwOCwiZXhwIjoxNjQwNzE5MzY4fQ.7TMGrYu1454nWZfc-sWVSA64ZqWTNejOgWGuzuUpoYk' \
+    -d '{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2021,12,28,22,51,48,178275145],"toDate":[2021,12,28,22,51,58,385255450]}'
 ----

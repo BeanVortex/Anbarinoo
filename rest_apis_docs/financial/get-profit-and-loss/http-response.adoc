@@ -2,7 +2,7 @@
 ----
 HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 148
+Content-Length: 147
 
-{"costs":null,"incomes":null,"profit":null,"loss":47.8740744190,"fromDate":"2021-12-28T13:42:16.590314654","toDate":"2021-12-28T13:42:26.779224247"}
+{"costs":null,"incomes":null,"profit":null,"loss":47.8740744190,"fromDate":"2021-12-28T22:51:48.178275145","toDate":"2021-12-28T22:51:58.38525545"}
 ----

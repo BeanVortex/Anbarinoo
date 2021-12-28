@@ -4,5 +4,5 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 Content-Length: 273
 
-{"id":4,"nameOf":"Me","payTo":"Other","isDebt":true,"isCheckedOut":false,"amount":115.56,"user":2,"issuedAt":"2021-12-28T13:42:14.594956415","validTill":"2022-01-02T13:42:14.594967857","createdAt":"2021-12-28T13:42:14.602554147","updatedAt":"2021-12-28T13:42:14.602567308"}
+{"id":4,"nameOf":"Me","payTo":"Other","isDebt":true,"isCheckedOut":false,"amount":115.56,"user":2,"issuedAt":"2021-12-28T22:51:46.334080698","validTill":"2022-01-02T22:51:46.334090019","createdAt":"2021-12-28T22:51:46.341083716","updatedAt":"2021-12-28T22:51:46.341094099"}
 ----

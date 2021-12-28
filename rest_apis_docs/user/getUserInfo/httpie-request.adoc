@@ -1,7 +1,7 @@
 [source,bash]
 ----
 $ http GET 'http://localhost:8080/api/user/2/' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA2ODYzMjgsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTY0MjUwMDcyOH0.p6OWVrcDki5vjB0ge2NAig0q5xKG_83JvRdSOE5IVhQ' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2NDA2ODYzMjgsImV4cCI6MTY0MDY4NjM4OH0.vuk6vi9CQs2-I92LJxYFLYoWXpQrkfTx9XSIdcdUbUI' \
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA3MTkzMDAsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTY0MjUzMzcwMH0.2fHKyPDsDYbBJk1kN34bwIY7FTd0huopWmMhZnw0pzk' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2NDA3MTkzMDAsImV4cCI6MTY0MDcxOTM2MH0.OB2v8vsnS4pU3iTfsbgxFWSsz3ymvI7TT4ZIhE4HPFY' \
     'Accept:application/json'
 ----

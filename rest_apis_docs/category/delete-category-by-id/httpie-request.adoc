@@ -3,6 +3,6 @@
 $ http DELETE 'http://localhost:8080/api/category/4/' \
     'Content-Type:application/json' \
     'Accept:application/json' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA2ODYzMjMsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQyNTAwNzIzfQ.KFeP-bhvFEVH_AL4RQlhm6pXoQM6le3kWwExv-AOqNY' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MDY4NjMyMywiZXhwIjoxNjQwNjg2MzgzfQ.CX7Dx2AgF3X04y4Ylrlmbs-ehVXLuDuTt-M4g1NWEbI'
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA3MTkyOTQsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQyNTMzNjk0fQ.bmoV8Bcmg2GOvlMDV-DBj_b8xouMbblEl5BYEvaPqq8' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MDcxOTI5NCwiZXhwIjoxNjQwNzE5MzU0fQ.FAazeiyGV4UbPyJNOYIxNf2_GobHxMcgpRg3Z1AziOk'
 ----

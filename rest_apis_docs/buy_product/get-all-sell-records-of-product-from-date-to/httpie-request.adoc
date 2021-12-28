@@ -1,8 +1,8 @@
 [source,bash]
 ----
-$ echo '{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2021,12,28,13,42,10,553441790],"toDate":[2021,12,28,13,42,10,644017995]}' | http POST 'http://localhost:8080/api/category/products/buy/get-by-product/date/5/' \
+$ echo '{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2021,12,28,22,51,42,340121305],"toDate":[2021,12,28,22,51,42,419723672]}' | http POST 'http://localhost:8080/api/category/products/buy/get-by-product/date/5/' \
     'Content-Type:application/json' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA2ODYzMzAsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQyNTAwNzMwfQ.R0-07MD_Xkex-vMAwauWvCRiJ_30QpBFqqW6Q2pTsa4' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MDY4NjMzMCwiZXhwIjoxNjQwNjg2MzkwfQ.-052yWd77lALnlm5P0X-mu_EKAjKmnIu-V56cfin064' \
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA3MTkzMDIsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQyNTMzNzAyfQ.lx4tNuo0QFzhf_6xrdULYPeAoBpXqo7nu77uhB5WlqA' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MDcxOTMwMiwiZXhwIjoxNjQwNzE5MzYyfQ.QvyGbks39gbi4wokd0FUmJmJZx7wzOyLKkN2HaWyF6g' \
     'Accept:application/json'
 ----
