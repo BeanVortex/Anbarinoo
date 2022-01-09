@@ -2,8 +2,8 @@
 ----
 POST /api/category/products/save/ HTTP/1.1
 Content-Type: multipart/form-data; boundary=6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
-refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA3MTkyOTcsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQyNTMzNjk3fQ.c5SKGjrHxpzFsFOtoJQSTdp8qOz7qR37HlJ4XtzXB54
-access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MDcxOTI5NywiZXhwIjoxNjQwNzE5MzU3fQ.lC8Sfed7me4bMA9U8uLgJKjcJavFdbXeFzH3-83tlMU
+refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDE3NjQzNTEsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQzNTc4NzUxfQ.oA1KM9jF77B-7pe4dw4UtikFsKFLbyadTDfb82tWte8
+access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MTc2NDM1MSwiZXhwIjoxNjQxNzY0NDExfQ.T2w6Z6_F_sNyiS0mkul0LVnMvZSlxiZvKwcMzg6o6jQ
 Accept: application/json
 Host: localhost:8080
 
@@ -15,6 +15,10 @@ product1
 Content-Disposition: form-data; name=price
 
 10
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Content-Disposition: form-data; name=tax
+
+9
 --6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
 Content-Disposition: form-data; name=description
 
@@ -35,6 +39,10 @@ product1
 Content-Disposition: form-data; name=price
 
 10
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Content-Disposition: form-data; name=tax
+
+9
 --6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
 Content-Disposition: form-data; name=description
 

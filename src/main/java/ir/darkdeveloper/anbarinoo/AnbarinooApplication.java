@@ -1,7 +1,6 @@
 package ir.darkdeveloper.anbarinoo;
 
 
-import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,7 +13,6 @@ public class AnbarinooApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
         SpringApplication.run(AnbarinooApplication.class, args);
-        log.error("d");
     }
 
     @Override

@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
-
 @Service
 @AllArgsConstructor
 public class ProductService {
@@ -46,10 +45,12 @@ public class ProductService {
     public ProductModel saveProduct(ProductModel product, HttpServletRequest req) {
         try {
             var savedProduct = productUtils.saveProduct(product, req);
-            var buy = new BuyModel();
-            buy.setProduct(savedProduct);
-            buy.setCount(savedProduct.getTotalCount());
-            buy.setPrice(savedProduct.getPrice());
+            var buy = BuyModel.builder()
+                    .product(savedProduct)
+                    .count(savedProduct.getTotalCount())
+                    .price(savedProduct.getPrice())
+                    .tax(savedProduct.getTax())
+                    .build();
             buyService.saveBuy(buy, true, req);
             savedProduct.setFirstBuyId(buy.getId());
             return repo.save(savedProduct);
@@ -63,7 +64,7 @@ public class ProductService {
     }
 
     /**
-     * For regular update with no images: another users can't update not owned products
+     * For regular update with no images: another users can't update, not users who owned products
      * If images and files and id provided, then they will be ignored
      * If price or count value is going to update, it will also update the first buy record of product
      *
@@ -75,9 +76,10 @@ public class ProductService {
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ProductModel updateProduct(ProductModel product, Long productId,
-                                      HttpServletRequest req) {
+            HttpServletRequest req) {
         try {
-            if (product.getId() != null) product.setId(null);
+            if (product.getId() != null)
+                product.setId(null);
 
             var foundProduct = repo.findById(productId);
             if (foundProduct.isPresent()) {
@@ -107,7 +109,8 @@ public class ProductService {
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public void updateProductFromBuyOrSell(ProductModel product, ProductModel preProduct, HttpServletRequest req) {
         try {
-            if (product.getId() != null) product.setId(null);
+            if (product.getId() != null)
+                product.setId(null);
             productUtils.checkUserIsSameUserForRequest(preProduct.getCategory().getUser().getId(), req,
                     "update");
             productUtils.updateProduct(product, preProduct);
@@ -136,12 +139,12 @@ public class ProductService {
         throw new NoContentException("This product does not exist");
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ProductModel getProduct(Long productId, HttpServletRequest req) {
         try {
             var product = repo.findById(productId);
             if (product.isPresent()) {
-                productUtils.checkUserIsSameUserForRequest(product.get().getCategory().getUser().getId(), req, "fetch");
+                 productUtils.checkUserIsSameUserForRequest(product.get().getCategory().getUser().getId(), req, "fetch");
                 return product.get();
             }
         } catch (ForbiddenException f) {
@@ -176,10 +179,12 @@ public class ProductService {
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ProductModel updateProductImages(ProductModel product, Long productId, HttpServletRequest req) {
         try {
-            if (product.getId() != null) throw new BadRequestException("Product id should null, can't update");
+            if (product.getId() != null)
+                throw new BadRequestException("Product id should null, can't update");
             var foundProduct = repo.findById(productId);
             if (foundProduct.isPresent()) {
-                productUtils.checkUserIsSameUserForRequest(foundProduct.get().getCategory().getUser().getId(), req, "update");
+                productUtils.checkUserIsSameUserForRequest(foundProduct.get().getCategory().getUser().getId(), req,
+                        "update");
                 return productUtils.updateProductImages(product, foundProduct.get());
             }
         } catch (ForbiddenException f) {
@@ -203,7 +208,8 @@ public class ProductService {
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ResponseEntity<?> updateDeleteProductImages(ProductModel product, Long productId, HttpServletRequest req) {
         try {
-            if (product.getId() != null) throw new BadRequestException("Product id should null, can't update");
+            if (product.getId() != null)
+                throw new BadRequestException("Product id should null, can't update");
             var foundProduct = repo.findById(productId);
             if (foundProduct.isPresent()) {
                 productUtils.checkUserIsSameUserForRequest(foundProduct.get().getCategory().getUser().getId(), req,
@@ -227,7 +233,8 @@ public class ProductService {
         try {
             var productOpt = repo.findById(id);
             if (productOpt.isPresent()) {
-                productUtils.checkUserIsSameUserForRequest(productOpt.get().getCategory().getUser().getId(), req, "delete");
+                productUtils.checkUserIsSameUserForRequest(productOpt.get().getCategory().getUser().getId(), req,
+                        "delete");
                 ioUtils.deleteProductFiles(productOpt.get());
                 repo.deleteById(id);
                 return new ResponseEntity<>(HttpStatus.OK);

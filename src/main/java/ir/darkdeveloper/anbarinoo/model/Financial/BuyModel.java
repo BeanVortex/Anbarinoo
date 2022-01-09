@@ -9,9 +9,7 @@ import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UpdateModel;
 import ir.darkdeveloper.anbarinoo.model.deserializers.BuyDeserializer;
 import ir.darkdeveloper.anbarinoo.model.serializers.BuySerialize;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -19,13 +17,17 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Data
+
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "buys")
 @JsonDeserialize(using = BuyDeserializer.class)
 @JsonSerialize(using = BuySerialize.class)
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class BuyModel implements UpdateModel<BuyModel> {
 
     @Id
@@ -41,7 +43,7 @@ public class BuyModel implements UpdateModel<BuyModel> {
     private BigDecimal price;
 
     @Column(nullable = false)
-    private Integer tax = 9;
+    private Integer tax;
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
@@ -61,5 +63,7 @@ public class BuyModel implements UpdateModel<BuyModel> {
         price = model.price != null || price == null ? model.price : price;
         tax = model.tax != null || tax == null ? model.tax : tax;
     }
+
 }
+
 

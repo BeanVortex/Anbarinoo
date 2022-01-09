@@ -2,8 +2,8 @@
 ----
 $ curl 'http://localhost:8080/api/category/products/update/delete-images/7/' -i -X PUT \
     -H 'Content-Type: application/json' \
-    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA3MTkyOTcsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQyNTMzNjk3fQ.c5SKGjrHxpzFsFOtoJQSTdp8qOz7qR37HlJ4XtzXB54' \
-    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MDcxOTI5NywiZXhwIjoxNjQwNzE5MzU3fQ.lC8Sfed7me4bMA9U8uLgJKjcJavFdbXeFzH3-83tlMU' \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDE3NjQzNTEsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQzNTc4NzUxfQ.oA1KM9jF77B-7pe4dw4UtikFsKFLbyadTDfb82tWte8' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MTc2NDM1MSwiZXhwIjoxNjQxNzY0NDExfQ.T2w6Z6_F_sNyiS0mkul0LVnMvZSlxiZvKwcMzg6o6jQ' \
     -H 'Accept: application/json' \
-    -d '{"id":null,"firstBuyId":null,"canUpdate":true,"name":null,"description":null,"images":["a3704acc-b6d9-46a6-b7e3-a54ab7ade8b4.jpeg","a7a07bd2-8156-49f2-9614-763c8f4438a7.jpeg"],"price":null,"category":null,"totalCount":null,"createdAt":null,"updatedAt":null}'
+    -d '{"id":null,"firstBuyId":null,"canUpdate":true,"name":null,"description":null,"images":["97c3bf1d-fa5f-4308-82cf-dcd66156c56f.jpeg","6e311b5d-8c26-415c-8231-f039f4a3f850.jpeg"],"price":null,"tax":null,"category":null,"totalCount":null,"createdAt":null,"updatedAt":null}'
 ----

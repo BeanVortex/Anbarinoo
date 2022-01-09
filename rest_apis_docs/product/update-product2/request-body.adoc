@@ -1,4 +1,4 @@
 [source,options="nowrap"]
 ----
-{"id":null,"firstBuyId":null,"canUpdate":true,"name":"product1Updated","description":"desc1Updated","images":null,"price":16.5,"category":null,"totalCount":6953546,"createdAt":null,"updatedAt":null}
+{"id":null,"firstBuyId":null,"canUpdate":true,"name":"product1Updated","description":"desc1Updated","images":null,"price":16.5,"tax":null,"category":null,"totalCount":6953546,"createdAt":null,"updatedAt":null}
 ----

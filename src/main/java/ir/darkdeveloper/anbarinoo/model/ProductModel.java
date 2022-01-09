@@ -10,22 +10,20 @@ import com.fasterxml.jackson.annotation.*;
 
 import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.SellModel;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.web.multipart.MultipartFile;
 
-import lombok.Data;
-
-@Data
+@Getter
+@Setter
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Table(name = "products")
-@ToString(exclude = "category")
-@EqualsAndHashCode(exclude = "category")
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class ProductModel implements UpdateModel<ProductModel> {
 
     @Id
@@ -34,6 +32,7 @@ public class ProductModel implements UpdateModel<ProductModel> {
 
     private Long firstBuyId;
 
+    @Builder.Default
     private Boolean canUpdate = true;
 
     @Column(length = 50, nullable = false)
@@ -52,18 +51,25 @@ public class ProductModel implements UpdateModel<ProductModel> {
     @Column(nullable = false, precision = 19, scale = 4)
     private BigDecimal price;
 
+    @Column(nullable = false)
+    private Integer tax;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     @JsonIgnore
+    @ToString.Exclude
     private List<SellModel> sells;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     @JsonIgnore
+    @ToString.Exclude
     private List<BuyModel> buys;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cat_id")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private CategoryModel category;
 
 
@@ -90,6 +96,7 @@ public class ProductModel implements UpdateModel<ProductModel> {
         description = model.description != null || description == null ? model.description : description;
         category = model.category != null || category == null ? model.category : category;
         totalCount = model.totalCount != null || totalCount == null ? model.totalCount : totalCount;
+        tax = model.tax != null || tax == null ? model.tax : tax;
     }
 }
 

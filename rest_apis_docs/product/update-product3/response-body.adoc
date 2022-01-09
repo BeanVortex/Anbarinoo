@@ -1,4 +1,4 @@
 [source,options="nowrap"]
 ----
-{"id":7,"firstBuyId":8,"canUpdate":false,"name":"product1Updated2","description":"desc1Updated2","images":["10b92a87-2e2b-4cb5-94d6-00cafcfbf0b7.jpeg","1feae142-ad71-4b2a-ae78-d3c738ad43fc.jpeg"],"price":50.0500,"category":6,"totalCount":50500.0000,"createdAt":"2021-12-28T22:51:37.802198","updatedAt":"2021-12-28T22:51:37.935642487"}
+{"id":7,"firstBuyId":8,"canUpdate":false,"name":"product1Updated2","description":"desc1Updated2","images":["06722817-f2a1-439f-9803-31ad8d172f65.jpeg","5223709b-c47c-4e69-8aae-99b47fd1c289.jpeg"],"price":50.0500,"tax":9,"category":6,"totalCount":50500.0000,"createdAt":"2022-01-10T01:09:12.398287","updatedAt":"2022-01-10T01:09:12.535600514"}
 ----

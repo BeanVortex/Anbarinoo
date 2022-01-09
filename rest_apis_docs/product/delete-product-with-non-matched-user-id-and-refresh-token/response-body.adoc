@@ -1,4 +1,4 @@
 [source,options="nowrap"]
 ----
-{"message":"You can't delete another user's products","httpStatus":"FORBIDDEN","timestamp":"2021-12-28T22:51:37.995038649"}
+{"message":"You can't delete another user's products","httpStatus":"FORBIDDEN","timestamp":"2022-01-10T01:09:12.601538548"}
 ----

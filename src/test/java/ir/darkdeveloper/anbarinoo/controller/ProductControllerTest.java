@@ -149,6 +149,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
 
         var category = new MockPart("category", catId.toString().getBytes());
         var price = new MockPart("price", "10".getBytes());
+        var tax = new MockPart("tax", "9".getBytes());
         var name = new MockPart("name", "product1".getBytes());
         var description = new MockPart("description", "desc1".getBytes());
         var totalCount = new MockPart("totalCount", "500".getBytes());
@@ -159,13 +160,13 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
                 "Hello, World!".getBytes());
 
         mockMvc.perform(multipart("/api/category/products/save/")
-                .part(name, price, description, category, totalCount)
-                .file(file1)
-                .file(file2)
-                .header("refresh_token", user1Refresh)
-                .header("access_token", user1Access)
-                .accept(MediaType.APPLICATION_JSON)
-        )
+                        .part(name, price, tax, description, category, totalCount)
+                        .file(file1)
+                        .file(file2)
+                        .header("refresh_token", user1Refresh)
+                        .header("access_token", user1Access)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.category").value(is(catId), Long.class))
@@ -183,15 +184,16 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     void saveProductWithoutImages() throws Exception {
         var category = new MockPart("category", catId.toString().getBytes());
         var price = new MockPart("price", "10".getBytes());
+        var tax = new MockPart("tax", "9".getBytes());
         var name = new MockPart("name", "product2".getBytes());
         var description = new MockPart("description", "desc2".getBytes());
         var totalCount = new MockPart("totalCount", "500".getBytes());
         mockMvc.perform(multipart("/api/category/products/save/")
-                .part(name, price, description, category, totalCount)
-                .header("refresh_token", user1Refresh)
-                .header("access_token", user1Access)
-                .accept(MediaType.APPLICATION_JSON)
-        )
+                        .part(name, price, tax, description, category, totalCount)
+                        .header("refresh_token", user1Refresh)
+                        .header("access_token", user1Access)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.category").value(is(catId), Long.class));
@@ -203,11 +205,11 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     void findByNameContainsWithAnotherUser() throws Exception {
         var name = "";
         mockMvc.perform(get("/api/category/products/search/")
-                .param("name", name)
-                .header("refresh_token", user2Refresh)
-                .header("access_token", user2Access)
-                .accept(MediaType.APPLICATION_JSON)
-        )
+                        .param("name", name)
+                        .header("refresh_token", user2Refresh)
+                        .header("access_token", user2Access)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
                 .andDo(print())
                 .andExpect(status().isNoContent());
     }
@@ -218,11 +220,11 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     void findByNameContains() throws Exception {
         var name = "";
         mockMvc.perform(get("/api/category/products/search/")
-                .param("name", name)
-                .header("refresh_token", user1Refresh)
-                .header("access_token", user1Access)
-                .accept(MediaType.APPLICATION_JSON)
-        )
+                        .param("name", name)
+                        .header("refresh_token", user1Refresh)
+                        .header("access_token", user1Access)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value(is(productId), Long.class));
@@ -241,12 +243,12 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
 
 
         mockMvc.perform(put("/api/category/products/update/{id}/", productId)
-                .content(mapToJson(product))
-                .header("refresh_token", user1Refresh)
-                .header("access_token", user1Access)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-        )
+                        .content(mapToJson(product))
+                        .header("refresh_token", user1Refresh)
+                        .header("access_token", user1Access)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.category").value(is(catId), Long.class))
@@ -270,12 +272,12 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
 
 
         mockMvc.perform(put("/api/category/products/update/{id}/", productId)
-                .content(mapToJson(product))
-                .header("refresh_token", user1Refresh)
-                .header("access_token", user1Access)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-        )
+                        .content(mapToJson(product))
+                        .header("refresh_token", user1Refresh)
+                        .header("access_token", user1Access)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
                 .andDo(print())
                 .andExpect(status().isBadRequest());
 
@@ -290,12 +292,12 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
         product.setDescription("desc1Updated2");
 
         mockMvc.perform(put("/api/category/products/update/{id}/", productId)
-                .content(mapToJson(product))
-                .header("refresh_token", user1Refresh)
-                .header("access_token", user1Access)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-        )
+                        .content(mapToJson(product))
+                        .header("refresh_token", user1Refresh)
+                        .header("access_token", user1Access)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(is("product1Updated2")))
@@ -329,16 +331,16 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
         // limit of 5 pics for a product
 
         mockMvc.perform(multipart("/api/category/products/update/images/{id}/", productId)
-                .part(id, name, price, description, totalCount)
-                .file(file1).file(file2).file(file3)
-                .header("refresh_token", user1Refresh)
-                .header("access_token", user1Access)
-                .accept(MediaType.APPLICATION_JSON)
-                .with(req -> {
-                    req.setMethod("PUT");
-                    return req;
-                })
-        )
+                        .part(id, name, price, description, totalCount)
+                        .file(file1).file(file2).file(file3)
+                        .header("refresh_token", user1Refresh)
+                        .header("access_token", user1Access)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(req -> {
+                            req.setMethod("PUT");
+                            return req;
+                        })
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.category").value(is(catId), Long.class))
@@ -358,10 +360,10 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
 
         //get product
         mockMvc.perform(get("/api/category/products/{id}/", productId)
-                .header("refresh_token", user1Refresh)
-                .header("access_token", user1Access)
-                .accept(MediaType.APPLICATION_JSON)
-        )
+                        .header("refresh_token", user1Refresh)
+                        .header("access_token", user1Access)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
                 .andExpect(status().isOk())
                 .andDo(result -> {
                     var jsonObject = new JSONObject(result.getResponse().getContentAsString());
@@ -375,12 +377,12 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
         product.setImages(images);
 
         mockMvc.perform(put("/api/category/products/update/delete-images/{id}/", productId)
-                .content(mapToJson(product))
-                .header("refresh_token", user1Refresh)
-                .header("access_token", user1Access)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-        )
+                        .content(mapToJson(product))
+                        .header("refresh_token", user1Refresh)
+                        .header("access_token", user1Access)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
                 .andDo(print())
                 .andExpect(status().isOk());
 
@@ -392,10 +394,10 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     void getProduct() throws Exception {
 
         mockMvc.perform(get("/api/category/products/{id}/", productId)
-                .header("refresh_token", user1Refresh)
-                .header("access_token", user1Access)
-                .accept(MediaType.APPLICATION_JSON)
-        )
+                        .header("refresh_token", user1Refresh)
+                        .header("access_token", user1Access)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.images", hasSize(3)));
@@ -408,10 +410,10 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void deleteProductWithNonMatchedUserIdAndRefreshToken() throws Exception {
         mockMvc.perform(delete("/api/category/products/{id}/", productId)
-                .header("refresh_token", user2Refresh)
-                .header("access_token", user2Access)
-                .accept(MediaType.APPLICATION_JSON)
-        )
+                        .header("refresh_token", user2Refresh)
+                        .header("access_token", user2Access)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
                 .andDo(print())
                 .andExpect(status().isForbidden());
     }
@@ -421,10 +423,10 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void deleteProduct() throws Exception {
         mockMvc.perform(delete("/api/category/products/{id}/", productId)
-                .header("refresh_token", user1Refresh)
-                .header("access_token", user1Access)
-                .accept(MediaType.APPLICATION_JSON)
-        )
+                        .header("refresh_token", user1Refresh)
+                        .header("access_token", user1Access)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
                 .andDo(print())
                 .andExpect(status().isOk());
     }

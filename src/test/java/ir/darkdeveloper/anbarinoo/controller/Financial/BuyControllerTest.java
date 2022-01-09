@@ -52,16 +52,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
+@ExtendWith({ RestDocumentationExtension.class, SpringExtension.class })
 @AutoConfigureRestDocs(outputDir = "rest_apis_docs/buy_product")
 @DirtiesContext
 public record BuyControllerTest(UserService userService,
-                                ProductService productService,
-                                JwtUtils jwtUtils,
-                                CategoryService categoryService,
-                                FinancialService financialService,
-                                RestDocumentationContextProvider restDocumentation,
-                                WebApplicationContext webApplicationContext) {
+        ProductService productService,
+        JwtUtils jwtUtils,
+        CategoryService categoryService,
+        FinancialService financialService,
+        RestDocumentationContextProvider restDocumentation,
+        WebApplicationContext webApplicationContext) {
 
     private static Long userId;
     private static String refresh;
@@ -72,7 +72,6 @@ public record BuyControllerTest(UserService userService,
     private static LocalDateTime from, to;
     private static HttpServletRequest request;
     private static MockMvc mockMvc;
-
 
     @Autowired
     public BuyControllerTest {
@@ -115,7 +114,7 @@ public record BuyControllerTest(UserService userService,
 
     @Test
     @Order(2)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(authorities = { "OP_ACCESS_USER" })
     void saveCategory() {
         var electronics = new CategoryModel("Electronics");
         categoryService.saveCategory(electronics, request);
@@ -126,12 +125,15 @@ public record BuyControllerTest(UserService userService,
     @Order(3)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void saveProduct() {
-        var product = new ProductModel();
-        product.setName("name");
-        product.setDescription("description");
-        product.setTotalCount(BigDecimal.valueOf(50));
-        product.setPrice(BigDecimal.valueOf(500));
-        product.setCategory(new CategoryModel(catId));
+        var product = ProductModel.builder()
+                .name("name")
+                .description("description")
+                .totalCount(BigDecimal.valueOf(50))
+                .price(BigDecimal.valueOf(500))
+                .category(new CategoryModel(catId))
+                .tax(9)
+                .build();
+        System.out.println(product);
         productService.saveProduct(product, request);
         productId = product.getId();
     }
@@ -140,10 +142,13 @@ public record BuyControllerTest(UserService userService,
     @Order(4)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void saveBuy() throws Exception {
-        var buy = new BuyModel();
-        buy.setProduct(new ProductModel(productId));
-        buy.setPrice(BigDecimal.valueOf(5000));
-        buy.setCount(BigDecimal.valueOf(8));
+        var buy = BuyModel.builder()
+                .product(new ProductModel(productId))
+                .price(BigDecimal.valueOf(5000))
+                .count(BigDecimal.valueOf(8))
+                .tax(10)
+                .build();
+        System.out.println(buy);
         from = LocalDateTime.now();
         mockMvc.perform(post("/api/category/products/buy/save/")
                 .header("refresh_token", refresh)
@@ -158,199 +163,188 @@ public record BuyControllerTest(UserService userService,
                 .andDo(result -> {
                     var obj = new JSONObject(result.getResponse().getContentAsString());
                     buyId = obj.getLong("id");
-                })
-        ;
+                });
     }
 
-    @Test
-    @Order(5)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
-    void updateBuy() throws Exception {
+     @Test
+     @Order(5)
+     @WithMockUser(authorities = "OP_ACCESS_USER")
+     void updateBuy() throws Exception {
 
-        var buy = new BuyModel();
-        buy.setProduct(new ProductModel(productId));
-        buy.setPrice(BigDecimal.valueOf(9000.568));
-        buy.setCount(BigDecimal.valueOf(60.2));
-        mockMvc.perform(put("/api/category/products/buy/update/{id}/", buyId)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-                .content(mapToJson(buy))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.price").value(is(BigDecimal.valueOf(9000.568)), BigDecimal.class))
-                .andExpect(jsonPath("$.count").value(is(BigDecimal.valueOf(60.2)), BigDecimal.class))
-        ;
+         var buy = new BuyModel();
+         buy.setProduct(new ProductModel(productId));
+         buy.setPrice(BigDecimal.valueOf(9000.568));
+         buy.setCount(BigDecimal.valueOf(60.2));
+         mockMvc.perform(put("/api/category/products/buy/update/{id}/", buyId)
+                 .header("refresh_token", refresh)
+                 .header("access_token", access)
+                 .content(mapToJson(buy))
+                 .contentType(MediaType.APPLICATION_JSON)
+                 .accept(MediaType.APPLICATION_JSON))
+                 .andDo(print())
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$").isMap())
+                 .andExpect(jsonPath("$.price").value(is(BigDecimal.valueOf(9000.568)), BigDecimal.class))
+                 .andExpect(jsonPath("$.count").value(is(BigDecimal.valueOf(60.2)), BigDecimal.class));
 
-    }
+     }
 
-    @Test
-    @Order(6)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getAllBuyRecordsOfProduct() throws Exception {
+     @Test
+     @Order(6)
+     @WithMockUser(authorities = "OP_ACCESS_USER")
+     void getAllBuyRecordsOfProduct() throws Exception {
 
-        mockMvc.perform(get("/api/category/products/buy/get-by-product/{id}/?page={page}&size={size}",
-                productId, 0, 2)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.pageable.pageSize").value(is(2)))
-                .andExpect(jsonPath("$.pageable.pageNumber").value(is(0)))
-                .andExpect(jsonPath("$.totalElements").value(is(2)))
-        ;
-    }
+         mockMvc.perform(get("/api/category/products/buy/get-by-product/{id}/?page={page}&size={size}",
+                 productId, 0, 2)
+                         .header("refresh_token", refresh)
+                         .header("access_token", access)
+                         .contentType(MediaType.APPLICATION_JSON)
+                         .accept(MediaType.APPLICATION_JSON))
+                 .andDo(print())
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$").isMap())
+                 .andExpect(jsonPath("$.content").isArray())
+                 .andExpect(jsonPath("$.pageable.pageSize").value(is(2)))
+                 .andExpect(jsonPath("$.pageable.pageNumber").value(is(0)))
+                 .andExpect(jsonPath("$.totalElements").value(is(2)));
+     }
 
-    @Test
-    @Order(7)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getAllBuyRecordsOfUser() throws Exception {
-        mockMvc.perform(get("/api/category/products/buy/get-by-user/{id}/?page={page}&size={size}",
-                userId, 0, 2)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.content").isNotEmpty())
-                .andExpect(jsonPath("$.pageable.pageSize").value(is(2)))
-                .andExpect(jsonPath("$.pageable.pageNumber").value(is(0)))
-                .andExpect(jsonPath("$.totalElements").value(is(2)))
-        ;
+     @Test
+     @Order(7)
+     @WithMockUser(authorities = "OP_ACCESS_USER")
+     void getAllBuyRecordsOfUser() throws Exception {
+         mockMvc.perform(get("/api/category/products/buy/get-by-user/{id}/?page={page}&size={size}",
+                 userId, 0, 2)
+                         .header("refresh_token", refresh)
+                         .header("access_token", access)
+                         .contentType(MediaType.APPLICATION_JSON)
+                         .accept(MediaType.APPLICATION_JSON))
+                 .andDo(print())
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$").isMap())
+                 .andExpect(jsonPath("$.content").isNotEmpty())
+                 .andExpect(jsonPath("$.pageable.pageSize").value(is(2)))
+                 .andExpect(jsonPath("$.pageable.pageNumber").value(is(0)))
+                 .andExpect(jsonPath("$.totalElements").value(is(2)));
 
+     }
 
-    }
+     @Test
+     @Order(8)
+     @WithMockUser(authorities = "OP_ACCESS_USER")
+     void getAllSellRecordsOfProductFromDateTo() throws Exception {
+         to = LocalDateTime.now();
+         var financial = new FinancialModel();
+         financial.setFromDate(from);
+         financial.setToDate(to);
+         mockMvc.perform(post("/api/category/products/buy/get-by-product/date/{id}/",
+                 productId)
+                         .header("refresh_token", refresh)
+                         .header("access_token", access)
+                         .contentType(MediaType.APPLICATION_JSON)
+                         .accept(MediaType.APPLICATION_JSON)
+                         .content(mapToJson(financial)))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$").isMap())
+                 .andExpect(jsonPath("$.content").isArray())
+                 .andExpect(jsonPath("$.content[0].product").value(is(productId), Long.class))
+                 .andExpect(jsonPath("$.totalElements").value(is(1)))
+                 .andDo(print());
+     }
 
-    @Test
-    @Order(8)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getAllSellRecordsOfProductFromDateTo() throws Exception {
-        to = LocalDateTime.now();
-        var financial = new FinancialModel();
-        financial.setFromDate(from);
-        financial.setToDate(to);
-        mockMvc.perform(post("/api/category/products/buy/get-by-product/date/{id}/",
-                productId)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(mapToJson(financial))
-        )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content[0].product").value(is(productId), Long.class))
-                .andExpect(jsonPath("$.totalElements").value(is(1)))
-                .andDo(print())
-        ;
-    }
+     @Test
+     @Order(9)
+     @WithMockUser(authorities = "OP_ACCESS_USER")
+     void getAllSellRecordsOfUserFromDateTo() throws Exception {
+         to = LocalDateTime.now();
+         var financial = new FinancialModel();
+         financial.setFromDate(from);
+         financial.setToDate(to);
+         mockMvc.perform(post("/api/category/products/buy/get-by-user/date/{id}/",
+                 userId)
+                         .header("refresh_token", refresh)
+                         .header("access_token", access)
+                         .contentType(MediaType.APPLICATION_JSON)
+                         .accept(MediaType.APPLICATION_JSON)
+                         .content(mapToJson(financial)))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$").isMap())
+                 .andExpect(jsonPath("$.content").isArray())
+                 .andExpect(jsonPath("$.content[0].product").value(is(productId), Long.class))
+                 .andExpect(jsonPath("$.totalElements").value(is(1)))
+                 .andDo(print());
 
-    @Test
-    @Order(9)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getAllSellRecordsOfUserFromDateTo() throws Exception {
-        to = LocalDateTime.now();
-        var financial = new FinancialModel();
-        financial.setFromDate(from);
-        financial.setToDate(to);
-        mockMvc.perform(post("/api/category/products/buy/get-by-user/date/{id}/",
-                userId)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(mapToJson(financial))
-        )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content[0].product").value(is(productId), Long.class))
-                .andExpect(jsonPath("$.totalElements").value(is(1)))
-                .andDo(print())
-        ;
+     }
 
-    }
+     @Test
+     @Order(10)
+     @WithMockUser(authorities = "OP_ACCESS_USER")
+     void getBuy() throws Exception {
+         mockMvc.perform(get("/api/category/products/buy/{id}/",
+                 buyId)
+                         .header("refresh_token", refresh)
+                         .header("access_token", access)
+                         .contentType(MediaType.APPLICATION_JSON)
+                         .accept(MediaType.APPLICATION_JSON))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$").isMap())
+                 .andExpect(jsonPath("$.product").value(is(productId), Long.class))
+                 .andExpect(jsonPath("$.id").value(is(buyId), Long.class))
+                 .andExpect(jsonPath("$.count").value(is(BigDecimal.valueOf(60.2)), BigDecimal.class))
+                 .andDo(print());
+     }
 
+     @Test
+     @Order(11)
+     @WithMockUser(authorities = "OP_ACCESS_USER")
+     void deleteBuy() throws Exception {
 
-    @Test
-    @Order(10)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getBuy() throws Exception {
-        mockMvc.perform(get("/api/category/products/buy/{id}/",
-                buyId)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.product").value(is(productId), Long.class))
-                .andExpect(jsonPath("$.id").value(is(buyId), Long.class))
-                .andExpect(jsonPath("$.count").value(is(BigDecimal.valueOf(60.2)), BigDecimal.class))
-                .andDo(print());
-    }
+         mockMvc.perform(delete("/api/category/products/buy/{id}/", buyId)
+                 .header("refresh_token", refresh)
+                 .header("access_token", access)
+                 .contentType(MediaType.APPLICATION_JSON)
+                 .accept(MediaType.APPLICATION_JSON))
+                 .andExpect(status().isOk())
+                 .andDo(print());
+     }
 
-    @Test
-    @Order(11)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
-    void deleteBuy() throws Exception {
+     @Test
+     @Order(12)
+     @WithMockUser(authorities = "OP_ACCESS_USER")
+     void getAllBuyRecordsOfProductAfterBuyDelete() throws Exception {
 
-        mockMvc.perform(delete("/api/category/products/buy/{id}/", buyId)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andDo(print());
-    }
+         mockMvc.perform(get("/api/category/products/buy/get-by-product/{id}/?page={page}&size={size}",
+                 productId, 0, 2)
+                         .header("refresh_token", refresh)
+                         .header("access_token", access)
+                         .contentType(MediaType.APPLICATION_JSON)
+                         .accept(MediaType.APPLICATION_JSON))
+                 .andDo(print())
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$").isMap())
+                 .andExpect(jsonPath("$.content").isArray())
+                 .andExpect(jsonPath("$.pageable.pageSize").value(is(2)))
+                 .andExpect(jsonPath("$.pageable.pageNumber").value(is(0)))
+                 .andExpect(jsonPath("$.totalElements").value(is(1)));
+     }
 
-    @Test
-    @Order(12)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getAllBuyRecordsOfProductAfterBuyDelete() throws Exception {
+     @Test
+     @Order(13)
+     @WithMockUser(authorities = "OP_ACCESS_USER")
+     void getBuyRecordOfAProductAfterProductDelete() throws Exception {
 
-        mockMvc.perform(get("/api/category/products/buy/get-by-product/{id}/?page={page}&size={size}",
-                productId, 0, 2)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.pageable.pageSize").value(is(2)))
-                .andExpect(jsonPath("$.pageable.pageNumber").value(is(0)))
-                .andExpect(jsonPath("$.totalElements").value(is(1)))
-        ;
-    }
+         var firstBuyId = productService.getProduct(productId, request).getFirstBuyId();
+         productService.deleteProduct(productId, request);
 
-    @Test
-    @Order(13)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
-    void getBuyRecordOfAProductAfterProductDelete() throws Exception {
-
-        var firstBuyId = productService.getProduct(productId, request).getFirstBuyId();
-        productService.deleteProduct(productId, request);
-
-        mockMvc.perform(get("/api/category/products/buy/{id}/",
-                firstBuyId)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent())
-                .andDo(print());
-    }
+         mockMvc.perform(get("/api/category/products/buy/{id}/",
+                 firstBuyId)
+                         .header("refresh_token", refresh)
+                         .header("access_token", access)
+                         .contentType(MediaType.APPLICATION_JSON)
+                         .accept(MediaType.APPLICATION_JSON))
+                 .andExpect(status().isNoContent())
+                 .andDo(print());
+     }
 
     private String mapToJson(Object obj) throws JsonProcessingException {
         return new ObjectMapper().findAndRegisterModules().writeValueAsString(obj);
@@ -371,7 +365,6 @@ public record BuyControllerTest(UserService userService,
         headers.put("access_token", access);
         headers.put("refresh_expiration", refreshDate);
         headers.put("access_expiration", accessDate);
-
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         for (String key : headers.keySet())

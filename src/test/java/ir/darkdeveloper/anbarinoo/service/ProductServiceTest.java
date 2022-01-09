@@ -1,12 +1,22 @@
 package ir.darkdeveloper.anbarinoo.service;
 
-import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
-import ir.darkdeveloper.anbarinoo.model.CategoryModel;
-import ir.darkdeveloper.anbarinoo.model.ProductModel;
-import ir.darkdeveloper.anbarinoo.model.UserModel;
-import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
-import org.junit.jupiter.api.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,17 +29,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import ir.darkdeveloper.anbarinoo.model.CategoryModel;
+import ir.darkdeveloper.anbarinoo.model.ProductModel;
+import ir.darkdeveloper.anbarinoo.model.UserModel;
+import ir.darkdeveloper.anbarinoo.util.JwtUtils;
+import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -97,11 +101,14 @@ public record ProductServiceTest(ProductService productService,
     @Order(3)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void saveProduct() {
-        var product = new ProductModel();
-        product.setName("name");
-        product.setDescription("description");
-        product.setTotalCount(BigDecimal.valueOf(50));
-        product.setPrice(BigDecimal.valueOf(500));
+        var product = ProductModel.builder()
+                .name("name")
+                .description("description")
+                .totalCount(BigDecimal.valueOf(50))
+                .price(BigDecimal.valueOf(500))
+                .category(new CategoryModel(catId))
+                .tax(9)
+                .build();
         MockMultipartFile file3 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
                 "Hello, World!".getBytes());
         MockMultipartFile file4 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,

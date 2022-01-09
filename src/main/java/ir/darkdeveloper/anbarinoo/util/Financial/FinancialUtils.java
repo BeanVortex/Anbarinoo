@@ -56,8 +56,11 @@ public class FinancialUtils {
 
         buys.forEach(buy -> {
             var initCost = buy.getCount().multiply(buy.getPrice());
-            var tax = initCost.multiply(BigDecimal.valueOf(buy.getTax(), 2));
-            buyCosts.set(buyCosts.get().add(initCost.add(tax)));
+            var costWithTax = new BigDecimal(0);
+            if (buy.getTax() != null && buy.getTax() != 0)
+                costWithTax = initCost.multiply(BigDecimal.valueOf(buy.getTax(), 2));
+
+            buyCosts.set(buyCosts.get().add(initCost.add(costWithTax)));
         });
         return buyCosts;
     }
@@ -71,9 +74,12 @@ public class FinancialUtils {
         var incomes = new AtomicReference<>(new BigDecimal(0));
 
         sells.forEach(sell -> {
-            var initCost = sell.getCount().multiply(sell.getPrice());
-            var tax = initCost.multiply(BigDecimal.valueOf(sell.getTax(), 2));
-            incomes.set(incomes.get().add(initCost.subtract(tax)));
+            var initIncomes = sell.getCount().multiply(sell.getPrice());
+            var incomesWithTax = new BigDecimal(0);
+            if (sell.getTax() != null && sell.getTax() != 0)
+                incomesWithTax = initIncomes.multiply(BigDecimal.valueOf(sell.getTax(), 2));
+
+            incomes.set(incomes.get().add(initIncomes.subtract(incomesWithTax)));
         });
         return incomes;
     }

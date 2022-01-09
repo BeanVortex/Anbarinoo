@@ -2,11 +2,12 @@
 ----
 $ curl 'http://localhost:8080/api/category/products/save/' -i -X POST \
     -H 'Content-Type: multipart/form-data' \
-    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA3MTkyOTcsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQyNTMzNjk3fQ.c5SKGjrHxpzFsFOtoJQSTdp8qOz7qR37HlJ4XtzXB54' \
-    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MDcxOTI5NywiZXhwIjoxNjQwNzE5MzU3fQ.lC8Sfed7me4bMA9U8uLgJKjcJavFdbXeFzH3-83tlMU' \
+    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDE3NjQzNTEsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQzNTc4NzUxfQ.oA1KM9jF77B-7pe4dw4UtikFsKFLbyadTDfb82tWte8' \
+    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MTc2NDM1MSwiZXhwIjoxNjQxNzY0NDExfQ.T2w6Z6_F_sNyiS0mkul0LVnMvZSlxiZvKwcMzg6o6jQ' \
     -H 'Accept: application/json' \
     -F 'name=product1' \
     -F 'price=10' \
+    -F 'tax=9' \
     -F 'description=desc1' \
     -F 'category=6' \
     -F 'totalCount=500' \
@@ -14,6 +15,7 @@ $ curl 'http://localhost:8080/api/category/products/save/' -i -X POST \
     -F 'files=@hello.jpg;type=image/jpeg' \
     -F 'name=product1' \
     -F 'price=10' \
+    -F 'tax=9' \
     -F 'description=desc1' \
     -F 'category=6' \
     -F 'totalCount=500'

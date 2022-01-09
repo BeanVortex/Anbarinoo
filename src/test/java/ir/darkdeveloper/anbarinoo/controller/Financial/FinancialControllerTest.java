@@ -131,12 +131,14 @@ public record FinancialControllerTest(UserService userService,
     @Order(3)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void saveProduct() {
-        var product = new ProductModel();
-        product.setName("name");
-        product.setDescription("description");
-        product.setTotalCount(BigDecimal.valueOf(50));
-        product.setPrice(BigDecimal.valueOf(500));
-        product.setCategory(new CategoryModel(catId));
+        var product = ProductModel.builder()
+                .name("name")
+                .description("description")
+                .totalCount(BigDecimal.valueOf(50))
+                .price(BigDecimal.valueOf(500))
+                .category(new CategoryModel(catId))
+                .tax(9)
+                .build();
         fromDate = LocalDateTime.now();
         productService.saveProduct(product, request);
         productId = product.getId();
@@ -146,10 +148,12 @@ public record FinancialControllerTest(UserService userService,
     @Order(4)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void saveBuy() throws InterruptedException {
-        var buy = new BuyModel();
-        buy.setProduct(new ProductModel(productId));
-        buy.setPrice(BigDecimal.valueOf(5000));
-        buy.setCount(BigDecimal.valueOf(8));
+        var buy = BuyModel.builder()
+                .product(new ProductModel(productId))
+                .price(BigDecimal.valueOf(5000))
+                .count(BigDecimal.valueOf(8))
+                .tax(9)
+                .build();
         buyService.saveBuy(buy, false, request);
         assertThat(buy.getId()).isNotNull();
         buyId = buy.getId();

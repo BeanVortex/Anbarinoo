@@ -1,4 +1,4 @@
 [source,options="nowrap"]
 ----
-{"id":2,"email":"email@mail.com","userName":"UpdatedUser n","provider":"LOCAL","enabled":true,"shopImage":"noImage.png","profileImage":"noProfile.jpeg","roles":["USER"],"createdAt":"2021-12-28T22:51:39.501386","updatedAt":"2021-12-28T22:51:40.298504","shopName":null,"address":"UpdatedAddress","description":"UpdatedDesc","debtOrDemand":[],"cheques":[],"categories":[],"name":"UpdatedUser n","username":"email@mail.com","accountNonExpired":true,"accountNonLocked":true,"credentialsNonExpired":true}
+{"id":2,"email":"email@mail.com","userName":"UpdatedUser n","provider":"LOCAL","enabled":true,"shopImage":"noImage.png","profileImage":"noProfile.jpeg","roles":["USER"],"createdAt":"2022-01-10T01:09:14.159021","updatedAt":"2022-01-10T01:09:14.964961","shopName":null,"address":"UpdatedAddress","description":"UpdatedDesc","debtOrDemand":[],"cheques":[],"categories":[],"name":"UpdatedUser n","username":"email@mail.com","accountNonExpired":true,"accountNonLocked":true,"credentialsNonExpired":true}
 ----

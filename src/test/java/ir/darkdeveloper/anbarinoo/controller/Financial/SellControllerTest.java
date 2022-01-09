@@ -121,12 +121,14 @@ public record SellControllerTest(UserService userService,
     @Order(3)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void saveProduct() {
-        var product = new ProductModel();
-        product.setName("name");
-        product.setDescription("description");
-        product.setTotalCount(BigDecimal.valueOf(50));
-        product.setPrice(BigDecimal.valueOf(500));
-        product.setCategory(new CategoryModel(catId));
+        var product = ProductModel.builder()
+                .name("name")
+                .description("description")
+                .totalCount(BigDecimal.valueOf(50))
+                .price(BigDecimal.valueOf(500))
+                .category(new CategoryModel(catId))
+                .tax(9)
+                .build();
         productService.saveProduct(product, request);
         productId = product.getId();
     }

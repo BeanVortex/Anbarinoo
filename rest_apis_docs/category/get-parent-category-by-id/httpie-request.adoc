@@ -3,6 +3,6 @@
 $ http GET 'http://localhost:8080/api/category/4/' \
     'Content-Type:application/json' \
     'Accept:application/json' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDA3MTkyOTQsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQyNTMzNjk0fQ.bmoV8Bcmg2GOvlMDV-DBj_b8xouMbblEl5BYEvaPqq8' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MDcxOTI5NCwiZXhwIjoxNjQwNzE5MzU0fQ.FAazeiyGV4UbPyJNOYIxNf2_GobHxMcgpRg3Z1AziOk'
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDE3NjQzNDksInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQzNTc4NzQ5fQ.mxaxp4i3xdH0wrdO_1kFL4RVAx1u-1TpIWEMD-ZGnR8' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MTc2NDM0OSwiZXhwIjoxNjQxNzY0NDA5fQ.bR1lEkf7eHCiDPZPk_U_YCL8ji_m5wMkvYjv5kD1kEg'
 ----
