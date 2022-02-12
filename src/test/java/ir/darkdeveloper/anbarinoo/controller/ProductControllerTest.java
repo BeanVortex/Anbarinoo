@@ -59,7 +59,6 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
 
 
     private static Long userId;
-    private static Long userId2;
     private static String user1Refresh;
     private static String user1Access;
     private static String user2Refresh;
@@ -125,7 +124,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
         user.setPasswordRepeat("pass12P+");
         user.setEnabled(true);
         userService.signUpUser(user, response);
-        userId2 = user.getId();
+        var userId2 = user.getId();
         request = setUpHeader(user.getEmail(), userId2);
         user2Refresh = request.getHeader("refresh_token");
         user2Access = request.getHeader("access_token");

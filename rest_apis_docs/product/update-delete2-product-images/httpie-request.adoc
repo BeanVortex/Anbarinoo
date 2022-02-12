@@ -1,8 +1,8 @@
 [source,bash]
 ----
-$ echo '{"id":null,"firstBuyId":null,"canUpdate":true,"name":null,"description":null,"images":["97c3bf1d-fa5f-4308-82cf-dcd66156c56f.jpeg","6e311b5d-8c26-415c-8231-f039f4a3f850.jpeg"],"price":null,"tax":null,"category":null,"totalCount":null,"createdAt":null,"updatedAt":null}' | http PUT 'http://localhost:8080/api/category/products/update/delete-images/7/' \
+$ echo '{"id":null,"firstBuyId":null,"canUpdate":true,"name":null,"description":null,"images":["03631422-d15e-40ed-984e-174fe5c9845d.jpeg","f2b1760a-bd64-478c-8565-e0e6ef442ce7.jpeg"],"price":null,"tax":null,"category":null,"totalCount":null,"createdAt":null,"updatedAt":null}' | http PUT 'http://localhost:8080/api/category/products/update/delete-images/7/' \
     'Content-Type:application/json' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDE3NjQzNTEsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQzNTc4NzUxfQ.oA1KM9jF77B-7pe4dw4UtikFsKFLbyadTDfb82tWte8' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MTc2NDM1MSwiZXhwIjoxNjQxNzY0NDExfQ.T2w6Z6_F_sNyiS0mkul0LVnMvZSlxiZvKwcMzg6o6jQ' \
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDQ2NDg4ODEsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQ2NDYzMjgxfQ.RugMOEeSIcguPny6s_zEvxh7KSobl-evj8VokqKn84M' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0NDY0ODg4MSwiZXhwIjoxNjQ0NjQ4OTQxfQ.Vt4zyedtM_HGkcd3gIReZ2Cs6EI3dfCeLBHsWVcvAII' \
     'Accept:application/json'
 ----

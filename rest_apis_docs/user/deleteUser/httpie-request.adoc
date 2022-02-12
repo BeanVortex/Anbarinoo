@@ -1,7 +1,7 @@
 [source,bash]
 ----
 $ http DELETE 'http://localhost:8080/api/user/2/' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDE3NjQzNTQsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTY0MzU3ODc1NH0.Yfl7RoNasCYsL-9asA7v5wxBH4kZFkVoPAO2m5t-kGg' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2NDE3NjQzNTQsImV4cCI6MTY0MTc2NDQxNH0.9JbdOKA8vxL3P9ia5Z3nOquZxYuJsYCl14pp5EZ8LDg' \
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDQ2NDg3MTgsInN1YiI6InVzZXIgbiIsInVzZXJfaWQiOjIsImV4cCI6MTY0NjQ2MzExOH0.BdeKbxflyLCJizqXnxNzBjWSbpTLXdL70C_yR2RbOqM' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIG4iLCJpYXQiOjE2NDQ2NDg3MTgsImV4cCI6MTY0NDY0ODc3OH0.elopTt80pCSFSL6DG4Ov8rGRRp4HafRsmYuOkGpLnbw' \
     'Accept:application/json'
 ----

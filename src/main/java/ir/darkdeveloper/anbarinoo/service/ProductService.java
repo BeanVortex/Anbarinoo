@@ -1,9 +1,6 @@
 package ir.darkdeveloper.anbarinoo.service;
 
-import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
-import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
-import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
-import ir.darkdeveloper.anbarinoo.exception.NoContentException;
+import ir.darkdeveloper.anbarinoo.exception.*;
 import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.repository.ProductRepository;
@@ -13,6 +10,7 @@ import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.ProductUtils;
 import lombok.AllArgsConstructor;
 import org.hibernate.exception.DataException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -22,6 +20,8 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.io.IOException;
+import java.util.function.Supplier;
 
 @Service
 @AllArgsConstructor
@@ -43,8 +43,13 @@ public class ProductService {
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER') && #product.getCategory() != null")
     public ProductModel saveProduct(ProductModel product, HttpServletRequest req) {
-        try {
-            var savedProduct = productUtils.saveProduct(product, req);
+        return exceptionHandlers(() -> {
+            ProductModel savedProduct;
+            try {
+                savedProduct = productUtils.saveProduct(product, req);
+            } catch (IOException e) {
+                throw new InternalServerException(e.getLocalizedMessage());
+            }
             var buy = BuyModel.builder()
                     .product(savedProduct)
                     .count(savedProduct.getTotalCount())
@@ -54,13 +59,7 @@ public class ProductService {
             buyService.saveBuy(buy, true, req);
             savedProduct.setFirstBuyId(buy.getId());
             return repo.save(savedProduct);
-        } catch (ForbiddenException f) {
-            throw new ForbiddenException(f.getLocalizedMessage());
-        } catch (BadRequestException b) {
-            throw new BadRequestException(b.getLocalizedMessage());
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
+        });
     }
 
     /**
@@ -76,30 +75,18 @@ public class ProductService {
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ProductModel updateProduct(ProductModel product, Long productId,
-            HttpServletRequest req) {
-        try {
-            if (product.getId() != null)
-                product.setId(null);
+                                      HttpServletRequest req) {
+        return exceptionHandlers(() -> {
+            if (product.getId() != null) product.setId(null);
 
-            var foundProduct = repo.findById(productId);
-            if (foundProduct.isPresent()) {
-                productUtils.checkUserIsSameUserForRequest(foundProduct.get().getCategory().getUser().getId(),
-                        req, "update");
-                if (product.getPrice() != null || product.getTotalCount() != null)
-                    productUtils.updateBuyWithProductUpdate(product, foundProduct.get(), buyService, req);
-                return productUtils.updateProduct(product, foundProduct.get());
-            }
-            throw new NoContentException("This product does not exist");
-
-        } catch (NoContentException f) {
-            throw new NoContentException(f.getLocalizedMessage());
-        } catch (ForbiddenException f) {
-            throw new ForbiddenException(f.getLocalizedMessage());
-        } catch (BadRequestException n) {
-            throw new BadRequestException(n.getLocalizedMessage());
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
+            var foundProduct = repo.findById(productId)
+                    .orElseThrow(() -> new NoContentException("This product does not exist"));
+            productUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(),
+                    req, "update");
+            if (product.getPrice() != null || product.getTotalCount() != null)
+                productUtils.updateBuyWithProductUpdate(product, foundProduct, buyService, req);
+            return productUtils.updateProduct(product, foundProduct);
+        });
     }
 
     /**
@@ -108,63 +95,45 @@ public class ProductService {
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public void updateProductFromBuyOrSell(ProductModel product, ProductModel preProduct, HttpServletRequest req) {
-        try {
+        exceptionHandlers(() -> {
             if (product.getId() != null)
                 product.setId(null);
             productUtils.checkUserIsSameUserForRequest(preProduct.getCategory().getUser().getId(), req,
                     "update");
             productUtils.updateProduct(product, preProduct);
-
-        } catch (ForbiddenException f) {
-            throw new ForbiddenException(f.getLocalizedMessage());
-        } catch (BadRequestException n) {
-            throw new BadRequestException(n.getLocalizedMessage());
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
+            return null;
+        });
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public Page<ProductModel> findByNameContains(String name, Pageable pageable, HttpServletRequest req) {
-        try {
-            var foundData = repo.findByNameContainsAndCategoryUserId(name,
-                    jwtUtils.getUserId(req.getHeader("refresh_token")), pageable);
+        return exceptionHandlers(() -> {
+            var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
+            var foundData = repo
+                    .findByNameContainsAndCategoryUserId(name, userId, pageable);
             if (!foundData.getContent().isEmpty() && foundData.getContent().get(0) != null)
                 return foundData;
-        } catch (ForbiddenException f) {
-            throw new ForbiddenException(f.getLocalizedMessage());
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
-        throw new NoContentException("This product does not exist");
+            else
+                throw new NoContentException("This product does not exist");
+        });
     }
 
-     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ProductModel getProduct(Long productId, HttpServletRequest req) {
-        try {
-            var product = repo.findById(productId);
-            if (product.isPresent()) {
-                 productUtils.checkUserIsSameUserForRequest(product.get().getCategory().getUser().getId(), req, "fetch");
-                return product.get();
-            }
-        } catch (ForbiddenException f) {
-            throw new ForbiddenException(f.getLocalizedMessage());
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
-        throw new NoContentException("This product does not exist");
+        return exceptionHandlers(() -> {
+            var product = repo.findById(productId)
+                    .orElseThrow(() -> new NoContentException("This product does not exist"));
+            productUtils.checkUserIsSameUserForRequest(product.getCategory().getUser().getId(), req, "fetch");
+            return product;
+        });
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public Page<ProductModel> getAllProducts(Pageable pageable, HttpServletRequest req) {
-        try {
+        return exceptionHandlers(() -> {
             var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
             return repo.findAllByCategoryUserId(userId, pageable);
-        } catch (ForbiddenException f) {
-            throw new ForbiddenException(f.getLocalizedMessage());
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
+        });
     }
 
     /**
@@ -178,23 +147,18 @@ public class ProductService {
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ProductModel updateProductImages(ProductModel product, Long productId, HttpServletRequest req) {
-        try {
-            if (product.getId() != null)
-                throw new BadRequestException("Product id should null, can't update");
-            var foundProduct = repo.findById(productId);
-            if (foundProduct.isPresent()) {
-                productUtils.checkUserIsSameUserForRequest(foundProduct.get().getCategory().getUser().getId(), req,
-                        "update");
-                return productUtils.updateProductImages(product, foundProduct.get());
+        if (product.getId() != null) product.setId(null);
+        return exceptionHandlers(() -> {
+            var foundProduct = repo.findById(productId)
+                    .orElseThrow(() -> new NoContentException("This product does not exist"));
+            productUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(), req,
+                    "update");
+            try {
+                return productUtils.updateProductImages(product, foundProduct);
+            } catch (IOException e) {
+                throw new InternalServerException(e.getLocalizedMessage());
             }
-        } catch (ForbiddenException f) {
-            throw new ForbiddenException(f.getLocalizedMessage());
-        } catch (BadRequestException n) {
-            throw new BadRequestException(n.getLocalizedMessage());
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
-        throw new NoContentException("This product does not exist");
+        });
     }
 
     /**
@@ -207,46 +171,50 @@ public class ProductService {
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ResponseEntity<?> updateDeleteProductImages(ProductModel product, Long productId, HttpServletRequest req) {
-        try {
-            if (product.getId() != null)
-                throw new BadRequestException("Product id should null, can't update");
-            var foundProduct = repo.findById(productId);
-            if (foundProduct.isPresent()) {
-                productUtils.checkUserIsSameUserForRequest(foundProduct.get().getCategory().getUser().getId(), req,
-                        "delete images of");
-                productUtils.updateDeleteProductImages(product, foundProduct.get());
-                return new ResponseEntity<>(HttpStatus.OK);
-            }
-        } catch (ForbiddenException f) {
-            throw new ForbiddenException(f.getLocalizedMessage());
-        } catch (BadRequestException n) {
-            throw new BadRequestException(n.getLocalizedMessage());
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
-        throw new NoContentException("This product does not exist");
+        if (product.getId() != null) product.setId(null);
+        return exceptionHandlers(() -> {
+            var foundProduct = repo.findById(productId)
+                    .orElseThrow(() -> new NoContentException("This product does not exist"));
+            productUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(), req,
+                    "delete images of");
+            productUtils.updateDeleteProductImages(product, foundProduct);
+            return new ResponseEntity<>(HttpStatus.OK);
+        });
     }
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ResponseEntity<?> deleteProduct(Long id, HttpServletRequest req) {
-        try {
-            var productOpt = repo.findById(id);
-            if (productOpt.isPresent()) {
-                productUtils.checkUserIsSameUserForRequest(productOpt.get().getCategory().getUser().getId(), req,
-                        "delete");
-                ioUtils.deleteProductFiles(productOpt.get());
-                repo.deleteById(id);
-                return new ResponseEntity<>(HttpStatus.OK);
+        return exceptionHandlers(() -> {
+            var product = repo.findById(id)
+                    .orElseThrow(() -> new NoContentException("This product does not exist"));
+            productUtils.checkUserIsSameUserForRequest(product.getCategory().getUser().getId(), req,
+                    "delete");
+            try {
+                ioUtils.deleteProductFiles(product);
+            } catch (IOException e) {
+                throw new InternalServerException(e.getLocalizedMessage());
             }
-        } catch (DataException s) {
-            throw new BadRequestException(s.getLocalizedMessage());
-        } catch (ForbiddenException f) {
-            throw new ForbiddenException(f.getLocalizedMessage());
+            repo.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        });
+    }
+
+    private <T> T exceptionHandlers(Supplier<T> supplier) {
+        try {
+            return supplier.get();
+        } catch (DataException | BadRequestException e) {
+            throw new BadRequestException(e.getLocalizedMessage());
+        } catch (ForbiddenException e) {
+            throw new ForbiddenException(e.getLocalizedMessage());
+        } catch (NoContentException e) {
+            throw new NoContentException(e.getLocalizedMessage());
+        } catch (DataIntegrityViolationException e) {
+            throw new DataExistsException("Product exists!");
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
         }
-        throw new NoContentException("This product does not exist");
     }
-
 }
+
+

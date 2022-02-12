@@ -1,7 +1,7 @@
 [source,bash]
 ----
 $ http GET 'http://localhost:8080/api/category/products/search/?name=' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDE3NjQzNTIsInN1YiI6ImVtYWlsMkBtYWlsLmNvbSIsInVzZXJfaWQiOjQsImV4cCI6MTY0MzU3ODc1Mn0.IuZnhIZCYi1lj_ezSw71R7bfnRShpUAyaY9xenB6-6g' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbDJAbWFpbC5jb20iLCJpYXQiOjE2NDE3NjQzNTIsImV4cCI6MTY0MTc2NDQxMn0.GH3bXBNzHmPH7PV5Ib9BrXNkODCm-pj-kX7kzQWVmkM' \
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDQ2NDg4ODIsInN1YiI6ImVtYWlsMkBtYWlsLmNvbSIsInVzZXJfaWQiOjQsImV4cCI6MTY0NjQ2MzI4Mn0.ZVEskRAfwMM68deqsAOB-LHBhRtsFbkarPbdz4u1xFk' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbDJAbWFpbC5jb20iLCJpYXQiOjE2NDQ2NDg4ODIsImV4cCI6MTY0NDY0ODk0Mn0.XOap82zzSAysQ3Ebjj4VNvjkVFNLQaRHk_JLl1luW3A' \
     'Accept:application/json'
 ----
