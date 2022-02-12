@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -156,14 +157,19 @@ public class SellService {
 
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
-    public Page<SellModel> getAllSellRecordsOfUserFromDateTo(Long userId, FinancialModel financial,
+    public Page<SellModel> getAllSellRecordsOfUserFromDateTo(Long userId, Optional<FinancialModel> financial,
                                                              HttpServletRequest req, Pageable pageable) {
         try {
-            if (financial.getFromDate() == null || financial.getToDate() == null)
-                throw new BadRequestException("fromDate and toDate date must not be null");
+            var from = financial
+                    .map(FinancialModel::getFromDate)
+                    .orElseThrow(() -> new BadRequestException("From date must not be null"));
+            var to = financial
+                    .map(FinancialModel::getToDate)
+                    .orElseThrow(() -> new BadRequestException("To date must not be null"));
+
             checkUserIsSameUserForRequest(null, userId, req, "fetch");
             return repo.findAllByProductCategoryUserIdAndCreatedAtAfterAndCreatedAtBefore(userId,
-                    financial.getFromDate(), financial.getToDate(), pageable);
+                    from, to, pageable);
         } catch (ForbiddenException f) {
             throw new ForbiddenException(f.getLocalizedMessage());
         } catch (BadRequestException n) {

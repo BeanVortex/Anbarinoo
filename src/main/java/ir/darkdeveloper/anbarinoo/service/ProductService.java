@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 @Service
@@ -56,7 +57,7 @@ public class ProductService {
                     .price(savedProduct.getPrice())
                     .tax(savedProduct.getTax())
                     .build();
-            buyService.saveBuy(buy, true, req);
+            buyService.saveBuy(Optional.of(buy), true, req);
             savedProduct.setFirstBuyId(buy.getId());
             return repo.save(savedProduct);
         });

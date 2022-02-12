@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user/financial/")
@@ -19,18 +20,18 @@ public class FinancialController {
     @PostMapping("/costs/")
     public ResponseEntity<?> getCosts(@RequestBody FinancialModel financial,
                                       HttpServletRequest req, Pageable pageable) {
-        return ResponseEntity.ok(service.getCosts(financial, req, pageable));
+        return ResponseEntity.ok(service.getCosts(Optional.ofNullable(financial), req, pageable));
     }
 
     @PostMapping("/incomes/")
     public ResponseEntity<?> getIncomes(@RequestBody FinancialModel financial,
                                         HttpServletRequest req, Pageable pageable) {
-        return ResponseEntity.ok(service.getIncomes(financial, req, pageable));
+        return ResponseEntity.ok(service.getIncomes(Optional.ofNullable(financial), req, pageable));
     }
 
     @PostMapping("/profit-loss/")
     public ResponseEntity<?> getProfitOrLoss(@RequestBody FinancialModel financial,
-                                        HttpServletRequest req, Pageable pageable) {
-        return ResponseEntity.ok(service.getProfitOrLoss(financial, req, pageable));
+                                             HttpServletRequest req, Pageable pageable) {
+        return ResponseEntity.ok(service.getProfitOrLoss(Optional.ofNullable(financial), req, pageable));
     }
 }

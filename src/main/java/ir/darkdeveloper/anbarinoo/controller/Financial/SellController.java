@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/category/products/sell")
@@ -47,16 +48,16 @@ public class SellController {
 
     @PostMapping("/get-by-product/date/{id}/")
     public ResponseEntity<?> getAllSellRecordsOfProductFromDateTo(@PathVariable("id") Long productId,
-                                                                 @RequestBody FinancialModel financial,
-                                                                 HttpServletRequest req, Pageable pageable) {
+                                                                  @RequestBody FinancialModel financial,
+                                                                  HttpServletRequest req, Pageable pageable) {
         return ResponseEntity.ok(service.getAllSellRecordsOfProductFromDateTo(productId, financial, req, pageable));
     }
 
     @PostMapping("/get-by-user/date/{id}/")
     public ResponseEntity<?> getAllSellRecordsOfUserFromDateTo(@PathVariable("id") Long userId,
-                                                              @RequestBody FinancialModel financial,
-                                                              HttpServletRequest req, Pageable pageable) {
-        return ResponseEntity.ok(service.getAllSellRecordsOfUserFromDateTo(userId, financial, req, pageable));
+                                                               @RequestBody FinancialModel financial,
+                                                               HttpServletRequest req, Pageable pageable) {
+        return ResponseEntity.ok(service.getAllSellRecordsOfUserFromDateTo(userId, Optional.ofNullable(financial), req, pageable));
     }
 
 

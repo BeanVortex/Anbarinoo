@@ -41,6 +41,7 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
@@ -154,7 +155,7 @@ public record FinancialControllerTest(UserService userService,
                 .count(BigDecimal.valueOf(8))
                 .tax(9)
                 .build();
-        buyService.saveBuy(buy, false, request);
+        buyService.saveBuy(Optional.of(buy), false, request);
         assertThat(buy.getId()).isNotNull();
         buyId = buy.getId();
         Thread.sleep(1000);
@@ -210,12 +211,12 @@ public record FinancialControllerTest(UserService userService,
         var finalCost = finalCost1.add(finalCost2).setScale(1, RoundingMode.CEILING);
 
         mockMvc.perform(post("/api/user/financial/costs/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-                .content(mapToJson(financial))
-        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", refresh)
+                        .header("access_token", access)
+                        .content(mapToJson(financial))
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.costs").value(is(finalCost), BigDecimal.class))
@@ -237,12 +238,12 @@ public record FinancialControllerTest(UserService userService,
                 .setScale(1, RoundingMode.CEILING);
 
         mockMvc.perform(post("/api/user/financial/incomes/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-                .content(mapToJson(financial))
-        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", refresh)
+                        .header("access_token", access)
+                        .content(mapToJson(financial))
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.incomes").value(is(finalIncome), BigDecimal.class))
@@ -253,11 +254,12 @@ public record FinancialControllerTest(UserService userService,
     @Order(10)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void updateABuyWithBiggerCountThanPrevious() {
-        var buy = new BuyModel();
-        buy.setPrice(BigDecimal.valueOf(6000));
-        buy.setCount(BigDecimal.valueOf(20));
-        buy.setProduct(new ProductModel(productId));
-        buyService.updateBuy(buy, buyId, request);
+        var buy = BuyModel.builder()
+                .price(BigDecimal.valueOf(6000))
+                .count(BigDecimal.valueOf(20))
+                .product(new ProductModel(productId))
+                .build();
+        buyService.updateBuy(Optional.of(buy), buyId, request);
     }
 
     @Test
@@ -275,11 +277,12 @@ public record FinancialControllerTest(UserService userService,
     @Order(12)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void updateABuyWithLessCountThanPrevious() {
-        var buy = new BuyModel();
-        buy.setPrice(BigDecimal.valueOf(6000));
-        buy.setCount(BigDecimal.valueOf(2));
-        buy.setProduct(new ProductModel(productId));
-        buyService.updateBuy(buy, buyId, request);
+        var buy = BuyModel.builder()
+                .price(BigDecimal.valueOf(6000))
+                .count(BigDecimal.valueOf(2))
+                .product(new ProductModel(productId))
+                .build();
+        buyService.updateBuy(Optional.of(buy), buyId, request);
     }
 
     @Test
@@ -323,12 +326,12 @@ public record FinancialControllerTest(UserService userService,
                 .setScale(1, RoundingMode.CEILING);
 
         mockMvc.perform(post("/api/user/financial/costs/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-                .content(mapToJson(financial))
-        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", refresh)
+                        .header("access_token", access)
+                        .content(mapToJson(financial))
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.costs").value(is(finalCost), BigDecimal.class))
@@ -353,12 +356,12 @@ public record FinancialControllerTest(UserService userService,
         var finalIncome = finalIncome1.add(finalIncome2).setScale(1, RoundingMode.CEILING);
 
         mockMvc.perform(post("/api/user/financial/incomes/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-                .content(mapToJson(financial))
-        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", refresh)
+                        .header("access_token", access)
+                        .content(mapToJson(financial))
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.incomes").value(is(finalIncome), BigDecimal.class))
@@ -407,12 +410,12 @@ public record FinancialControllerTest(UserService userService,
 
         var finalProfitOrLoss1 = finalProfitOrLoss;
         mockMvc.perform(post("/api/user/financial/profit-loss/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-                .content(mapToJson(financial))
-        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", refresh)
+                        .header("access_token", access)
+                        .content(mapToJson(financial))
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(result -> {

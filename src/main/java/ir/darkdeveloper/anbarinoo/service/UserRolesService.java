@@ -1,19 +1,18 @@
 package ir.darkdeveloper.anbarinoo.service;
 
-import java.util.List;
-import java.util.Set;
-
-import javax.transaction.Transactional;
-
 import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
 import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
+import ir.darkdeveloper.anbarinoo.model.UserRole;
+import ir.darkdeveloper.anbarinoo.repository.UserRolesRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import ir.darkdeveloper.anbarinoo.model.UserRole;
-import ir.darkdeveloper.anbarinoo.repository.UserRolesRepo;
+import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
 
 @Service
 public class UserRolesService {
@@ -27,14 +26,10 @@ public class UserRolesService {
 
     @Transactional
     public ResponseEntity<?> saveRole(UserRole role) {
-        try {
+        return exceptionHandlers(() -> {
             repo.save(role);
-        } catch (ForbiddenException e) {
-            throw new ForbiddenException(e.getLocalizedMessage());
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
-        return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
+        });
     }
 
     public List<UserRole> getAllRoles() {
@@ -46,16 +41,24 @@ public class UserRolesService {
     }
 
     public ResponseEntity<?> deleteRole(Long id) {
-        try {
+        return exceptionHandlers(() -> {
             repo.deleteById(id);
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
-        return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
+        });
     }
 
     public Boolean exists(String name) {
         return repo.findByName(name).isPresent();
+    }
+
+    private <T> T exceptionHandlers(Supplier<T> supplier) {
+        try {
+            return supplier.get();
+        } catch (ForbiddenException f) {
+            throw new ForbiddenException(f.getLocalizedMessage());
+        } catch (Exception e) {
+            throw new InternalServerException(e.getLocalizedMessage());
+        }
     }
 
 }

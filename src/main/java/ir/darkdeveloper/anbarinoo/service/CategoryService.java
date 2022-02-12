@@ -1,15 +1,13 @@
 package ir.darkdeveloper.anbarinoo.service;
 
-import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
-import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
-import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
-import ir.darkdeveloper.anbarinoo.exception.NoContentException;
+import ir.darkdeveloper.anbarinoo.exception.*;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.CategoryRepo;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import org.hibernate.exception.DataException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.function.Supplier;
 
 @Service
 public class CategoryService {
@@ -38,15 +37,11 @@ public class CategoryService {
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
     public CategoryModel saveCategory(CategoryModel model, HttpServletRequest req) {
-        try {
-            if (model.getId() != null) throw new ForbiddenException("Id of category must be null to save a category");
+        return exceptionHandlers(() -> {
+            if (model.getId() != null) model.setId(null);
             model.setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
             return repo.save(model);
-        } catch (ForbiddenException e) {
-            throw new ForbiddenException(e.getLocalizedMessage());
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
+        });
     }
 
     /**
@@ -55,73 +50,65 @@ public class CategoryService {
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
     public CategoryModel saveSubCategory(CategoryModel model, Long parentId, HttpServletRequest req) {
-        try {
+        return exceptionHandlers(() -> {
             var fetchedCategory = getCategoryById(parentId, req);
             model.setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
             model.setParent(fetchedCategory);
             fetchedCategory.addChild(model);
             return repo.save(model);
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
+        });
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public List<CategoryModel> getCategoriesByUser(HttpServletRequest req) {
-        try {
-//            checkUserIsSameUserForRequest(userId, null, req, "fetch");
+        return exceptionHandlers(() -> {
             var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
             return repo.findAllByUserId(userId);
-        } catch (ForbiddenException f) {
-            throw new ForbiddenException(f.getLocalizedMessage());
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
+        });
     }
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ResponseEntity<?> deleteCategory(Long categoryId, HttpServletRequest req) {
-
-        try {
-            checkUserIsSameUserForRequest(null, categoryId, req, "delete");
+        return exceptionHandlers(() -> {
+            checkUserIsSameUserForRequest(categoryId, req, "delete");
             repo.deleteById(categoryId);
-        } catch (ForbiddenException f) {
-            throw new ForbiddenException(f.getLocalizedMessage());
-        } catch (DataException s) {
-            throw new BadRequestException(s.getLocalizedMessage());
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
-        return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
+        });
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public CategoryModel getCategoryById(Long id, HttpServletRequest req) {
-        try {
-            checkUserIsSameUserForRequest(null, id, req, "fetch");
-            return repo.findById(id).orElse(null);
-        } catch (NoContentException n) {
-            throw new NoContentException(n.getLocalizedMessage());
-        } catch (ForbiddenException f) {
-            throw new ForbiddenException(f.getLocalizedMessage());
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
+    public CategoryModel getCategoryById(Long categoryId, HttpServletRequest req) {
+        return exceptionHandlers(() -> {
+            checkUserIsSameUserForRequest(categoryId, req, "fetch");
+            return repo.findById(categoryId).orElseThrow(() -> new NoContentException("Category is not found"));
+        });
     }
 
-    private void checkUserIsSameUserForRequest(Long userId, Long categoryId, HttpServletRequest req, String operation) {
-        if (userId == null) {
-            var catFound = repo.findById(categoryId);
-            if (catFound.isPresent())
-                userId = catFound.get().getUser().getId();
-            else
-                throw new NoContentException("Category does not exist.");
-        }
+    private void checkUserIsSameUserForRequest(Long categoryId, HttpServletRequest req, String operation) {
+        var foundCategory = repo.findById(categoryId)
+                .orElseThrow(() -> new NoContentException("Category does not exist"));
+        var userId = foundCategory.getUser().getId();
 
         Long id = jwtUtils.getUserId(req.getHeader("refresh_token"));
         if (!userId.equals(id))
             throw new ForbiddenException("You can't " + operation + " another user's categories");
+    }
+
+    private <T> T exceptionHandlers(Supplier<T> supplier) {
+        try {
+            return supplier.get();
+        } catch (DataException | BadRequestException e) {
+            throw new BadRequestException(e.getLocalizedMessage());
+        } catch (ForbiddenException e) {
+            throw new ForbiddenException(e.getLocalizedMessage());
+        } catch (NoContentException e) {
+            throw new NoContentException(e.getLocalizedMessage());
+        } catch (DataIntegrityViolationException e) {
+            throw new DataExistsException("Category exists!");
+        } catch (Exception e) {
+            throw new InternalServerException(e.getLocalizedMessage());
+        }
     }
 
 }

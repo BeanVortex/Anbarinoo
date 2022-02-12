@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/category/products/buy")
@@ -25,12 +26,12 @@ public class BuyController {
 
     @PostMapping("/save/")
     public ResponseEntity<?> saveBuy(@RequestBody BuyModel buy, HttpServletRequest req) {
-        return ResponseEntity.ok(service.saveBuy(buy, false, req));
+        return ResponseEntity.ok(service.saveBuy(Optional.ofNullable(buy), false, req));
     }
 
     @PutMapping("/update/{id}/")
     public ResponseEntity<?> updateBuy(@RequestBody BuyModel buy, @PathVariable Long id, HttpServletRequest req) {
-        return ResponseEntity.ok(service.updateBuy(buy, id, req));
+        return ResponseEntity.ok(service.updateBuy(Optional.ofNullable(buy), id, req));
     }
 
     @GetMapping("/get-by-product/{id}/")
@@ -49,14 +50,15 @@ public class BuyController {
     public ResponseEntity<?> getAllBuyRecordsOfProductFromDateTo(@PathVariable("id") Long productId,
                                                                  @RequestBody FinancialModel financial,
                                                                  HttpServletRequest req, Pageable pageable) {
-        return ResponseEntity.ok(service.getAllBuyRecordsOfProductFromDateTo(productId, financial, req, pageable));
+        return ResponseEntity.ok(service.getAllBuyRecordsOfProductFromDateTo(productId, Optional.ofNullable(financial),
+                req, pageable));
     }
 
     @PostMapping("/get-by-user/date/{id}/")
     public ResponseEntity<?> getAllBuyRecordsOfUserFromDateTo(@PathVariable("id") Long userId,
                                                               @RequestBody FinancialModel financial,
                                                               HttpServletRequest req, Pageable pageable) {
-        return ResponseEntity.ok(service.getAllBuyRecordsOfUserFromDateTo(userId, financial, req, pageable));
+        return ResponseEntity.ok(service.getAllBuyRecordsOfUserFromDateTo(userId, Optional.ofNullable(financial), req, pageable));
     }
 
     @GetMapping("/{id}/")
