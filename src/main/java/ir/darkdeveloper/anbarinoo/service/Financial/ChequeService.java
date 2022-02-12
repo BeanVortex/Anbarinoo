@@ -150,7 +150,7 @@ public class ChequeService {
         } catch (Exception e) {
             throw new InternalServerException(e.getLocalizedMessage());
         }
-        throw new NoContentException("Cheque does not exist");
+        throw new NoContentException("Cheques do not exist");
     }
 
     private void checkUserIsSameUserForRequest(Long userId, HttpServletRequest req, String operation) {

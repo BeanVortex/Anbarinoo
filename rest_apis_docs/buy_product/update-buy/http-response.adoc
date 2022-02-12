@@ -1,8 +1,8 @@
 [source,http,options="nowrap"]
 ----
-HTTP/1.1 200 OK
-Content-Type: application/json
-Content-Length: 144
+HTTP/1.1 404 Not Found
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
 
-{"id":7,"count":60.2,"price":9000.568,"tax":10,"product":5,"createdAt":"2022-01-10T01:09:16.994410","updatedAt":"2022-01-10T01:09:17.013481568"}
 ----

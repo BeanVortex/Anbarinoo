@@ -54,7 +54,7 @@ public record UserServiceTest(UserService service,
     @Test
     @Order(1)
     @WithMockUser(username = "anonymousUser")
-    @Disabled
+//    @Disabled
     void signUpWithoutImage() throws Exception {
         HttpServletResponse response = mock(HttpServletResponse.class);
         var user = new UserModel();
@@ -63,8 +63,8 @@ public record UserServiceTest(UserService service,
         user.setDescription("desc");
         user.setUserName("user n");
         user.setEnabled(true);
-        user.setPassword("pass1");
-        user.setPasswordRepeat("pass1");
+        user.setPassword("pass12B~");
+        user.setPasswordRepeat("pass12B~");
         service.signUpUser(user, response);
         request = setUpHeader(user);
         userId = user.getId();

@@ -1,4 +1,4 @@
 [source,options="nowrap"]
 ----
-{"message":"Buy record do not exist.","httpStatus":"NO_CONTENT","timestamp":"2022-01-10T01:09:17.169672985"}
+{"message":"Buy record do not exist.","httpStatus":"NO_CONTENT","timestamp":"2022-01-28T22:34:53.541397448"}
 ----

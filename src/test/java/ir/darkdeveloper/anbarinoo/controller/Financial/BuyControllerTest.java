@@ -148,7 +148,6 @@ public record BuyControllerTest(UserService userService,
                 .count(BigDecimal.valueOf(8))
                 .tax(10)
                 .build();
-        System.out.println(buy);
         from = LocalDateTime.now();
         mockMvc.perform(post("/api/category/products/buy/save/")
                 .header("refresh_token", refresh)

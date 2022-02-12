@@ -6,11 +6,10 @@ import ir.darkdeveloper.anbarinoo.repository.UserRepo;
 import ir.darkdeveloper.anbarinoo.security.jwt.JwtAuth;
 import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.Operations;
+import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -26,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.function.Supplier;
 
 @Service("userService")
 @AllArgsConstructor
@@ -51,18 +51,12 @@ public class UserService implements UserDetailsService {
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_EDIT_USER') && #id != null")
     public UserModel updateUser(UserModel model, Long id, HttpServletRequest req) {
-        try {
-            if (model.getId() != null) throw new BadRequestException("User id should null, can't update");
+        if (model.getId() != null) throw new BadRequestException("User id should null, can't update");
+        return exceptionHandlers(() -> {
             checkUserIsSameUserForRequest(id, req, "update");
             var updatedUser = userOP.updateUser(model, id);
             return repo.save(updatedUser);
-        } catch (BadRequestException n) {
-            throw new BadRequestException(n.getLocalizedMessage());
-        } catch (ForbiddenException f) {
-            throw new ForbiddenException(f.getLocalizedMessage());
-        } catch (NoContentException e) {
-            throw new NoContentException(e.getLocalizedMessage());
-        }
+        });
     }
 
     /**
@@ -75,20 +69,17 @@ public class UserService implements UserDetailsService {
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_EDIT_USER')&& #id != null")
     public UserModel updateUserImages(UserModel user, Long id, HttpServletRequest req) {
-        try {
-            if (user.getId() != null) throw new BadRequestException("User id should null, can't update");
-            checkUserIsSameUserForRequest(id, req, "update images");
-            var updatedUser = userOP.updateUserImages(user, id);
-            return repo.save(updatedUser);
-        } catch (BadRequestException n) {
-            throw new BadRequestException(n.getLocalizedMessage());
-        } catch (ForbiddenException f) {
-            throw new ForbiddenException(f.getLocalizedMessage());
-        } catch (NoContentException e) {
-            throw new NoContentException(e.getLocalizedMessage());
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
+        if (user.getId() != null) throw new BadRequestException("User id should null, can't update");
+
+        return exceptionHandlers(() -> {
+            try {
+                checkUserIsSameUserForRequest(id, req, "update images");
+                var updatedUser = userOP.updateUserImages(user, id);
+                return repo.save(updatedUser);
+            } catch (IOException e) {
+                throw new InternalServerException(e.getLocalizedMessage());
+            }
+        });
     }
 
     /**
@@ -101,41 +92,33 @@ public class UserService implements UserDetailsService {
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_EDIT_USER') && #id != null")
     public UserModel updateDeleteUserImages(UserModel user, Long id, HttpServletRequest req) {
-        try {
-            if (user.getId() != null) throw new BadRequestException("User id should null, can't update");
-            checkUserIsSameUserForRequest(id, req, "delete images");
-            var updatedUser = userOP.updateDeleteUserImages(user, id);
-            return repo.save(updatedUser);
-        } catch (BadRequestException n) {
-            throw new BadRequestException(n.getLocalizedMessage());
-        } catch (ForbiddenException f) {
-            throw new ForbiddenException(f.getLocalizedMessage());
-        } catch (NoContentException e) {
-            throw new NoContentException(e.getLocalizedMessage());
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
+        if (user.getId() != null) throw new BadRequestException("User id should null, can't update");
+
+        return exceptionHandlers(() -> {
+            try {
+                checkUserIsSameUserForRequest(id, req, "delete images");
+                var updatedUser = userOP.updateDeleteUserImages(user, id);
+                return repo.save(updatedUser);
+            } catch (IOException e) {
+                throw new InternalServerException(e.getLocalizedMessage());
+            }
+        });
     }
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_DELETE_USER')")
     public ResponseEntity<?> deleteUser(Long id, HttpServletRequest req) {
-        try {
-            if (id == null) throw new NoContentException("User id is null, can't update");
-            var userOpt = repo.findById(id);
-            if (userOpt.isPresent()) {
-                checkUserIsSameUserForRequest(userOpt.get().getId(), req, "delete");
-                userOP.deleteUser(userOpt.get());
-                return new ResponseEntity<>("Successfully deleted user", HttpStatus.OK);
+        if (id == null) throw new BadRequestException("User id is null, can't update");
+        return exceptionHandlers(() -> {
+            var user = repo.findById(id).orElseThrow(() -> new NoContentException("User does not exist"));
+            checkUserIsSameUserForRequest(user.getId(), req, "delete");
+            try {
+                userOP.deleteUser(user);
+            } catch (IOException e) {
+                throw new InternalServerException(e.getLocalizedMessage());
             }
-        } catch (NoContentException n) {
-            throw new BadRequestException(n.getLocalizedMessage());
-        } catch (ForbiddenException f) {
-            throw new ForbiddenException(f.getLocalizedMessage());
-        } catch (IOException e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
-        throw new NoContentException("User does not exist");
+            return new ResponseEntity<>("Successfully deleted user", HttpStatus.OK);
+        });
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN')")
@@ -159,68 +142,45 @@ public class UserService implements UserDetailsService {
     @PreAuthorize("authentication.name.equals(@userService.getAdminUser().getUsername()) " +
             "|| authentication.name.equals('anonymousUser')")
     public ResponseEntity<?> signUpUser(UserModel model, HttpServletResponse response) throws Exception {
-        try {
-            userAuthUtils.signup(model, response);
+        return exceptionHandlers(() -> {
+            try {
+                userAuthUtils.signup(model, response);
+            } catch (IOException e) {
+                throw new InternalServerException(e.getLocalizedMessage());
+            }
             return new ResponseEntity<>(repo.findByEmailOrUsername(model.getUsername()), HttpStatus.OK);
-        } catch (DataIntegrityViolationException e) {
-            throw new DataExistsException("User exists!");
-        } catch (EmailNotValidException e) {
-            throw new EmailNotValidException(e.getLocalizedMessage());
-        } catch (PasswordException e) {
-            throw new PasswordException(e.getLocalizedMessage());
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
+        });
+
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
     public UserModel getUserInfo(Long id, HttpServletRequest req) {
-        try {
-            var userOpt = repo.findUserById(id);
-
-            if (userOpt.isPresent()) {
-                checkUserIsSameUserForRequest(id, req, "fetch");
-                return userOpt.get();
-            }
-        } catch (ForbiddenException f) {
-            throw new ForbiddenException(f.getLocalizedMessage());
-        }
-        throw new NoContentException("User does not exist");
+        return exceptionHandlers(() -> {
+            var user = repo.findUserById(id).orElseThrow(() -> new NoContentException("User does not exist"));
+            checkUserIsSameUserForRequest(id, req, "fetch");
+            return user;
+        });
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
     public UserModel getSimpleCurrentUserInfo(HttpServletRequest req) {
-        try {
+        return exceptionHandlers(() -> {
             var id = jwtUtils.getUserId(req.getHeader("refresh_token"));
-            var userOpt = repo.getSimpleUserInfo(id);
-            if (userOpt.isPresent()) {
-                return userOpt.get();
-            }
-        } catch (ForbiddenException f) {
-            throw new ForbiddenException(f.getLocalizedMessage());
-        }
-        throw new NoContentException("User does not exist");
+            return repo.getSimpleUserInfo(id).orElseThrow(() -> new NoContentException("User does not exist"));
+        });
     }
 
 
     @Transactional
     public ResponseEntity<?> verifyUserEmail(String token) {
-
-        var model = verificationService.findByToken(token);
-
-        try {
-            if (model.isPresent())
-                if (model.get().getExpiresAt().isAfter(LocalDateTime.now())) {
-                    model.get().setVerifiedAt(LocalDateTime.now());
-                    repo.trueEnabledById(model.get().getUser().getId());
-                    verificationService.saveToken(model.get());
-                    return new ResponseEntity<>("Email Successfully verified", HttpStatus.OK);
-                } else
-                    throw new BadRequestException("Link is expired. try logging in again");
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
-        throw new InternalServerException("Link does not exists");
+        var model = verificationService.findByToken(token).orElseThrow(() -> new InternalServerException("Link does not exists"));
+        if (model.getExpiresAt().isAfter(LocalDateTime.now())) {
+            model.setVerifiedAt(LocalDateTime.now());
+            repo.trueEnabledById(model.getUser().getId());
+            verificationService.saveToken(model);
+            return new ResponseEntity<>("Email Successfully verified", HttpStatus.OK);
+        } else
+            throw new BadRequestException("Link is expired. try logging in again");
     }
 
     public AdminUserProperties getAdminUser() {
@@ -231,5 +191,23 @@ public class UserService implements UserDetailsService {
         var id = jwtUtils.getUserId(req.getHeader("refresh_token"));
         if (!userId.equals(id))
             throw new ForbiddenException("You can't " + operation + " another user's products");
+    }
+
+    private <T> T exceptionHandlers(Supplier<T> supplier) {
+        try {
+            return supplier.get();
+        } catch (DataIntegrityViolationException e) {
+            throw new DataExistsException("User exists!");
+        } catch (EmailNotValidException e) {
+            throw new EmailNotValidException(e.getLocalizedMessage());
+        } catch (PasswordException e) {
+            throw new PasswordException(e.getLocalizedMessage());
+        } catch (ForbiddenException f) {
+            throw new ForbiddenException(f.getLocalizedMessage());
+        } catch (NoContentException e) {
+            throw new NoContentException(e.getLocalizedMessage());
+        } catch (Exception e) {
+            throw new InternalServerException(e.getLocalizedMessage());
+        }
     }
 }

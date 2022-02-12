@@ -168,7 +168,7 @@ public class ProductService {
     }
 
     /**
-     * For Images update only: another users can't update not owned products
+     * For Images update only: another users can't, update not owned products
      *
      * @param product   should files and id and images not to be null and user be null
      * @param productId should not to be null
@@ -198,7 +198,7 @@ public class ProductService {
     }
 
     /**
-     * For Images delete only: another users can't update not owned products
+     * For Images delete only: another users can't update, not owned products
      *
      * @param product   should images name not to be null and user and id be null, image names are going to delete
      * @param productId should not to be null
