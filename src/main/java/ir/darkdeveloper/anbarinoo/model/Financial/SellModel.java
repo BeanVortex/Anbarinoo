@@ -9,9 +9,7 @@ import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UpdateModel;
 import ir.darkdeveloper.anbarinoo.model.deserializers.SellDeserializer;
 import ir.darkdeveloper.anbarinoo.model.serializers.SellSerialize;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -19,13 +17,15 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "sells")
 @JsonDeserialize(using = SellDeserializer.class)
 @JsonSerialize(using = SellSerialize.class)
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class SellModel implements UpdateModel<SellModel> {
 
     @Id

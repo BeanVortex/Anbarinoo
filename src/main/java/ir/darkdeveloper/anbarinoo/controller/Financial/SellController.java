@@ -26,17 +26,18 @@ public class SellController {
 
     @PostMapping("/save/")
     public ResponseEntity<?> saveSell(@RequestBody SellModel sell, HttpServletRequest request) {
-        return ResponseEntity.ok(service.saveSell(sell, request));
+        return ResponseEntity.ok(service.saveSell(Optional.ofNullable(sell), request));
     }
 
     @PutMapping("/update/{id}/")
-    public ResponseEntity<?> updateSell(@RequestBody SellModel sell, @PathVariable Long id, HttpServletRequest request) {
-        return ResponseEntity.ok(service.updateSell(sell, id, request));
+    public ResponseEntity<?> updateSell(@RequestBody SellModel sell, @PathVariable Long id,
+                                        HttpServletRequest request) {
+        return ResponseEntity.ok(service.updateSell(Optional.ofNullable(sell), id, request));
     }
 
     @GetMapping("/get-by-product/{id}/")
-    public ResponseEntity<?> getAllSellRecordsOfProduct(@PathVariable("id") Long productId, HttpServletRequest request,
-                                                        Pageable pageable) {
+    public ResponseEntity<?> getAllSellRecordsOfProduct(@PathVariable("id") Long productId,
+                                                        HttpServletRequest request, Pageable pageable) {
         return ResponseEntity.ok(service.getAllSellRecordsOfProduct(productId, request, pageable));
     }
 
@@ -50,14 +51,16 @@ public class SellController {
     public ResponseEntity<?> getAllSellRecordsOfProductFromDateTo(@PathVariable("id") Long productId,
                                                                   @RequestBody FinancialModel financial,
                                                                   HttpServletRequest req, Pageable pageable) {
-        return ResponseEntity.ok(service.getAllSellRecordsOfProductFromDateTo(productId, financial, req, pageable));
+        return ResponseEntity.ok(service.getAllSellRecordsOfProductFromDateTo(productId,
+                Optional.ofNullable(financial), req, pageable));
     }
 
     @PostMapping("/get-by-user/date/{id}/")
     public ResponseEntity<?> getAllSellRecordsOfUserFromDateTo(@PathVariable("id") Long userId,
                                                                @RequestBody FinancialModel financial,
                                                                HttpServletRequest req, Pageable pageable) {
-        return ResponseEntity.ok(service.getAllSellRecordsOfUserFromDateTo(userId, Optional.ofNullable(financial), req, pageable));
+        return ResponseEntity.ok(service.getAllSellRecordsOfUserFromDateTo(userId,
+                Optional.ofNullable(financial), req, pageable));
     }
 
 

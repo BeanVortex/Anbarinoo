@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -38,10 +39,10 @@ import static org.mockito.Mockito.when;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext
 public record SellServiceTest(UserService userService,
-                       JwtUtils jwtUtils,
-                       ProductService productService,
-                       SellService sellService,
-                       CategoryService categoryService) {
+                              JwtUtils jwtUtils,
+                              ProductService productService,
+                              SellService sellService,
+                              CategoryService categoryService) {
 
     private static HttpServletRequest request;
     private static Long userId;
@@ -113,12 +114,12 @@ public record SellServiceTest(UserService userService,
     @Order(4)
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void saveSell() {
-        var sellRecord = new SellModel();
-        var product = new ProductModel(productId);
-        sellRecord.setCount(BigDecimal.valueOf(20));
-        sellRecord.setPrice(BigDecimal.valueOf(50));
-        sellRecord.setProduct(product);
-        sellService.saveSell(sellRecord, request);
+        var sellRecord = SellModel.builder()
+                .product(new ProductModel(productId))
+                .price(BigDecimal.valueOf(50))
+                .count(BigDecimal.valueOf(20))
+                .build();
+        sellService.saveSell(Optional.of(sellRecord), request);
         sellId = sellRecord.getId();
         var fetchedSell = sellService.getSell(sellId, request);
         assertThat(fetchedSell.getProduct()).isNotNull();
@@ -129,14 +130,13 @@ public record SellServiceTest(UserService userService,
     @Order(5)
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void updateSellWithNullUpdatableValues() {
-        var sellRecord = new SellModel();
-        var product = new ProductModel();
-        product.setId(productId);
-        sellRecord.setCount(null);
-        sellRecord.setPrice(null);
-        sellRecord.setProduct(product);
+        var sellRecord = SellModel.builder()
+                .product(new ProductModel(productId))
+                .price(null)
+                .count(null)
+                .build();
         assertThrows(BadRequestException.class, () -> {
-            sellService.updateSell(sellRecord, sellId, request);
+            sellService.updateSell(Optional.of(sellRecord), sellId, request);
             var fetchedSell = sellService.getSell(sellId, request);
             assertThat(fetchedSell.getCount()).isEqualTo(BigDecimal.valueOf(200000, 4));
             assertThat(fetchedSell.getPrice()).isEqualTo(BigDecimal.valueOf(500000, 4));
@@ -147,13 +147,12 @@ public record SellServiceTest(UserService userService,
     @Order(6)
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void updateSell() {
-        var sellRecord = new SellModel();
-        var product = new ProductModel();
-        product.setId(productId);
-        sellRecord.setCount(BigDecimal.valueOf(26.502));
-        sellRecord.setPrice(BigDecimal.valueOf(60.505));
-        sellRecord.setProduct(product);
-        sellService.updateSell(sellRecord, sellId, request);
+        var sellRecord = SellModel.builder()
+                .product(new ProductModel(productId))
+                .price(BigDecimal.valueOf(60.505))
+                .count(BigDecimal.valueOf(26.502))
+                .build();
+        sellService.updateSell(Optional.of(sellRecord), sellId, request);
         var fetchedSell = sellService.getSell(sellId, request);
         assertThat(fetchedSell.getCount()).isEqualTo(BigDecimal.valueOf(265020, 4));
         assertThat(fetchedSell.getPrice()).isEqualTo(BigDecimal.valueOf(605050, 4));

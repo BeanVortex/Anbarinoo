@@ -165,11 +165,12 @@ public record FinancialControllerTest(UserService userService,
     @Order(5)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void saveSell() throws InterruptedException {
-        var sell = new SellModel();
-        sell.setProduct(new ProductModel(productId));
-        sell.setPrice(BigDecimal.valueOf(6000));
-        sell.setCount(BigDecimal.valueOf(4));
-        sellService.saveSell(sell, request);
+        var sell = SellModel.builder()
+                .product(new ProductModel(productId))
+                .price(BigDecimal.valueOf(6000))
+                .count(BigDecimal.valueOf(4))
+                .build();
+        sellService.saveSell(Optional.of(sell), request);
         sellId = sell.getId();
         assertThat(sell.getId()).isNotNull();
         Thread.sleep(1000);
@@ -266,11 +267,12 @@ public record FinancialControllerTest(UserService userService,
     @Order(11)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void updateASellWithBiggerCountThanPrevious() {
-        var sell = new SellModel();
-        sell.setPrice(BigDecimal.valueOf(9000));
-        sell.setCount(BigDecimal.valueOf(6));
-        sell.setProduct(new ProductModel(productId));
-        sellService.updateSell(sell, sellId, request);
+        var sell = SellModel.builder()
+                .price(BigDecimal.valueOf(9000))
+                .count(BigDecimal.valueOf(6))
+                .product(new ProductModel(productId))
+                .build();
+        sellService.updateSell(Optional.of(sell), sellId, request);
     }
 
     @Test
@@ -289,11 +291,12 @@ public record FinancialControllerTest(UserService userService,
     @Order(13)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void updateASellWithLessCountThanPrevious() {
-        var sell = new SellModel();
-        sell.setPrice(BigDecimal.valueOf(9000));
-        sell.setCount(BigDecimal.valueOf(3));
-        sell.setProduct(new ProductModel(productId));
-        sellService.updateSell(sell, sellId, request);
+        var sell = SellModel.builder()
+                .price(BigDecimal.valueOf(9000))
+                .count(BigDecimal.valueOf(3))
+                .product(new ProductModel(productId))
+                .build();
+        sellService.updateSell(Optional.of(sell), sellId, request);
     }
 
     @Test
