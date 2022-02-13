@@ -1,8 +1,0 @@
-[source,bash]
-----
-$ curl 'http://localhost:8080/api/category/products/sell/get-by-product/5/?page=0&size=2' -i -X GET \
-    -H 'Content-Type: application/json' \
-    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDQ3NTgzMTUsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQ2NTcyNzE1fQ.EIGeNnVIlgqa60VBVUfhpZ9zEIQIuzLiE-6zREDSVWo' \
-    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0NDc1ODMxNSwiZXhwIjoxNjQ0NzU4Mzc1fQ.plynHQlzS4rK5yJUpnqNGCIXqXf9eZLQdbWPu7X3R1A' \
-    -H 'Accept: application/json'
-----

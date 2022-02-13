@@ -1,4 +1,0 @@
-[source,options="nowrap"]
-----
-{"message":"Category does not exist","httpStatus":"NO_CONTENT","timestamp":"2022-02-13T16:48:13.385347837"}
-----

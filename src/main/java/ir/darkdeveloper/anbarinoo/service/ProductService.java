@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -112,10 +113,10 @@ public class ProductService {
             var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
             var foundData = repo
                     .findByNameContainsAndCategoryUserId(name, userId, pageable);
-            if (!foundData.getContent().isEmpty() && foundData.getContent().get(0) != null)
-                return foundData;
-            else
-                throw new NoContentException("This product does not exist");
+            foundData.map(Page::getContent)
+                    .map(list -> list.isEmpty() ? null : list.get(0))
+                    .orElseThrow(() -> new NoContentException("This product does not exist"));
+            return foundData.get();
         });
     }
 

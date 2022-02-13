@@ -1,4 +1,0 @@
-[source,options="nowrap"]
-----
-{"content":[{"id":7,"count":60.2000,"price":9000.5680,"tax":10,"product":5,"createdAt":"2022-02-13T16:48:20.981848","updatedAt":"2022-02-13T16:48:21.000726"}],"pageable":{"sort":{"empty":true,"sorted":false,"unsorted":true},"offset":0,"pageNumber":0,"pageSize":20,"paged":true,"unpaged":false},"totalPages":1,"totalElements":1,"last":true,"size":20,"number":0,"sort":{"empty":true,"sorted":false,"unsorted":true},"numberOfElements":1,"first":true,"empty":false}
-----

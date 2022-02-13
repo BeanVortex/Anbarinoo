@@ -1,4 +1,0 @@
-[source,options="nowrap"]
-----
-{"id":9,"firstBuyId":10,"canUpdate":true,"name":"product2","description":"desc2","images":["noImage.png"],"price":10,"tax":9,"category":6,"totalCount":500,"createdAt":"2022-02-13T16:48:16.152042148","updatedAt":"2022-02-13T16:48:16.152752208"}
-----

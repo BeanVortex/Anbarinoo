@@ -1,8 +1,0 @@
-[source,bash]
-----
-$ echo '{"nameOf":"Me2","isDebt":false,"isCheckedOut":true,"validTill":"2022-02-23T16:48:23.215885464"}' | http POST 'http://localhost:8080/api/user/financial/cheque/update/4/' \
-    'Content-Type:application/json' \
-    'Accept:application/json' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDQ3NTgzMDMsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQ2NTcyNzAzfQ.S4xTQS2vV58HU9XtSBLpYM5nU3QrbrVtE0KKocbPO-k' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0NDc1ODMwMywiZXhwIjoxNjQ0NzU4MzYzfQ.BbHsnhUXbKDnP1t5HShA_v_oyXAi6kyJ7RNvkPs5Z-w'
-----

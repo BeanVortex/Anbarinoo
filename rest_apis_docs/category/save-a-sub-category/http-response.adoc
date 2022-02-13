@@ -1,8 +1,0 @@
-[source,http,options="nowrap"]
-----
-HTTP/1.1 200 OK
-Content-Type: application/json
-Content-Length: 59
-
-{"id":5,"name":"Mobiles","user":2,"parent":4,"children":[]}
-----

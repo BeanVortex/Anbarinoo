@@ -1,8 +1,0 @@
-[source,http,options="nowrap"]
-----
-HTTP/1.1 200 OK
-Content-Type: application/json
-Content-Length: 593
-
-{"content":[{"id":5,"nameOf":"Me2","payTo":"Other","isDebt":false,"isCheckedOut":true,"amount":750.0600,"chequeId":4,"user":2,"issuedAt":"2022-02-13T16:48:23.175341","validTill":"2022-02-23T16:48:23.215885","createdAt":"2022-02-13T16:48:23.190160","updatedAt":"2022-02-13T16:48:23.239059"}],"pageable":{"sort":{"empty":true,"sorted":false,"unsorted":true},"offset":0,"pageNumber":0,"pageSize":20,"paged":true,"unpaged":false},"totalPages":1,"totalElements":1,"last":true,"size":20,"number":0,"sort":{"empty":true,"sorted":false,"unsorted":true},"numberOfElements":1,"first":true,"empty":false}
-----

@@ -1,4 +1,0 @@
-[source,options="nowrap"]
-----
-{"count":60.2,"price":9000.568,"product":5}
-----

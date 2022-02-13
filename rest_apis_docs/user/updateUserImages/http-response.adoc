@@ -1,8 +1,0 @@
-[source,http,options="nowrap"]
-----
-HTTP/1.1 200 OK
-Content-Type: application/json
-Content-Length: 558
-
-{"id":2,"email":"email@mail.com","userName":"UpdatedUser n","provider":"LOCAL","enabled":true,"shopImage":"89576a1d-5b29-4878-9226-5f4a5e650bf0.jpeg","profileImage":"7ae2b946-1e6e-4198-a97f-02d5a8965b09.jpeg","roles":["USER"],"createdAt":"2022-02-13T16:48:18.110183","updatedAt":"2022-02-13T16:48:18.876959364","shopName":null,"address":"UpdatedAddress","description":"UpdatedDesc","debtOrDemand":[],"cheques":[],"categories":[],"name":"UpdatedUser n","username":"email@mail.com","accountNonExpired":true,"accountNonLocked":true,"credentialsNonExpired":true}
-----

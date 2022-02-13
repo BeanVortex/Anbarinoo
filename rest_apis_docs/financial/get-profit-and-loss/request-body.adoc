@@ -1,4 +1,0 @@
-[source,options="nowrap"]
-----
-{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2022,2,13,16,48,27,682852201],"toDate":[2022,2,13,16,48,33,384536899]}
-----

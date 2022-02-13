@@ -1,8 +1,0 @@
-[source,bash]
-----
-$ curl 'http://localhost:8080/api/category/products/buy/7/' -i -X DELETE \
-    -H 'Content-Type: application/json' \
-    -H 'refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDQ3NTgzMDAsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQ2NTcyNzAwfQ.AUwvvM7gQKy97vLO_J3LlVWDn_L0x-WBiPpd20BpxNY' \
-    -H 'access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0NDc1ODMwMCwiZXhwIjoxNjQ0NzU4MzYwfQ.yr4qPHYIneGKw6OHqQWUYNhgBK2C9Gp1QRAALRmfCg0' \
-    -H 'Accept: application/json'
-----

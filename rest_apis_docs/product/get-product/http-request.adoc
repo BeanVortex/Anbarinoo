@@ -1,9 +1,0 @@
-[source,http,options="nowrap"]
-----
-GET /api/category/products/7/ HTTP/1.1
-refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDQ3NTgyOTUsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQ2NTcyNjk1fQ.ufsyoYp1GmLxOKaDjOHdSrx6RZ6PljK5DV67JXVlezA
-access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0NDc1ODI5NSwiZXhwIjoxNjQ0NzU4MzU1fQ.YhjsaAqSfkos4m_qHvOgXc-yhsRv7IUX2-8_5TgvRJM
-Accept: application/json
-Host: localhost:8080
-
-----

@@ -1,8 +1,0 @@
-[source,bash]
-----
-$ echo '{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2022,2,13,16,48,20,968290461],"toDate":[2022,2,13,16,48,21,48888863]}' | http POST 'http://localhost:8080/api/category/products/buy/get-by-product/date/5/' \
-    'Content-Type:application/json' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDQ3NTgzMDAsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQ2NTcyNzAwfQ.AUwvvM7gQKy97vLO_J3LlVWDn_L0x-WBiPpd20BpxNY' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0NDc1ODMwMCwiZXhwIjoxNjQ0NzU4MzYwfQ.yr4qPHYIneGKw6OHqQWUYNhgBK2C9Gp1QRAALRmfCg0' \
-    'Accept:application/json'
-----
