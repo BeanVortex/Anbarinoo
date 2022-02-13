@@ -2,7 +2,7 @@ package ir.darkdeveloper.anbarinoo.controller.Financial;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
+import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.FinancialModel;
@@ -169,11 +169,12 @@ public record FinancialControllerTest(UserService userService,
                 .product(new ProductModel(productId))
                 .price(BigDecimal.valueOf(6000))
                 .count(BigDecimal.valueOf(4))
+                .tax(9)
                 .build();
         sellService.saveSell(Optional.of(sell), request);
         sellId = sell.getId();
         assertThat(sell.getId()).isNotNull();
-        Thread.sleep(1000);
+        Thread.sleep(100);
     }
 
     @Test
@@ -183,7 +184,7 @@ public record FinancialControllerTest(UserService userService,
         var product = new ProductModel();
         product.setTotalCount(BigDecimal.valueOf(9850));
         product.setPrice(BigDecimal.valueOf(564));
-        assertThrows(BadRequestException.class, () -> productService.updateProduct(product, productId, request));
+        assertThrows(NoContentException.class, () -> productService.updateProduct(product, 13L, request));
     }
 
     @Test
@@ -259,6 +260,7 @@ public record FinancialControllerTest(UserService userService,
                 .price(BigDecimal.valueOf(6000))
                 .count(BigDecimal.valueOf(20))
                 .product(new ProductModel(productId))
+                .tax(9)
                 .build();
         buyService.updateBuy(Optional.of(buy), buyId, request);
     }
@@ -271,6 +273,7 @@ public record FinancialControllerTest(UserService userService,
                 .price(BigDecimal.valueOf(9000))
                 .count(BigDecimal.valueOf(6))
                 .product(new ProductModel(productId))
+                .tax(9)
                 .build();
         sellService.updateSell(Optional.of(sell), sellId, request);
     }
@@ -283,6 +286,7 @@ public record FinancialControllerTest(UserService userService,
                 .price(BigDecimal.valueOf(6000))
                 .count(BigDecimal.valueOf(2))
                 .product(new ProductModel(productId))
+                .tax(9)
                 .build();
         buyService.updateBuy(Optional.of(buy), buyId, request);
     }
@@ -295,6 +299,7 @@ public record FinancialControllerTest(UserService userService,
                 .price(BigDecimal.valueOf(9000))
                 .count(BigDecimal.valueOf(3))
                 .product(new ProductModel(productId))
+                .tax(9)
                 .build();
         sellService.updateSell(Optional.of(sell), sellId, request);
     }

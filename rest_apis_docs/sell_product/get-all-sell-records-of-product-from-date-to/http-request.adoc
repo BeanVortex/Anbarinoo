@@ -2,11 +2,11 @@
 ----
 POST /api/category/products/sell/get-by-product/date/5/ HTTP/1.1
 Content-Type: application/json
-refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDE3NjQzNzUsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQzNTc4Nzc1fQ.liBB7ZokbpfRsxFQOdO-wrdsRpr9P7oWpwFI4wHcCC8
-access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MTc2NDM3NSwiZXhwIjoxNjQxNzY0NDM1fQ.wQ-n-ibY-gxGIlh09b_l5qTSlx8sQtbv8AXDLTkS9AI
+refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDQ3NTgzMTUsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQ2NTcyNzE1fQ.EIGeNnVIlgqa60VBVUfhpZ9zEIQIuzLiE-6zREDSVWo
+access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0NDc1ODMxNSwiZXhwIjoxNjQ0NzU4Mzc1fQ.plynHQlzS4rK5yJUpnqNGCIXqXf9eZLQdbWPu7X3R1A
 Accept: application/json
-Content-Length: 133
+Content-Length: 137
 Host: localhost:8080
 
-{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2022,1,10,1,9,35,205449334],"toDate":[2022,1,10,1,9,35,279280221]}
+{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2022,2,13,16,48,35,216608169],"toDate":[2022,2,13,16,48,35,289830195]}
 ----

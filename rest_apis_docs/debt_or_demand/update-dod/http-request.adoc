@@ -3,10 +3,10 @@
 PUT /api/user/financial/debt-demand/update/4/ HTTP/1.1
 Content-Type: application/json
 Accept: application/json
-refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDE3NjQzNjEsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQzNTc4NzYxfQ.Kis_Ulp7QlIDVTxVqiwdE2DyE7WXxecEEqzoXvJNImE
-access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MTc2NDM2MSwiZXhwIjoxNjQxNzY0NDIxfQ.9_hD3jrMVbbJYNAc7FB6MpoJ4s8nttYyNO19TWip20c
+refresh_token: eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDQ3NTgzMDUsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQ2NTcyNzA1fQ.kw1HzQ_HOjBxtJfYR8R1WkpGVzmPpIusgY1BEqJk6IQ
+access_token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0NDc1ODMwNSwiZXhwIjoxNjQ0NzU4MzY1fQ.geMIy-0JMomRLicW54wZUVAgYJrXuU3G5-LgieGzGpc
 Content-Length: 125
 Host: localhost:8080
 
-{"nameOf":"Other","payTo":"Me","isDebt":false,"isCheckedOut":false,"amount":1564,"validTill":"2022-01-18T01:09:21.146102405"}
+{"nameOf":"Other","payTo":"Me","isDebt":false,"isCheckedOut":false,"amount":1564,"validTill":"2022-02-21T16:48:25.797645080"}
 ----

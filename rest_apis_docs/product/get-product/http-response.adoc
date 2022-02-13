@@ -4,5 +4,5 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 Content-Length: 385
 
-{"id":7,"firstBuyId":null,"canUpdate":true,"name":"product1Updated2","description":"desc1Updated2","images":["2a69d975-9979-4999-b014-a3b10582b461.jpeg","2c64ceeb-03c7-41be-934a-78015b7dd468.jpeg","3bcec2ee-2664-4a78-98c6-868464c07348.jpeg"],"price":50.0500,"tax":9,"category":6,"totalCount":50500.0000,"createdAt":"2022-02-12T10:24:42.423419","updatedAt":"2022-02-12T10:24:42.846126"}
+{"id":7,"firstBuyId":null,"canUpdate":true,"name":"product1Updated2","description":"desc1Updated2","images":["66777e73-f69f-479b-afc9-8a58475792d4.jpeg","81716198-3fa3-49cc-b031-1985fb9ff754.jpeg","e0cbc3c0-cbc6-4da5-bc23-6709e98b72fa.jpeg"],"price":50.0500,"tax":9,"category":6,"totalCount":50500.0000,"createdAt":"2022-02-13T16:48:16.127146","updatedAt":"2022-02-13T16:48:16.319276"}
 ----

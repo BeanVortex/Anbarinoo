@@ -1,4 +1,4 @@
 [source,options="nowrap"]
 ----
-{"id":null,"firstBuyId":null,"canUpdate":true,"name":null,"description":null,"images":["03631422-d15e-40ed-984e-174fe5c9845d.jpeg","f2b1760a-bd64-478c-8565-e0e6ef442ce7.jpeg"],"price":null,"tax":null,"category":null,"totalCount":null,"createdAt":null,"updatedAt":null}
+{"id":null,"firstBuyId":null,"canUpdate":true,"name":null,"description":null,"images":["ff92a60f-f430-41be-8119-25a24f333dad.jpeg","66a58f87-f9b1-4745-a9a9-8609c7294b6b.jpeg"],"price":null,"tax":null,"category":null,"totalCount":null,"createdAt":null,"updatedAt":null}
 ----

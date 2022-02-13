@@ -5,8 +5,7 @@ import ir.darkdeveloper.anbarinoo.model.Auth.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.Auth.Authority;
 import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.DebtOrDemandModel;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,11 +18,14 @@ import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
 @JsonIgnoreProperties(value = "attributes")
-@ToString(exclude = {"categories"}, doNotUseGetters = true)
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel> {
 
     @Id
@@ -95,16 +97,19 @@ public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel
     @OneToMany(mappedBy = "user")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
+    @ToString.Exclude
     private List<DebtOrDemandModel> debtOrDemand;
 
     @OneToMany(mappedBy = "user")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
+    @ToString.Exclude
     private List<ChequeModel> cheques;
 
     @OneToMany(mappedBy = "user")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
+    @ToString.Exclude
     private List<CategoryModel> categories;
 
     // For saving products I need it
@@ -128,9 +133,6 @@ public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel
         this.address = address;
         this.description = description;
         this.provider = provider;
-    }
-
-    public UserModel() {
     }
 
     @Override

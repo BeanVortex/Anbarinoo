@@ -10,6 +10,7 @@ import ir.darkdeveloper.anbarinoo.util.Financial.FinancialUtils;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import lombok.AllArgsConstructor;
 import org.hibernate.exception.DataException;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +24,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 @Service
-@AllArgsConstructor
 public class SellService {
 
     private final SellRepo repo;
@@ -31,11 +31,19 @@ public class SellService {
     private final ProductService productService;
     private final FinancialUtils fUtils;
 
+    public SellService(SellRepo repo, JwtUtils jwtUtils,
+                       ProductService productService, @Lazy FinancialUtils fUtils) {
+        this.repo = repo;
+        this.jwtUtils = jwtUtils;
+        this.productService = productService;
+        this.fUtils = fUtils;
+    }
+
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public SellModel saveSell(Optional<SellModel> sell, HttpServletRequest req) {
         return exceptionHandlers(() -> {
-            checkSellData(sell);
+            checkSellData(sell, Optional.empty());
             // checked sell data validity in checkSellData, so it is safe to use orElseThrow
             saveProductCount(sell.orElseThrow(), req);
             return repo.save(sell.orElseThrow());
@@ -46,7 +54,7 @@ public class SellService {
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public SellModel updateSell(Optional<SellModel> sell, Long sellId, HttpServletRequest req) {
         return exceptionHandlers(() -> {
-            checkSellData(sell);
+            checkSellData(sell, Optional.of(sellId));
             var preSell = repo.findById(sellId)
                     .orElseThrow(() -> new NoContentException("Sell record doesn't exist"));
             // checked sell data validity in checkSellData, so it is safe to use orElseThrow
@@ -172,12 +180,13 @@ public class SellService {
     }
 
 
-    private void checkSellData(Optional<SellModel> sell) {
+    private void checkSellData(Optional<SellModel> sell, Optional<Long> sellId) {
         sell.map(SellModel::getProduct)
                 .map(ProductModel::getId)
                 .orElseThrow(() -> new BadRequestException("Product id is null, Can't sell"));
 
-        sell.ifPresent(sellModel -> sellModel.setId(null));
+
+        sell.ifPresent(sellModel -> sellId.ifPresentOrElse(sellModel::setId, () -> sellModel.setId(null)));
 
         sell.map(SellModel::getCount)
                 .filter(c -> c.compareTo(BigDecimal.ZERO) > 0)

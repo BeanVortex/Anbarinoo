@@ -1,8 +1,8 @@
 [source,bash]
 ----
-$ echo '{"count":60.2,"price":9000.568,"product":5}' | http PUT 'http://localhost:8080/api/category/products/buy/update//' \
+$ echo '{"count":60.2,"price":9000.568,"product":5}' | http PUT 'http://localhost:8080/api/category/products/buy/update/7/' \
     'Content-Type:application/json' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDMzOTY2OTIsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQ1MjExMDkyfQ.GnqRZ0XClGmCFz09DbQ68mDKKvaMBVyRUNNFrtQntB8' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MzM5NjY5MiwiZXhwIjoxNjQzMzk2NzUyfQ.30oFjLmKaIrxCWX-WrprzCbzdJSCSVaCe6NCQjk_vVs' \
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDQ3NTgzMDAsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQ2NTcyNzAwfQ.AUwvvM7gQKy97vLO_J3LlVWDn_L0x-WBiPpd20BpxNY' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0NDc1ODMwMCwiZXhwIjoxNjQ0NzU4MzYwfQ.yr4qPHYIneGKw6OHqQWUYNhgBK2C9Gp1QRAALRmfCg0' \
     'Accept:application/json'
 ----

@@ -1,4 +1,4 @@
 [source,options="nowrap"]
 ----
-{"message":"Id must be null to save a buy record","httpStatus":"BAD_REQUEST","timestamp":"2022-01-28T22:34:52.871366733"}
+{"id":7,"count":8,"price":5000,"tax":10,"product":5,"createdAt":"2022-02-13T16:48:20.981847896","updatedAt":"2022-02-13T16:48:20.981861376"}
 ----

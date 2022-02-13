@@ -41,7 +41,7 @@ public class SellModel implements UpdateModel<SellModel> {
     private BigDecimal price;
 
     @Column(nullable = false)
-    private Integer tax = 9;
+    private Integer tax;
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")

@@ -1,8 +1,8 @@
 [source,bash]
 ----
-$ echo '{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2022,1,10,1,9,23,49559588],"toDate":[2022,1,10,1,9,33,249352493]}' | http POST 'http://localhost:8080/api/user/financial/incomes/' \
+$ echo '{"costs":null,"incomes":null,"profit":null,"loss":null,"fromDate":[2022,2,13,16,48,27,682852201],"toDate":[2022,2,13,16,48,33,384536899]}' | http POST 'http://localhost:8080/api/user/financial/incomes/' \
     'Content-Type:application/json' \
     'Accept:application/json' \
-    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDE3NjQzNjMsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQzNTc4NzYzfQ.ggEqsaXddXyw0BxyYxIbn40EMYEFPVqprAI1NdsdMcs' \
-    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0MTc2NDM2MywiZXhwIjoxNjQxNzY0NDIzfQ.VfDtWlNm_fPpHpedy9VvxjG04fX3xw3uYUW3GsaTu44'
+    'refresh_token:eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NDQ3NTgzMDcsInN1YiI6ImVtYWlsQG1haWwuY29tIiwidXNlcl9pZCI6MiwiZXhwIjoxNjQ2NTcyNzA3fQ.UNM08hOfP_Dn_STxKln3qEkmJkw0V9IPY6fNsS7Pn2c' \
+    'access_token:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlbWFpbEBtYWlsLmNvbSIsImlhdCI6MTY0NDc1ODMwNywiZXhwIjoxNjQ0NzU4MzY3fQ.IJvUmQMtEMiAauOOKRwAZpRYgcModQUxJF1imipBvt0'
 ----

@@ -4,5 +4,5 @@ HTTP/1.1 403 Forbidden
 Content-Type: application/json
 Content-Length: 123
 
-{"message":"You can't delete another user's products","httpStatus":"FORBIDDEN","timestamp":"2022-02-12T10:24:42.960454262"}
+{"message":"You can't delete another user's products","httpStatus":"FORBIDDEN","timestamp":"2022-02-13T16:48:16.414651111"}
 ----

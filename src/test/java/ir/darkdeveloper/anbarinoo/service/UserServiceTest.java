@@ -1,5 +1,6 @@
 package ir.darkdeveloper.anbarinoo.service;
 
+import ir.darkdeveloper.anbarinoo.exception.DataExistsException;
 import ir.darkdeveloper.anbarinoo.model.Auth.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -44,8 +46,8 @@ public record UserServiceTest(UserService service,
 
     @BeforeAll
     static void setUp() {
-        Authentication authentication = Mockito.mock(Authentication.class);
-        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        var authentication = Mockito.mock(Authentication.class);
+        var securityContext = Mockito.mock(SecurityContext.class);
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         request = mock(HttpServletRequest.class);
@@ -56,15 +58,16 @@ public record UserServiceTest(UserService service,
     @WithMockUser(username = "anonymousUser")
 //    @Disabled
     void signUpWithoutImage() throws Exception {
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        var user = new UserModel();
-        user.setEmail("email@mail.com");
-        user.setAddress("address");
-        user.setDescription("desc");
-        user.setUserName("user n");
-        user.setEnabled(true);
-        user.setPassword("pass12B~");
-        user.setPasswordRepeat("pass12B~");
+        var response = mock(HttpServletResponse.class);
+        var user = UserModel.builder()
+                .email("email@mail.com")
+                .address("address")
+                .description("desc")
+                .userName("user n")
+                .enabled(true)
+                .password("pass12B~")
+                .passwordRepeat("pass12B~")
+                .build();
         service.signUpUser(user, response);
         request = setUpHeader(user);
         userId = user.getId();
@@ -73,25 +76,30 @@ public record UserServiceTest(UserService service,
     @Test
     @Order(1)
     @WithMockUser(username = "anonymousUser")
-    void signUpWithImage() throws Exception {
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        var user = new UserModel();
-        user.setEmail("email@mail.com");
-        user.setAddress("address");
-        user.setDescription("desc");
-        user.setUserName("user n");
-        user.setEnabled(true);
-        MockMultipartFile file1 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!".getBytes());
-        MockMultipartFile file2 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!".getBytes());
-        user.setProfileFile(file1);
-        user.setShopFile(file2);
-        user.setPassword("pass12B~");
-        user.setPasswordRepeat("pass12B~");
-        service.signUpUser(user, response);
-        request = setUpHeader(user);
-        userId = user.getId();
+    void signUpWithImage() {
+        var response = mock(HttpServletResponse.class);
+
+        var file1 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!" .getBytes());
+        var file2 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!" .getBytes());
+
+        var user = UserModel.builder()
+                .email("email@mail.com")
+                .address("address")
+                .description("desc")
+                .userName("user n")
+                .enabled(true)
+                .profileFile(file1)
+                .shopFile(file2)
+                .password("pass12B~")
+                .passwordRepeat("pass12B~")
+                .build();
+        assertThrows(DataExistsException.class, () -> {
+            service.signUpUser(user, response);
+            request = setUpHeader(user);
+            userId = user.getId();
+        });
     }
 
     @Test
@@ -133,9 +141,9 @@ public record UserServiceTest(UserService service,
         user.setDescription("dex");
         user.setShopName("shop1");
         MockMultipartFile file1 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!".getBytes());
+                "Hello, World!" .getBytes());
         MockMultipartFile file2 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!".getBytes());
+                "Hello, World!" .getBytes());
         user.setProfileFile(file1);
         user.setShopFile(file2);
         var fetchedUser = service.getUserInfo(userId, request);

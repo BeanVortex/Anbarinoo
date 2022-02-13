@@ -1,4 +1,4 @@
 [source,options="nowrap"]
 ----
-{"count":15,"price":9000.568,"tax":9,"product":5}
+{"count":15,"price":9000.568,"product":5}
 ----

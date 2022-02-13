@@ -34,7 +34,7 @@ public class BuyService {
 
     @Autowired
     public BuyService(BuyRepo repo, JwtUtils jwtUtils, @Lazy ProductService productService,
-                      FinancialUtils fUtils) {
+                      @Lazy FinancialUtils fUtils) {
         this.repo = repo;
         this.jwtUtils = jwtUtils;
         this.productService = productService;
@@ -45,7 +45,7 @@ public class BuyService {
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public BuyModel saveBuy(Optional<BuyModel> buy, Boolean isSaveProduct, HttpServletRequest req) {
         return exceptionHandlers(() -> {
-            checkBuyData(buy);
+            checkBuyData(buy, Optional.empty());
             if (!isSaveProduct)
                 saveProductCount(buy.orElseThrow(), req);
             // checked buy data validity in checkBuyData, so it is safe to use orElseThrow
@@ -57,7 +57,7 @@ public class BuyService {
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public BuyModel updateBuy(Optional<BuyModel> buy, Long buyId, HttpServletRequest req) {
         return exceptionHandlers(() -> {
-            checkBuyData(buy);
+            checkBuyData(buy, Optional.of(buyId));
             var preBuy = repo.findById(buyId)
                     .orElseThrow(() -> new NoContentException("Buy record doesn't exist"));
             // checked buy data validity in checkBuyData, so it is safe to use orElseThrow
@@ -181,12 +181,12 @@ public class BuyService {
     }
 
 
-    private void checkBuyData(Optional<BuyModel> buy) {
+    private void checkBuyData(Optional<BuyModel> buy, Optional<Long> buyId) {
         buy.map(BuyModel::getProduct)
                 .map(ProductModel::getId)
                 .orElseThrow(() -> new BadRequestException("Product id is null, Can't sell"));
 
-        buy.ifPresent(buyModel -> buyModel.setId(null));
+        buy.ifPresent(buyModel -> buyId.ifPresentOrElse(buyModel::setId, () -> buyModel.setId(null)));
 
         buy.map(BuyModel::getCount)
                 .filter(c -> c.compareTo(BigDecimal.ZERO) > 0)

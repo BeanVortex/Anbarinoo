@@ -58,8 +58,8 @@ public record SellServiceTest(UserService userService,
 
     @BeforeAll
     static void setUp() {
-        Authentication authentication = Mockito.mock(Authentication.class);
-        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        var authentication = Mockito.mock(Authentication.class);
+        var securityContext = Mockito.mock(SecurityContext.class);
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         request = mock(HttpServletRequest.class);
@@ -71,15 +71,16 @@ public record SellServiceTest(UserService userService,
     @Order(1)
     @WithMockUser(username = "anonymousUser")
     void saveUser() throws Exception {
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        var user = new UserModel();
-        user.setEmail("email@mail.com");
-        user.setAddress("address");
-        user.setDescription("desc");
-        user.setUserName("user n");
-        user.setPassword("pass12P+");
-        user.setPasswordRepeat("pass12P+");
-        user.setEnabled(true);
+        var response = mock(HttpServletResponse.class);
+        var user = UserModel.builder()
+                .email("email@mail.com")
+                .address("address")
+                .description("desc")
+                .userName("user n")
+                .enabled(true)
+                .password("pass12B~")
+                .passwordRepeat("pass12B~")
+                .build();
         userService.signUpUser(user, response);
         userId = user.getId();
         request = setUpHeader(user.getEmail(), userId);
@@ -118,6 +119,7 @@ public record SellServiceTest(UserService userService,
                 .product(new ProductModel(productId))
                 .price(BigDecimal.valueOf(50))
                 .count(BigDecimal.valueOf(20))
+                .tax(9)
                 .build();
         sellService.saveSell(Optional.of(sellRecord), request);
         sellId = sellRecord.getId();
@@ -190,12 +192,12 @@ public record SellServiceTest(UserService userService,
     //should return the object; data is being removed
     private HttpServletRequest setUpHeader(String email, Long userId) {
 
-        Map<String, String> headers = new HashMap<>();
+        var headers = new HashMap<String, String>();
         headers.put(null, "HTTP/1.1 200 OK");
         headers.put("Content-Type", "text/html");
 
-        String refreshToken = jwtUtils.generateRefreshToken(email, userId);
-        String accessToken = jwtUtils.generateAccessToken(email);
+        var refreshToken = jwtUtils.generateRefreshToken(email, userId);
+        var accessToken = jwtUtils.generateAccessToken(email);
         var refreshDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
         var accessDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
         headers.put("refresh_token", refreshToken);

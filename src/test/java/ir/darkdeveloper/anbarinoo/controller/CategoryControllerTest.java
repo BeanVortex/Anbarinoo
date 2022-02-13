@@ -52,7 +52,6 @@ public record CategoryControllerTest(UserService userService,
 
     private static Long catId;
     private static Long subCatId;
-    private static Long userId;
     private static HttpServletRequest request;
     private static MockMvc mockMvc;
 
@@ -92,7 +91,7 @@ public record CategoryControllerTest(UserService userService,
         user.setPasswordRepeat("pass12P+");
         user.setEnabled(true);
         userService.signUpUser(user, response);
-        userId = user.getId();
+        Long userId = user.getId();
         request = setUpHeader(user.getEmail(), userId);
     }
 
