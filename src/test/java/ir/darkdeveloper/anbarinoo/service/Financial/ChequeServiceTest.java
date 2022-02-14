@@ -19,8 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -44,8 +44,8 @@ public record ChequeServiceTest(ChequeService chequeService,
 
     @BeforeAll
     static void setUp() {
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
+        var authentication = mock(Authentication.class);
+        var securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         request = mock(HttpServletRequest.class);
@@ -56,13 +56,15 @@ public record ChequeServiceTest(ChequeService chequeService,
     @Order(1)
     @WithMockUser(username = "anonymousUser")
     void saveUser() throws Exception {
-        var user = new UserModel();
-        user.setEmail("email@mail.com");
-        user.setAddress("address");
-        user.setDescription("desc");
-        user.setPassword("pass12P+");
-        user.setPasswordRepeat("pass12P+");
-        user.setEnabled(false);
+        var user = UserModel.builder()
+                .email("email@mail.com")
+                .address("address")
+                .description("desc")
+                .userName("user n")
+                .enabled(false)
+                .password("pass12B~")
+                .passwordRepeat("pass12B~")
+                .build();
         var response = mock(HttpServletResponse.class);
         userService.signUpUser(user, response);
         var fetchedModel = (UserModel) userService.loadUserByUsername(user.getEmail());
@@ -77,15 +79,16 @@ public record ChequeServiceTest(ChequeService chequeService,
     @Order(2)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void saveCheque() {
-        var cheque = new ChequeModel();
-        cheque.setAmount(new BigDecimal("554.55"));
-        cheque.setIsDebt(true);
-        cheque.setNameOf("DD");
-        cheque.setPayTo("GG");
-        cheque.setIssuedAt(LocalDateTime.now());
-        cheque.setValidTill(LocalDateTime.now().plusDays(5));
+        var cheque = ChequeModel.builder()
+                .amount(new BigDecimal("554.55"))
+                .isDebt(true)
+                .nameOf("DD")
+                .payTo("GG")
+                .issuedAt(LocalDateTime.now())
+                .validTill(LocalDateTime.now().plusDays(5))
+                .build();
         cheque.setUser(new UserModel(userId));
-        chequeService.saveCheque(cheque, request);
+        chequeService.saveCheque(Optional.of(cheque), request);
         chequeId = cheque.getId();
     }
 
@@ -101,7 +104,7 @@ public record ChequeServiceTest(ChequeService chequeService,
     @Order(4)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void getChequesByUserId() {
-        List<ChequeModel> cheques = chequeService.getChequesByUserId(userId, request);
+        var cheques = chequeService.getChequesByUserId(userId, request);
         assertThat(cheques.size()).isNotEqualTo(0);
         for (ChequeModel cheque : cheques)
             assertThat(cheque.getUser().getId()).isEqualTo(userId);
@@ -114,7 +117,7 @@ public record ChequeServiceTest(ChequeService chequeService,
     void updateCheque() {
         var cheque = new ChequeModel();
         cheque.setIsCheckedOut(true);
-        cheque = chequeService.updateCheque(cheque, chequeId, request);
+        cheque = chequeService.updateCheque(Optional.of(cheque), chequeId, request);
         assertThat(cheque.getIsCheckedOut()).isTrue();
     }
 
@@ -158,7 +161,6 @@ public record ChequeServiceTest(ChequeService chequeService,
 
         return request;
     }
-
 
 
 }

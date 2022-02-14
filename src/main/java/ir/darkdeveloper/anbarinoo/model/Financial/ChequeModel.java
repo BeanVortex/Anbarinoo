@@ -17,6 +17,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -24,17 +25,16 @@ import ir.darkdeveloper.anbarinoo.model.UpdateModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.model.deserializers.ChequeDeserializer;
 import ir.darkdeveloper.anbarinoo.model.serializers.ChequeSerializer;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "cheques")
 @JsonDeserialize(using = ChequeDeserializer.class)
 @JsonSerialize(using = ChequeSerializer.class)
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class ChequeModel implements UpdateModel<ChequeModel> {
 
     @Id

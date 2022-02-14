@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ir.darkdeveloper.anbarinoo.service.Financial.ChequeService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user/financial/cheque")
@@ -22,13 +23,13 @@ public class ChequeController {
 
     @PostMapping("/save/")
     public ResponseEntity<?> saveCheque(@RequestBody ChequeModel cheque, HttpServletRequest req) {
-        return ResponseEntity.ok().body(service.saveCheque(cheque, req));
+        return ResponseEntity.ok().body(service.saveCheque(Optional.ofNullable(cheque), req));
     }
 
     @PostMapping("/update/{id}/")
     public ResponseEntity<?> updateCheque(@RequestBody ChequeModel cheque, @PathVariable Long id,
                                           HttpServletRequest req) {
-        return ResponseEntity.ok().body(service.updateCheque(cheque, id, req));
+        return ResponseEntity.ok().body(service.updateCheque(Optional.ofNullable(cheque), id, req));
     }
 
     @GetMapping("/{id}/")

@@ -17,19 +17,19 @@ import ir.darkdeveloper.anbarinoo.model.UpdateModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.model.deserializers.DebtOrDemandDeserializer;
 import ir.darkdeveloper.anbarinoo.model.serializers.DebtOrDemandSerializer;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "debts_demands")
 @JsonDeserialize(using = DebtOrDemandDeserializer.class)
 @JsonSerialize(using = DebtOrDemandSerializer.class)
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class DebtOrDemandModel implements UpdateModel<DebtOrDemandModel> {
 
     @Id
