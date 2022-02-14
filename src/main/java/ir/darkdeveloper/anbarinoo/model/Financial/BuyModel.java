@@ -43,7 +43,8 @@ public class BuyModel implements UpdateModel<BuyModel> {
     private BigDecimal price;
 
     @Column(nullable = false)
-    private Integer tax;
+    @Builder.Default
+    private Integer tax = 9;
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")

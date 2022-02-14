@@ -18,6 +18,7 @@ import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.security.jwt.JwtAuth;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -53,18 +54,18 @@ public class UserController {
 
     @PutMapping("/update/{id}/")
     public UserModel updateUser(@ModelAttribute UserModel user, @PathVariable Long id, HttpServletRequest req) {
-        return userService.updateUser(user, id, req);
+        return userService.updateUser(Optional.ofNullable(user), id, req);
     }
 
     @PutMapping("/update/images/{id}/")
     public UserModel updateUserImages(@ModelAttribute UserModel user, @PathVariable Long id, HttpServletRequest req) {
-        return userService.updateUserImages(user, id, req);
+        return userService.updateUserImages(Optional.ofNullable(user), id, req);
     }
 
     @PutMapping("/update/delete-images/{id}/")
     public UserModel updateDeleteUserImages(@ModelAttribute UserModel user, @PathVariable Long id,
                                             HttpServletRequest req) {
-        return userService.updateDeleteUserImages(user, id, req);
+        return userService.updateDeleteUserImages(Optional.ofNullable(user), id, req);
     }
 
     @DeleteMapping("/{id}/")

@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Component
@@ -20,16 +21,21 @@ public class PasswordUtils {
     /**
      * updates preUser Password
      */
-    public void updatePasswordUsingPrevious(UserModel user, UserModel preUser) {
+    public void updatePasswordUsingPrevious(Optional<UserModel> user, UserModel preUser) {
         //update pass
-        if (user.getPassword() != null && user.getPasswordRepeat() != null) {
-            if (user.getPrevPassword() != null) {
-                if (encoder.matches(user.getPrevPassword(), preUser.getPassword()))
-                    preUser.setPassword(encoder.encode(user.getPassword()));
-                else
-                    throw new PasswordException("Previous password is wrong");
-            } else
-                throw new PasswordException("Enter previous password to change");
+        var passExists = user.map(UserModel::getPassword).isPresent();
+        var rPassExists = user.map(UserModel::getPasswordRepeat).isPresent();
+        if (passExists && rPassExists) {
+            user.map(UserModel::getPrevPassword).ifPresentOrElse(
+                    prePass -> {
+                        if (encoder.matches(prePass, preUser.getPassword()))
+                            preUser.setPassword(encoder.encode(user.get().getPassword()));
+                        else
+                            throw new PasswordException("Previous password is wrong");
+                    },
+                    () -> {
+                        throw new PasswordException("Enter previous password to change");
+                    });
         }
         //else keep preUser pass
     }

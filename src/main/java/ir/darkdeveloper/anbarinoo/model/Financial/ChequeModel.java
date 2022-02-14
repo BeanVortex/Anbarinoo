@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import lombok.*;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -28,6 +29,7 @@ import ir.darkdeveloper.anbarinoo.model.serializers.ChequeSerializer;
 
 @Getter
 @Setter
+@ToString
 @Entity
 @Table(name = "cheques")
 @JsonDeserialize(using = ChequeDeserializer.class)
@@ -51,9 +53,11 @@ public class ChequeModel implements UpdateModel<ChequeModel> {
     private BigDecimal amount;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean isDebt = false;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean isCheckedOut = false;
 
     @ManyToOne

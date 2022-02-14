@@ -10,12 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 public class IOUtils {
@@ -30,17 +28,17 @@ public class IOUtils {
      * @param file MultipartFile
      * @param path after user/
      */
-    private String saveFile(MultipartFile file, String path) throws IOException {
+    private Optional<String> saveFile(MultipartFile file, String path) throws IOException {
         if (file != null) {
             // first it may not upload and save file in the path. should create static/img
             // folder in resources
-            String location = ResourceUtils.getFile(path).getAbsolutePath();
-            byte[] bytes = file.getBytes();
-            String fileName = UUID.randomUUID() + "." + Objects.requireNonNull(file.getContentType()).split("/")[1];
+            var location = ResourceUtils.getFile(path).getAbsolutePath();
+            var bytes = file.getBytes();
+            var fileName = UUID.randomUUID() + "." + Objects.requireNonNull(file.getContentType()).split("/")[1];
             Files.write(Paths.get(location + File.separator + fileName), bytes);
-            return fileName;
+            return Optional.of(fileName);
         }
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -57,7 +55,7 @@ public class IOUtils {
     /**
      * Saves user images
      *
-     * @param user  if images are null then the default will set
+     * @param user if images are null then the default will set
      * @throws IOException -
      */
     public void saveUserImages(UserModel user)
@@ -68,40 +66,40 @@ public class IOUtils {
         if (user.getProfileImage() == null || user.getProfileFile() == null)
             user.setProfileImage(DEFAULT_PROFILE_IMAGE);
 
-        String profileFileName = saveFile(user.getProfileFile(), USER_IMAGE_PATH);
-        if (profileFileName != null)
-            user.setProfileImage(profileFileName);
+        var profileFileName = saveFile(user.getProfileFile(), USER_IMAGE_PATH);
+        profileFileName.ifPresent(user::setProfileImage);
 
-        String shopFileName = saveFile(user.getShopFile(), USER_IMAGE_PATH);
-        if (shopFileName != null)
-            user.setShopImage(shopFileName);
+        var shopFileName = saveFile(user.getShopFile(), USER_IMAGE_PATH);
+        shopFileName.ifPresent(user::setShopImage);
     }
 
-    public void updateUserImages(UserModel user, UserModel preUser) throws IOException {
+    public void updateUserImages(Optional<UserModel> userOpt, UserModel preUser) throws IOException {
+
+        var user = userOpt.orElseThrow(() -> new BadRequestException("User can't be null"));
 
         if (user.getShopFile() != null && !preUser.getShopImage().equals(DEFAULT_SHOP_IMAGE))
             deleteShopFile(preUser);
-
 
         if (user.getProfileFile() != null && !preUser.getProfileImage().equals(DEFAULT_PROFILE_IMAGE))
             deleteProfileFile(preUser);
 
 
-        String profileFileName = saveFile(user.getProfileFile(), USER_IMAGE_PATH);
-        if (profileFileName != null) {
-            user.setProfileImage(profileFileName);
+        var profileFileName = saveFile(user.getProfileFile(), USER_IMAGE_PATH);
+        profileFileName.ifPresent(fileName -> {
+            user.setProfileImage(fileName);
             preUser.setProfileImage(null);
-        }
+        });
 
-        String shopFileName = saveFile(user.getShopFile(), USER_IMAGE_PATH);
-        if (shopFileName != null) {
-            user.setShopImage(shopFileName);
+        var shopFileName = saveFile(user.getShopFile(), USER_IMAGE_PATH);
+        shopFileName.ifPresent(fileName -> {
+            user.setShopImage(fileName);
             preUser.setShopImage(null);
-        }
+        });
     }
 
 
-    public void updateDeleteUserImages(UserModel user, UserModel preUser) throws IOException {
+    public void updateDeleteUserImages(Optional<UserModel> userOpt, UserModel preUser) throws IOException {
+        var user = userOpt.orElseThrow(() -> new BadRequestException("User can't be null"));
         if (user.getShopImage() != null && user.getShopImage().equals(preUser.getShopImage())) {
             deleteShopFile(preUser);
             preUser.setShopImage(DEFAULT_SHOP_IMAGE);
@@ -164,11 +162,10 @@ public class IOUtils {
         if (files.size() > 5)
             throw new BadRequestException("You can't have images more than 5!");
 
-        for (MultipartFile file : files)
-            fileNames.add(saveFile(file, PRODUCT_IMAGE_PATH));
+        for (var file : files)
+            fileNames.add(saveFile(file, PRODUCT_IMAGE_PATH).orElse(DEFAULT_PRODUCT_IMAGE));
 
-        if (!fileNames.isEmpty())
-            product.setImages(fileNames);
+        product.setImages(fileNames);
     }
 
     /**
@@ -185,7 +182,7 @@ public class IOUtils {
             throw new BadRequestException("You can't have images more than 5!");
 
         for (MultipartFile file : files)
-            fileNames.add(saveFile(file, PRODUCT_IMAGE_PATH));
+            fileNames.add(saveFile(file, PRODUCT_IMAGE_PATH).orElse(DEFAULT_PRODUCT_IMAGE));
 
         //adding remaining images name in previous product
         product.update(preProduct);
@@ -209,7 +206,7 @@ public class IOUtils {
                         Files.delete(Paths.get(imgPath));
                     preProduct.getImages().remove(oldImg);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    throw new UncheckedIOException(e);
                 }
             }
         });
@@ -221,17 +218,23 @@ public class IOUtils {
      * When deleting user is useful: it deletes any image own by a user's product
      * it won't delete the default image
      *
-     * @param products : delete these product's images
+     * @param productsOpt : delete this product's images
      */
-    public void deleteProductImagesOfUser(List<ProductModel> products) throws IOException {
-        if (products != null)
-            for (ProductModel product : products)
-                for (String name : product.getImages()) {
-                    var imgPath = getImagePath(PRODUCT_IMAGE_PATH, name);
-                    if (!name.equals(DEFAULT_PRODUCT_IMAGE) && imgPath != null)
-                        Files.delete(Paths.get(imgPath));
-                }
-
+    public void deleteProductImagesOfUser(Optional<List<ProductModel>> productsOpt) {
+        productsOpt.ifPresent(products -> products.stream()
+                .map(ProductModel::getImages)
+                .flatMap(Collection::stream)
+                .forEach(name -> {
+                    try {
+                        var imgPath = getImagePath(PRODUCT_IMAGE_PATH, name);
+                        if (!name.equals(DEFAULT_PRODUCT_IMAGE) && imgPath != null) {
+                            Files.delete(Paths.get(imgPath));
+                        }
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                })
+        );
     }
 
     /**
@@ -241,7 +244,7 @@ public class IOUtils {
      */
     public void deleteProductFiles(ProductModel product) throws IOException {
         var names = product.getImages();
-        for (String name : names) {
+        for (var name : names) {
             var imgPath = getImagePath(PRODUCT_IMAGE_PATH, name);
             if (!name.equals(DEFAULT_PRODUCT_IMAGE) && imgPath != null)
                 Files.delete(Paths.get(imgPath));

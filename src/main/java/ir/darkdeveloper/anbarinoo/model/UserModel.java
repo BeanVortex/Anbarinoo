@@ -106,7 +106,7 @@ public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel
     @ToString.Exclude
     private List<ChequeModel> cheques;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
     @ToString.Exclude

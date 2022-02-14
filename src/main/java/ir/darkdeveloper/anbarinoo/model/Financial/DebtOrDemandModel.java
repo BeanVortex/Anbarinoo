@@ -23,6 +23,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 @Getter
 @Setter
+@ToString
 @Entity
 @Table(name = "debts_demands")
 @JsonDeserialize(using = DebtOrDemandDeserializer.class)
@@ -43,9 +44,11 @@ public class DebtOrDemandModel implements UpdateModel<DebtOrDemandModel> {
     private String payTo;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean isDebt = false;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean isCheckedOut = false;
 
 

@@ -2,21 +2,18 @@ package ir.darkdeveloper.anbarinoo.model;
 
 
 import com.fasterxml.jackson.annotation.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.LinkedList;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "categories")
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"children"})
 public class CategoryModel {
 
     @Id
@@ -43,10 +40,12 @@ public class CategoryModel {
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @ToString.Exclude
     private List<CategoryModel> children = new LinkedList<>();
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
     @JsonIgnore
+    @ToString.Exclude
     private List<ProductModel> products;
 
     public CategoryModel(String name) {

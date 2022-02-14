@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@ToString
 @Entity
 @Table(name = "sells")
 @JsonDeserialize(using = SellDeserializer.class)
@@ -41,7 +42,8 @@ public class SellModel implements UpdateModel<SellModel> {
     private BigDecimal price;
 
     @Column(nullable = false)
-    private Integer tax;
+    @Builder.Default
+    private Integer tax = 9;
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")

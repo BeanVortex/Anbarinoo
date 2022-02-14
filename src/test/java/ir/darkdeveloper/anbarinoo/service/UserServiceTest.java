@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -109,7 +110,7 @@ public record UserServiceTest(UserService service,
         var fetchedUser = service.getUserInfo(userId, request);
         var user = new UserModel();
         user.setAddress("DFDF");
-        service.updateUser(user, userId, request);
+        service.updateUser(Optional.of(user), userId, request);
         var fetchedUser2 = service.getUserInfo(userId, request);
         assertThat(fetchedUser2.getPassword()).isNotNull();
         assertThat(fetchedUser2.getShopImage()).isEqualTo(fetchedUser.getShopImage());
@@ -126,7 +127,7 @@ public record UserServiceTest(UserService service,
         user.setPrevPassword("pass12B~");
         user.setPassword("pass4321B~");
         user.setPasswordRepeat("pass4321B~");
-        service.updateUser(user, userId, request);
+        service.updateUser(Optional.of(user), userId, request);
         var fetchedUser2 = service.getUserInfo(userId, request);
         assertThat(encoder.matches("pass4321B~", fetchedUser2.getPassword())).isTrue();
         assertThat(fetchedUser2.getShopImage()).isEqualTo(fetchedUser.getShopImage());
@@ -147,7 +148,7 @@ public record UserServiceTest(UserService service,
         user.setProfileFile(file1);
         user.setShopFile(file2);
         var fetchedUser = service.getUserInfo(userId, request);
-        service.updateUserImages(user, userId, request);
+        service.updateUserImages(Optional.of(user), userId, request);
         var fetchedUser2 = service.getUserInfo(userId, request);
         assertThat(fetchedUser.getShopImage()).isNotEqualTo(fetchedUser2.getShopImage());
         assertThat(fetchedUser.getProfileImage()).isNotEqualTo(fetchedUser2.getProfileImage());
@@ -163,7 +164,7 @@ public record UserServiceTest(UserService service,
         var fetchedUser = service.getUserInfo(userId, request);
         user.setProfileImage(fetchedUser.getProfileImage());
         user.setShopImage(fetchedUser.getShopImage());
-        service.updateDeleteUserImages(user, userId, request);
+        service.updateDeleteUserImages(Optional.of(user), userId, request);
         var fetchedUser2 = service.getUserInfo(userId, request);
         assertThat(fetchedUser.getShopImage()).isNotEqualTo(fetchedUser2.getShopImage());
         assertThat(fetchedUser.getProfileImage()).isNotEqualTo(fetchedUser2.getProfileImage());

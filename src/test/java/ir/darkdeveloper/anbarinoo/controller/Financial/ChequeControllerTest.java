@@ -105,22 +105,23 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
     @Order(2)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void saveCheque() throws Exception {
-        var cheque = new ChequeModel();
-        cheque.setAmount(BigDecimal.valueOf(750.06));
-        cheque.setIsCheckedOut(false);
-        cheque.setNameOf("Me");
-        cheque.setPayTo("Other");
-        cheque.setIssuedAt(LocalDateTime.now());
-        cheque.setValidTill(LocalDateTime.now().plusDays(5));
-        cheque.setIsDebt(false);
+        var cheque = ChequeModel.builder()
+                .amount(BigDecimal.valueOf(750.06))
+                .nameOf("Me")
+                .payTo("Other")
+                .issuedAt(LocalDateTime.now())
+                .validTill(LocalDateTime.now().plusDays(5))
+//                .isCheckedOut(false)
+//                .isDebt(false)
+                .build();
 
         mockMvc.perform(post("/api/user/financial/cheque/save/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-                .content(mapToJson(cheque))
-        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", refresh)
+                        .header("access_token", access)
+                        .content(mapToJson(cheque))
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andDo(result -> {
@@ -141,12 +142,12 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
         cheque.setValidTill(LocalDateTime.now().plusDays(10));
 
         mockMvc.perform(post("/api/user/financial/cheque/update/{id}/", chequeId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-                .content(mapToJson(cheque))
-        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", refresh)
+                        .header("access_token", access)
+                        .content(mapToJson(cheque))
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.amount").value(is(750.06)))
@@ -163,10 +164,10 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
     void getChequeAndDod() throws Exception {
         var cheque = new AtomicReference<ChequeModel>();
         mockMvc.perform(get("/api/user/financial/cheque/{id}/", chequeId)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-        )
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", refresh)
+                        .header("access_token", access)
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.amount").value(is(750.06)))
@@ -179,10 +180,10 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
         ;
 
         mockMvc.perform(get("/api/user/financial/debt-demand/get-by-user/{id}/", userId)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-        )
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", refresh)
+                        .header("access_token", access)
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].amount").value(is(cheque.get().getAmount()), BigDecimal.class))
@@ -203,10 +204,10 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
     void getChequesByUserId() throws Exception {
 
         mockMvc.perform(get("/api/user/financial/cheque/user/{id}/", userId)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-        )
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", refresh)
+                        .header("access_token", access)
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].amount").value(is(750.06)))
@@ -222,11 +223,11 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
     void findByPayToContains() throws Exception {
         var payTo = "th";
         mockMvc.perform(get("/api/user/financial/cheque/search/")
-                .param("payTo", payTo)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-        )
+                        .param("payTo", payTo)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", refresh)
+                        .header("access_token", access)
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].amount").value(is(750.06)))
@@ -240,10 +241,10 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void deleteCheque() throws Exception {
         mockMvc.perform(delete("/api/user/financial/cheque/{id}/", chequeId)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-        )
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", refresh)
+                        .header("access_token", access)
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
         ;
@@ -254,10 +255,10 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getDODAfterChequeDelete() throws Exception {
         mockMvc.perform(get("/api/user/financial/debt-demand/get-by-user/{id}/", userId)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-        )
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", refresh)
+                        .header("access_token", access)
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(0)))

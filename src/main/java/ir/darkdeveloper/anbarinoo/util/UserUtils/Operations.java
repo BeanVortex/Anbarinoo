@@ -1,5 +1,6 @@
 package ir.darkdeveloper.anbarinoo.util.UserUtils;
 
+import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.EmailNotValidException;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -34,47 +36,42 @@ public class Operations {
 
         ioUtils.deleteUserImages(user);
         for (var cat : user.getCategories())
-            ioUtils.deleteProductImagesOfUser(cat.getProducts());
+            ioUtils.deleteProductImagesOfUser(Optional.of(cat.getProducts()));
 
         refreshService.deleteTokenByUserId(user.getId());
         repo.deleteById(user.getId());
-
     }
 
-    public UserModel updateUser(UserModel user, Long id) {
+    public UserModel updateUser(Optional<UserModel> user, Long id) {
         //email update
         //userUtils.validateEmail(model);
-        if (user.getProfileImage() != null || user.getShopImage() != null) {
-            user.setProfileImage(null);
-            user.setShopImage(null);
+        user.orElseThrow(() -> new BadRequestException("User can't be null"));
+        var pImageExists = user.map(UserModel::getProfileImage).isPresent();
+        var sImageExists = user.map(UserModel::getShopImage).isPresent();
+        if (pImageExists || sImageExists) {
+            user.get().setProfileImage(null);
+            user.get().setShopImage(null);
         }
-        var foundUser = repo.findUserById(id);
-        if (foundUser.isPresent()) {
-            passwordUtils.updatePasswordUsingPrevious(user, foundUser.get());
-            foundUser.get().update(user);
-            return foundUser.get();
-        }
-        throw new NoContentException("User not found");
+        var foundUser = repo.findUserById(id).orElseThrow(() -> new NoContentException("User not found"));
+        passwordUtils.updatePasswordUsingPrevious(user, foundUser);
+        foundUser.update(user.get());
+        return foundUser;
     }
 
-    public UserModel updateUserImages(UserModel user, Long id) throws IOException {
-        var foundUser = repo.findUserById(id);
-        if (foundUser.isPresent()) {
-            ioUtils.updateUserImages(user, foundUser.get());
-            //changed merge to update
-            foundUser.get().update(user);
-            return foundUser.get();
-        }
-        throw new NoContentException("User not found");
+    public UserModel updateUserImages(Optional<UserModel> user, Long id) throws IOException {
+        user.orElseThrow(() -> new BadRequestException("User can't be null"));
+        var foundUser = repo.findUserById(id).orElseThrow(() -> new NoContentException("User not found"));
+        ioUtils.updateUserImages(user, foundUser);
+        //changed merge to update
+        foundUser.update(user.get());
+        return foundUser;
     }
 
-    public UserModel updateDeleteUserImages(UserModel user, Long id) throws IOException {
-        var foundUser = repo.findUserById(id);
-        if (foundUser.isPresent()) {
-            ioUtils.updateDeleteUserImages(user, foundUser.get());
-            return foundUser.get();
-        }
-        throw new NoContentException("User not found");
+    public UserModel updateDeleteUserImages(Optional<UserModel> user, Long id) throws IOException {
+        var foundUser = repo.findUserById(id)
+                .orElseThrow(() -> new NoContentException("User not found"));
+        ioUtils.updateDeleteUserImages(user, foundUser);
+        return foundUser;
     }
 
 

@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 @Service("userService")
@@ -49,12 +50,12 @@ public class UserService implements UserDetailsService {
      * implementation of this method!!
      */
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_EDIT_USER') && #id != null")
-    public UserModel updateUser(UserModel model, Long id, HttpServletRequest req) {
-        if (model.getId() != null) throw new BadRequestException("User id should null, can't update");
+    @PreAuthorize("hasAnyAuthority('OP_EDIT_USER')")
+    public UserModel updateUser(Optional<UserModel> user, Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
+            user.map(UserModel::getId).ifPresent(i -> user.get().setId(null));
             checkUserIsSameUserForRequest(id, req, "update");
-            var updatedUser = userOP.updateUser(model, id);
+            var updatedUser = userOP.updateUser(user, id);
             return repo.save(updatedUser);
         });
     }
@@ -68,10 +69,9 @@ public class UserService implements UserDetailsService {
      */
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_EDIT_USER')&& #id != null")
-    public UserModel updateUserImages(UserModel user, Long id, HttpServletRequest req) {
-        if (user.getId() != null) throw new BadRequestException("User id should null, can't update");
-
+    public UserModel updateUserImages(Optional<UserModel> user, Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
+            user.map(UserModel::getId).ifPresent(i -> user.get().setId(null));
             try {
                 checkUserIsSameUserForRequest(id, req, "update images");
                 var updatedUser = userOP.updateUserImages(user, id);
@@ -90,11 +90,10 @@ public class UserService implements UserDetailsService {
      * @return user with deleted image(s) (default images)
      */
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_EDIT_USER') && #id != null")
-    public UserModel updateDeleteUserImages(UserModel user, Long id, HttpServletRequest req) {
-        if (user.getId() != null) throw new BadRequestException("User id should null, can't update");
-
+    @PreAuthorize("hasAnyAuthority('OP_EDIT_USER')")
+    public UserModel updateDeleteUserImages(Optional<UserModel> user, Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
+            user.map(UserModel::getId).ifPresent(i -> user.get().setId(null));
             try {
                 checkUserIsSameUserForRequest(id, req, "delete images");
                 var updatedUser = userOP.updateDeleteUserImages(user, id);
@@ -108,7 +107,6 @@ public class UserService implements UserDetailsService {
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_DELETE_USER')")
     public ResponseEntity<?> deleteUser(Long id, HttpServletRequest req) {
-        if (id == null) throw new BadRequestException("User id is null, can't update");
         return exceptionHandlers(() -> {
             var user = repo.findById(id).orElseThrow(() -> new NoContentException("User does not exist"));
             checkUserIsSameUserForRequest(user.getId(), req, "delete");

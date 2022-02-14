@@ -60,7 +60,6 @@ public record ChequeServiceTest(ChequeService chequeService,
                 .email("email@mail.com")
                 .address("address")
                 .description("desc")
-                .userName("user n")
                 .enabled(false)
                 .password("pass12B~")
                 .passwordRepeat("pass12B~")
@@ -81,14 +80,17 @@ public record ChequeServiceTest(ChequeService chequeService,
     void saveCheque() {
         var cheque = ChequeModel.builder()
                 .amount(new BigDecimal("554.55"))
-                .isDebt(true)
                 .nameOf("DD")
                 .payTo("GG")
                 .issuedAt(LocalDateTime.now())
                 .validTill(LocalDateTime.now().plusDays(5))
+//                .isCheckedOut(true)
+                .isDebt(true)
                 .build();
         cheque.setUser(new UserModel(userId));
         chequeService.saveCheque(Optional.of(cheque), request);
+        assertThat(cheque.getIsDebt()).isTrue();
+        assertThat(cheque.getIsCheckedOut()).isFalse();
         chequeId = cheque.getId();
     }
 

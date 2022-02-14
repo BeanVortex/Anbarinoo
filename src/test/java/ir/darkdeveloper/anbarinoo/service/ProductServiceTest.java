@@ -1,6 +1,7 @@
 package ir.darkdeveloper.anbarinoo.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -13,11 +14,8 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import ir.darkdeveloper.anbarinoo.exception.NoContentException;
+import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -194,6 +192,7 @@ public record ProductServiceTest(ProductService productService,
     @Test
     @Order(8)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    @Disabled
     void deleteAllUpdateProductImages() {
         var product = new ProductModel();
         var fetchedProduct = productService.getProduct(productId, request);
@@ -222,8 +221,20 @@ public record ProductServiceTest(ProductService productService,
     @Test
     @Order(10)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    @Disabled
     void deleteProduct() {
         productService.deleteProduct(productId, request);
+    }
+
+    @Test
+    @Order(11)
+    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER", "OP_DELETE_USER"})
+    void deleteUser() {
+        // should delete all products and product images of this user
+        // for images check build/resources/test/static/user/product_images/
+        userService.deleteUser(userId, request);
+        assertThrows(NoContentException.class, () -> categoryService.getCategoryById(catId, request));
+        assertThrows(NoContentException.class, () -> productService.getProduct(productId, request));
     }
 
     //should return the object; data is being removed
