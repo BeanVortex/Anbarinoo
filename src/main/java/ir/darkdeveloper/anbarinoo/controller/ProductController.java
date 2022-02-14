@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/category/products")
@@ -33,19 +34,19 @@ public class ProductController {
     @PutMapping("/update/{id}/")
     public ResponseEntity<?> updateProduct(@RequestBody ProductModel product, @PathVariable("id") Long productId,
                                            HttpServletRequest request) {
-        return ResponseEntity.ok().body(service.updateProduct(product, productId, request));
+        return ResponseEntity.ok().body(service.updateProduct(Optional.ofNullable(product), productId, request));
     }
 
     @PutMapping("/update/images/{id}/")
     public ResponseEntity<?> updateProductImages(@ModelAttribute ProductModel product, @PathVariable("id") Long productId,
                                                  HttpServletRequest request) {
-        return ResponseEntity.ok().body(service.updateProductImages(product, productId, request));
+        return ResponseEntity.ok().body(service.updateProductImages(Optional.ofNullable(product), productId, request));
     }
 
     @PutMapping("/update/delete-images/{id}/")
     public ResponseEntity<?> updateDeleteProductImages(@RequestBody ProductModel product, @PathVariable("id") Long productId,
                                                        HttpServletRequest request) {
-        return service.updateDeleteProductImages(product, productId, request);
+        return service.updateDeleteProductImages(Optional.ofNullable(product), productId, request);
     }
 
     @GetMapping("/{id}/")
@@ -55,7 +56,7 @@ public class ProductController {
 
     @GetMapping("/user/")
     public ResponseEntity<?> getAllProducts(Pageable pageable,
-                                                HttpServletRequest request) {
+                                            HttpServletRequest request) {
         return ResponseEntity.ok().body(service.getAllProducts(pageable, request));
     }
 

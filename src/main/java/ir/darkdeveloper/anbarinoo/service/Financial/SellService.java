@@ -8,7 +8,6 @@ import ir.darkdeveloper.anbarinoo.repository.Financial.SellRepo;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.util.Financial.FinancialUtils;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import lombok.AllArgsConstructor;
 import org.hibernate.exception.DataException;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -148,7 +147,7 @@ public class SellService {
         if (preProduct.getTotalCount().compareTo(sell.getCount()) >= 0) {
             product.setTotalCount(preProduct.getTotalCount().subtract(sell.getCount()));
             preProduct.setCanUpdate(false);
-            productService.updateProductFromBuyOrSell(product, preProduct, req);
+            productService.updateProductFromBuyOrSell(Optional.of(product), preProduct, req);
         } else throw new BadRequestException("Not enough product left in stuck to sell!");
     }
 
@@ -163,12 +162,11 @@ public class SellService {
             if (sell.getCount().compareTo(preSell.getCount()) > 0) {
                 difference = sell.getCount().subtract(preSell.getCount());
                 product.setTotalCount(preProduct.getTotalCount().subtract(difference));
-                productService.updateProductFromBuyOrSell(product, preProduct, req);
             } else if (sell.getCount().compareTo(preSell.getCount()) < 0) {
                 difference = preSell.getCount().subtract(sell.getCount());
                 product.setTotalCount(preProduct.getTotalCount().add(difference));
-                productService.updateProductFromBuyOrSell(product, preProduct, req);
             }
+            productService.updateProductFromBuyOrSell(Optional.of(product), preProduct, req);
         } else throw new BadRequestException("Not enough product left in stuck to sell!");
     }
 
@@ -176,7 +174,7 @@ public class SellService {
         var preProduct = productService.getProduct(sell.getProduct().getId(), req);
         var product = new ProductModel();
         product.setTotalCount(preProduct.getTotalCount().subtract(sell.getCount()));
-        productService.updateProductFromBuyOrSell(product, preProduct, req);
+        productService.updateProductFromBuyOrSell(Optional.of(product), preProduct, req);
     }
 
 

@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -76,18 +75,21 @@ public class ProductService {
      */
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ProductModel updateProduct(ProductModel product, Long productId,
-                                      HttpServletRequest req) {
+    public ProductModel updateProduct(Optional<ProductModel> product, Long productId, HttpServletRequest req) {
         return exceptionHandlers(() -> {
-            if (product.getId() != null) product.setId(null);
+            product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
 
             var foundProduct = repo.findById(productId)
                     .orElseThrow(() -> new NoContentException("This product does not exist"));
             productUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(),
                     req, "update");
-            if (product.getPrice() != null || product.getTotalCount() != null)
+
+            if (product.map(ProductModel::getPrice).isPresent()
+                    || product.map(ProductModel::getTotalCount).isPresent())
                 productUtils.updateBuyWithProductUpdate(product, foundProduct, buyService, req);
-            return productUtils.updateProduct(product, foundProduct);
+
+            product.orElseThrow(() -> new BadRequestException("Product can't be null"));
+            return productUtils.updateProduct(product.get(), foundProduct);
         });
     }
 
@@ -96,13 +98,12 @@ public class ProductService {
      */
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public void updateProductFromBuyOrSell(ProductModel product, ProductModel preProduct, HttpServletRequest req) {
+    public void updateProductFromBuyOrSell(Optional<ProductModel> product, ProductModel preProduct, HttpServletRequest req) {
         exceptionHandlers(() -> {
-            if (product.getId() != null)
-                product.setId(null);
-            productUtils.checkUserIsSameUserForRequest(preProduct.getCategory().getUser().getId(), req,
-                    "update");
-            productUtils.updateProduct(product, preProduct);
+            product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
+            productUtils.checkUserIsSameUserForRequest(preProduct.getCategory().getUser().getId(), req, "update");
+            product.orElseThrow(() -> new BadRequestException("Product can't be null"));
+            productUtils.updateProduct(product.get(), preProduct);
             return null;
         });
     }
@@ -148,9 +149,9 @@ public class ProductService {
      */
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ProductModel updateProductImages(ProductModel product, Long productId, HttpServletRequest req) {
-        if (product.getId() != null) product.setId(null);
+    public ProductModel updateProductImages(Optional<ProductModel> product, Long productId, HttpServletRequest req) {
         return exceptionHandlers(() -> {
+            product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
             var foundProduct = repo.findById(productId)
                     .orElseThrow(() -> new NoContentException("This product does not exist"));
             productUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(), req,
@@ -172,14 +173,16 @@ public class ProductService {
      */
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ResponseEntity<?> updateDeleteProductImages(ProductModel product, Long productId, HttpServletRequest req) {
-        if (product.getId() != null) product.setId(null);
+    public ResponseEntity<?> updateDeleteProductImages(Optional<ProductModel> product, Long productId,
+                                                       HttpServletRequest req) {
         return exceptionHandlers(() -> {
+            product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
             var foundProduct = repo.findById(productId)
                     .orElseThrow(() -> new NoContentException("This product does not exist"));
             productUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(), req,
                     "delete images of");
-            productUtils.updateDeleteProductImages(product, foundProduct);
+            product.orElseThrow(() -> new BadRequestException("Product can't be null"));
+            productUtils.updateDeleteProductImages(product.get(), foundProduct);
             return new ResponseEntity<>(HttpStatus.OK);
         });
     }

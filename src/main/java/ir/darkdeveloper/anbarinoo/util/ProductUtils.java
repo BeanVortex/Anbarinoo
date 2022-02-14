@@ -15,6 +15,9 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 public class ProductUtils {
@@ -37,7 +40,7 @@ public class ProductUtils {
 
     @NotNull
     public ProductModel saveProduct(ProductModel product, HttpServletRequest req) throws IOException {
-        if (product.getId() != null) throw new BadRequestException("Product id should null, can't update");
+        if (product.getId() != null) product.setId(null);
         var fetchedCat = categoryService.getCategoryById(product.getCategory().getId(), req);
         checkUserIsSameUserForRequest(fetchedCat.getUser().getId(), req, "create");
         product.setCategory(fetchedCat);
@@ -50,14 +53,14 @@ public class ProductUtils {
         return repo.save(preProduct);
     }
 
-    public ProductModel updateProductImages(ProductModel product, ProductModel preProduct) throws IOException {
-        if (product.getFiles() == null)
-            throw new BadRequestException("Image files are empty");
+    public ProductModel updateProductImages(Optional<ProductModel> product, ProductModel preProduct) throws IOException {
+        product.map(ProductModel::getFiles)
+                .orElseThrow(() -> new BadRequestException("Image files are empty"));
 
-        ioUtils.addProductImages(product, preProduct);
-        product.getCategory().setUser(new UserModel(preProduct.getCategory().getUser().getId()));
-        product.update(preProduct);
-        return repo.save(product);
+        ioUtils.addProductImages(product.get(), preProduct);
+        product.get().getCategory().setUser(new UserModel(preProduct.getCategory().getUser().getId()));
+        product.get().update(preProduct);
+        return repo.save(product.get());
     }
 
     public void checkUserIsSameUserForRequest(Long userId, HttpServletRequest req, String operation) {
@@ -77,38 +80,47 @@ public class ProductUtils {
     /**
      * If price or count value is going to update, it will also update the first buy record of product
      */
-    public void updateBuyWithProductUpdate(ProductModel product, ProductModel preProduct,
+    public void updateBuyWithProductUpdate(Optional<ProductModel> product, ProductModel preProduct,
                                            BuyService buyService, HttpServletRequest req) {
         if (preProduct.getCanUpdate()) {
-            var buy = (BuyModel) null;
+            var buy = new AtomicReference<>(Optional.<BuyModel>empty());
             var firstBuyId = preProduct.getFirstBuyId();
-            var isPriceUpdated = false;
-            var isCountUpdated = false;
-            if (product.getPrice() != null && product.getPrice().compareTo(preProduct.getPrice()) != 0) {
-                buy = buyService.getBuy(firstBuyId, req);
-                buy.setPrice(product.getPrice());
-                isPriceUpdated = true;
-            }
+            var isPriceUpdated = new AtomicBoolean(false);
+            var isCountUpdated = new AtomicBoolean(false);
 
-            if (product.getTotalCount() != null && product.getTotalCount().compareTo(preProduct.getTotalCount()) != 0) {
-                if (buy == null) {
-                    buy = buyService.getBuy(firstBuyId, req);
-                }
-                buy.setCount(product.getTotalCount());
-                isCountUpdated = true;
-            }
+            product.map(ProductModel::getPrice)
+                    .filter(price -> price.compareTo(preProduct.getPrice()) != 0)
+                    .ifPresent(b -> {
+                        var tmp = buyService.getBuy(firstBuyId, req);
+                        tmp.setPrice(product.get().getPrice());
+                        buy.set(Optional.of(tmp));
+                        isPriceUpdated.set(true);
+                    });
 
-            if (buy != null) {
-                if (!isCountUpdated) {
-                    buy.setCount(preProduct.getTotalCount());
-                }
+            product.map(ProductModel::getTotalCount)
+                    .filter(count -> count.compareTo(preProduct.getTotalCount()) != 0)
+                    .ifPresent(b -> {
+                        buy.get().ifPresentOrElse(
+                                buyModel -> buyModel.setCount(product.get().getTotalCount()),
+                                () -> {
+                                    buy.set(Optional.of(buyService.getBuy(firstBuyId, req)));
+                                    buy.get().ifPresent(buyModel -> buyModel.setCount(product.get().getTotalCount()));
+                                }
+                        );
+                        isCountUpdated.set(true);
+                    });
 
-                if (!isPriceUpdated) {
-                    buy.setPrice(preProduct.getPrice());
-                }
+
+            buy.get().ifPresent(buyModel -> {
+                if (!isCountUpdated.get())
+                    buyModel.setCount(preProduct.getTotalCount());
+                if (!isPriceUpdated.get())
+                    buyModel.setPrice(preProduct.getPrice());
+
                 preProduct.setCanUpdate(false);
-                buyRepo.save(buy);
-            }
+                buyRepo.save(buyModel);
+            });
+
         } else
             throw new BadRequestException("You can't update the product's totalCount or Price. You have already" +
                     " updated these once or you are updating after selling or buying this product." +

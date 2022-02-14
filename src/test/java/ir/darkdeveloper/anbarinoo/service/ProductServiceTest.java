@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,7 +48,7 @@ public record ProductServiceTest(ProductService productService,
     private static HttpServletRequest request;
     private static Long catId;
     private static Long userId;
-//    private static Long userId2;
+    //    private static Long userId2;
     private static Long productId;
 
     @Autowired
@@ -69,21 +70,23 @@ public record ProductServiceTest(ProductService productService,
     @WithMockUser(username = "anonymousUser")
     void saveUser() throws Exception {
         var response = mock(HttpServletResponse.class);
-        var user = new UserModel();
-        user.setEmail("email@mail.com");
-        user.setAddress("address");
-        user.setDescription("desc");
-        user.setUserName("user n");
-        user.setPassword("pass12P+");
-        user.setPasswordRepeat("pass12P+");
-        user.setEnabled(true);
+        var user = UserModel.builder()
+                .email("email@mail.com")
+                .address("address")
+                .description("desc")
+                .userName("user n")
+                .password("pass12P+")
+                .passwordRepeat("pass12P+")
+                .enabled(true)
+                .build();
         userService.signUpUser(user, response);
         userId = user.getId();
         request = setUpHeader(user.getEmail(), userId);
-        var user2 = new UserModel();
-        user2.setEmail("email2@mail.com");
-        user2.setPassword("pass12P+");
-        user2.setPasswordRepeat("pass12P+");
+        var user2 = UserModel.builder()
+                .email("email2@mail.com")
+                .password("pass12P+")
+                .passwordRepeat("pass12P+")
+                .build();
         userService.signUpUser(user2, response);
 //        userId2 = user2.getId();
     }
@@ -109,10 +112,10 @@ public record ProductServiceTest(ProductService productService,
                 .category(new CategoryModel(catId))
                 .tax(9)
                 .build();
-        MockMultipartFile file3 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!".getBytes());
-        MockMultipartFile file4 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!".getBytes());
+        var file3 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!" .getBytes());
+        var file4 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!" .getBytes());
         product.setFiles(Arrays.asList(file3, file4));
         product.setCategory(new CategoryModel(catId));
         productService.saveProduct(product, request);
@@ -131,17 +134,19 @@ public record ProductServiceTest(ProductService productService,
     @Order(5)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void updateProduct() {
-        var product = new ProductModel();
-        product.setName("updatedName");
-        product.setDescription("updatedDescription");
-        product.setTotalCount(BigDecimal.valueOf(10));
-        product.setCategory(new CategoryModel(catId));
+        var product = ProductModel.builder()
+                .name("updatedName")
+                .description("updatedDescription")
+                .totalCount(BigDecimal.valueOf(10))
+                .category(new CategoryModel(catId))
+                .build();
 
-        productService.updateProduct(product, productId, request);
+        productService.updateProduct(Optional.of(product), productId, request);
         var fetchedProduct = productService.getProduct(productId, request);
         assertThat(fetchedProduct.getCategory().getName())
                 .isEqualTo("Electronics");
-
+        assertThat(fetchedProduct.getTotalCount()).isEqualTo(BigDecimal.valueOf(10_0000, 4));
+        assertThat(fetchedProduct.getPrice()).isEqualTo(BigDecimal.valueOf(500_0000, 4));
     }
 
     @Test
@@ -150,16 +155,16 @@ public record ProductServiceTest(ProductService productService,
     void updateProductImages() {
         var product = new ProductModel();
 
-        MockMultipartFile file3 = new MockMultipartFile("file", "helladsfo.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!".getBytes());
-        MockMultipartFile file4 = new MockMultipartFile("file", "heladsflo.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!".getBytes());
-        MockMultipartFile file5 = new MockMultipartFile("file", "heladsflo.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!".getBytes());
+        var file3 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!" .getBytes());
+        var file4 = new MockMultipartFile("file", "hole.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!" .getBytes());
+        var file5 = new MockMultipartFile("file", "halo.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!" .getBytes());
 
         product.setFiles(Arrays.asList(file3, file4, file5));
 
-        productService.updateProductImages(product, productId, request);
+        productService.updateProductImages(Optional.of(product), productId, request);
 
         var fetchedProduct = productService.getProduct(productId, request);
         assertThat(fetchedProduct.getImages().size()).isNotEqualTo(0);
@@ -178,7 +183,7 @@ public record ProductServiceTest(ProductService productService,
         fileNames.remove(1);
         product.setImages(fileNames);
 
-        productService.updateDeleteProductImages(product, productId, request);
+        productService.updateDeleteProductImages(Optional.of(product), productId, request);
 
         var fetchedProduct2 = productService.getProduct(productId, request);
         assertThat(fetchedProduct2.getImages().size()).isEqualTo(2);
@@ -194,7 +199,7 @@ public record ProductServiceTest(ProductService productService,
         var fetchedProduct = productService.getProduct(productId, request);
         product.setImages(fetchedProduct.getImages());
 
-        productService.updateDeleteProductImages(product, productId, request);
+        productService.updateDeleteProductImages(Optional.of(product), productId, request);
 
         var fetchedProduct2 = productService.getProduct(productId, request);
         assertThat(fetchedProduct2.getImages().size()).isNotEqualTo(0);

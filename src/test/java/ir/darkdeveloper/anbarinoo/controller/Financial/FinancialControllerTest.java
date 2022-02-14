@@ -184,7 +184,8 @@ public record FinancialControllerTest(UserService userService,
         var product = new ProductModel();
         product.setTotalCount(BigDecimal.valueOf(9850));
         product.setPrice(BigDecimal.valueOf(564));
-        assertThrows(NoContentException.class, () -> productService.updateProduct(product, 13L, request));
+        assertThrows(NoContentException.class,
+                () -> productService.updateProduct(Optional.of(product), 13L, request));
     }
 
     @Test
