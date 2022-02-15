@@ -286,7 +286,7 @@ public record UserControllerTest(UserController controller,
                 .header("access_token", signupAccessToken)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").value(is("Successfully deleted user")))
+                .andExpect(jsonPath("$").value(is("Deleted the user")))
                 .andDo(print());
     }
 
