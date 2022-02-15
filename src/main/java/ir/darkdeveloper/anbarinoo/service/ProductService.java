@@ -47,7 +47,7 @@ public class ProductService {
         return exceptionHandlers(() -> {
             ProductModel savedProduct;
             try {
-                savedProduct = productUtils.saveProduct(product, req);
+                savedProduct = productUtils.saveProduct(Optional.ofNullable(product), req);
             } catch (IOException e) {
                 throw new InternalServerException(e.getLocalizedMessage());
             }

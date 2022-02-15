@@ -12,10 +12,10 @@ import org.springframework.util.SerializationUtils;
 public class CookieUtils {
 
     public static Optional<Cookie> getCookie(HttpServletRequest req, String name) {
-        Cookie[] cookies = req.getCookies();
+        var cookies = req.getCookies();
 
         if (cookies != null && cookies.length != 0)
-            for (Cookie cookie : cookies)
+            for (var cookie : cookies)
                 if (cookie.getName().equals(name))
                     return Optional.of(cookie);
 
@@ -23,7 +23,7 @@ public class CookieUtils {
     }
 
     public static void addCookie(HttpServletResponse res, String name, String value, int maxAge) {
-        Cookie cookie = new Cookie(name, value);
+        var cookie = new Cookie(name, value);
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);
         cookie.setHttpOnly(true);
@@ -31,22 +31,25 @@ public class CookieUtils {
     }
 
     public static void deleteCookie(HttpServletRequest req, HttpServletResponse res, String name) {
-        Cookie[] cookies = req.getCookies();
-        if (cookies != null && cookies.length != 0)
-            for (Cookie cookie : cookies)
-                if (cookie.getName().equals(name)) {
-                    cookie.setValue("");
-                    cookie.setPath("/");
-                    cookie.setMaxAge(0);
-                    res.addCookie(cookie);
-                }
+        var cookies = Optional.ofNullable(req.getCookies());
+        cookies.map(cs -> cs.length)
+                .filter(i -> i != 0)
+                .ifPresent(i -> {
+                    for (var cookie : cookies.get())
+                        if (cookie.getName().equals(name)) {
+                            cookie.setValue("");
+                            cookie.setPath("/");
+                            cookie.setMaxAge(0);
+                            res.addCookie(cookie);
+                        }
+                });
     }
 
     public static String serialize(Object obj) {
         return Base64.getUrlEncoder().encodeToString(SerializationUtils.serialize(obj));
     }
-    
-    public static <T> T deserialize(Cookie cookie, Class<T> cls){
+
+    public static <T> T deserialize(Cookie cookie, Class<T> cls) {
         return cls.cast(SerializationUtils.deserialize(Base64.getUrlDecoder().decode(cookie.getValue())));
     }
 

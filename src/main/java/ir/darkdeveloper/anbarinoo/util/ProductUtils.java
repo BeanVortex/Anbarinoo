@@ -39,8 +39,9 @@ public class ProductUtils {
     }
 
     @NotNull
-    public ProductModel saveProduct(ProductModel product, HttpServletRequest req) throws IOException {
-        if (product.getId() != null) product.setId(null);
+    public ProductModel saveProduct(Optional<ProductModel> productOpt, HttpServletRequest req) throws IOException {
+        productOpt.map(ProductModel::getId).ifPresent(i -> productOpt.get().setId(null));
+        var product = productOpt.orElseThrow(() -> new BadRequestException("Product can't be null"));
         var fetchedCat = categoryService.getCategoryById(product.getCategory().getId(), req);
         checkUserIsSameUserForRequest(fetchedCat.getUser().getId(), req, "create");
         product.setCategory(fetchedCat);
@@ -72,7 +73,6 @@ public class ProductUtils {
 
     public void updateDeleteProductImages(ProductModel product, ProductModel preProduct) {
         ioUtils.updateDeleteProductImages(product, preProduct);
-
         repo.save(preProduct);
     }
 

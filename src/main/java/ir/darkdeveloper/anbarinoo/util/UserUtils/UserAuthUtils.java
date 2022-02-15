@@ -1,9 +1,9 @@
 package ir.darkdeveloper.anbarinoo.util.UserUtils;
 
+import io.jsonwebtoken.lang.Collections;
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.EmailNotValidException;
 import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
-import ir.darkdeveloper.anbarinoo.exception.PasswordException;
 import ir.darkdeveloper.anbarinoo.model.Auth.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
@@ -136,7 +136,7 @@ public class UserAuthUtils {
 
     public UserDetails loadUserByUsername(String username) {
         if (username.equals(adminUser.getUsername())) {
-            GrantedAuthority[] authorities = (GrantedAuthority[]) adminUser.getAuthorities().toArray();
+            var authorities = adminUser.getAuthorities();
             return User.builder().username(adminUser.getUsername())
                     .password(encoder.encode(adminUser.getPassword())).authorities(authorities).build();
         }

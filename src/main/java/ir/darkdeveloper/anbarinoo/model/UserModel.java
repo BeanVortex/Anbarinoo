@@ -156,7 +156,7 @@ public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> auth = new ArrayList<>();
+        var auth = new ArrayList<GrantedAuthority>();
         if (roles != null)
             roles.forEach(e -> auth.addAll(e.getAuthorities()));
         else

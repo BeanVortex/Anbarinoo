@@ -9,10 +9,11 @@ import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import ir.darkdeveloper.anbarinoo.model.Auth.Authority;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "roles")
 @NoArgsConstructor
@@ -38,6 +39,7 @@ public class UserRole implements Serializable {
     @JoinTable(joinColumns = @JoinColumn(name = "role", referencedColumnName = "name"),
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @ToString.Exclude
     private List<UserModel> users;
 
     public UserRole(Long id, String name, List<Authority> authorities) {

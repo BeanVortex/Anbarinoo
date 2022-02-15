@@ -172,7 +172,7 @@ public class IOUtils {
      * Adding new images to the product
      *
      * @param product:    in this you should send new images files
-     * @param preProduct: data of this object will merged with product and adds remaining images to product
+     * @param preProduct: data of this object will be merged with product and adds remaining images to product
      */
     public void addProductImages(ProductModel product, ProductModel preProduct) throws IOException {
         var fileNames = new ArrayList<String>();

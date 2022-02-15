@@ -1,27 +1,22 @@
 package ir.darkdeveloper.anbarinoo.security.jwt;
 
-import java.io.IOException;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
-
-import org.springframework.context.annotation.Lazy;
-import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
-import org.springframework.web.filter.OncePerRequestFilter;
-
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 import ir.darkdeveloper.anbarinoo.service.RefreshService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Lazy))
@@ -37,13 +32,13 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,@NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        String refreshToken = request.getHeader("refresh_token");
-        String accessToken = request.getHeader("access_token");
+        var refreshToken = request.getHeader("refresh_token");
+        var accessToken = request.getHeader("access_token");
 
         if (refreshToken != null && accessToken != null && !jwtUtils.isTokenExpired(refreshToken)) {
 
-            String username = jwtUtils.getUsername(refreshToken);
-            Long userId = ((Integer) jwtUtils.getAllClaimsFromToken(refreshToken).get("user_id")).longValue();
+            var username = jwtUtils.getUsername(refreshToken);
+            var userId = ((Integer) jwtUtils.getAllClaimsFromToken(refreshToken).get("user_id")).longValue();
 
             authenticateUser(username);
 
@@ -54,11 +49,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
     private void authenticateUser(String username) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        var auth = SecurityContextHolder.getContext().getAuthentication();
         if (username != null && auth == null) {
             //db query
-            UserDetails userDetails = userAuthUtils.loadUserByUsername(username);
-            UsernamePasswordAuthenticationToken upToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+            var userDetails = userAuthUtils.loadUserByUsername(username);
+            var upToken = new UsernamePasswordAuthenticationToken(userDetails, null,
                     userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(upToken);
 
@@ -70,7 +65,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String newAccessToken;
 
-        // if this if didn't execute it means the access token is still valid
+        // if this didn't execute, it means the access token is still valid
         if (jwtUtils.isTokenExpired(accessToken)) {
             //db query
             String storedAccessToken = refreshService.getRefreshByUserId(userId).getAccessToken();

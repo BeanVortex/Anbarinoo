@@ -69,9 +69,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     }
 
     private void headerSetup(HttpServletResponse response, Authentication authentication) {
-        UserModel user = (UserModel) userService.loadUserByUsername(authentication.getName());
-        String refreshToken = jwtUtils.generateRefreshToken(user.getEmail(), user.getId());
-        String accessToken = jwtUtils.generateAccessToken(user.getEmail());
+        var user = (UserModel) userService.loadUserByUsername(authentication.getName());
+        var refreshToken = jwtUtils.generateRefreshToken(user.getEmail(), user.getId());
+        var accessToken = jwtUtils.generateAccessToken(user.getEmail());
 
         userAuthUtils.setupHeader(response, accessToken, refreshToken);
     }
