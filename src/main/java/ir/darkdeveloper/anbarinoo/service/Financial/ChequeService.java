@@ -40,7 +40,7 @@ public class ChequeService {
             cheque.get().setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
             var savedCheque = repo.save(cheque.get());
             var dod = createDodFromCheque(savedCheque);
-            dodService.saveDOD(dod, req);
+            dodService.saveDOD(Optional.of(dod), req);
             return savedCheque;
         });
     }
@@ -61,7 +61,7 @@ public class ChequeService {
             foundCheque.update(cheque.get());
             var savedCheque = repo.save(foundCheque);
             var dod = createDodFromCheque(savedCheque);
-            dodService.updateDODByChequeId(dod, req);
+            dodService.updateDODByChequeId(Optional.of(dod), req);
             return savedCheque;
         });
     }
@@ -109,7 +109,6 @@ public class ChequeService {
             return fetchedData;
         });
     }
-
 
 
     private void checkUserIsSameUserForRequest(Long userId, HttpServletRequest req, String operation) {

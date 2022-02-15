@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user/financial/debt-demand")
@@ -24,13 +25,13 @@ public class DebtOrDemandController {
 
     @PostMapping("/save/")
     public ResponseEntity<?> saveDOD(@RequestBody DebtOrDemandModel dod, HttpServletRequest req) {
-        return ResponseEntity.ok(service.saveDOD(dod, req));
+        return ResponseEntity.ok(service.saveDOD(Optional.ofNullable(dod), req));
     }
 
     @PutMapping("/update/{id}/")
     public ResponseEntity<?> updateDOD(@RequestBody DebtOrDemandModel dod, @PathVariable Long id,
                                        HttpServletRequest req) {
-        return ResponseEntity.ok(service.updateDOD(dod, id, req));
+        return ResponseEntity.ok(service.updateDOD(Optional.of(dod), id, req));
     }
 
     @GetMapping("/get-by-user/{id}/")
@@ -46,8 +47,7 @@ public class DebtOrDemandController {
 
     @DeleteMapping("/{id}/")
     public ResponseEntity<?> deleteDOD(@PathVariable("id") Long dodId, HttpServletRequest request) {
-        service.deleteDOD(dodId, request);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return service.deleteDOD(dodId, request);
     }
 
 

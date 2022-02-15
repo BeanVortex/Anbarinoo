@@ -5,7 +5,6 @@ import ir.darkdeveloper.anbarinoo.model.Financial.SellModel;
 import ir.darkdeveloper.anbarinoo.service.Financial.SellService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,8 +70,7 @@ public class SellController {
 
     @DeleteMapping("/{id}/")
     public ResponseEntity<?> deleteSell(@PathVariable("id") Long sellId, HttpServletRequest request) {
-        service.deleteSell(sellId, request);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return service.deleteSell(sellId, request);
     }
 
 }

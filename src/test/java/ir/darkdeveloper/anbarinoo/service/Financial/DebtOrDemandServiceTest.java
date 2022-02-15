@@ -1,6 +1,7 @@
 package ir.darkdeveloper.anbarinoo.service.Financial;
 
 import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
+import ir.darkdeveloper.anbarinoo.model.Financial.DebtOrDemandModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
@@ -8,6 +9,8 @@ import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,16 +32,19 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext
-public record ChequeServiceTest(ChequeService chequeService,
-                                UserService userService,
-                                JwtUtils jwtUtils) {
+public record DebtOrDemandServiceTest(DebtOrDemandService demandService,
+                                      UserService userService,
+                                      JwtUtils jwtUtils) {
+
+    // Other methods in DebtOrDemandService are covered in ChequeServiceTest
 
     private static HttpServletRequest request;
     private static Long userId;
-    private static Long chequeId;
+    private static Long dodId;
 
     @Autowired
-    public ChequeServiceTest {
+    public DebtOrDemandServiceTest {
+
     }
 
     @BeforeAll
@@ -49,7 +55,6 @@ public record ChequeServiceTest(ChequeService chequeService,
         SecurityContextHolder.setContext(securityContext);
         request = mock(HttpServletRequest.class);
     }
-
 
     @Test
     @Order(1)
@@ -73,69 +78,67 @@ public record ChequeServiceTest(ChequeService chequeService,
         request = setUpHeader(user.getEmail(), userId);
     }
 
+
     @Test
     @Order(2)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
-    void saveCheque() {
-        var cheque = ChequeModel.builder()
-                .amount(new BigDecimal("554.55"))
-                .nameOf("DD")
-                .payTo("GG")
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void saveDOD() {
+        var dod = DebtOrDemandModel.builder()
+                .amount(BigDecimal.valueOf(115.56))
+                .isDebt(true)
                 .issuedAt(LocalDateTime.now())
                 .validTill(LocalDateTime.now().plusDays(5))
-//                .isCheckedOut(true)
-                .isDebt(true)
+                .nameOf("Me")
+                .payTo("Other")
                 .build();
-        cheque.setUser(new UserModel(userId));
-        chequeService.saveCheque(Optional.of(cheque), request);
-        assertThat(cheque.getIsDebt()).isTrue();
-        assertThat(cheque.getIsCheckedOut()).isFalse();
-        chequeId = cheque.getId();
+        demandService.saveDOD(Optional.of(dod), request);
+        dodId = dod.getId();
     }
 
     @Test
     @Order(3)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
-    void getCheque() {
-        var fetchedCheque = chequeService.getCheque(chequeId, request);
-        assertThat(fetchedCheque).isNotNull();
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void updateDOD() {
+        var dod = DebtOrDemandModel.builder()
+                //should ignore id
+                .id(25L)
+                .amount(BigDecimal.valueOf(1564))
+                .isDebt(false)
+                .validTill(LocalDateTime.now().plusDays(8))
+                .nameOf("Other")
+                .payTo("Me")
+                .build();
+        demandService.updateDOD(Optional.of(dod), dodId, request);
+        var fetchedDod = demandService.getDOD(dodId, request);
+        assertThat(fetchedDod.getId()).isEqualTo(dodId);
     }
 
     @Test
     @Order(4)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
-    void getChequesByUserId() {
-        var cheques = chequeService.getChequesByUserId(userId, request);
-        assertThat(cheques.size()).isNotEqualTo(0);
-        for (ChequeModel cheque : cheques)
-            assertThat(cheque.getUser().getId()).isEqualTo(userId);
-
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void getAllDODRecordsOfUser() {
+        var pageable = PageRequest.of(0, 8);
+        var fetchedDods = demandService.getAllDODRecordsOfUser(userId, request, pageable);
+        assertThat(fetchedDods.getContent().size()).isEqualTo(1);
+        assertThat(fetchedDods.getContent().get(0).getId()).isEqualTo(dodId);
+        assertThat(fetchedDods.getContent().get(0).getPayTo()).isEqualTo("Me");
     }
 
     @Test
     @Order(5)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
-    void updateCheque() {
-        var cheque = new ChequeModel();
-        cheque.setIsCheckedOut(true);
-        cheque = chequeService.updateCheque(Optional.of(cheque), chequeId, request);
-        assertThat(cheque.getIsCheckedOut()).isTrue();
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void getDOD() {
+        var fetchedDod = demandService.getDOD(dodId, request);
+        assertThat(fetchedDod.getPayTo()).isEqualTo("Me");
+        assertThat(fetchedDod.getNameOf()).isEqualTo("Other");
     }
 
     @Test
     @Order(6)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
-    void findByPayToContains() {
-        var fetchedCheque = chequeService.getCheque(chequeId, request);
-        var cheques = chequeService.findByPayToContains(fetchedCheque.getPayTo(), request);
-        assertThat(cheques.get(0)).isNotNull();
-    }
-
-    @Test
-    @Order(7)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
-    void deleteCheque() {
-        chequeService.deleteCheque(chequeId, request);
+    @WithMockUser(authorities = "OP_ACCESS_USER")
+    void deleteDOD() {
+        var deleteRes = demandService.deleteDOD(dodId, request);
+        assertThat(deleteRes.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
 
@@ -162,6 +165,5 @@ public record ChequeServiceTest(ChequeService chequeService,
 
         return request;
     }
-
 
 }

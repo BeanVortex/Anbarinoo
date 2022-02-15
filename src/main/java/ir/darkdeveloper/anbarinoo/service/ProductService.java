@@ -201,7 +201,7 @@ public class ProductService {
                 throw new InternalServerException(e.getLocalizedMessage());
             }
             repo.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return ResponseEntity.ok("Deleted the product");
         });
     }
 

@@ -5,7 +5,6 @@ import ir.darkdeveloper.anbarinoo.model.Financial.FinancialModel;
 import ir.darkdeveloper.anbarinoo.service.Financial.BuyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -68,8 +67,7 @@ public class BuyController {
 
     @DeleteMapping("/{id}/")
     public ResponseEntity<?> deleteBuy(@PathVariable("id") Long buyId, HttpServletRequest req) {
-        service.deleteBuy(buyId, req);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return service.deleteBuy(buyId, req);
     }
 
 }

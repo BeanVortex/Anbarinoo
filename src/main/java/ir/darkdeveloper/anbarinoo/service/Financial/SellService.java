@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -92,14 +93,14 @@ public class SellService {
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
-    public void deleteSell(Long sellId, HttpServletRequest req) {
-        exceptionHandlers(() -> {
+    public ResponseEntity<?> deleteSell(Long sellId, HttpServletRequest req) {
+        return exceptionHandlers(() -> {
             var sell = repo.findById(sellId)
                     .orElseThrow(() -> new NoContentException("Sell record doesn't exist"));
             checkUserIsSameUserForRequest(sell.getProduct(), null, req, "delete sell record of");
             repo.deleteById(sellId);
             deleteProductCount(sell, req);
-            return null;
+            return ResponseEntity.ok("Deleted the sell record");
         });
     }
 

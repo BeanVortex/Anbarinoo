@@ -32,7 +32,7 @@ public class CategoryService {
 
 
     /**
-     * Only save a category. children will ignored
+     * Only save a category. children will be ignored
      */
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
@@ -73,7 +73,7 @@ public class CategoryService {
         return exceptionHandlers(() -> {
             checkUserIsSameUserForRequest(categoryId, req, "delete");
             repo.deleteById(categoryId);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return ResponseEntity.ok("Deleted the category");
         });
     }
 

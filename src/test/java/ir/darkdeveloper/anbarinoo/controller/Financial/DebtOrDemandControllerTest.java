@@ -78,14 +78,14 @@ public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
     @WithMockUser(username = "anonymousUser")
     void saveUser() throws Exception {
         HttpServletResponse response = mock(HttpServletResponse.class);
-        var user = new UserModel();
-        user.setEmail("email@mail.com");
-        user.setAddress("address");
-        user.setDescription("desc");
-        user.setUserName("user n");
-        user.setPassword("pass12P+");
-        user.setPasswordRepeat("pass12P+");
-        user.setEnabled(true);
+        var user = UserModel.builder()
+                .email("email@mail.com")
+                .address("address")
+                .description("desc")
+                .userName("user n")
+                .password("pass12P+")
+                .passwordRepeat("pass12P+")
+                .build();
         userService.signUpUser(user, response);
         userId = user.getId();
         setUpHeader(user.getEmail(), userId);
@@ -96,20 +96,21 @@ public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
     @Order(2)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void saveDOD() throws Exception {
-        var dod = new DebtOrDemandModel();
-        dod.setAmount(BigDecimal.valueOf(115.56));
-        dod.setIsDebt(true);
-        dod.setIssuedAt(LocalDateTime.now());
-        dod.setValidTill(LocalDateTime.now().plusDays(5));
-        dod.setNameOf("Me");
-        dod.setPayTo("Other");
+        var dod = DebtOrDemandModel.builder()
+                .amount(BigDecimal.valueOf(115.56))
+                .isDebt(true)
+                .issuedAt(LocalDateTime.now())
+                .validTill(LocalDateTime.now().plusDays(5))
+                .nameOf("Me")
+                .payTo("Other")
+                .build();
         mockMvc.perform(post("/api/user/financial/debt-demand/save/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-                .content(mapToJson(dod))
-        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", refresh)
+                        .header("access_token", access)
+                        .content(mapToJson(dod))
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andDo(result -> {
@@ -123,23 +124,27 @@ public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
     @Order(3)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void updateDOD() throws Exception {
-        var dod = new DebtOrDemandModel();
-        dod.setAmount(BigDecimal.valueOf(1564));
-        dod.setIsDebt(false);
-        dod.setValidTill(LocalDateTime.now().plusDays(8));
-        dod.setNameOf("Other");
-        dod.setPayTo("Me");
+        var dod = DebtOrDemandModel.builder()
+                //should ignore id
+                .id(25L)
+                .amount(BigDecimal.valueOf(1564))
+                .isDebt(false)
+                .validTill(LocalDateTime.now().plusDays(8))
+                .nameOf("Other")
+                .payTo("Me")
+                .build();
         mockMvc.perform(put("/api/user/financial/debt-demand/update/{id}/", dodId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-                .content(mapToJson(dod))
-        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", refresh)
+                        .header("access_token", access)
+                        .content(mapToJson(dod))
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nameOf").value(is("Other")))
                 .andExpect(jsonPath("$.payTo").value(is("Me")))
+                .andExpect(jsonPath("$.id").value(is(dodId), Long.class))
                 .andExpect(jsonPath("$.amount").value(is(BigDecimal.valueOf(1564)), BigDecimal.class))
                 .andExpect(jsonPath("$.isDebt").value(is(false)))
         ;
@@ -151,10 +156,10 @@ public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
     void getAllDODRecordsOfUser() throws Exception {
 
         mockMvc.perform(get("/api/user/financial/debt-demand/get-by-user/{id}/", userId)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-        )
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", refresh)
+                        .header("access_token", access)
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
@@ -170,10 +175,10 @@ public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getDOD() throws Exception {
         mockMvc.perform(get("/api/user/financial/debt-demand/{id}/", dodId)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-        )
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", refresh)
+                        .header("access_token", access)
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
@@ -186,10 +191,10 @@ public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void deleteDOD() throws Exception {
         mockMvc.perform(delete("/api/user/financial/debt-demand/{id}/", dodId)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", refresh)
-                .header("access_token", access)
-        )
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", refresh)
+                        .header("access_token", access)
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
         ;

@@ -43,7 +43,7 @@ public class UserRolesService {
     public ResponseEntity<?> deleteRole(Long id) {
         return exceptionHandlers(() -> {
             repo.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return ResponseEntity.ok("Deleted the role");
         });
     }
 

@@ -115,7 +115,7 @@ public class UserService implements UserDetailsService {
             } catch (IOException e) {
                 throw new InternalServerException(e.getLocalizedMessage());
             }
-            return new ResponseEntity<>("Successfully deleted user", HttpStatus.OK);
+            return new ResponseEntity<>("Deleted the user", HttpStatus.OK);
         });
     }
 
