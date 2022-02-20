@@ -186,9 +186,13 @@ public class UserService implements UserDetailsService {
     }
 
     private void checkUserIsSameUserForRequest(Long userId, HttpServletRequest req, String operation) {
-        var id = jwtUtils.getUserId(req.getHeader("refresh_token"));
-        if (!userId.equals(id))
-            throw new ForbiddenException("You can't " + operation + " another user's products");
+        var token = req.getHeader("refresh_token");
+        if (!jwtUtils.isTokenExpired(token)) {
+            var id = jwtUtils.getUserId(token);
+            if (!userId.equals(id))
+                throw new ForbiddenException("You can't " + operation + " another user's products");
+        } else
+            throw new ForbiddenException("You are logged out. Try logging in again");
     }
 
     private <T> T exceptionHandlers(Supplier<T> supplier) {

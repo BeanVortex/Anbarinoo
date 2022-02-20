@@ -17,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor(onConstructor = @__(@Lazy))
@@ -29,20 +30,20 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,@NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        var refreshToken = request.getHeader("refresh_token");
-        var accessToken = request.getHeader("access_token");
+        var refreshToken = Optional.ofNullable(request.getHeader("refresh_token"));
+        var accessToken = Optional.ofNullable(request.getHeader("access_token"));
 
-        if (refreshToken != null && accessToken != null && !jwtUtils.isTokenExpired(refreshToken)) {
+        if (refreshToken.isPresent() && accessToken.isPresent()
+                && !jwtUtils.isTokenExpired(refreshToken.get())) {
 
-            var username = jwtUtils.getUsername(refreshToken);
-            var userId = ((Integer) jwtUtils.getAllClaimsFromToken(refreshToken).get("user_id")).longValue();
-
+            var username = jwtUtils.getUsername(refreshToken.get());
+            var userId = ((Integer) jwtUtils.getAllClaimsFromToken(refreshToken.get())
+                    .get("user_id")).longValue();
             authenticateUser(username);
-
-            setUpHeader(response, accessToken, username, userId);
+            setUpHeader(response, accessToken.get(), username, userId);
         }
         filterChain.doFilter(request, response);
     }
@@ -71,7 +72,7 @@ public class JwtFilter extends OncePerRequestFilter {
             String storedAccessToken = refreshService.getRefreshByUserId(userId).getAccessToken();
             if (accessToken.equals(storedAccessToken)) {
                 newAccessToken = jwtUtils.generateAccessToken(username);
-                RefreshModel refreshModel = new RefreshModel();
+                var refreshModel = new RefreshModel();
                 refreshModel.setAccessToken(newAccessToken);
                 refreshModel.setUserId(userId);
                 //db query

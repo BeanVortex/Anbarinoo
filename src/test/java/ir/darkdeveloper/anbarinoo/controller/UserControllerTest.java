@@ -57,8 +57,8 @@ public record UserControllerTest(UserController controller,
 
     @BeforeAll
     static void setUp() {
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
+        var authentication = mock(Authentication.class);
+        var securityContext = mock(SecurityContext.class);
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
     }
@@ -81,17 +81,17 @@ public record UserControllerTest(UserController controller,
         var password = new MockPart("password", "Pass!12".getBytes());
         var passwordRepeat = new MockPart("passwordRepeat", "Pass!12".getBytes());
         var email = new MockPart("email", "email@mail.com".getBytes());
-        Part[] parts = {email, des, username, address, password, passwordRepeat};
+        var parts = new Part[]{email, des, username, address, password, passwordRepeat};
         var file1 = new MockMultipartFile("profileFile", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
                 "Hello, World!".getBytes());
         var file2 = new MockMultipartFile("shopFile", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
                 "Hello, World!".getBytes());
 
         mockMvc.perform(multipart("/api/user/signup/")
-                .part(parts)
-                .file(file1)
-                .file(file2)
-                .accept(MediaType.APPLICATION_JSON))
+                        .part(parts)
+                        .file(file1)
+                        .file(file2)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andDo(result -> {
                     signupRefreshToken = result.getResponse().getHeader("refresh_token");
@@ -117,9 +117,9 @@ public record UserControllerTest(UserController controller,
         auth.setPassword("Pass!12");
         System.out.println(mapToJson(auth));
         mockMvc.perform(post("/api/user/login/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(mapToJson(auth)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(mapToJson(auth)))
                 .andDo(print())
                 .andDo(result -> {
                     signupRefreshToken = result.getResponse().getHeader("refresh_token");
@@ -141,14 +141,14 @@ public record UserControllerTest(UserController controller,
         var id = new MockPart("id", null);
 
         mockMvc.perform(multipart("/api/user/update/{id}/", userId)
-                .part(des, username, address, id)
-                .header("refresh_token", signupRefreshToken)
-                .header("access_token", signupAccessToken)
-                .accept(MediaType.APPLICATION_JSON)
-                .with(request -> {
-                    request.setMethod("PUT");
-                    return request;
-                }))
+                        .part(des, username, address, id)
+                        .header("refresh_token", signupRefreshToken)
+                        .header("access_token", signupAccessToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(request -> {
+                            request.setMethod("PUT");
+                            return request;
+                        }))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.address").value(is("UpdatedAddress")))
@@ -169,16 +169,16 @@ public record UserControllerTest(UserController controller,
         var id = new MockPart("id", null);
 
         mockMvc.perform(multipart("/api/user/update/images/{id}/", userId)
-                .part(id)
-                .file(file1)
-                .file(file2)
-                .header("refresh_token", signupRefreshToken)
-                .header("access_token", signupAccessToken)
-                .accept(MediaType.APPLICATION_JSON)
-                .with(request -> {
-                    request.setMethod("PUT");
-                    return request;
-                }))
+                        .part(id)
+                        .file(file1)
+                        .file(file2)
+                        .header("refresh_token", signupRefreshToken)
+                        .header("access_token", signupAccessToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(request -> {
+                            request.setMethod("PUT");
+                            return request;
+                        }))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andDo(result -> {
@@ -202,14 +202,14 @@ public record UserControllerTest(UserController controller,
         var id = new MockPart("id", null);
 
         mockMvc.perform(multipart("/api/user/update/delete-images/{id}/", userId)
-                .part(sh, pr, id)
-                .header("refresh_token", signupRefreshToken)
-                .header("access_token", signupAccessToken)
-                .accept(MediaType.APPLICATION_JSON)
-                .with(request -> {
-                    request.setMethod("PUT");
-                    return request;
-                }))
+                        .part(sh, pr, id)
+                        .header("refresh_token", signupRefreshToken)
+                        .header("access_token", signupAccessToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(request -> {
+                            request.setMethod("PUT");
+                            return request;
+                        }))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$.shopImage").value(is("noImage.png")))
@@ -232,9 +232,9 @@ public record UserControllerTest(UserController controller,
     void getUserInfo() throws Exception {
 
         mockMvc.perform(get("/api/user/{id}/", userId)
-                .header("refresh_token", signupRefreshToken)
-                .header("access_token", signupAccessToken)
-                .accept(MediaType.APPLICATION_JSON))
+                        .header("refresh_token", signupRefreshToken)
+                        .header("access_token", signupAccessToken)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$").isMap())
@@ -249,9 +249,9 @@ public record UserControllerTest(UserController controller,
     void getSimpleCurrentUserInfo() throws Exception {
 
         mockMvc.perform(get("/api/user/info/", userId)
-                .header("refresh_token", signupRefreshToken)
-                .header("access_token", signupAccessToken)
-                .accept(MediaType.APPLICATION_JSON))
+                        .header("refresh_token", signupRefreshToken)
+                        .header("access_token", signupAccessToken)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$").isMap())
@@ -265,9 +265,9 @@ public record UserControllerTest(UserController controller,
     @WithMockUser(authorities = "OP_ACCESS_ADMIN")
     void getAllUsers() throws Exception {
         mockMvc.perform(get("/api/user/all/")
-                .header("refresh_token", signupRefreshToken)
-                .header("access_token", signupAccessToken)
-                .accept(MediaType.APPLICATION_JSON))
+                        .header("refresh_token", signupRefreshToken)
+                        .header("access_token", signupAccessToken)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$").isMap())
@@ -282,9 +282,9 @@ public record UserControllerTest(UserController controller,
     @WithMockUser(authorities = "OP_DELETE_USER")
     void deleteUser() throws Exception {
         mockMvc.perform(delete("/api/user/{id}/", userId)
-                .header("refresh_token", signupRefreshToken)
-                .header("access_token", signupAccessToken)
-                .accept(MediaType.APPLICATION_JSON))
+                        .header("refresh_token", signupRefreshToken)
+                        .header("access_token", signupAccessToken)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value(is("Deleted the user")))
                 .andDo(print());

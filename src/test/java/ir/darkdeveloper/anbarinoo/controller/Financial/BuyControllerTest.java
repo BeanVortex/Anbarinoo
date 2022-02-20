@@ -38,7 +38,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
@@ -79,8 +78,8 @@ public record BuyControllerTest(UserService userService,
 
     @BeforeAll
     static void setUp() {
-        Authentication authentication = Mockito.mock(Authentication.class);
-        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        var authentication = Mockito.mock(Authentication.class);
+        var securityContext = Mockito.mock(SecurityContext.class);
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         request = mock(HttpServletRequest.class);
@@ -98,15 +97,16 @@ public record BuyControllerTest(UserService userService,
     @Order(1)
     @WithMockUser(username = "anonymousUser")
     void saveUser() throws Exception {
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        var user = new UserModel();
-        user.setEmail("email@mail.com");
-        user.setAddress("address");
-        user.setDescription("desc");
-        user.setUserName("user n");
-        user.setPassword("pass12P+");
-        user.setPasswordRepeat("pass12P+");
-        user.setEnabled(true);
+        var response = mock(HttpServletResponse.class);
+        var user = UserModel.builder()
+                .email("email@mail.com")
+                .address("address")
+                .description("desc")
+                .userName("user n")
+                .password("pass12P+")
+                .passwordRepeat("pass12P+")
+                .enabled(true)
+                .build();
         userService.signUpUser(user, response);
         userId = user.getId();
         request = setUpHeader(user.getEmail(), userId);
@@ -353,7 +353,7 @@ public record BuyControllerTest(UserService userService,
     //should return the object; data is being removed
     private HttpServletRequest setUpHeader(String email, Long userId) {
 
-        Map<String, String> headers = new HashMap<>();
+        var headers = new HashMap<String, String>();
         headers.put(null, "HTTP/1.1 200 OK");
         headers.put("Content-Type", "text/html");
 
@@ -366,8 +366,8 @@ public record BuyControllerTest(UserService userService,
         headers.put("refresh_expiration", refreshDate);
         headers.put("access_expiration", accessDate);
 
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        for (String key : headers.keySet())
+        var request = mock(HttpServletRequest.class);
+        for (var key : headers.keySet())
             when(request.getHeader(key)).thenReturn(headers.get(key));
 
         return request;

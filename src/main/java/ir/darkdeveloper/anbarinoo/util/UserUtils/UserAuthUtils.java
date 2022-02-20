@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 
 @Component
 @AllArgsConstructor
@@ -44,7 +45,7 @@ public class UserAuthUtils {
     private final Operations operations;
     private PasswordUtils passwordUtils;
 
-    public static final SimpleDateFormat TOKEN_EXPIRATION_FORMAT = new SimpleDateFormat("EE MMM dd yyyy HH:mm:ss");
+    public static final DateTimeFormatter TOKEN_EXPIRATION_FORMAT = DateTimeFormatter.ofPattern("EE MMM dd yyyy HH:mm:ss");
 
 
     public void signup(UserModel user, HttpServletResponse response) throws IOException {
@@ -78,8 +79,8 @@ public class UserAuthUtils {
      * @param rawPass   for super admin, pass null
      */
     public void authenticateUser(JwtAuth authModel, Long userId, String rawPass, HttpServletResponse response) {
-        String username = authModel.getUsername();
-        String password = authModel.getPassword();
+        var username = authModel.getUsername();
+        var password = authModel.getPassword();
 
         var user = repo.findByEmailOrUsername(username);
 
@@ -102,7 +103,7 @@ public class UserAuthUtils {
             throw new EmailNotValidException("Email is not verified! Check your emails");
         }
 
-        RefreshModel rModel = new RefreshModel();
+        var rModel = new RefreshModel();
         if (authModel.getUsername().equals(adminUser.getUsername())) {
             rModel.setUserId(adminUser.getId());
             rModel.setId(refreshService.getIdByUserId(adminUser.getId()));
@@ -111,8 +112,8 @@ public class UserAuthUtils {
             rModel.setUserId(getUserIdByUsernameOrEmail(username));
         }
 
-        String accessToken = jwtUtils.generateAccessToken(username);
-        String refreshToken = jwtUtils.generateRefreshToken(username, rModel.getUserId());
+        var accessToken = jwtUtils.generateAccessToken(username);
+        var refreshToken = jwtUtils.generateRefreshToken(username, rModel.getUserId());
 
         rModel.setAccessToken(accessToken);
 
@@ -122,7 +123,8 @@ public class UserAuthUtils {
     }
 
     public void setupHeader(HttpServletResponse response, String accessToken, String refreshToken) {
-        var refreshDate = TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
+        var date = jwtUtils.getExpirationDate(refreshToken);
+        var refreshDate = TOKEN_EXPIRATION_FORMAT.format(date);
 //        var accessDate = TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
         response.addHeader("refresh_token", refreshToken);
         response.addHeader("access_token", accessToken);

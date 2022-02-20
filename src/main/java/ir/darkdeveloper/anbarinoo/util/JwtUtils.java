@@ -1,10 +1,14 @@
 package ir.darkdeveloper.anbarinoo.util;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.function.Function;
 
 import javax.annotation.PostConstruct;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +26,8 @@ import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
 
 @Service
+@Getter
+@Setter
 public class JwtUtils {
 
     // defined in application.properties or application.yml
@@ -31,10 +37,14 @@ public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
     private final PasswordEncoder encoder;
+    private Long refreshExpire;
+    private Long accessExpire;
 
     @Autowired
     public JwtUtils(PasswordEncoder encoder) {
         this.encoder = encoder;
+        refreshExpire = (long) (60 * 60 * 24 * 7 * 3 * 1000);
+        accessExpire = (long) (60 * 1000);
     }
 
     @PostConstruct
@@ -47,8 +57,7 @@ public class JwtUtils {
     // generates a unique jwt token
     public String generateRefreshToken(String username, Long userId) {
         // expires in 21 days
-        var expireIn = (long) 60 * 60 * 24 * 7 * 3 * 1000;
-        var date = new Date(System.currentTimeMillis() + expireIn);
+        var date = new Date(System.currentTimeMillis() + refreshExpire);
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .setIssuedAt(new Date())
@@ -58,8 +67,9 @@ public class JwtUtils {
 
     // Generates access token
     public String generateAccessToken(String username) {
-        Date date = new Date(System.currentTimeMillis() + 60 * 1000);
-        return Jwts.builder().signWith(SignatureAlgorithm.HS256, secret).setSubject(username).setIssuedAt(new Date())
+        var date = new Date(System.currentTimeMillis() + accessExpire);
+        return Jwts.builder().signWith(SignatureAlgorithm.HS256, secret).setSubject(username)
+                .setIssuedAt(new Date())
                 .setExpiration(date).compact();
     }
 
@@ -93,12 +103,14 @@ public class JwtUtils {
         return true;
     }
 
-    public Date getExpirationDate(String token) throws JwtException {
-        return getClaimFromToken(token, Claims::getExpiration);
+    public LocalDateTime getExpirationDate(String token) throws JwtException {
+        return getClaimFromToken(token, Claims::getExpiration)
+                .toInstant().atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
     }
 
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = getAllClaimsFromToken(token);
+        var claims = getAllClaimsFromToken(token);
         return claimsResolver.apply(claims);
     }
 }
