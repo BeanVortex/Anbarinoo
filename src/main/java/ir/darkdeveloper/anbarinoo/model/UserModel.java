@@ -40,19 +40,16 @@ public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel
     @Column(unique = true)
     private String userName;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Pattern(regexp = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9\\s]).+", message = "Bad password")
     @Size(min = 6, message = "Password length must be at least 6")
     private String password;
 
     @Transient
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Pattern(regexp = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9\\s]).+", message = "Bad repeat password")
     @Size(min = 6, message = "Password length must be at least 6")
     private String passwordRepeat;
 
     @Transient
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String prevPassword;
 
     @Enumerated(EnumType.STRING)
@@ -61,14 +58,12 @@ public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel
     private Boolean enabled;
 
     @Transient
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private MultipartFile shopFile;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String shopImage;
 
     @Transient
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private MultipartFile profileFile;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)

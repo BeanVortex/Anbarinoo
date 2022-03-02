@@ -14,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -50,7 +49,6 @@ public class UserService implements UserDetailsService {
      * implementation of this method!!
      */
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_EDIT_USER')")
     public UserModel updateUser(Optional<UserModel> user, Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             user.map(UserModel::getId).ifPresent(i -> user.get().setId(null));
@@ -68,7 +66,6 @@ public class UserService implements UserDetailsService {
      * @return updated user images
      */
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_EDIT_USER')&& #id != null")
     public UserModel updateUserImages(Optional<UserModel> user, Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             user.map(UserModel::getId).ifPresent(i -> user.get().setId(null));
@@ -90,7 +87,6 @@ public class UserService implements UserDetailsService {
      * @return user with deleted image(s) (default images)
      */
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_EDIT_USER')")
     public UserModel updateDeleteUserImages(Optional<UserModel> user, Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             user.map(UserModel::getId).ifPresent(i -> user.get().setId(null));
@@ -105,7 +101,6 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_DELETE_USER')")
     public ResponseEntity<?> deleteUser(Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var user = repo.findById(id).orElseThrow(() -> new NoContentException("User does not exist"));
@@ -119,39 +114,35 @@ public class UserService implements UserDetailsService {
         });
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN')")
     public Page<UserModel> allUsers(Pageable pageable) {
         return repo.findAll(pageable);
     }
 
     @Transactional
-    public ResponseEntity<?> loginUser(JwtAuth model, HttpServletResponse response) {
+    public UserModel loginUser(JwtAuth model, HttpServletResponse response) {
 
         if (model.getUsername().equals(adminUser.getUsername()))
             userAuthUtils.authenticateUser(model, null, null, response);
         else
             userAuthUtils.authenticateUser(model, userAuthUtils.getUserIdByUsernameOrEmail(model.getUsername()), null,
                     response);
-        return new ResponseEntity<>(repo.findByEmailOrUsername(model.getUsername()), HttpStatus.OK);
+        return repo.findByEmailOrUsername(model.getUsername());
 
     }
 
     @Transactional
-    @PreAuthorize("authentication.name.equals(@userService.getAdminUser().getUsername()) " +
-            "|| authentication.name.equals('anonymousUser')")
-    public ResponseEntity<?> signUpUser(UserModel model, HttpServletResponse response) throws Exception {
+    public UserModel signUpUser(UserModel model, HttpServletResponse response) throws Exception {
         return exceptionHandlers(() -> {
             try {
                 userAuthUtils.signup(model, response);
             } catch (IOException e) {
                 throw new InternalServerException(e.getLocalizedMessage());
             }
-            return new ResponseEntity<>(repo.findByEmailOrUsername(model.getUsername()), HttpStatus.OK);
+            return repo.findByEmailOrUsername(model.getUsername());
         });
 
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
     public UserModel getUserInfo(Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var user = repo.findUserById(id).orElseThrow(() -> new NoContentException("User does not exist"));
@@ -160,7 +151,10 @@ public class UserService implements UserDetailsService {
         });
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
+
+    /**
+     * @return a simple user model that won't query for other data like categories, products ...
+     */
     public UserModel getSimpleCurrentUserInfo(HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var id = jwtUtils.getUserId(req.getHeader("refresh_token"));

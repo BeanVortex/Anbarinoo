@@ -102,7 +102,7 @@ public record UserControllerTest(UserController controller,
                     shopImage = obj.getString("shopImage");
 
                 })
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.id").isNotEmpty())
         ;
@@ -160,10 +160,36 @@ public record UserControllerTest(UserController controller,
     @Test
     @Order(4)
     @WithMockUser(authorities = "OP_EDIT_USER")
-    void updateUserImages() throws Exception {
-        MockMultipartFile file1 = new MockMultipartFile("profileFile", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+    void updateUserImagesNotAcceptable() throws Exception {
+        var file1 = new MockMultipartFile("profileFile", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
                 "Hello, World!".getBytes());
-        MockMultipartFile file2 = new MockMultipartFile("shopFile", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+        var file2 = new MockMultipartFile("shopFile", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!".getBytes());
+
+        var id = new MockPart("id", null);
+
+        mockMvc.perform(multipart("/api/user/update/images//")
+                        .part(id)
+                        .file(file1)
+                        .file(file2)
+                        .header("refresh_token", signupRefreshToken)
+                        .header("access_token", signupAccessToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(request -> {
+                            request.setMethod("PUT");
+                            return request;
+                        }))
+                .andDo(print())
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @Order(5)
+    @WithMockUser(authorities = "OP_EDIT_USER")
+    void updateUserImages() throws Exception {
+        var file1 = new MockMultipartFile("profileFile", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
+                "Hello, World!".getBytes());
+        var file2 = new MockMultipartFile("shopFile", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
                 "Hello, World!".getBytes());
 
         var id = new MockPart("id", null);
@@ -179,8 +205,8 @@ public record UserControllerTest(UserController controller,
                             request.setMethod("PUT");
                             return request;
                         }))
-                .andExpect(status().isOk())
                 .andDo(print())
+                .andExpect(status().isOk())
                 .andDo(result -> {
                     JSONObject obj = new JSONObject(result.getResponse().getContentAsString());
                     var newProfile = obj.getString("profileImage");
@@ -193,7 +219,7 @@ public record UserControllerTest(UserController controller,
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     @WithMockUser(authorities = "OP_EDIT_USER")
     void updateDeleteUserImages() throws Exception {
 
@@ -227,7 +253,7 @@ public record UserControllerTest(UserController controller,
 
 
     @Test
-    @Order(6)
+    @Order(7)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getUserInfo() throws Exception {
 
@@ -244,7 +270,7 @@ public record UserControllerTest(UserController controller,
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getSimpleCurrentUserInfo() throws Exception {
 
@@ -261,7 +287,7 @@ public record UserControllerTest(UserController controller,
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     @WithMockUser(authorities = "OP_ACCESS_ADMIN")
     void getAllUsers() throws Exception {
         mockMvc.perform(get("/api/user/all/")
@@ -278,7 +304,7 @@ public record UserControllerTest(UserController controller,
     }
 
     @Test
-    @Order(9)
+    @Order(10)
     @WithMockUser(authorities = "OP_DELETE_USER")
     void deleteUser() throws Exception {
         mockMvc.perform(delete("/api/user/{id}/", userId)

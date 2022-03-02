@@ -21,7 +21,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -76,7 +75,7 @@ public record UserServiceTest(UserService service,
 
     @Test
     @Order(1)
-    @WithMockUser(username = "anonymousUser")
+//    @WithMockUser(username = "anonymousUser")
     void signUpWithImage() {
         var response = mock(HttpServletResponse.class);
 
@@ -105,7 +104,7 @@ public record UserServiceTest(UserService service,
 
     @Test
     @Order(2)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_EDIT_USER", "OP_ACCESS_USER"})
+//    @WithMockUser(username = "email@mail.com", authorities = {"OP_EDIT_USER", "OP_ACCESS_USER"})
     void updateUserWithKeepImagesAndNullPasswords() {
         var fetchedUser = service.getUserInfo(userId, request);
         var user = new UserModel();
@@ -120,7 +119,6 @@ public record UserServiceTest(UserService service,
 
     @Test
     @Order(3)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_EDIT_USER", "OP_ACCESS_USER"})
     void updateUserWithKeepImagesAndNewPasswords() {
         var fetchedUser = service.getUserInfo(userId, request);
         var user = new UserModel();
@@ -136,7 +134,6 @@ public record UserServiceTest(UserService service,
 
     @Test
     @Order(4)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_EDIT_USER", "OP_ACCESS_USER"})
     void updateUserWithNewImages() {
         var user = new UserModel();
         user.setDescription("dex");
@@ -157,7 +154,6 @@ public record UserServiceTest(UserService service,
 
     @Test
     @Order(5)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_EDIT_USER", "OP_ACCESS_USER"})
     void updateDeleteUserImages() {
         var user = new UserModel();
         user.setDescription("dexfd");
@@ -175,7 +171,6 @@ public record UserServiceTest(UserService service,
 
     @Test
     @Order(6)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void getUserInfo() {
         var model = service.getUserInfo(userId, request);
         assertThat(encoder.matches("pass4321B~", model.getPassword())).isTrue();
@@ -186,7 +181,6 @@ public record UserServiceTest(UserService service,
 
     @Test
     @Order(7)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
     void getCurrentUserInfo() {
         var model = service.getSimpleCurrentUserInfo(request);
         assertThat(model.getId()).isNotNull();
@@ -207,13 +201,11 @@ public record UserServiceTest(UserService service,
 
     @Test
     @Order(8)
-    @WithMockUser(authorities = "OP_DELETE_USER")
     void deleteUser() {
         service.deleteUser(userId, request);
     }
 
     @Test
-    @WithMockUser(authorities = "OP_ACCESS_ROLE")
     @Order(9)
     void getRoles() {
         var roles = rolesService.getAllRoles();
@@ -228,12 +220,12 @@ public record UserServiceTest(UserService service,
     //should return the object; data is being removed
     private HttpServletRequest setUpHeader(UserModel user) {
 
-        Map<String, String> headers = new HashMap<>();
+        var headers = new HashMap<String,String>();
         headers.put(null, "HTTP/1.1 200 OK");
         headers.put("Content-Type", "text/html");
 
-        String refreshToken = jwtUtils.generateRefreshToken(user.getEmail(), user.getId());
-        String accessToken = jwtUtils.generateAccessToken(user.getEmail());
+        var refreshToken = jwtUtils.generateRefreshToken(user.getEmail(), user.getId());
+        var accessToken = jwtUtils.generateAccessToken(user.getEmail());
         var refreshDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
         var accessDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
         headers.put("refresh_token", refreshToken);
@@ -242,8 +234,8 @@ public record UserServiceTest(UserService service,
         headers.put("access_expiration", accessDate);
 
 
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        for (String key : headers.keySet())
+        var request = mock(HttpServletRequest.class);
+        for (var key : headers.keySet())
             when(request.getHeader(key)).thenReturn(headers.get(key));
 
         return request;
