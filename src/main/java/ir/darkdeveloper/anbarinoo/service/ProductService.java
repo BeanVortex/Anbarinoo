@@ -1,6 +1,7 @@
 package ir.darkdeveloper.anbarinoo.service;
 
 import ir.darkdeveloper.anbarinoo.exception.*;
+import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.repository.ProductRepository;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -42,21 +44,15 @@ public class ProductService {
      * @param req     should contain refresh token
      */
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER') && #product.getCategory() != null")
-    public ProductModel saveProduct(ProductModel product, HttpServletRequest req) {
+    public ProductModel saveProduct(Optional<ProductModel> product, HttpServletRequest req) {
         return exceptionHandlers(() -> {
-            ProductModel savedProduct;
-            try {
-                savedProduct = productUtils.saveProduct(Optional.ofNullable(product), req);
-            } catch (IOException e) {
-                throw new InternalServerException(e.getLocalizedMessage());
-            }
+            product.map(ProductModel::getCategory).orElseThrow(() -> new BadRequestException("Product can't be null"));
+            product.map(ProductModel::getCategory).map(CategoryModel::getId)
+                    .orElseThrow(() -> new BadRequestException("Product category or category id can't be empty"));
+            var savedProduct = productUtils.saveProduct(product, req);
             var buy = BuyModel.builder()
-                    .product(savedProduct)
-                    .count(savedProduct.getTotalCount())
-                    .price(savedProduct.getPrice())
-                    .tax(savedProduct.getTax())
-                    .build();
+                    .product(savedProduct).count(savedProduct.getTotalCount())
+                    .price(savedProduct.getPrice()).tax(savedProduct.getTax()).build();
             buyService.saveBuy(Optional.of(buy), true, req);
             savedProduct.setFirstBuyId(buy.getId());
             return repo.save(savedProduct);
@@ -74,7 +70,6 @@ public class ProductService {
      * @return updated product with kept images
      */
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ProductModel updateProduct(Optional<ProductModel> product, Long productId, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
@@ -108,7 +103,6 @@ public class ProductService {
         });
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public Page<ProductModel> findByNameContains(String name, Pageable pageable, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
@@ -131,7 +125,6 @@ public class ProductService {
         });
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public Page<ProductModel> getAllProducts(Pageable pageable, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
@@ -148,7 +141,6 @@ public class ProductService {
      * @return updated product with new images
      */
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ProductModel updateProductImages(Optional<ProductModel> product, Long productId, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
@@ -172,7 +164,6 @@ public class ProductService {
      * @param req       should contain refresh token
      */
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ResponseEntity<?> updateDeleteProductImages(Optional<ProductModel> product, Long productId,
                                                        HttpServletRequest req) {
         return exceptionHandlers(() -> {
@@ -188,19 +179,13 @@ public class ProductService {
     }
 
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ResponseEntity<?> deleteProduct(Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var product = repo.findById(id)
                     .orElseThrow(() -> new NoContentException("This product does not exist"));
-            productUtils.checkUserIsSameUserForRequest(product.getCategory().getUser().getId(), req,
-                    "delete");
-            try {
-                ioUtils.deleteProductFiles(product);
-            } catch (IOException e) {
-                throw new InternalServerException(e.getLocalizedMessage());
-            }
+            productUtils.checkUserIsSameUserForRequest(product.getCategory().getUser().getId(), req, "delete");
             repo.deleteById(id);
+            ioUtils.deleteProductFiles(product);
             return ResponseEntity.ok("Deleted the product");
         });
     }

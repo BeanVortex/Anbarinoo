@@ -9,6 +9,10 @@ import org.mapstruct.Mappings;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
+    @Mappings({
+            @Mapping(target = "createdAt", dateFormat = "EE MMM dd yyyy HH:mm:ss"),
+            @Mapping(target = "updatedAt", dateFormat = "EE MMM dd yyyy HH:mm:ss")
+    })
     UserDto userToDto(UserModel model);
 
     @Mappings({

@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
@@ -134,7 +135,7 @@ public record BuyControllerTest(UserService userService,
                 .tax(9)
                 .build();
         System.out.println(product);
-        productService.saveProduct(product, request);
+        productService.saveProduct(Optional.of(product), request);
         productId = product.getId();
     }
 

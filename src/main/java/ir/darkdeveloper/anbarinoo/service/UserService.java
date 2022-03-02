@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -69,13 +68,10 @@ public class UserService implements UserDetailsService {
     public UserModel updateUserImages(Optional<UserModel> user, Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             user.map(UserModel::getId).ifPresent(i -> user.get().setId(null));
-            try {
-                checkUserIsSameUserForRequest(id, req, "update images");
-                var updatedUser = userOP.updateUserImages(user, id);
-                return repo.save(updatedUser);
-            } catch (IOException e) {
-                throw new InternalServerException(e.getLocalizedMessage());
-            }
+            checkUserIsSameUserForRequest(id, req, "update images");
+            var updatedUser = userOP.updateUserImages(user, id);
+            return repo.save(updatedUser);
+
         });
     }
 
@@ -90,13 +86,9 @@ public class UserService implements UserDetailsService {
     public UserModel updateDeleteUserImages(Optional<UserModel> user, Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             user.map(UserModel::getId).ifPresent(i -> user.get().setId(null));
-            try {
-                checkUserIsSameUserForRequest(id, req, "delete images");
-                var updatedUser = userOP.updateDeleteUserImages(user, id);
-                return repo.save(updatedUser);
-            } catch (IOException e) {
-                throw new InternalServerException(e.getLocalizedMessage());
-            }
+            checkUserIsSameUserForRequest(id, req, "delete images");
+            var updatedUser = userOP.updateDeleteUserImages(user, id);
+            return repo.save(updatedUser);
         });
     }
 
@@ -105,11 +97,7 @@ public class UserService implements UserDetailsService {
         return exceptionHandlers(() -> {
             var user = repo.findById(id).orElseThrow(() -> new NoContentException("User does not exist"));
             checkUserIsSameUserForRequest(user.getId(), req, "delete");
-            try {
-                userOP.deleteUser(user);
-            } catch (IOException e) {
-                throw new InternalServerException(e.getLocalizedMessage());
-            }
+            userOP.deleteUser(user);
             return new ResponseEntity<>("Deleted the user", HttpStatus.OK);
         });
     }
@@ -133,11 +121,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     public UserModel signUpUser(UserModel model, HttpServletResponse response) throws Exception {
         return exceptionHandlers(() -> {
-            try {
-                userAuthUtils.signup(model, response);
-            } catch (IOException e) {
-                throw new InternalServerException(e.getLocalizedMessage());
-            }
+            userAuthUtils.signup(model, response);
             return repo.findByEmailOrUsername(model.getUsername());
         });
 

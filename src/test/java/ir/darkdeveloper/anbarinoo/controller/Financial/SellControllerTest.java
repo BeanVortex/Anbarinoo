@@ -35,6 +35,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
@@ -130,7 +131,7 @@ public record SellControllerTest(UserService userService,
                 .category(new CategoryModel(catId))
                 .tax(9)
                 .build();
-        productService.saveProduct(product, request);
+        productService.saveProduct(Optional.of(product), request);
         productId = product.getId();
     }
 

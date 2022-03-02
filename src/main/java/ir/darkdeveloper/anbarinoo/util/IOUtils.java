@@ -56,21 +56,23 @@ public class IOUtils {
      * Saves user images
      *
      * @param user if images are null then the default will set
-     * @throws IOException -
      */
-    public void saveUserImages(UserModel user)
-            throws IOException {
+    public void saveUserImages(UserModel user) {
 
         if (user.getShopImage() == null || user.getShopFile() == null)
             user.setShopImage(DEFAULT_SHOP_IMAGE);
         if (user.getProfileImage() == null || user.getProfileFile() == null)
             user.setProfileImage(DEFAULT_PROFILE_IMAGE);
 
-        var profileFileName = saveFile(user.getProfileFile(), USER_IMAGE_PATH);
-        profileFileName.ifPresent(user::setProfileImage);
+        try {
+            var profileFileName = saveFile(user.getProfileFile(), USER_IMAGE_PATH);
+            profileFileName.ifPresent(user::setProfileImage);
 
-        var shopFileName = saveFile(user.getShopFile(), USER_IMAGE_PATH);
-        shopFileName.ifPresent(user::setShopImage);
+            var shopFileName = saveFile(user.getShopFile(), USER_IMAGE_PATH);
+            shopFileName.ifPresent(user::setShopImage);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     public void updateUserImages(Optional<UserModel> userOpt, UserModel preUser) throws IOException {
@@ -242,12 +244,16 @@ public class IOUtils {
      *
      * @param product: delete files of a product
      */
-    public void deleteProductFiles(ProductModel product) throws IOException {
+    public void deleteProductFiles(ProductModel product) {
         var names = product.getImages();
-        for (var name : names) {
-            var imgPath = getImagePath(PRODUCT_IMAGE_PATH, name);
-            if (!name.equals(DEFAULT_PRODUCT_IMAGE) && imgPath != null)
-                Files.delete(Paths.get(imgPath));
+        try {
+            for (var name : names) {
+                var imgPath = getImagePath(PRODUCT_IMAGE_PATH, name);
+                if (!name.equals(DEFAULT_PRODUCT_IMAGE) && imgPath != null)
+                    Files.delete(Paths.get(imgPath));
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 

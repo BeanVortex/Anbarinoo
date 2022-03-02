@@ -8,12 +8,12 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
@@ -111,12 +111,12 @@ public record ProductServiceTest(ProductService productService,
                 .tax(9)
                 .build();
         var file3 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!" .getBytes());
+                "Hello, World!".getBytes());
         var file4 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!" .getBytes());
+                "Hello, World!".getBytes());
         product.setFiles(Arrays.asList(file3, file4));
         product.setCategory(new CategoryModel(catId));
-        productService.saveProduct(product, request);
+        productService.saveProduct(Optional.of(product), request);
         productId = product.getId();
     }
 
@@ -154,11 +154,11 @@ public record ProductServiceTest(ProductService productService,
         var product = new ProductModel();
 
         var file3 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!" .getBytes());
+                "Hello, World!".getBytes());
         var file4 = new MockMultipartFile("file", "hole.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!" .getBytes());
+                "Hello, World!".getBytes());
         var file5 = new MockMultipartFile("file", "halo.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!" .getBytes());
+                "Hello, World!".getBytes());
 
         product.setFiles(Arrays.asList(file3, file4, file5));
 
@@ -240,12 +240,12 @@ public record ProductServiceTest(ProductService productService,
     //should return the object; data is being removed
     private HttpServletRequest setUpHeader(String email, Long userId) {
 
-        Map<String, String> headers = new HashMap<>();
+        var headers = new HashMap<String, String>();
         headers.put(null, "HTTP/1.1 200 OK");
         headers.put("Content-Type", "text/html");
 
-        String refreshToken = jwtUtils.generateRefreshToken(email, userId);
-        String accessToken = jwtUtils.generateAccessToken(email);
+        var refreshToken = jwtUtils.generateRefreshToken(email, userId);
+        var accessToken = jwtUtils.generateAccessToken(email);
         var refreshDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
         var accessDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
         headers.put("refresh_token", refreshToken);
@@ -254,8 +254,8 @@ public record ProductServiceTest(ProductService productService,
         headers.put("access_expiration", accessDate);
 
 
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        for (String key : headers.keySet())
+        var request = mock(HttpServletRequest.class);
+        for (var key : headers.keySet())
             when(request.getHeader(key)).thenReturn(headers.get(key));
 
         return request;

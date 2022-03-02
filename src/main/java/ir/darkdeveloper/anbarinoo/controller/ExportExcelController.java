@@ -7,6 +7,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +23,8 @@ import java.io.IOException;
 public class ExportExcelController {
 
 
-    @GetMapping("/products/")
+    @GetMapping("/products")
+    @PreAuthorize("authentication.name.equals('anonymousUser')")
     public ResponseEntity<Resource> productsExcel(HttpServletRequest req) throws IOException {
 
         var workbook = new XSSFWorkbook();

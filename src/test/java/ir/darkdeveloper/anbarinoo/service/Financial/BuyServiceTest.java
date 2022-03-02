@@ -105,7 +105,7 @@ public record BuyServiceTest(UserService userService,
                 .category(new CategoryModel(catId))
                 .tax(9)
                 .build();
-        productService.saveProduct(product, request);
+        productService.saveProduct(Optional.of(product), request);
         productId = product.getId();
     }
 

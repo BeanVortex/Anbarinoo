@@ -168,7 +168,8 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.category").value(is(catId), Long.class))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.categoryId").value(is(catId), Long.class))
                 .andExpect(jsonPath("$.images", hasSize(2)))
                 .andDo(result -> {
                     JSONObject jsonObject = new JSONObject(result.getResponse().getContentAsString());
@@ -195,7 +196,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.category").value(is(catId), Long.class));
+                .andExpect(jsonPath("$.categoryId").value(is(catId), Long.class));
     }
 
     @Test
@@ -250,7 +251,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.category").value(is(catId), Long.class))
+                .andExpect(jsonPath("$.categoryId").value(is(catId), Long.class))
                 .andExpect(jsonPath("$.price").value(is(50.05)))
                 .andExpect(jsonPath("$.totalCount").value(is(50500), Integer.class))
                 .andExpect(jsonPath("$.name").value(is("product1Updated")))
@@ -342,7 +343,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.category").value(is(catId), Long.class))
+                .andExpect(jsonPath("$.categoryId").value(is(catId), Long.class))
                 .andExpect(jsonPath("$.price").value(is(50.05)))
                 .andExpect(jsonPath("$.totalCount").value(is(50500), Integer.class))
                 .andExpect(jsonPath("$.name").value(is("product1Updated2")))

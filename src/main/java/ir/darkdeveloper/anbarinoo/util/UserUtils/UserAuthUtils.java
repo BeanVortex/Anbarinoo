@@ -23,6 +23,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -48,7 +49,8 @@ public class UserAuthUtils {
     public static final DateTimeFormatter TOKEN_EXPIRATION_FORMAT = DateTimeFormatter.ofPattern("EE MMM dd yyyy HH:mm:ss");
 
 
-    public void signup(UserModel user, HttpServletResponse response) throws IOException {
+    @Transactional
+    public void signup(UserModel user, HttpServletResponse response) {
         if (user.getId() != null)
             throw new ForbiddenException("You are not allowed to sign up! :|");
 

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -39,13 +40,17 @@ public class ProductUtils {
     }
 
     @NotNull
-    public ProductModel saveProduct(Optional<ProductModel> productOpt, HttpServletRequest req) throws IOException {
+    public ProductModel saveProduct(Optional<ProductModel> productOpt, HttpServletRequest req) {
         productOpt.map(ProductModel::getId).ifPresent(i -> productOpt.get().setId(null));
         var product = productOpt.orElseThrow(() -> new BadRequestException("Product can't be null"));
         var fetchedCat = categoryService.getCategoryById(product.getCategory().getId(), req);
         checkUserIsSameUserForRequest(fetchedCat.getUser().getId(), req, "create");
         product.setCategory(fetchedCat);
-        ioUtils.saveProductImages(product);
+        try {
+            ioUtils.saveProductImages(product);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         return repo.save(product);
     }
 

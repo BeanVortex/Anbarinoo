@@ -45,7 +45,6 @@ public class ProductModel implements UpdateModel<ProductModel> {
     private List<String> images;
 
     @Transient
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<MultipartFile> files;
 
     @Column(nullable = false, precision = 19, scale = 4)
@@ -55,12 +54,10 @@ public class ProductModel implements UpdateModel<ProductModel> {
     private Integer tax;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
-    @JsonIgnore
     @ToString.Exclude
     private List<SellModel> sells;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
-    @JsonIgnore
     @ToString.Exclude
     private List<BuyModel> buys;
 

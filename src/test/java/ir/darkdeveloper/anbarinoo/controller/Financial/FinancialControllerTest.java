@@ -141,7 +141,7 @@ public record FinancialControllerTest(UserService userService,
                 .tax(9)
                 .build();
         fromDate = LocalDateTime.now();
-        productService.saveProduct(product, request);
+        productService.saveProduct(Optional.of(product), request);
         productId = product.getId();
     }
 

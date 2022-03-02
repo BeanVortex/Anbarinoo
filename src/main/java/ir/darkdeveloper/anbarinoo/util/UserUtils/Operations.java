@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,11 +31,15 @@ public class Operations {
     private final UserRepo repo;
     private final PasswordUtils passwordUtils;
 
-    public void deleteUser(UserModel user) throws IOException {
+    public void deleteUser(UserModel user) {
         if (!user.isEnabled())
             throw new EmailNotValidException("Email is not verified! Check your emails");
 
-        ioUtils.deleteUserImages(user);
+        try {
+            ioUtils.deleteUserImages(user);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         for (var cat : user.getCategories())
             ioUtils.deleteProductImagesOfUser(Optional.of(cat.getProducts()));
 
@@ -58,19 +63,27 @@ public class Operations {
         return foundUser;
     }
 
-    public UserModel updateUserImages(Optional<UserModel> user, Long id) throws IOException {
+    public UserModel updateUserImages(Optional<UserModel> user, Long id) {
         user.orElseThrow(() -> new BadRequestException("User can't be null"));
         var foundUser = repo.findUserById(id).orElseThrow(() -> new NoContentException("User not found"));
-        ioUtils.updateUserImages(user, foundUser);
+        try {
+            ioUtils.updateUserImages(user, foundUser);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         //changed merge to update
         foundUser.update(user.get());
         return foundUser;
     }
 
-    public UserModel updateDeleteUserImages(Optional<UserModel> user, Long id) throws IOException {
+    public UserModel updateDeleteUserImages(Optional<UserModel> user, Long id) {
         var foundUser = repo.findUserById(id)
                 .orElseThrow(() -> new NoContentException("User not found"));
-        ioUtils.updateDeleteUserImages(user, foundUser);
+        try {
+            ioUtils.updateDeleteUserImages(user, foundUser);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         return foundUser;
     }
 
