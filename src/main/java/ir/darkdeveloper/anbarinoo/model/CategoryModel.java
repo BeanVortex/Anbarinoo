@@ -44,8 +44,8 @@ public class CategoryModel {
     private List<CategoryModel> children = new LinkedList<>();
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
-    @JsonIgnore
     @ToString.Exclude
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<ProductModel> products;
 
     public CategoryModel(String name) {

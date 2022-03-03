@@ -3,6 +3,7 @@ package ir.darkdeveloper.anbarinoo.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
+import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
@@ -27,7 +28,7 @@ import org.springframework.web.context.WebApplicationContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -91,7 +92,7 @@ public record CategoryControllerTest(UserService userService,
         user.setPasswordRepeat("pass12P+");
         user.setEnabled(true);
         userService.signUpUser(user, response);
-        Long userId = user.getId();
+        var userId = user.getId();
         request = setUpHeader(user.getEmail(), userId);
     }
 
@@ -100,15 +101,15 @@ public record CategoryControllerTest(UserService userService,
     @Order(2)
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void saveCategory() throws Exception {
-        CategoryModel electronics = new CategoryModel("Electronics");
+        var electronics = new CategoryModel("Electronics");
         System.out.println(mapToJson(electronics));
         mockMvc.perform(post("/api/category/save/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(mapToJson(electronics))
-                .header("refresh_token", request.getHeader("refresh_token"))
-                .header("access_token", request.getHeader("access_token"))
-        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(mapToJson(electronics))
+                        .header("refresh_token", request.getHeader("refresh_token"))
+                        .header("access_token", request.getHeader("access_token"))
+                )
                 .andDo(print())
                 .andDo(result -> {
                     JSONObject jsonObject = new JSONObject(result.getResponse().getContentAsString());
@@ -117,38 +118,58 @@ public record CategoryControllerTest(UserService userService,
                 .andExpect(status().isOk());
     }
 
+    // should not save product
     @Test
     @Order(3)
+    @WithMockUser(authorities = {"OP_ACCESS_USER"})
+    void saveCategoryWithProduct() throws Exception {
+        var electronics = new CategoryModel("Electronics");
+        electronics.setProducts(List.of(new ProductModel(5L)));
+        System.out.println(mapToJson(electronics));
+        mockMvc.perform(post("/api/category/save/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(mapToJson(electronics))
+                        .header("refresh_token", request.getHeader("refresh_token"))
+                        .header("access_token", request.getHeader("access_token"))
+                )
+                .andDo(print())
+                .andExpect(jsonPath("$.products").isEmpty())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @Order(4)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void saveASubCategory() throws Exception {
         var subCat = new CategoryModel("Mobiles");
         System.out.println(mapToJson(subCat));
         mockMvc.perform(post("/api/category/sub-category/save/{parentId}/", catId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(mapToJson(subCat))
-                .header("refresh_token", request.getHeader("refresh_token"))
-                .header("access_token", request.getHeader("access_token"))
-        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(mapToJson(subCat))
+                        .header("refresh_token", request.getHeader("refresh_token"))
+                        .header("access_token", request.getHeader("access_token"))
+                )
                 .andDo(print())
                 .andDo(result -> {
                     JSONObject jsonObject = new JSONObject(result.getResponse().getContentAsString());
                     subCatId = jsonObject.getLong("id");
                 })
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.parent").value(is(catId), Long.class));
+                .andExpect(jsonPath("$.parentId").value(is(catId), Long.class));
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getParentCategoryById() throws Exception {
         mockMvc.perform(get("/api/category/{id}/", catId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", request.getHeader("refresh_token"))
-                .header("access_token", request.getHeader("access_token"))
-        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", request.getHeader("refresh_token"))
+                        .header("access_token", request.getHeader("access_token"))
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.children").isArray())
@@ -158,46 +179,46 @@ public record CategoryControllerTest(UserService userService,
 
 
     @Test
-    @Order(5)
+    @Order(6)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getCategoriesByUser() throws Exception {
         mockMvc.perform(get("/api/category/user/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", request.getHeader("refresh_token"))
-                .header("access_token", request.getHeader("access_token"))
-        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", request.getHeader("refresh_token"))
+                        .header("access_token", request.getHeader("access_token"))
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[1].name").value(is("Mobiles")));
+                .andExpect(jsonPath("$.categories", hasSize(3)))
+                .andExpect(jsonPath("$.categories[2].name").value(is("Mobiles")));
     }
 
 
     @Test
-    @Order(6)
+    @Order(7)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void deleteCategoryById() throws Exception {
         mockMvc.perform(delete("/api/category/{id}/", catId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", request.getHeader("refresh_token"))
-                .header("access_token", request.getHeader("access_token"))
-        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", request.getHeader("refresh_token"))
+                        .header("access_token", request.getHeader("access_token"))
+                )
                 .andDo(print())
                 .andExpect(status().isOk());
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getSubCategoryByIdAfterParentDelete() throws Exception {
         mockMvc.perform(get("/api/category/{id}/", subCatId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("refresh_token", request.getHeader("refresh_token"))
-                .header("access_token", request.getHeader("access_token"))
-        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("refresh_token", request.getHeader("refresh_token"))
+                        .header("access_token", request.getHeader("access_token"))
+                )
                 .andDo(print())
                 .andExpect(status().isNoContent());
     }
@@ -210,12 +231,12 @@ public record CategoryControllerTest(UserService userService,
 
     private HttpServletRequest setUpHeader(String email, Long userId) {
 
-        Map<String, String> headers = new HashMap<>();
+        var headers = new HashMap<String, String>();
         headers.put(null, "HTTP/1.1 200 OK");
         headers.put("Content-Type", "text/html");
 
-        String refreshToken = jwtUtils.generateRefreshToken(email, userId);
-        String accessToken = jwtUtils.generateAccessToken(email);
+        var refreshToken = jwtUtils.generateRefreshToken(email, userId);
+        var accessToken = jwtUtils.generateAccessToken(email);
         var refreshDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
         var accessDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
         headers.put("refresh_token", refreshToken);
@@ -224,8 +245,8 @@ public record CategoryControllerTest(UserService userService,
         headers.put("access_expiration", accessDate);
 
 
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        for (String key : headers.keySet())
+        var request = mock(HttpServletRequest.class);
+        for (var key : headers.keySet())
             when(request.getHeader(key)).thenReturn(headers.get(key));
 
         return request;

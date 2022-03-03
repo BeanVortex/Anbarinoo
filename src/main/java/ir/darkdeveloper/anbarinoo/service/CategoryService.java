@@ -5,10 +5,9 @@ import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.CategoryRepo;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.exception.DataException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -19,23 +18,17 @@ import java.util.List;
 import java.util.function.Supplier;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryService {
 
     private final CategoryRepo repo;
     private final JwtUtils jwtUtils;
-
-    @Autowired
-    public CategoryService(CategoryRepo repo, JwtUtils jwtUtils) {
-        this.repo = repo;
-        this.jwtUtils = jwtUtils;
-    }
 
 
     /**
      * Only save a category. children will be ignored
      */
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
     public CategoryModel saveCategory(CategoryModel model, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             if (model.getId() != null) model.setId(null);
@@ -45,10 +38,9 @@ public class CategoryService {
     }
 
     /**
-     * Saves a category under a parent (children of this sub cat will ignored)
+     * Saves a category under a parent (children of this sub cat will be ignored)
      */
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
     public CategoryModel saveSubCategory(CategoryModel model, Long parentId, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var fetchedCategory = getCategoryById(parentId, req);
@@ -59,7 +51,6 @@ public class CategoryService {
         });
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public List<CategoryModel> getCategoriesByUser(HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
@@ -68,7 +59,6 @@ public class CategoryService {
     }
 
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ResponseEntity<?> deleteCategory(Long categoryId, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             checkUserIsSameUserForRequest(categoryId, req, "delete");
@@ -89,8 +79,7 @@ public class CategoryService {
         var foundCategory = repo.findById(categoryId)
                 .orElseThrow(() -> new NoContentException("Category does not exist"));
         var userId = foundCategory.getUser().getId();
-
-        Long id = jwtUtils.getUserId(req.getHeader("refresh_token"));
+        var id = jwtUtils.getUserId(req.getHeader("refresh_token"));
         if (!userId.equals(id))
             throw new ForbiddenException("You can't " + operation + " another user's categories");
     }
