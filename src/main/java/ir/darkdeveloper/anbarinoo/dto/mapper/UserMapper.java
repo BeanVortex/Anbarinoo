@@ -1,5 +1,6 @@
 package ir.darkdeveloper.anbarinoo.dto.mapper;
 
+import ir.darkdeveloper.anbarinoo.config.StartupConfig;
 import ir.darkdeveloper.anbarinoo.dto.UserDto;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import org.mapstruct.Mapper;
@@ -10,8 +11,8 @@ import org.mapstruct.Mappings;
 public interface UserMapper {
 
     @Mappings({
-            @Mapping(target = "createdAt", dateFormat = "EE MMM dd yyyy HH:mm:ss"),
-            @Mapping(target = "updatedAt", dateFormat = "EE MMM dd yyyy HH:mm:ss")
+            @Mapping(target = "createdAt", dateFormat = StartupConfig.DATE_FORMAT),
+            @Mapping(target = "updatedAt", dateFormat = StartupConfig.DATE_FORMAT)
     })
     UserDto userToDto(UserModel model);
 

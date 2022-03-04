@@ -39,7 +39,6 @@ public class DebtOrDemandService {
     /**
      * Only id, nameOf, isDebt, payTo, amount, issuedAt, validTill will take effect
      */
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public DebtOrDemandModel updateDOD(Optional<DebtOrDemandModel> dodOpt, Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var dod = checkDODAndGet(dodOpt);
@@ -76,7 +75,6 @@ public class DebtOrDemandService {
         });
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public Page<DebtOrDemandModel> getAllDODRecordsOfUser(Long userId, HttpServletRequest req, Pageable pageable) {
         return exceptionHandlers(() -> {
             checkUserIsSameUserForRequest(userId, req, "fetch Debt or Demand record");
@@ -84,7 +82,6 @@ public class DebtOrDemandService {
         });
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public DebtOrDemandModel getDOD(Long dodId, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var foundDod = repo.findById(dodId)
@@ -94,7 +91,6 @@ public class DebtOrDemandService {
         });
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public ResponseEntity<?> deleteDOD(Long dodId, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var foundDod = repo.findById(dodId)
@@ -102,7 +98,7 @@ public class DebtOrDemandService {
             checkUserIsSameUserForRequest(foundDod.getUser().getId(), req,
                     "delete Debt or Demand record");
             repo.deleteById(dodId);
-            return ResponseEntity.ok("Deleted the Debt or Demand");
+            return ResponseEntity.ok("Debt or Demand deleted");
         });
     }
 

@@ -76,7 +76,7 @@ public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
     @Test
     @Order(1)
     @WithMockUser(username = "anonymousUser")
-    void saveUser() throws Exception {
+    void saveUser() {
         HttpServletResponse response = mock(HttpServletResponse.class);
         var user = UserModel.builder()
                 .email("email@mail.com")
@@ -112,7 +112,7 @@ public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
                         .content(mapToJson(dod))
                 )
                 .andDo(print())
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andDo(result -> {
                     var jsonObject = new JSONObject(result.getResponse().getContentAsString());
                     dodId = jsonObject.getLong("id");

@@ -1,12 +1,15 @@
 package ir.darkdeveloper.anbarinoo.controller.Financial;
 
+import ir.darkdeveloper.anbarinoo.dto.DebtOrDemandDto;
+import ir.darkdeveloper.anbarinoo.dto.mapper.DebtOrDemandMapper;
 import ir.darkdeveloper.anbarinoo.model.Financial.DebtOrDemandModel;
 import ir.darkdeveloper.anbarinoo.service.Financial.DebtOrDemandService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,30 +21,38 @@ import java.util.Optional;
 public class DebtOrDemandController {
 
     private final DebtOrDemandService service;
+    private final DebtOrDemandMapper mapper;
 
     @PostMapping("/save/")
-    public ResponseEntity<?> saveDOD(@RequestBody DebtOrDemandModel dod, HttpServletRequest req) {
-        return ResponseEntity.ok(service.saveDOD(Optional.ofNullable(dod), req));
+    public ResponseEntity<DebtOrDemandDto> saveDOD(@RequestBody DebtOrDemandModel dod, HttpServletRequest req) {
+        return new ResponseEntity<>(mapper.dodToDto(service.saveDOD(Optional.ofNullable(dod), req)),
+                HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}/")
-    public ResponseEntity<?> updateDOD(@RequestBody DebtOrDemandModel dod, @PathVariable Long id,
-                                       HttpServletRequest req) {
-        return ResponseEntity.ok(service.updateDOD(Optional.of(dod), id, req));
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
+    public ResponseEntity<DebtOrDemandDto> updateDOD(
+            @RequestBody DebtOrDemandModel dod, @PathVariable Long id,
+            HttpServletRequest req) {
+        return ResponseEntity.ok(mapper.dodToDto(service.updateDOD(Optional.of(dod), id, req)));
     }
 
     @GetMapping("/get-by-user/{id}/")
-    public ResponseEntity<?> getAllDODRecordsOfUser(@PathVariable("id") Long userId, HttpServletRequest request,
-                                                     Pageable pageable) {
-        return ResponseEntity.ok(service.getAllDODRecordsOfUser(userId, request, pageable));
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
+    public ResponseEntity<Page<DebtOrDemandDto>> getAllDODRecordsOfUser(
+            @PathVariable("id") Long userId, HttpServletRequest request,
+            Pageable pageable) {
+        return ResponseEntity.ok(service.getAllDODRecordsOfUser(userId, request, pageable).map(mapper::dodToDto));
     }
 
     @GetMapping("/{id}/")
-    public ResponseEntity<?> getDOD(@PathVariable("id") Long dodId, HttpServletRequest request) {
-        return ResponseEntity.ok(service.getDOD(dodId, request));
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
+    public ResponseEntity<DebtOrDemandDto> getDOD(@PathVariable("id") Long dodId, HttpServletRequest request) {
+        return ResponseEntity.ok(mapper.dodToDto(service.getDOD(dodId, request)));
     }
 
     @DeleteMapping("/{id}/")
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public ResponseEntity<?> deleteDOD(@PathVariable("id") Long dodId, HttpServletRequest request) {
         return service.deleteDOD(dodId, request);
     }

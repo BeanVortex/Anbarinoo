@@ -2,6 +2,7 @@ package ir.darkdeveloper.anbarinoo.controller.Financial;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ir.darkdeveloper.anbarinoo.config.StartupConfig;
 import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.UserService;
@@ -28,11 +29,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.mock;
@@ -196,16 +195,12 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
                 .andExpect(jsonPath("$.content[0].isCheckedOut").value(is(cheque.get().getIsCheckedOut())))
                 .andExpect(jsonPath("$.content[0].nameOf").value(is(cheque.get().getNameOf())))
                 .andExpect(jsonPath("$.content[0].payTo").value(is(cheque.get().getPayTo())))
-                .andExpect(jsonPath("$.content[0].user").value(is(cheque.get().getUser().getId()), Long.class))
-                .andExpect(result -> {
-                    var obj = new JSONObject(result.getResponse().getContentAsString());
-                    var obj0 = obj.getJSONArray("content").getJSONObject(0);
-                    var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-                    var issuedAt = LocalDateTime.parse(obj0.getString("issuedAt")).format(formatter);
-                    var validTill = LocalDateTime.parse(obj0.getString("validTill")).format(formatter);
-                    assertThat(issuedAt).isEqualTo(cheque.get().getIssuedAt().toString());
-                    assertThat(validTill).isEqualTo(cheque.get().getValidTill().toString());
-                });
+                .andExpect(jsonPath("$.content[0].userId").value(is(cheque.get().getUser().getId()), Long.class))
+                .andExpect(jsonPath("$.content[0].issuedAt").value(cheque.get().getIssuedAt()
+                        .format(StartupConfig.DATE_FORMATTER)))
+                .andExpect(jsonPath("$.content[0].validTill").value(cheque.get().getValidTill()
+                        .format(StartupConfig.DATE_FORMATTER)))
+        ;
 
     }
 

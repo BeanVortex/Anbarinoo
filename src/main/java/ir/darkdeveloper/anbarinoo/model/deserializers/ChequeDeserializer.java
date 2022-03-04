@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import ir.darkdeveloper.anbarinoo.config.StartupConfig;
 import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import lombok.SneakyThrows;
@@ -11,7 +12,6 @@ import lombok.SneakyThrows;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class ChequeDeserializer extends StdDeserializer<ChequeModel> {
 
@@ -43,7 +43,7 @@ public class ChequeDeserializer extends StdDeserializer<ChequeModel> {
         var user = new UserModel(userId);
 
 
-        var dateFormatter = DateTimeFormatter.ofPattern("EE MMM dd yyyy HH:mm:ss");
+        var dateFormatter = StartupConfig.DATE_FORMATTER;
         var issuedAt = (LocalDateTime) null;
         if (node.get("issuedAt") != null) {
             var issuedAtStr = node.get("issuedAt").asText();
@@ -83,8 +83,8 @@ public class ChequeDeserializer extends StdDeserializer<ChequeModel> {
                 createdAt, updatedAt);
     }
 
-    boolean isLegalDate(String s) {
-        var sdf = new SimpleDateFormat("EE MMM dd yyyy HH:mm:ss");
+    private boolean isLegalDate(String s) {
+        var sdf = new SimpleDateFormat(StartupConfig.DATE_FORMAT);
         sdf.setLenient(false);
         return sdf.parse(s, new ParsePosition(0)) != null;
     }
