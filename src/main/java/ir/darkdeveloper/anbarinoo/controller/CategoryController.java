@@ -6,6 +6,7 @@ import ir.darkdeveloper.anbarinoo.dto.CategoryDto;
 import ir.darkdeveloper.anbarinoo.dto.mapper.CategoryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,7 +35,7 @@ public class CategoryController {
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
     public ResponseEntity<CategoryDto> saveCategory(@RequestBody CategoryModel model,
                                                     HttpServletRequest request) {
-        return ResponseEntity.ok(mapper.categoryToDto(service.saveCategory(model, request)));
+        return new ResponseEntity<>(mapper.categoryToDto(service.saveCategory(model, request)), HttpStatus.CREATED);
     }
 
     @PostMapping("/sub-category/save/{parentId}/")

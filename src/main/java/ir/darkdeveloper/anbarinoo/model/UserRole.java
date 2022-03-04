@@ -15,6 +15,8 @@ import lombok.*;
 @Entity
 @Table(name = "roles")
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserRole implements Serializable {
 
 

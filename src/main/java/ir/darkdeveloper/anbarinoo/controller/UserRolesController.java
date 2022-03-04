@@ -2,6 +2,9 @@ package ir.darkdeveloper.anbarinoo.controller;
 
 import java.util.List;
 
+import ir.darkdeveloper.anbarinoo.dto.UserRoleDto;
+import ir.darkdeveloper.anbarinoo.dto.mapper.UserRoleMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,31 +22,32 @@ import ir.darkdeveloper.anbarinoo.service.UserRolesService;
 
 @RestController
 @RequestMapping("/api/user/role")
-@CrossOrigin("*")
+@RequiredArgsConstructor
 public class UserRolesController {
-    
+
     private final UserRolesService service;
+    private final UserRoleMapper mapper;
 
-    @Autowired
-    public UserRolesController(UserRolesService service) {
-        this.service = service;
-    }
-
-    @GetMapping("/")
-    @PreAuthorize("hasAuthority('OP_ACCESS_ROLE')")
-    public List<UserRole> getAllRoles(){
-        return service.getAllRoles();
-    }
 
     @PostMapping("/")
     @PreAuthorize("hasAuthority('OP_ADD_ROLE')")
-    public ResponseEntity<?> saveRole(@RequestBody UserRole role){
+    public ResponseEntity<?> saveRole(@RequestBody UserRole role) {
         return service.saveRole(role);
+    }
+
+    record UserRoleDtos(List<UserRoleDto> userRoles) {
+    }
+
+    @GetMapping("/all/")
+    @PreAuthorize("hasAuthority('OP_ACCESS_ROLE')")
+    public ResponseEntity<UserRoleDtos> getAllRoles() {
+        return ResponseEntity.ok(new UserRoleDtos(service.getAllRoles().stream().map(mapper::userRoleToDto).toList()));
+
     }
 
     @DeleteMapping("/{id}/")
     @PreAuthorize("hasAuthority('OP_DELETE_ROLE')")
-    public ResponseEntity<?> deleteRole(@PathVariable("id") Long id){
+    public ResponseEntity<?> deleteRole(@PathVariable("id") Long id) {
         return service.deleteRole(id);
     }
 }

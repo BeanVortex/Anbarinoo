@@ -7,6 +7,7 @@ import ir.darkdeveloper.anbarinoo.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,9 @@ public class ProductController {
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ResponseEntity<ProductDto> saveProduct(@ModelAttribute ProductModel product,
                                                   HttpServletRequest request) {
-        return ResponseEntity.ok(mapper.productToDto(service.saveProduct(Optional.ofNullable(product), request)));
+        return new ResponseEntity<>(
+                mapper.productToDto(service.saveProduct(Optional.ofNullable(product), request)),
+                HttpStatus.CREATED);
     }
 
     @GetMapping("/search/")

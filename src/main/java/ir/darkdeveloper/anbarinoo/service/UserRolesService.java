@@ -26,7 +26,7 @@ public class UserRolesService {
     public ResponseEntity<?> saveRole(UserRole role) {
         return exceptionHandlers(() -> {
             repo.save(role);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>("Role created", HttpStatus.CREATED);
         });
     }
 
@@ -41,7 +41,7 @@ public class UserRolesService {
     public ResponseEntity<?> deleteRole(Long id) {
         return exceptionHandlers(() -> {
             repo.deleteById(id);
-            return ResponseEntity.ok("Deleted the role");
+            return ResponseEntity.ok("Role deleted");
         });
     }
 

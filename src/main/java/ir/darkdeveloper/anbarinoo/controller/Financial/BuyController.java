@@ -8,6 +8,7 @@ import ir.darkdeveloper.anbarinoo.service.Financial.BuyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,9 @@ public class BuyController {
 
     @PostMapping("/save/")
     public ResponseEntity<BuyDto> saveBuy(@RequestBody BuyModel buy, HttpServletRequest req) {
-        return ResponseEntity.ok(mapper.buyToDto(service.saveBuy(Optional.ofNullable(buy), false, req)));
+        return new ResponseEntity<>(
+                mapper.buyToDto(service.saveBuy(Optional.ofNullable(buy), false, req)),
+                HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}/")

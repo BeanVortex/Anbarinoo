@@ -63,7 +63,6 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
                     .antMatchers("/", "/info", "/css/**",
                                 "/fonts/**", 
                                 "/js/**", "/img/**",
-                                "/user/**",
                                 "/api/user/signup/",
                                 "/api/user/login/",
                                 "/api/post/all/",

@@ -92,16 +92,16 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     @Test
     @Order(1)
     @WithMockUser(username = "anonymousUser")
-    void saveUser() throws Exception {
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        var user = new UserModel();
-        user.setEmail("email@mail.com");
-        user.setAddress("address");
-        user.setDescription("desc");
-        user.setUserName("user n");
-        user.setPassword("pass12P+");
-        user.setPasswordRepeat("pass12P+");
-        user.setEnabled(true);
+    void saveUser() {
+        var response = mock(HttpServletResponse.class);
+        var user = UserModel.builder()
+                .email("email@mail.com")
+                .address("address")
+                .description("desc")
+                .userName("user n")
+                .password("pass12P+")
+                .passwordRepeat("pass12P+")
+                .build();
         userService.signUpUser(user, response);
         userId = user.getId();
         request = setUpHeader(user.getEmail(), userId);
@@ -113,16 +113,16 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     @Test
     @Order(2)
     @WithMockUser(username = "anonymousUser")
-    void saveUser2() throws Exception {
+    void saveUser2() {
         HttpServletResponse response = mock(HttpServletResponse.class);
-        var user = new UserModel();
-        user.setEmail("email2@mail.com");
-        user.setAddress("address");
-        user.setDescription("desc");
-        user.setUserName("user n2");
-        user.setPassword("pass12P+");
-        user.setPasswordRepeat("pass12P+");
-        user.setEnabled(true);
+        var user = UserModel.builder()
+                .email("email2@mail.com")
+                .address("address")
+                .description("desc")
+                .userName("user n2")
+                .password("pass12P+")
+                .passwordRepeat("pass12P+")
+                .build();
         userService.signUpUser(user, response);
         var userId2 = user.getId();
         request = setUpHeader(user.getEmail(), userId2);
@@ -167,7 +167,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.categoryId").value(is(catId), Long.class))
                 .andExpect(jsonPath("$.images", hasSize(2)))
@@ -195,7 +195,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.categoryId").value(is(catId), Long.class));
     }
 
