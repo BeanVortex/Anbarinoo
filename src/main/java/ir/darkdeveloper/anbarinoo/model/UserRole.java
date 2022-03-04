@@ -6,8 +6,6 @@ import java.util.List;
 
 import javax.persistence.*;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import ir.darkdeveloper.anbarinoo.model.Auth.Authority;
 import lombok.*;
 
@@ -38,7 +36,6 @@ public class UserRole implements Serializable {
     @ManyToMany
     @JoinTable(joinColumns = @JoinColumn(name = "role", referencedColumnName = "name"),
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @ToString.Exclude
     private List<UserModel> users;
 

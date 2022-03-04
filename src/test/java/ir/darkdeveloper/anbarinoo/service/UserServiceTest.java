@@ -57,7 +57,7 @@ public record UserServiceTest(UserService service,
     @Order(1)
     @WithMockUser(username = "anonymousUser")
 //    @Disabled
-    void signUpWithoutImage() throws Exception {
+    void signUpWithoutImage() {
         var response = mock(HttpServletResponse.class);
         var user = UserModel.builder()
                 .email("email@mail.com")
@@ -80,9 +80,9 @@ public record UserServiceTest(UserService service,
         var response = mock(HttpServletResponse.class);
 
         var file1 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!" .getBytes());
+                "Hello, World!".getBytes());
         var file2 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!" .getBytes());
+                "Hello, World!".getBytes());
 
         var user = UserModel.builder()
                 .email("email@mail.com")
@@ -139,9 +139,9 @@ public record UserServiceTest(UserService service,
         user.setDescription("dex");
         user.setShopName("shop1");
         MockMultipartFile file1 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!" .getBytes());
+                "Hello, World!".getBytes());
         MockMultipartFile file2 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
-                "Hello, World!" .getBytes());
+                "Hello, World!".getBytes());
         user.setProfileFile(file1);
         user.setShopFile(file2);
         var fetchedUser = service.getUserInfo(userId, request);
@@ -220,7 +220,7 @@ public record UserServiceTest(UserService service,
     //should return the object; data is being removed
     private HttpServletRequest setUpHeader(UserModel user) {
 
-        var headers = new HashMap<String,String>();
+        var headers = new HashMap<String, String>();
         headers.put(null, "HTTP/1.1 200 OK");
         headers.put("Content-Type", "text/html");
 

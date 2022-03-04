@@ -1,8 +1,5 @@
 package ir.darkdeveloper.anbarinoo.model.Financial;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
@@ -48,8 +45,6 @@ public class BuyModel implements UpdateModel<BuyModel> {
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    @JsonIdentityReference(alwaysAsId = true)
     private ProductModel product;
 
     @CreationTimestamp

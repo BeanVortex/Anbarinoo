@@ -71,16 +71,13 @@ public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name")
-    @JsonIdentityReference(alwaysAsId = true)
     private Set<UserRole> roles;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     private String shopName;
@@ -90,20 +87,15 @@ public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel
     private String description;
 
     @OneToMany(mappedBy = "user")
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    @JsonIdentityReference(alwaysAsId = true)
     @ToString.Exclude
     private List<DebtOrDemandModel> debtOrDemand;
 
     @OneToMany(mappedBy = "user")
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    @JsonIdentityReference(alwaysAsId = true)
+
     @ToString.Exclude
     private List<ChequeModel> cheques;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    @JsonIdentityReference(alwaysAsId = true)
     @ToString.Exclude
     private List<CategoryModel> categories;
 

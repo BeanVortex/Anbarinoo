@@ -12,14 +12,14 @@ import ir.darkdeveloper.anbarinoo.repository.VerificationRepo;
 @RequiredArgsConstructor
 public class VerificationService {
 
-    private final VerificationRepo verificationRepo;
+    private final VerificationRepo repo;
 
     public void saveToken(VerificationModel model) {
-        verificationRepo.save(model);
+        repo.save(model);
     }
 
     public Optional<VerificationModel> findByToken(String token) {
-        return verificationRepo.findByToken(token);
+        return repo.findByToken(token);
     }
 
 }

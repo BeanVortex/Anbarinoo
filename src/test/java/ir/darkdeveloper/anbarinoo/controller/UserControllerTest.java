@@ -96,7 +96,7 @@ public record UserControllerTest(UserController controller,
                 .andDo(result -> {
                     signupRefreshToken = result.getResponse().getHeader("refresh_token");
                     signupAccessToken = result.getResponse().getHeader("access_token");
-                    JSONObject obj = new JSONObject(result.getResponse().getContentAsString());
+                    var obj = new JSONObject(result.getResponse().getContentAsString());
                     userId = obj.getLong("id");
                     profileImage = obj.getString("profileImage");
                     shopImage = obj.getString("shopImage");
@@ -206,7 +206,7 @@ public record UserControllerTest(UserController controller,
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andDo(result -> {
-                    JSONObject obj = new JSONObject(result.getResponse().getContentAsString());
+                    var obj = new JSONObject(result.getResponse().getContentAsString());
                     var newProfile = obj.getString("profileImage");
                     var newShop = obj.getString("shopImage");
                     assertThat(profileImage).isNotEqualTo(newProfile);

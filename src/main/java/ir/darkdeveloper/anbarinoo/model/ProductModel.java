@@ -63,8 +63,6 @@ public class ProductModel implements UpdateModel<ProductModel> {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cat_id")
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    @JsonIdentityReference(alwaysAsId = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private CategoryModel category;
@@ -73,11 +71,10 @@ public class ProductModel implements UpdateModel<ProductModel> {
     @Column(nullable = false, precision = 19, scale = 4)
     private BigDecimal totalCount;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 

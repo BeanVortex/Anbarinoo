@@ -97,7 +97,7 @@ public record BuyControllerTest(UserService userService,
     @Test
     @Order(1)
     @WithMockUser(username = "anonymousUser")
-    void saveUser() throws Exception {
+    void saveUser() {
         var response = mock(HttpServletResponse.class);
         var user = UserModel.builder()
                 .email("email@mail.com")
@@ -158,7 +158,7 @@ public record BuyControllerTest(UserService userService,
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.product").value(is(productId), Long.class))
+                .andExpect(jsonPath("$.productId").value(is(productId), Long.class))
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.tax").value(is(10)))
                 .andDo(result -> {
@@ -248,7 +248,7 @@ public record BuyControllerTest(UserService userService,
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content[0].product").value(is(productId), Long.class))
+                .andExpect(jsonPath("$.content[0].productId").value(is(productId), Long.class))
                 .andExpect(jsonPath("$.totalElements").value(is(1)))
                 .andDo(print());
     }
@@ -271,7 +271,7 @@ public record BuyControllerTest(UserService userService,
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content[0].product").value(is(productId), Long.class))
+                .andExpect(jsonPath("$.content[0].productId").value(is(productId), Long.class))
                 .andExpect(jsonPath("$.totalElements").value(is(1)))
                 .andDo(print());
 
@@ -289,7 +289,7 @@ public record BuyControllerTest(UserService userService,
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.product").value(is(productId), Long.class))
+                .andExpect(jsonPath("$.productId").value(is(productId), Long.class))
                 .andExpect(jsonPath("$.id").value(is(buyId), Long.class))
                 .andExpect(jsonPath("$.count").value(is(BigDecimal.valueOf(60.2)), BigDecimal.class))
                 .andDo(print());

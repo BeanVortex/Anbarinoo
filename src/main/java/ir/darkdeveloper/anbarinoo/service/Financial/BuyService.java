@@ -49,7 +49,6 @@ public class BuyService {
     }
 
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public BuyModel updateBuy(Optional<BuyModel> buy, Long buyId, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             checkBuyData(buy, Optional.of(buyId));
@@ -62,7 +61,6 @@ public class BuyService {
         });
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public Page<BuyModel> getAllBuyRecordsOfProduct(Long productId, HttpServletRequest req, Pageable pageable) {
         return exceptionHandlers(() -> {
             // will be checked the user is same user in getProduct method
@@ -71,7 +69,6 @@ public class BuyService {
         });
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public Page<BuyModel> getAllBuyRecordsOfUser(Long userId, HttpServletRequest req, Pageable pageable) {
         return exceptionHandlers(() -> {
             checkUserIsSameUserForRequest(null, userId, req, "fetch");
@@ -79,7 +76,6 @@ public class BuyService {
         });
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public BuyModel getBuy(Long buyId, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var foundBuyRecord = repo.findById(buyId)
@@ -90,8 +86,7 @@ public class BuyService {
     }
 
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
-    public ResponseEntity<?> deleteBuy(Long buyId, HttpServletRequest req) {
+    public ResponseEntity<String> deleteBuy(Long buyId, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var buy = repo.findById(buyId)
                     .orElseThrow(() -> new NoContentException("Buy record doesn't exist"));
@@ -114,7 +109,6 @@ public class BuyService {
         });
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public Page<BuyModel> getAllBuyRecordsOfProductFromDateTo(Long productId, Optional<FinancialModel> financial,
                                                               HttpServletRequest req, Pageable pageable) {
         return exceptionHandlers(() -> {

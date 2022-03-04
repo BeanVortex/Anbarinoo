@@ -68,7 +68,7 @@ public record BuyServiceTest(UserService userService,
     @Test
     @Order(1)
     @WithMockUser(username = "anonymousUser")
-    void saveUser() throws Exception {
+    void saveUser() {
         var response = mock(HttpServletResponse.class);
         var user = UserModel.builder()
                 .email("email@mail.com")

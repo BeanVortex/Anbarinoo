@@ -26,26 +26,22 @@ public class CategoryModel {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    @JsonIdentityReference(alwaysAsId = true)
+//    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+//    @JsonIdentityReference(alwaysAsId = true)
     private UserModel user;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_id")
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    @JsonIdentityReference(alwaysAsId = true)
     private CategoryModel parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE)
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    @JsonIdentityReference(alwaysAsId = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @ToString.Exclude
     private List<CategoryModel> children = new LinkedList<>();
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
-    @ToString.Exclude
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @ToString.Exclude
     private List<ProductModel> products;
 
     public CategoryModel(String name) {
