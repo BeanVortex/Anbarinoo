@@ -3,6 +3,7 @@ package ir.darkdeveloper.anbarinoo.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -15,17 +16,13 @@ import ir.darkdeveloper.anbarinoo.model.UserRole;
 import ir.darkdeveloper.anbarinoo.service.UserRolesService;
 
 @Configuration
+@RequiredArgsConstructor
 public class StartupConfig {
 
     private final UserRolesService rolesService;
 
     @Value("${user.email-verification-disabled}")
     private Boolean userEnabled;
-
-    @Autowired
-    public StartupConfig(UserRolesService rolesService) {
-        this.rolesService = rolesService;
-    }
 
     @Bean
     public Boolean userEnabled(){

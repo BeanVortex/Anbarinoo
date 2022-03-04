@@ -10,7 +10,7 @@ import ir.darkdeveloper.anbarinoo.service.RefreshService;
 import ir.darkdeveloper.anbarinoo.service.VerificationService;
 import ir.darkdeveloper.anbarinoo.util.IOUtils;
 import ir.darkdeveloper.anbarinoo.util.email.EmailService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class Operations {
 
     private final VerificationService verificationService;
@@ -40,8 +40,8 @@ public class Operations {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        for (var cat : user.getCategories())
-            ioUtils.deleteProductImagesOfUser(Optional.of(cat.getProducts()));
+
+        user.getCategories().forEach(cat -> ioUtils.deleteProductImagesOfUser(Optional.of(cat.getProducts())));
 
         refreshService.deleteTokenByUserId(user.getId());
         repo.deleteById(user.getId());
@@ -51,9 +51,9 @@ public class Operations {
         //email update
         //userUtils.validateEmail(model);
         user.orElseThrow(() -> new BadRequestException("User can't be null"));
-        var pImageExists = user.map(UserModel::getProfileImage).isPresent();
-        var sImageExists = user.map(UserModel::getShopImage).isPresent();
-        if (pImageExists || sImageExists) {
+        var profileImageExists = user.map(UserModel::getProfileImage).isPresent();
+        var shopImageExists = user.map(UserModel::getShopImage).isPresent();
+        if (profileImageExists || shopImageExists) {
             user.get().setProfileImage(null);
             user.get().setShopImage(null);
         }
@@ -89,11 +89,11 @@ public class Operations {
 
 
     public void sendEmail(UserModel user) {
-        String token = UUID.randomUUID().toString();
-        VerificationModel emailVerify = new VerificationModel(token, user, LocalDateTime.now().plusMinutes(20));
+        var token = UUID.randomUUID().toString();
+        var emailVerify = new VerificationModel(token, user, LocalDateTime.now().plusMinutes(20));
         verificationService.saveToken(emailVerify);
 
-        String link = domainName + "/api/user/verify/?t=" + token;
+        var link = domainName + "/api/user/verify/?t=" + token;
         emailService.send(user.getEmail(), emailService.buildEmail(user.getName(), link));
 
     }

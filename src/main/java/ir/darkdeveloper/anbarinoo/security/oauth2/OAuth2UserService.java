@@ -11,6 +11,8 @@ import ir.darkdeveloper.anbarinoo.model.Auth.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.UserRepo;
 
+import java.util.Optional;
+
 @Service
 public class OAuth2UserService extends DefaultOAuth2UserService {
 
@@ -23,16 +25,17 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2User oAuth2User = super.loadUser(userRequest);
-        var user = repo.findByEmailOrUsername(oAuth2User.getAttribute("email"));
-        if (user == null) {
-            user = new UserModel();
-            user.setEmail(oAuth2User.getAttribute("email"));
-        }
+        var oAuth2User = super.loadUser(userRequest);
+        var user = repo.findByEmailOrUsername(oAuth2User.getAttribute("email"))
+                .orElseGet(() -> {
+                    var newUser = new UserModel();
+                    newUser.setEmail(oAuth2User.getAttribute("email"));
+                    return newUser;
+                });
         user.setEnabled(oAuth2User.getAttribute("email_verified"));
         user.setProfileImage(oAuth2User.getAttribute("picture"));
         user.setProvider(AuthProvider.GOOGLE);
-        user = repo.save(user);
+        repo.save(user);
         return user;
     }
 

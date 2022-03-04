@@ -14,14 +14,14 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "email_verification")
-@Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
 public class VerificationModel {
 

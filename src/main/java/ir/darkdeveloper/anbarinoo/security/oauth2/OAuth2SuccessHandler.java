@@ -38,7 +38,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
-        String targetUrl = determineTargetUrl(request, response, authentication);
+        var targetUrl = determineTargetUrl(request, response, authentication);
 
         if (response.isCommitted()) {
             logger.debug("Response has already been committed. Unable to redirect to " + targetUrl);
@@ -56,12 +56,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue);
 
-        // rejects redirects from unknown hosts. known hosts are defined in application.yml with prefix of 'oauth2'
+        // Reject redirects from unknown hosts. known hosts are defined in application.yml with prefix of 'oauth2'
         if (redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get()))
             throw new BadRequestException(
                     "Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication");
 
-        String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
+        var targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
         headerSetup(response, authentication);
 
@@ -82,12 +82,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     }
 
     private boolean isAuthorizedRedirectUri(String uri) {
-        URI clientRedirectUri = URI.create(uri);
+        var clientRedirectUri = URI.create(uri);
 
         return oAuth2Properties.getAuthorizedRedirectUris().stream().anyMatch(authorizedRedirectUri -> {
             // Only validate host and port. Let the clients use different paths if they want to
-            // So I dont check the path of uri 
-            URI authorizedURI = URI.create(authorizedRedirectUri);
+            // So I don't check the path of uri
+            var authorizedURI = URI.create(authorizedRedirectUri);
             return authorizedURI.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
                     && authorizedURI.getPort() == clientRedirectUri.getPort();
         });

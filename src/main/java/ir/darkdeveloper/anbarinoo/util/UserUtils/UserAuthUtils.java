@@ -1,24 +1,23 @@
 package ir.darkdeveloper.anbarinoo.util.UserUtils;
 
-import io.jsonwebtoken.lang.Collections;
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.EmailNotValidException;
 import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
+import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.Auth.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.UserRepo;
-import ir.darkdeveloper.anbarinoo.security.jwt.JwtAuth;
+import ir.darkdeveloper.anbarinoo.dto.LoginDto;
 import ir.darkdeveloper.anbarinoo.service.RefreshService;
 import ir.darkdeveloper.anbarinoo.service.UserRolesService;
 import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
 import ir.darkdeveloper.anbarinoo.util.IOUtils;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,12 +25,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserAuthUtils {
 
     private final AuthenticationManager authManager;
@@ -44,9 +42,10 @@ public class UserAuthUtils {
     private final UserRolesService roleService;
     private final Boolean userEnabled;
     private final Operations operations;
-    private PasswordUtils passwordUtils;
+    private final PasswordUtils passwordUtils;
 
-    public static final DateTimeFormatter TOKEN_EXPIRATION_FORMAT = DateTimeFormatter.ofPattern("EE MMM dd yyyy HH:mm:ss");
+    public static final DateTimeFormatter TOKEN_EXPIRATION_FORMAT =
+            DateTimeFormatter.ofPattern("EE MMM dd yyyy HH:mm:ss");
 
 
     @Transactional
@@ -71,20 +70,21 @@ public class UserAuthUtils {
         if (!user.getEnabled())
             operations.sendEmail(user);
         else
-            authenticateUser(new JwtAuth(user.getEmail(), rawPass), user.getId(), rawPass, response);
+            authenticateUser(new LoginDto(user.getEmail(), rawPass), user.getId(), rawPass, response);
 
     }
 
     /**
-     * @param authModel has username and password (JwtAuth)
-     * @param userId    for super admin, pass null
-     * @param rawPass   for super admin, pass null
+     * @param loginDto has username and password (LoginDto)
+     * @param userId   for super admin, pass null
+     * @param rawPass  for super admin, pass null
      */
-    public void authenticateUser(JwtAuth authModel, Long userId, String rawPass, HttpServletResponse response) {
-        var username = authModel.getUsername();
-        var password = authModel.getPassword();
+    public void authenticateUser(LoginDto loginDto, Long userId, String rawPass, HttpServletResponse response) {
+        var username = loginDto.username();
+        var password = loginDto.password();
 
-        var user = repo.findByEmailOrUsername(username);
+        var user = repo.findByEmailOrUsername(username)
+                .orElseThrow(() -> new NoContentException("User does not exist"));
 
         UsernamePasswordAuthenticationToken auth;
         if (rawPass != null)
@@ -106,7 +106,7 @@ public class UserAuthUtils {
         }
 
         var rModel = new RefreshModel();
-        if (authModel.getUsername().equals(adminUser.getUsername())) {
+        if (loginDto.username().equals(adminUser.getUsername())) {
             rModel.setUserId(adminUser.getId());
             rModel.setId(refreshService.getIdByUserId(adminUser.getId()));
         } else {
@@ -138,11 +138,13 @@ public class UserAuthUtils {
         return repo.findUserIdByUsername(username);
     }
 
-    public UserDetails loadUserByUsername(String username) {
+    public Optional<? extends UserDetails> loadUserByUsername(String username) {
         if (username.equals(adminUser.getUsername())) {
             var authorities = adminUser.getAuthorities();
-            return User.builder().username(adminUser.getUsername())
-                    .password(encoder.encode(adminUser.getPassword())).authorities(authorities).build();
+            return Optional.of(
+                    User.builder().username(adminUser.getUsername())
+                            .password(encoder.encode(adminUser.getPassword())).authorities(authorities).build()
+            );
         }
         return repo.findByEmailOrUsername(username);
     }

@@ -18,7 +18,6 @@ import lombok.ToString;
 @Table(name = "tokens")
 public class RefreshModel {
 
-
     @Id
     @GeneratedValue
     private Long id;

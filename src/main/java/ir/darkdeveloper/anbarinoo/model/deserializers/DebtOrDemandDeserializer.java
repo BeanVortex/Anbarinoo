@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 
 public class DebtOrDemandDeserializer extends StdDeserializer<DebtOrDemandModel> {
 
+    // do not delete
     public DebtOrDemandDeserializer() {
         this(null);
     }

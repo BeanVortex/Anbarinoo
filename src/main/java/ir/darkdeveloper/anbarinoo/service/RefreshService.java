@@ -1,6 +1,7 @@
 package ir.darkdeveloper.anbarinoo.service;
 
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,14 +11,10 @@ import ir.darkdeveloper.anbarinoo.repository.RefreshRepo;
 import javax.transaction.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class RefreshService {
 
     private final RefreshRepo repo;
-
-    @Autowired
-    public RefreshService(RefreshRepo repo) {
-        this.repo = repo;
-    }
 
     @Transactional
     public void saveToken(RefreshModel model) {

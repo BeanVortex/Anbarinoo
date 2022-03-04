@@ -4,6 +4,7 @@ import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
 import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
 import ir.darkdeveloper.anbarinoo.model.UserRole;
 import ir.darkdeveloper.anbarinoo.repository.UserRolesRepo;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,14 +16,11 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 @Service
+@RequiredArgsConstructor
 public class UserRolesService {
 
     private final UserRolesRepo repo;
 
-    @Autowired
-    public UserRolesService(UserRolesRepo repo) {
-        this.repo = repo;
-    }
 
     @Transactional
     public ResponseEntity<?> saveRole(UserRole role) {

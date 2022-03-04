@@ -1,7 +1,9 @@
 package ir.darkdeveloper.anbarinoo.util;
 
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -12,14 +14,15 @@ import org.springframework.util.SerializationUtils;
 public class CookieUtils {
 
     public static Optional<Cookie> getCookie(HttpServletRequest req, String name) {
-        var cookies = req.getCookies();
 
-        if (cookies != null && cookies.length != 0)
-            for (var cookie : cookies)
-                if (cookie.getName().equals(name))
-                    return Optional.of(cookie);
+        var foundCookie = new AtomicReference<>(Optional.<Cookie>empty());
+        var cookies = Optional.ofNullable(req.getCookies()).map(List::of);
+        cookies.ifPresent(cookies1 -> cookies1.forEach(cookie -> {
+            if (cookie.getName().equals(name))
+                foundCookie.set(Optional.of(cookie));
+        }));
 
-        return Optional.empty();
+        return foundCookie.get();
     }
 
     public static void addCookie(HttpServletResponse res, String name, String value, int maxAge) {

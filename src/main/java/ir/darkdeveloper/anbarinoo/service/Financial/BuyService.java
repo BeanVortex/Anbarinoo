@@ -8,8 +8,8 @@ import ir.darkdeveloper.anbarinoo.repository.Financial.BuyRepo;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.util.Financial.FinancialUtils;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.exception.DataException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -26,21 +26,15 @@ import java.util.function.Supplier;
 
 
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Lazy))
 public class BuyService {
 
     private final BuyRepo repo;
     private final JwtUtils jwtUtils;
+    @Lazy
     private final ProductService productService;
+    @Lazy
     private final FinancialUtils fUtils;
-
-    @Autowired
-    public BuyService(BuyRepo repo, JwtUtils jwtUtils, @Lazy ProductService productService,
-                      @Lazy FinancialUtils fUtils) {
-        this.repo = repo;
-        this.jwtUtils = jwtUtils;
-        this.productService = productService;
-        this.fUtils = fUtils;
-    }
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")

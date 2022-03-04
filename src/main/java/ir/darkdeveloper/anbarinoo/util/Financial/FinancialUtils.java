@@ -5,7 +5,7 @@ import ir.darkdeveloper.anbarinoo.model.Financial.FinancialModel;
 import ir.darkdeveloper.anbarinoo.service.Financial.BuyService;
 import ir.darkdeveloper.anbarinoo.service.Financial.DebtOrDemandService;
 import ir.darkdeveloper.anbarinoo.service.Financial.SellService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class FinancialUtils {
 
     private final DebtOrDemandService dodService;

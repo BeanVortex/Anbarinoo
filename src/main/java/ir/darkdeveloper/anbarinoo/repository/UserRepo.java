@@ -20,7 +20,7 @@ import java.util.Optional;
 public interface UserRepo extends PagingAndSortingRepository<UserModel, Long> {
 
     @Query("SELECT model FROM UserModel model WHERE model.email = :username OR model.userName = :username")
-    UserModel findByEmailOrUsername(@Param("username") String username);
+    Optional<UserModel> findByEmailOrUsername(@Param("username") String username);
 
     Optional<UserModel> findUserById(Long id);
 

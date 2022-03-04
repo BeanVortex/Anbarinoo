@@ -3,12 +3,12 @@ package ir.darkdeveloper.anbarinoo.service;
 import ir.darkdeveloper.anbarinoo.exception.*;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.UserRepo;
-import ir.darkdeveloper.anbarinoo.security.jwt.JwtAuth;
+import ir.darkdeveloper.anbarinoo.dto.LoginDto;
 import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.Operations;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 @Service("userService")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
     private final UserRepo repo;
@@ -39,7 +39,8 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userAuthUtils.loadUserByUsername(username);
+        return userAuthUtils.loadUserByUsername(username)
+                .orElseThrow(() -> new NoContentException("User does not exist"));
     }
 
 
@@ -107,22 +108,24 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public UserModel loginUser(JwtAuth model, HttpServletResponse response) {
-
-        if (model.getUsername().equals(adminUser.getUsername()))
-            userAuthUtils.authenticateUser(model, null, null, response);
-        else
-            userAuthUtils.authenticateUser(model, userAuthUtils.getUserIdByUsernameOrEmail(model.getUsername()), null,
-                    response);
-        return repo.findByEmailOrUsername(model.getUsername());
-
+    public UserModel loginUser(LoginDto loginDto, HttpServletResponse response) {
+        return exceptionHandlers(() -> {
+            if (loginDto.username().equals(adminUser.getUsername()))
+                userAuthUtils.authenticateUser(loginDto, null, null, response);
+            else
+                userAuthUtils.authenticateUser(loginDto, userAuthUtils.getUserIdByUsernameOrEmail(loginDto.username()), null,
+                        response);
+            return repo.findByEmailOrUsername(loginDto.username())
+                    .orElseThrow(() -> new NoContentException("User does not exist"));
+        });
     }
 
     @Transactional
-    public UserModel signUpUser(UserModel model, HttpServletResponse response) throws Exception {
+    public UserModel signUpUser(UserModel model, HttpServletResponse response) {
         return exceptionHandlers(() -> {
             userAuthUtils.signup(model, response);
-            return repo.findByEmailOrUsername(model.getUsername());
+            return repo.findByEmailOrUsername(model.getUsername())
+                    .orElseThrow(() -> new NoContentException("User does not exist"));
         });
 
     }

@@ -77,10 +77,10 @@ public record JwtTest(WebApplicationContext webApplicationContext, JwtUtils jwtU
     void signUpUser() throws Exception {
         var address = new MockPart("address", "address".getBytes());
         var des = new MockPart("description", "desc".getBytes());
-        var username = new MockPart("userName", "user n".getBytes());
+        var username = new MockPart("userName5", "user n".getBytes());
         var password = new MockPart("password", "Pass!12".getBytes());
         var passwordRepeat = new MockPart("passwordRepeat", "Pass!12".getBytes());
-        var email = new MockPart("email", "email@mail.com".getBytes());
+        var email = new MockPart("email", "email5@mail.com".getBytes());
         var parts = new Part[]{email, des, username, address, password, passwordRepeat};
 
         mockMvc.perform(multipart("/api/user/signup/")

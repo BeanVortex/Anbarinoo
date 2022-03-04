@@ -3,6 +3,7 @@ package ir.darkdeveloper.anbarinoo.controller.Financial;
 import ir.darkdeveloper.anbarinoo.model.Financial.FinancialModel;
 import ir.darkdeveloper.anbarinoo.service.Financial.FinancialService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user/financial/")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class FinancialController {
 
     private final FinancialService service;

@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 public class BuyDeserializer extends StdDeserializer<BuyModel> {
+
+    // do not delete
     public BuyDeserializer() {
         this(null);
     }

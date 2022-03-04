@@ -1,6 +1,7 @@
 package ir.darkdeveloper.anbarinoo.controller.Financial;
 
 import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,14 +13,10 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user/financial/cheque")
+@RequiredArgsConstructor
 public class ChequeController {
 
     private final ChequeService service;
-
-    @Autowired
-    public ChequeController(ChequeService service) {
-        this.service = service;
-    }
 
     @PostMapping("/save/")
     public ResponseEntity<?> saveCheque(@RequestBody ChequeModel cheque, HttpServletRequest req) {

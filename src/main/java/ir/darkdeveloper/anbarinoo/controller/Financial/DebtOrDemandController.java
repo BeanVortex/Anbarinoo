@@ -2,6 +2,7 @@ package ir.darkdeveloper.anbarinoo.controller.Financial;
 
 import ir.darkdeveloper.anbarinoo.model.Financial.DebtOrDemandModel;
 import ir.darkdeveloper.anbarinoo.service.Financial.DebtOrDemandService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -13,15 +14,10 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user/financial/debt-demand")
+@RequiredArgsConstructor
 public class DebtOrDemandController {
 
     private final DebtOrDemandService service;
-
-    @Autowired
-    public DebtOrDemandController(DebtOrDemandService service) {
-        this.service = service;
-    }
-
 
     @PostMapping("/save/")
     public ResponseEntity<?> saveDOD(@RequestBody DebtOrDemandModel dod, HttpServletRequest req) {

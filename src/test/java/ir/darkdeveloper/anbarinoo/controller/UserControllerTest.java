@@ -2,7 +2,7 @@ package ir.darkdeveloper.anbarinoo.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ir.darkdeveloper.anbarinoo.security.jwt.JwtAuth;
+import ir.darkdeveloper.anbarinoo.dto.LoginDto;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
@@ -112,14 +112,12 @@ public record UserControllerTest(UserController controller,
     @Test
     @Order(2)
     void loginUser() throws Exception {
-        var auth = new JwtAuth();
-        auth.setUsername("user n");
-        auth.setPassword("Pass!12");
-        System.out.println(mapToJson(auth));
+        var loginDto = new LoginDto("user n", "Pass!12");
+        System.out.println(mapToJson(loginDto));
         mockMvc.perform(post("/api/user/login/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .content(mapToJson(auth)))
+                        .content(mapToJson(loginDto)))
                 .andDo(print())
                 .andDo(result -> {
                     signupRefreshToken = result.getResponse().getHeader("refresh_token");

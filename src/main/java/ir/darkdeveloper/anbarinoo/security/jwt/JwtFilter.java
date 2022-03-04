@@ -1,5 +1,6 @@
 package ir.darkdeveloper.anbarinoo.security.jwt;
 
+import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 import ir.darkdeveloper.anbarinoo.service.RefreshService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
@@ -53,7 +54,8 @@ public class JwtFilter extends OncePerRequestFilter {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (username != null && auth == null) {
             //db query
-            var userDetails = userAuthUtils.loadUserByUsername(username);
+            var userDetails = userAuthUtils.loadUserByUsername(username)
+                    .orElseThrow(() -> new NoContentException("User does not exist"));
             var upToken = new UsernamePasswordAuthenticationToken(userDetails, null,
                     userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(upToken);
@@ -69,7 +71,7 @@ public class JwtFilter extends OncePerRequestFilter {
         // if this didn't execute, it means the access token is still valid
         if (jwtUtils.isTokenExpired(accessToken)) {
             //db query
-            String storedAccessToken = refreshService.getRefreshByUserId(userId).getAccessToken();
+            var storedAccessToken = refreshService.getRefreshByUserId(userId).getAccessToken();
             if (accessToken.equals(storedAccessToken)) {
                 newAccessToken = jwtUtils.generateAccessToken(username);
                 var refreshModel = new RefreshModel();

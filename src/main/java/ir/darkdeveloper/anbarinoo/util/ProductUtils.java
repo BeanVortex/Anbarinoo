@@ -21,22 +21,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Component
-public class ProductUtils {
-
-    private final JwtUtils jwtUtils;
-    private final ProductRepository repo;
-    private final IOUtils ioUtils;
-    private final CategoryService categoryService;
-    private final BuyRepo buyRepo;
+public record ProductUtils(JwtUtils jwtUtils,
+                           ProductRepository repo,
+                           IOUtils ioUtils,
+                           CategoryService categoryService,
+                           BuyRepo buyRepo) {
 
     @Autowired
-    public ProductUtils(JwtUtils jwtUtils, ProductRepository repo, IOUtils ioUtils,
-                        CategoryService categoryService, BuyRepo buyRepo) {
-        this.jwtUtils = jwtUtils;
-        this.repo = repo;
-        this.ioUtils = ioUtils;
-        this.categoryService = categoryService;
-        this.buyRepo = buyRepo;
+    public ProductUtils {
     }
 
     @NotNull

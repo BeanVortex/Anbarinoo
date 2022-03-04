@@ -1,20 +1,10 @@
 package ir.darkdeveloper.anbarinoo.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import ir.darkdeveloper.anbarinoo.model.CategoryModel;
+import ir.darkdeveloper.anbarinoo.model.UserModel;
+import ir.darkdeveloper.anbarinoo.util.JwtUtils;
+import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
+import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,10 +14,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 
-import ir.darkdeveloper.anbarinoo.model.CategoryModel;
-import ir.darkdeveloper.anbarinoo.model.UserModel;
-import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -56,13 +49,13 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
     @Test
     @Order(1)
     @WithMockUser(username = "anonymousUser")
-    void saveUser() throws Exception {
+    void saveUser() {
         var response = mock(HttpServletResponse.class);
         var user = UserModel.builder()
-                .email("email@mail.com")
+                .email("email4@mail.com")
                 .address("address")
                 .description("desc")
-                .userName("user n")
+                .userName("user n4")
                 .password("pass12P+")
                 .passwordRepeat("pass12P+")
                 .enabled(true)
@@ -74,7 +67,7 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
 
     @Test
     @Order(2)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(username = "email4@mail.com", authorities = {"OP_ACCESS_USER"})
     void saveCategory() {
 
         var user = new UserModel(userId);
@@ -100,7 +93,7 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
 
     @Test
     @Order(3)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(username = "email4@mail.com", authorities = {"OP_ACCESS_USER"})
     void getCategoriesByUser() {
         var categories = categoryService.getCategoriesByUser(request);
         assertThat(categories.size()).isNotEqualTo(0);
@@ -108,7 +101,7 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
 
     @Test
     @Order(4)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(username = "email4@mail.com", authorities = {"OP_ACCESS_USER"})
     void getParentCategoryById() {
         /* var parentCat =  */
         categoryService.getCategoryById(electronics.getId(), request);
@@ -119,14 +112,14 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
 
     @Test
     @Order(5)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(username = "email4@mail.com", authorities = {"OP_ACCESS_USER"})
     void deleteCategory() {
         categoryService.deleteCategory(electronics.getId(), request);
     }
 
     @Test
     @Order(6)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(username = "email4@mail.com", authorities = {"OP_ACCESS_USER"})
     void getUserAfterCatDelete() {
         var fetchedUser = userService.getUserInfo(userId, request);
         assertThat(fetchedUser).isNotNull();
@@ -135,7 +128,7 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
     //should return the object; data is being removed
     private HttpServletRequest setUpHeader(String email, Long userId) {
 
-        Map<String, String> headers = new HashMap<>();
+        var headers = new HashMap<String, String>();
         headers.put(null, "HTTP/1.1 200 OK");
         headers.put("Content-Type", "text/html");
 
@@ -149,8 +142,8 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
         headers.put("access_expiration", accessDate);
 
 
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        for (String key : headers.keySet())
+        var request = mock(HttpServletRequest.class);
+        for (var key : headers.keySet())
             when(request.getHeader(key)).thenReturn(headers.get(key));
 
         return request;

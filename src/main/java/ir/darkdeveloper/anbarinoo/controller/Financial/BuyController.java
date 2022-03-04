@@ -3,6 +3,7 @@ package ir.darkdeveloper.anbarinoo.controller.Financial;
 import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.FinancialModel;
 import ir.darkdeveloper.anbarinoo.service.Financial.BuyService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -13,15 +14,10 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/category/products/buy")
+@RequiredArgsConstructor
 public class BuyController {
 
     private final BuyService service;
-
-    @Autowired
-    public BuyController(BuyService service) {
-        this.service = service;
-    }
-
 
     @PostMapping("/save/")
     public ResponseEntity<?> saveBuy(@RequestBody BuyModel buy, HttpServletRequest req) {

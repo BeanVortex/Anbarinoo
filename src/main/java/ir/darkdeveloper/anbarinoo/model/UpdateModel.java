@@ -7,6 +7,7 @@ public interface UpdateModel<T> {
     default void update(T model) {
         // how works:
         // id = model.id != null || id == null ? model.id : id;
+        // useless but I like to keep it here
         var f1 = this.getClass().getDeclaredFields();
         var f2 = model.getClass().getDeclaredFields();
         try {

@@ -6,6 +6,7 @@ import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.Financial.DebtOrDemandRepo;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.exception.DataException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -20,7 +21,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class DebtOrDemandService {
 
     private final DebtOrDemandRepo repo;

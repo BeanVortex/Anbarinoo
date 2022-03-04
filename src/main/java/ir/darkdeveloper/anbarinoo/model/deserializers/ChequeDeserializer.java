@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 
 public class ChequeDeserializer extends StdDeserializer<ChequeModel> {
 
+    // do not delete
     public ChequeDeserializer() {
         this(null);
     }

@@ -19,7 +19,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import ir.darkdeveloper.anbarinoo.model.UserModel;
-import ir.darkdeveloper.anbarinoo.security.jwt.JwtAuth;
+import ir.darkdeveloper.anbarinoo.dto.LoginDto;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 
 import java.util.Optional;
@@ -40,16 +40,16 @@ public class UserController {
                                               HttpServletResponse response) throws Exception {
         if (!bindingResult.hasErrors())
             return new ResponseEntity<>(
-                    userMapper.userToDto(userService.signUpUser(user, response)),
-                    HttpStatus.CREATED);
+                    userMapper.userToDto(userService.signUpUser(user, response)), HttpStatus.CREATED);
+
         var errors = bindingResult.getFieldErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.toList());
         throw new BadRequestException(errors.toString());
     }
 
     @PostMapping("/login/")
-    public ResponseEntity<UserDto> loginUser(@RequestBody JwtAuth authModel, HttpServletResponse response) {
-        return ResponseEntity.ok(userMapper.userToDto(userService.loginUser(authModel, response)));
+    public ResponseEntity<UserDto> loginUser(@RequestBody LoginDto loginDto, HttpServletResponse response) {
+        return ResponseEntity.ok(userMapper.userToDto(userService.loginUser(loginDto, response)));
     }
 
     @GetMapping("/verify/")

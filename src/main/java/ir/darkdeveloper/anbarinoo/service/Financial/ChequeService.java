@@ -7,6 +7,7 @@ import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.Financial.ChequeRepo;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.exception.DataException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ChequeService {
 
     private final ChequeRepo repo;

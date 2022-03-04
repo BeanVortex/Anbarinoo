@@ -8,6 +8,7 @@ import ir.darkdeveloper.anbarinoo.repository.Financial.SellRepo;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.util.Financial.FinancialUtils;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.exception.DataException;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -24,20 +25,15 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Lazy))
 public class SellService {
 
     private final SellRepo repo;
     private final JwtUtils jwtUtils;
     private final ProductService productService;
+    @Lazy
     private final FinancialUtils fUtils;
 
-    public SellService(SellRepo repo, JwtUtils jwtUtils,
-                       ProductService productService, @Lazy FinancialUtils fUtils) {
-        this.repo = repo;
-        this.jwtUtils = jwtUtils;
-        this.productService = productService;
-        this.fUtils = fUtils;
-    }
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
@@ -183,7 +179,6 @@ public class SellService {
         sell.map(SellModel::getProduct)
                 .map(ProductModel::getId)
                 .orElseThrow(() -> new BadRequestException("Product id is null, Can't sell"));
-
 
         sell.ifPresent(sellModel -> sellId.ifPresentOrElse(sellModel::setId, () -> sellModel.setId(null)));
 
