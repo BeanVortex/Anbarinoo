@@ -2,9 +2,9 @@ package ir.darkdeveloper.anbarinoo.controller.Financial;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ir.darkdeveloper.anbarinoo.dto.FinancialDto;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
-import ir.darkdeveloper.anbarinoo.model.Financial.FinancialModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.CategoryService;
@@ -149,7 +149,7 @@ public record BuyControllerTest(UserService userService,
                 .count(BigDecimal.valueOf(8))
                 .tax(10)
                 .build();
-        from = LocalDateTime.now();
+        from = LocalDateTime.now().minusHours(1);
         mockMvc.perform(post("/api/category/products/buy/save/")
                         .header("refresh_token", refresh)
                         .header("access_token", access)
@@ -234,10 +234,8 @@ public record BuyControllerTest(UserService userService,
     @Order(8)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getAllSellRecordsOfProductFromDateTo() throws Exception {
-        to = LocalDateTime.now();
-        var financial = new FinancialModel();
-        financial.setFromDate(from);
-        financial.setToDate(to);
+        to = LocalDateTime.now().plusMinutes(1);
+        var financial = new FinancialDto(from, to);
         mockMvc.perform(post("/api/category/products/buy/get-by-product/date/{id}/",
                         productId)
                         .header("refresh_token", refresh)
@@ -245,22 +243,22 @@ public record BuyControllerTest(UserService userService,
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(mapToJson(financial)))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content[0].productId").value(is(productId), Long.class))
-                .andExpect(jsonPath("$.totalElements").value(is(1)))
-                .andDo(print());
+                .andExpect(jsonPath("$.totalElements").value(is(2)))
+        ;
     }
 
     @Test
     @Order(9)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getAllSellRecordsOfUserFromDateTo() throws Exception {
-        to = LocalDateTime.now();
-        var financial = new FinancialModel();
-        financial.setFromDate(from);
-        financial.setToDate(to);
+        to = LocalDateTime.now().plusMinutes(1);
+        var financial = new FinancialDto(from, to);
+
         mockMvc.perform(post("/api/category/products/buy/get-by-user/date/{id}/",
                         userId)
                         .header("refresh_token", refresh)
@@ -268,12 +266,13 @@ public record BuyControllerTest(UserService userService,
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(mapToJson(financial)))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content[0].productId").value(is(productId), Long.class))
-                .andExpect(jsonPath("$.totalElements").value(is(1)))
-                .andDo(print());
+                .andExpect(jsonPath("$.totalElements").value(is(2)))
+        ;
 
     }
 

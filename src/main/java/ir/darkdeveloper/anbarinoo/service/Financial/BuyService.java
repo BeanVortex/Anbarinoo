@@ -1,8 +1,8 @@
 package ir.darkdeveloper.anbarinoo.service.Financial;
 
+import ir.darkdeveloper.anbarinoo.dto.FinancialDto;
 import ir.darkdeveloper.anbarinoo.exception.*;
 import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
-import ir.darkdeveloper.anbarinoo.model.Financial.FinancialModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.repository.Financial.BuyRepo;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
@@ -98,7 +98,7 @@ public class BuyService {
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
-    public Page<BuyModel> getAllBuyRecordsOfUserFromDateTo(Long userId, Optional<FinancialModel> financial,
+    public Page<BuyModel> getAllBuyRecordsOfUserFromDateTo(Long userId, Optional<FinancialDto> financial,
                                                            HttpServletRequest req, Pageable pageable) {
         return exceptionHandlers(() -> {
             var from = fUtils.getFromDate(financial);
@@ -109,7 +109,7 @@ public class BuyService {
         });
     }
 
-    public Page<BuyModel> getAllBuyRecordsOfProductFromDateTo(Long productId, Optional<FinancialModel> financial,
+    public Page<BuyModel> getAllBuyRecordsOfProductFromDateTo(Long productId, Optional<FinancialDto> financial,
                                                               HttpServletRequest req, Pageable pageable) {
         return exceptionHandlers(() -> {
             var from = fUtils.getFromDate(financial);

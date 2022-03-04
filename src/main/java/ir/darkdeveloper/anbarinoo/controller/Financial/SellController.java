@@ -1,10 +1,9 @@
 package ir.darkdeveloper.anbarinoo.controller.Financial;
 
-import ir.darkdeveloper.anbarinoo.model.Financial.FinancialModel;
+import ir.darkdeveloper.anbarinoo.dto.FinancialDto;
 import ir.darkdeveloper.anbarinoo.model.Financial.SellModel;
 import ir.darkdeveloper.anbarinoo.service.Financial.SellService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +43,7 @@ public class SellController {
 
     @PostMapping("/get-by-product/date/{id}/")
     public ResponseEntity<?> getAllSellRecordsOfProductFromDateTo(@PathVariable("id") Long productId,
-                                                                  @RequestBody FinancialModel financial,
+                                                                  @RequestBody FinancialDto financial,
                                                                   HttpServletRequest req, Pageable pageable) {
         return ResponseEntity.ok(service.getAllSellRecordsOfProductFromDateTo(productId,
                 Optional.ofNullable(financial), req, pageable));
@@ -52,7 +51,7 @@ public class SellController {
 
     @PostMapping("/get-by-user/date/{id}/")
     public ResponseEntity<?> getAllSellRecordsOfUserFromDateTo(@PathVariable("id") Long userId,
-                                                               @RequestBody FinancialModel financial,
+                                                               @RequestBody FinancialDto financial,
                                                                HttpServletRequest req, Pageable pageable) {
         return ResponseEntity.ok(service.getAllSellRecordsOfUserFromDateTo(userId,
                 Optional.ofNullable(financial), req, pageable));

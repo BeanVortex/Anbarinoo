@@ -1,9 +1,8 @@
 package ir.darkdeveloper.anbarinoo.service.Financial;
 
-import ir.darkdeveloper.anbarinoo.model.Financial.FinancialModel;
+import ir.darkdeveloper.anbarinoo.dto.FinancialDto;
 import ir.darkdeveloper.anbarinoo.util.Financial.FinancialUtils;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,53 +22,38 @@ public class FinancialService {
 
 
     @PreAuthorize("hasAuthority('OP_ACCESS_USER')")
-    public FinancialModel getCosts(Optional<FinancialModel> financial, HttpServletRequest req, Pageable pageable) {
+    public FinancialDto getCosts(Optional<FinancialDto> financial, HttpServletRequest req, Pageable pageable) {
         var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
 
         var from = fUtils.getFromDate(financial);
         var to = fUtils.getToDate(financial);
-        var newFinancial = FinancialModel.builder()
-                .fromDate(from)
-                .toDate(to)
-                .build();
-
         var buyCosts = fUtils.getBuyCosts(financial, req, pageable, userId);
 
         var dodCosts = fUtils.getDodCosts(req, pageable, userId, from, to);
 
-        newFinancial.setCosts(buyCosts.get().add(dodCosts.get()));
-        return newFinancial;
+        return new FinancialDto(buyCosts.get().add(dodCosts.get()), null, from, to);
     }
 
 
     @PreAuthorize("hasAuthority('OP_ACCESS_USER')")
-    public FinancialModel getIncomes(Optional<FinancialModel> financial, HttpServletRequest req, Pageable pageable) {
+    public FinancialDto getIncomes(Optional<FinancialDto> financial, HttpServletRequest req, Pageable pageable) {
         var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
 
         var from = fUtils.getFromDate(financial);
         var to = fUtils.getToDate(financial);
-        var newFinancial = FinancialModel.builder()
-                .fromDate(from)
-                .toDate(to)
-                .build();
 
         var sellIncomes = fUtils.getSellIncomes(financial, req, pageable, userId);
         var dodIncomes = fUtils.getDodIncomes(req, pageable, userId, from, to);
 
-        newFinancial.setIncomes(sellIncomes.get().add(dodIncomes.get()));
-        return newFinancial;
+        return new FinancialDto(null, sellIncomes.get().add(dodIncomes.get()), from, to);
     }
 
     @PreAuthorize("hasAuthority('OP_ACCESS_USER')")
-    public FinancialModel getProfitOrLoss(Optional<FinancialModel> financial, HttpServletRequest req, Pageable pageable) {
+    public FinancialDto getProfitOrLoss(Optional<FinancialDto> financial, HttpServletRequest req, Pageable pageable) {
         var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
 
         var from = fUtils.getFromDate(financial);
         var to = fUtils.getToDate(financial);
-        var newFinancial = FinancialModel.builder()
-                .fromDate(from)
-                .toDate(to)
-                .build();
 
         var sellIncomes = fUtils.getSellIncomes(financial, req, pageable, userId);
         var dodIncomes = fUtils.getDodIncomes(req, pageable, userId, from, to);
@@ -78,16 +62,15 @@ public class FinancialService {
 
         var incomes = sellIncomes.get().add(dodIncomes.get());
         var costs = buyCosts.get().add(dodCosts.get());
+        var profit = BigDecimal.valueOf(0);
+        var loss = BigDecimal.valueOf(0);
 
         if (incomes.compareTo(costs) > 0)
-            newFinancial.setProfit(calculateProfit(incomes, costs));
+            profit = calculateProfit(incomes, costs);
         else if (incomes.compareTo(costs) < 0)
-            newFinancial.setLoss(calculateLoss(incomes, costs));
-        else {
-            newFinancial.setLoss(BigDecimal.valueOf(0));
-            newFinancial.setProfit(BigDecimal.valueOf(0));
-        }
-        return newFinancial;
+            loss = calculateLoss(incomes, costs);
+
+        return new FinancialDto(costs, incomes, profit, loss, from, to);
     }
 
 

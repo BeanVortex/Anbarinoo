@@ -1,9 +1,9 @@
 package ir.darkdeveloper.anbarinoo.controller.Financial;
 
 import ir.darkdeveloper.anbarinoo.dto.BuyDto;
+import ir.darkdeveloper.anbarinoo.dto.FinancialDto;
 import ir.darkdeveloper.anbarinoo.dto.mapper.BuyMapper;
 import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
-import ir.darkdeveloper.anbarinoo.model.Financial.FinancialModel;
 import ir.darkdeveloper.anbarinoo.service.Financial.BuyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -54,7 +54,7 @@ public class BuyController {
     @PostMapping("/get-by-product/date/{id}/")
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public ResponseEntity<Page<BuyDto>> getAllBuyRecordsOfProductFromDateTo(@PathVariable("id") Long productId,
-                                                                            @RequestBody FinancialModel financial,
+                                                                            @RequestBody FinancialDto financial,
                                                                             HttpServletRequest req, Pageable pageable) {
         return ResponseEntity.ok(service.getAllBuyRecordsOfProductFromDateTo(productId, Optional.ofNullable(financial),
                 req, pageable).map(mapper::buyToDto));
@@ -62,7 +62,7 @@ public class BuyController {
 
     @PostMapping("/get-by-user/date/{id}/")
     public ResponseEntity<Page<BuyDto>> getAllBuyRecordsOfUserFromDateTo(@PathVariable("id") Long userId,
-                                                                         @RequestBody FinancialModel financial,
+                                                                         @RequestBody FinancialDto financial,
                                                                          HttpServletRequest req, Pageable pageable) {
         return ResponseEntity.ok(service.getAllBuyRecordsOfUserFromDateTo(userId, Optional.ofNullable(financial),
                 req, pageable).map(mapper::buyToDto));

@@ -2,10 +2,10 @@ package ir.darkdeveloper.anbarinoo.controller.Financial;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ir.darkdeveloper.anbarinoo.dto.FinancialDto;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
-import ir.darkdeveloper.anbarinoo.model.Financial.FinancialModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.SellModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
@@ -40,7 +40,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -104,16 +103,17 @@ public record FinancialControllerTest(UserService userService,
     @Test
     @Order(1)
     @WithMockUser(username = "anonymousUser")
-    void saveUser() throws Exception {
+    void saveUser() {
         HttpServletResponse response = mock(HttpServletResponse.class);
-        var user = new UserModel();
-        user.setEmail("email@mail.com");
-        user.setAddress("address");
-        user.setDescription("desc");
-        user.setUserName("user n");
-        user.setPassword("pass12P+");
-        user.setPasswordRepeat("pass12P+");
-        user.setEnabled(true);
+        var user = UserModel.builder()
+                .email("email@mail.com")
+                .address("address")
+                .description("desc")
+                .userName("user n")
+                .password("pass12P+")
+                .passwordRepeat("pass12P+")
+                .enabled(true)
+                .build();
         userService.signUpUser(user, response);
         request = setUpHeader(user.getEmail(), user.getId());
     }
@@ -140,7 +140,7 @@ public record FinancialControllerTest(UserService userService,
                 .category(new CategoryModel(catId))
                 .tax(9)
                 .build();
-        fromDate = LocalDateTime.now();
+        fromDate = LocalDateTime.now().minusHours(1);
         productService.saveProduct(Optional.of(product), request);
         productId = product.getId();
     }
@@ -148,7 +148,7 @@ public record FinancialControllerTest(UserService userService,
     @RepeatedTest(5)
     @Order(4)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void saveBuy() throws InterruptedException {
+    void saveBuy() {
         var buy = BuyModel.builder()
                 .product(new ProductModel(productId))
                 .price(BigDecimal.valueOf(5000))
@@ -158,13 +158,12 @@ public record FinancialControllerTest(UserService userService,
         buyService.saveBuy(Optional.of(buy), false, request);
         assertThat(buy.getId()).isNotNull();
         buyId = buy.getId();
-        Thread.sleep(1000);
     }
 
     @RepeatedTest(5)
     @Order(5)
     @WithMockUser(authorities = "OP_ACCESS_USER")
-    void saveSell() throws InterruptedException {
+    void saveSell() {
         var sell = SellModel.builder()
                 .product(new ProductModel(productId))
                 .price(BigDecimal.valueOf(6000))
@@ -174,7 +173,6 @@ public record FinancialControllerTest(UserService userService,
         sellService.saveSell(Optional.of(sell), request);
         sellId = sell.getId();
         assertThat(sell.getId()).isNotNull();
-        Thread.sleep(100);
     }
 
     @Test
@@ -200,10 +198,8 @@ public record FinancialControllerTest(UserService userService,
     @Order(8)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getCosts() throws Exception {
-        var financial = new FinancialModel();
-        financial.setFromDate(fromDate);
-        toDate = LocalDateTime.now();
-        financial.setToDate(toDate);
+        toDate = LocalDateTime.now().plusMinutes(1);
+        var financial = new FinancialDto(fromDate, toDate);
 
         var cost1 = BigDecimal.valueOf(50).multiply(BigDecimal.valueOf(500));
         var cost2 = BigDecimal.valueOf(5000).multiply(BigDecimal.valueOf(8));
@@ -230,9 +226,7 @@ public record FinancialControllerTest(UserService userService,
     @Order(9)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getIncomes() throws Exception {
-        var financial = new FinancialModel();
-        financial.setFromDate(fromDate);
-        financial.setToDate(toDate);
+        var financial = new FinancialDto(fromDate, toDate);
         var income = BigDecimal.valueOf(6000).multiply(BigDecimal.valueOf(4));
 
         var tax = income.multiply(BigDecimal.valueOf(9, 2));
@@ -317,10 +311,8 @@ public record FinancialControllerTest(UserService userService,
     @Order(15)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getCostsAfterBuyAndSellUpdates() throws Exception {
-        var financial = new FinancialModel();
-        financial.setFromDate(fromDate);
-        toDate = LocalDateTime.now();
-        financial.setToDate(toDate);
+        toDate = LocalDateTime.now().plusMinutes(1);
+        var financial = new FinancialDto(fromDate, toDate);
 
         var cost1 = BigDecimal.valueOf(50).multiply(BigDecimal.valueOf(500));
         var cost2 = BigDecimal.valueOf(5000).multiply(BigDecimal.valueOf(8));
@@ -351,9 +343,7 @@ public record FinancialControllerTest(UserService userService,
     @Order(16)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getIncomesAfterBuyAndSellUpdates() throws Exception {
-        var financial = new FinancialModel();
-        financial.setFromDate(fromDate);
-        financial.setToDate(toDate);
+        var financial = new FinancialDto(fromDate, toDate);
 
         var income1 = BigDecimal.valueOf(6000).multiply(BigDecimal.valueOf(4));
         var income2 = BigDecimal.valueOf(9000).multiply(BigDecimal.valueOf(3));
@@ -382,9 +372,8 @@ public record FinancialControllerTest(UserService userService,
     @Order(17)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getProfitAndLoss() throws Exception {
-        var financial = new FinancialModel();
-        financial.setFromDate(fromDate);
-        financial.setToDate(toDate);
+        var financial = new FinancialDto(fromDate, toDate);
+
 
         var income1 = BigDecimal.valueOf(6000).multiply(BigDecimal.valueOf(4));
         var income2 = BigDecimal.valueOf(9000).multiply(BigDecimal.valueOf(3));
@@ -447,7 +436,7 @@ public record FinancialControllerTest(UserService userService,
     //should return the object; data is being removed
     private HttpServletRequest setUpHeader(String email, Long userId) {
 
-        Map<String, String> headers = new HashMap<>();
+        var headers = new HashMap<String, String>();
         headers.put(null, "HTTP/1.1 200 OK");
         headers.put("Content-Type", "text/html");
 
@@ -461,8 +450,8 @@ public record FinancialControllerTest(UserService userService,
         headers.put("access_expiration", accessDate);
 
 
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        for (String key : headers.keySet())
+        var request = mock(HttpServletRequest.class);
+        for (var key : headers.keySet())
             when(request.getHeader(key)).thenReturn(headers.get(key));
 
         return request;

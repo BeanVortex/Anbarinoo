@@ -1,7 +1,8 @@
 package ir.darkdeveloper.anbarinoo.util.Financial;
 
+import ir.darkdeveloper.anbarinoo.config.StartupConfig;
+import ir.darkdeveloper.anbarinoo.dto.FinancialDto;
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
-import ir.darkdeveloper.anbarinoo.model.Financial.FinancialModel;
 import ir.darkdeveloper.anbarinoo.service.Financial.BuyService;
 import ir.darkdeveloper.anbarinoo.service.Financial.DebtOrDemandService;
 import ir.darkdeveloper.anbarinoo.service.Financial.SellService;
@@ -50,7 +51,7 @@ public class FinancialUtils {
     }
 
     @NotNull
-    public AtomicReference<BigDecimal> getBuyCosts(Optional<FinancialModel> financial, HttpServletRequest req,
+    public AtomicReference<BigDecimal> getBuyCosts(Optional<FinancialDto> financial, HttpServletRequest req,
                                                    Pageable pageable, Long userId) {
         var buys = buyService.getAllBuyRecordsOfUserFromDateTo(userId, financial,
                 req, pageable).getContent();
@@ -68,7 +69,7 @@ public class FinancialUtils {
     }
 
     @NotNull
-    public AtomicReference<BigDecimal> getSellIncomes(Optional<FinancialModel> financial, HttpServletRequest req,
+    public AtomicReference<BigDecimal> getSellIncomes(Optional<FinancialDto> financial, HttpServletRequest req,
                                                       Pageable pageable, Long userId) {
         var sells = sellService.getAllSellRecordsOfUserFromDateTo(userId, financial,
                 req, pageable).getContent();
@@ -86,15 +87,17 @@ public class FinancialUtils {
         return incomes;
     }
 
-    public LocalDateTime getFromDate(Optional<FinancialModel> financial) {
+    public LocalDateTime getFromDate(Optional<FinancialDto> financial) {
         return financial
-                .map(FinancialModel::getFromDate)
+                .map(FinancialDto::fromDate)
+                .map(date -> LocalDateTime.parse(date, StartupConfig.DATE_FORMATTER))
                 .orElseThrow(() -> new BadRequestException("From date must not be null"));
     }
 
-    public LocalDateTime getToDate(Optional<FinancialModel> financial) {
+    public LocalDateTime getToDate(Optional<FinancialDto> financial) {
         return financial
-                .map(FinancialModel::getToDate)
+                .map(FinancialDto::toDate)
+                .map(date -> LocalDateTime.parse(date, StartupConfig.DATE_FORMATTER))
                 .orElseThrow(() -> new BadRequestException("To date must not be null"));
     }
 

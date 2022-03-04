@@ -1,10 +1,10 @@
 package ir.darkdeveloper.anbarinoo.config;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
@@ -20,12 +20,24 @@ import ir.darkdeveloper.anbarinoo.service.UserRolesService;
 public class StartupConfig {
 
     private final UserRolesService rolesService;
+    public static final String DATE_FORMAT = "EE MMM dd yyyy HH:mm:ss";
+    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
+
+    @Bean
+    public String dateFormat() {
+        return DATE_FORMAT;
+    }
+
+    @Bean
+    public DateTimeFormatter dateFormatter() {
+        return DATE_FORMATTER;
+    }
 
     @Value("${user.email-verification-disabled}")
     private Boolean userEnabled;
 
     @Bean
-    public Boolean userEnabled(){
+    public Boolean userEnabled() {
         return userEnabled;
     }
 

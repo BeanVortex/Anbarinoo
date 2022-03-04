@@ -1,11 +1,22 @@
 spring:
-  jpa.hibernate:
-    ddl-auto: create
-  datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:db
-    username: sa
-    password: sa
+  profiles:
+    active: h2
+  mail:
+    host: localhost
+    username: darkd
+    password: 1234
+    port: 1025
+    properties:
+      mail:
+        smtp:
+          ssl:
+            trust: "*"
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
   security:
     oauth2:
       client:
@@ -43,22 +54,40 @@ jwt:
 
 server.domain_name: https://www.anbarinoo.ir
 
-
-spring.mail:
-  host: localhost
-  username: darkd
-  password: 1234
-  port: 1025
-  properties:
-    mail:
-      smtp:
-        ssl:
-          trust: "*"
-        auth: true
-        starttls:
-          enable: true
-        connectiontimeout: 5000
-        timeout: 3000
-        writetimeout: 5000
+---
+spring:
+  config:
+    activate:
+      on-profile: h2
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:db
+    username: sa
+    password: sa
 
 
+---
+spring:
+  config:
+    activate:
+      on-profile: postgres
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyHbmImpl
+        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        #format_sql: true
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/anbarinoo
+    username: darkdeveloper
+    password: 1234
