@@ -115,7 +115,7 @@ public record CategoryControllerTest(UserService userService,
                     JSONObject jsonObject = new JSONObject(result.getResponse().getContentAsString());
                     catId = jsonObject.getLong("id");
                 })
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
     // should not save product
@@ -135,7 +135,7 @@ public record CategoryControllerTest(UserService userService,
                 )
                 .andDo(print())
                 .andExpect(jsonPath("$.products").isEmpty())
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
     @Test

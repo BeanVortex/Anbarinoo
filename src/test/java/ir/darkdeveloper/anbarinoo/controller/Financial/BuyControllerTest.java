@@ -157,7 +157,7 @@ public record BuyControllerTest(UserService userService,
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.productId").value(is(productId), Long.class))
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.tax").value(is(10)))
