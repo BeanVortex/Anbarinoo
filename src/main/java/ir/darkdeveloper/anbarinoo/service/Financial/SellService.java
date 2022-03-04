@@ -36,7 +36,6 @@ public class SellService {
 
 
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public SellModel saveSell(Optional<SellModel> sell, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             checkSellData(sell, Optional.empty());
@@ -47,7 +46,6 @@ public class SellService {
     }
 
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public SellModel updateSell(Optional<SellModel> sell, Long sellId, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             checkSellData(sell, Optional.of(sellId));
@@ -60,7 +58,6 @@ public class SellService {
         });
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public Page<SellModel> getAllSellRecordsOfProduct(Long productId, HttpServletRequest req, Pageable pageable) {
         return exceptionHandlers(() -> {
             // checked the user is same user in this method
@@ -69,7 +66,6 @@ public class SellService {
         });
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public Page<SellModel> getAllSellRecordsOfUser(Long userId, HttpServletRequest req, Pageable pageable) {
         return exceptionHandlers(() -> {
             checkUserIsSameUserForRequest(null, userId, req, "fetch");
@@ -77,7 +73,6 @@ public class SellService {
         });
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public SellModel getSell(Long sellId, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var foundSellRecord = repo.findById(sellId)
@@ -96,7 +91,7 @@ public class SellService {
             checkUserIsSameUserForRequest(sell.getProduct(), null, req, "delete sell record of");
             repo.deleteById(sellId);
             deleteProductCount(sell, req);
-            return ResponseEntity.ok("Deleted the sell record");
+            return ResponseEntity.ok("Sell record Deleted");
         });
     }
 

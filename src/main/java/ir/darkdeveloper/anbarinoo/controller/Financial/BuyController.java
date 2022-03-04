@@ -2,7 +2,7 @@ package ir.darkdeveloper.anbarinoo.controller.Financial;
 
 import ir.darkdeveloper.anbarinoo.dto.BuyDto;
 import ir.darkdeveloper.anbarinoo.dto.FinancialDto;
-import ir.darkdeveloper.anbarinoo.dto.mapper.BuyMapper;
+import ir.darkdeveloper.anbarinoo.dto.mapper.BuySellMapper;
 import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
 import ir.darkdeveloper.anbarinoo.service.Financial.BuyService;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import java.util.Optional;
 public class BuyController {
 
     private final BuyService service;
-    private final BuyMapper mapper;
+    private final BuySellMapper mapper;
 
     @PostMapping("/save/")
     public ResponseEntity<BuyDto> saveBuy(@RequestBody BuyModel buy, HttpServletRequest req) {

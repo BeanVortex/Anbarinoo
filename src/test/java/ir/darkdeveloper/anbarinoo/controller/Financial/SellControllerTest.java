@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
@@ -153,8 +152,8 @@ public record SellControllerTest(UserService userService,
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.product").value(is(productId), Long.class))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.productId").value(is(productId), Long.class))
                 .andExpect(jsonPath("$").isMap())
                 .andDo(result -> {
                     var obj = new JSONObject(result.getResponse().getContentAsString());
@@ -179,8 +178,8 @@ public record SellControllerTest(UserService userService,
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.product").value(is(productId), Long.class))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.productId").value(is(productId), Long.class))
                 .andExpect(jsonPath("$").isMap())
                 .andDo(result -> {
                     var obj = new JSONObject(result.getResponse().getContentAsString());
@@ -271,7 +270,7 @@ public record SellControllerTest(UserService userService,
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content[0].product").value(is(productId), Long.class))
+                .andExpect(jsonPath("$.content[0].productId").value(is(productId), Long.class))
                 .andExpect(jsonPath("$.totalElements").value(is(2)))
         ;
     }
@@ -295,7 +294,7 @@ public record SellControllerTest(UserService userService,
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content[0].product").value(is(productId), Long.class))
+                .andExpect(jsonPath("$.content[0].productId").value(is(productId), Long.class))
                 .andExpect(jsonPath("$.totalElements").value(is(2)))
         ;
 
@@ -313,7 +312,7 @@ public record SellControllerTest(UserService userService,
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.product").value(is(productId), Long.class))
+                .andExpect(jsonPath("$.productId").value(is(productId), Long.class))
                 .andExpect(jsonPath("$.id").value(is(sellId), Long.class))
                 .andExpect(jsonPath("$.count").value(is(BigDecimal.valueOf(15.0)), BigDecimal.class))
                 .andDo(print());
@@ -378,7 +377,7 @@ public record SellControllerTest(UserService userService,
     //should return the object; data is being removed
     private HttpServletRequest setUpHeader(String email, Long userId) {
 
-        Map<String, String> headers = new HashMap<>();
+        var headers = new HashMap<String, String>();
         headers.put(null, "HTTP/1.1 200 OK");
         headers.put("Content-Type", "text/html");
 
@@ -392,8 +391,8 @@ public record SellControllerTest(UserService userService,
         headers.put("access_expiration", accessDate);
 
 
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        for (String key : headers.keySet())
+        var request = mock(HttpServletRequest.class);
+        for (var key : headers.keySet())
             when(request.getHeader(key)).thenReturn(headers.get(key));
 
         return request;

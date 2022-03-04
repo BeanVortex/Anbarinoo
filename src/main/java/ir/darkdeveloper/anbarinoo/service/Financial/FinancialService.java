@@ -21,7 +21,6 @@ public class FinancialService {
     private final FinancialUtils fUtils;
 
 
-    @PreAuthorize("hasAuthority('OP_ACCESS_USER')")
     public FinancialDto getCosts(Optional<FinancialDto> financial, HttpServletRequest req, Pageable pageable) {
         var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
 
@@ -35,7 +34,6 @@ public class FinancialService {
     }
 
 
-    @PreAuthorize("hasAuthority('OP_ACCESS_USER')")
     public FinancialDto getIncomes(Optional<FinancialDto> financial, HttpServletRequest req, Pageable pageable) {
         var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
 
@@ -48,7 +46,6 @@ public class FinancialService {
         return new FinancialDto(null, sellIncomes.get().add(dodIncomes.get()), from, to);
     }
 
-    @PreAuthorize("hasAuthority('OP_ACCESS_USER')")
     public FinancialDto getProfitOrLoss(Optional<FinancialDto> financial, HttpServletRequest req, Pageable pageable) {
         var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
 
