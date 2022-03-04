@@ -28,10 +28,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.mock;
@@ -66,8 +67,8 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
 
     @BeforeAll
     static void setUp() {
-        Authentication authentication = Mockito.mock(Authentication.class);
-        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        var authentication = Mockito.mock(Authentication.class);
+        var securityContext = Mockito.mock(SecurityContext.class);
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         request = mock(HttpServletRequest.class);
@@ -84,16 +85,17 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
     @Test
     @Order(1)
     @WithMockUser(username = "anonymousUser")
-    void saveUser() throws Exception {
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        var user = new UserModel();
-        user.setEmail("email@mail.com");
-        user.setAddress("address");
-        user.setDescription("desc");
-        user.setUserName("user n");
-        user.setPassword("pass12P+");
-        user.setPasswordRepeat("pass12P+");
-        user.setEnabled(true);
+    void saveUser() {
+        var response = mock(HttpServletResponse.class);
+        var user = UserModel.builder()
+                .email("email@mail.com")
+                .address("address")
+                .description("desc")
+                .userName("user n")
+                .password("pass12P+")
+                .passwordRepeat("pass12P+")
+                .enabled(true)
+                .build();
         userService.signUpUser(user, response);
         userId = user.getId();
         request = setUpHeader(user.getEmail(), userId);
@@ -123,7 +125,9 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
                         .content(mapToJson(cheque))
                 )
                 .andDo(print())
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.isCheckedOut").value(false))
+                .andExpect(jsonPath("$.isDebt").value(false))
                 .andDo(result -> {
                     var jsonObject = new JSONObject(result.getResponse().getContentAsString());
                     chequeId = jsonObject.getLong("id");
@@ -175,7 +179,8 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
                 .andExpect(jsonPath("$.nameOf").value(is("Me2")))
                 .andDo(result -> {
                     var om = new ObjectMapper();
-                    cheque.set(om.readValue(result.getResponse().getContentAsString(), ChequeModel.class));
+                    var m = om.readValue(result.getResponse().getContentAsString(), ChequeModel.class);
+                    cheque.set(m);
                 })
         ;
 
@@ -192,9 +197,15 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
                 .andExpect(jsonPath("$.content[0].nameOf").value(is(cheque.get().getNameOf())))
                 .andExpect(jsonPath("$.content[0].payTo").value(is(cheque.get().getPayTo())))
                 .andExpect(jsonPath("$.content[0].user").value(is(cheque.get().getUser().getId()), Long.class))
-                .andExpect(jsonPath("$.content[0].issuedAt").value(is(cheque.get().getIssuedAt().toString())))
-                .andExpect(jsonPath("$.content[0].validTill").value(is(cheque.get().getValidTill().toString())))
-        ;
+                .andExpect(result -> {
+                    var obj = new JSONObject(result.getResponse().getContentAsString());
+                    var obj0 = obj.getJSONArray("content").getJSONObject(0);
+                    var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+                    var issuedAt = LocalDateTime.parse(obj0.getString("issuedAt")).format(formatter);
+                    var validTill = LocalDateTime.parse(obj0.getString("validTill")).format(formatter);
+                    assertThat(issuedAt).isEqualTo(cheque.get().getIssuedAt().toString());
+                    assertThat(validTill).isEqualTo(cheque.get().getValidTill().toString());
+                });
 
     }
 
@@ -210,9 +221,9 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].amount").value(is(750.06)))
-                .andExpect(jsonPath("$[0].isCheckedOut").value(is(true)))
-                .andExpect(jsonPath("$[0].nameOf").value(is("Me2")))
+                .andExpect(jsonPath("$.cheques[0].amount").value(is(750.06)))
+                .andExpect(jsonPath("$.cheques[0].isCheckedOut").value(is(true)))
+                .andExpect(jsonPath("$.cheques[0].nameOf").value(is("Me2")))
         ;
 
     }
@@ -230,9 +241,9 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].amount").value(is(750.06)))
-                .andExpect(jsonPath("$[0].isCheckedOut").value(is(true)))
-                .andExpect(jsonPath("$[0].nameOf").value(is("Me2")))
+                .andExpect(jsonPath("$.cheques[0].amount").value(is(750.06)))
+                .andExpect(jsonPath("$.cheques[0].isCheckedOut").value(is(true)))
+                .andExpect(jsonPath("$.cheques[0].nameOf").value(is("Me2")))
         ;
     }
 
@@ -272,12 +283,12 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
     //should return the object; data is being removed
     private HttpServletRequest setUpHeader(String email, Long userId) {
 
-        Map<String, String> headers = new HashMap<>();
+        var headers = new HashMap<String, String>();
         headers.put(null, "HTTP/1.1 200 OK");
         headers.put("Content-Type", "text/html");
 
-        String refreshToken = jwtUtils.generateRefreshToken(email, userId);
-        String accessToken = jwtUtils.generateAccessToken(email);
+        var refreshToken = jwtUtils.generateRefreshToken(email, userId);
+        var accessToken = jwtUtils.generateAccessToken(email);
         var refreshDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
         var accessDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
         headers.put("refresh_token", refreshToken);
@@ -286,8 +297,8 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
         headers.put("access_expiration", accessDate);
 
 
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        for (String key : headers.keySet())
+        var request = mock(HttpServletRequest.class);
+        for (var key : headers.keySet())
             when(request.getHeader(key)).thenReturn(headers.get(key));
 
         return request;

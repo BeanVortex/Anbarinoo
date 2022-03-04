@@ -33,7 +33,6 @@ public class ChequeService {
      * Saving a new cheque will save in debt or demand model too
      */
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ChequeModel saveCheque(Optional<ChequeModel> cheque, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             cheque.orElseThrow(() -> new BadRequestException("Cheque can't be null"));
@@ -51,7 +50,6 @@ public class ChequeService {
      * Updating a cheque will update in debt or demand model too
      */
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ChequeModel updateCheque(Optional<ChequeModel> cheque, Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             cheque.orElseThrow(() -> new BadRequestException("Cheque can't be null"));
@@ -72,7 +70,6 @@ public class ChequeService {
      * Deleting a cheque will delete in debt or demand model too
      */
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ResponseEntity<?> deleteCheque(Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var foundCheque = repo.findById(id)
@@ -80,11 +77,10 @@ public class ChequeService {
             checkUserIsSameUserForRequest(foundCheque.getUser().getId(), req, "delete");
             repo.deleteById(id);
             dodService.deleteDODByChequeId(id, req);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return ResponseEntity.ok("Deleted cheque");
         });
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public List<ChequeModel> getChequesByUserId(Long userId, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             checkUserIsSameUserForRequest(userId, req, "fetch");
@@ -92,7 +88,6 @@ public class ChequeService {
         });
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ChequeModel getCheque(Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var cheque = repo.findById(id)
@@ -102,7 +97,6 @@ public class ChequeService {
         });
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public List<ChequeModel> findByPayToContains(String payTo, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var fetchedData = repo.findChequeModelByPayToContains(payTo);
