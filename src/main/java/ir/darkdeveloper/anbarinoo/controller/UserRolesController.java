@@ -2,13 +2,8 @@ package ir.darkdeveloper.anbarinoo.controller;
 
 import java.util.List;
 
-import ir.darkdeveloper.anbarinoo.dto.UserRoleDto;
-import ir.darkdeveloper.anbarinoo.dto.mapper.UserRoleMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,8 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ir.darkdeveloper.anbarinoo.dto.UserRoleDto;
+import ir.darkdeveloper.anbarinoo.dto.mapper.UserRoleMapper;
 import ir.darkdeveloper.anbarinoo.model.UserRole;
 import ir.darkdeveloper.anbarinoo.service.UserRolesService;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/user/role")

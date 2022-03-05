@@ -5,7 +5,6 @@ import javax.servlet.http.HttpServletRequest;
 import ir.darkdeveloper.anbarinoo.dto.CategoryDto;
 import ir.darkdeveloper.anbarinoo.dto.mapper.CategoryMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

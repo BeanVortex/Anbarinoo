@@ -1,6 +1,5 @@
 package ir.darkdeveloper.anbarinoo.service.Financial;
 
-import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.DebtOrDemandModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.UserService;

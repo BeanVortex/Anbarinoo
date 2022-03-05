@@ -211,7 +211,8 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isEmpty());
     }
 
     @Test

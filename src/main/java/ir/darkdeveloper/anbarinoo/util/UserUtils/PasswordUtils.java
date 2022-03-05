@@ -2,7 +2,6 @@ package ir.darkdeveloper.anbarinoo.util.UserUtils;
 
 import ir.darkdeveloper.anbarinoo.exception.PasswordException;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;

@@ -11,8 +11,6 @@ import ir.darkdeveloper.anbarinoo.model.Auth.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.UserRepo;
 
-import java.util.Optional;
-
 @Service
 public class OAuth2UserService extends DefaultOAuth2UserService {
 

@@ -8,8 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 
-import java.util.List;
-import java.util.Optional;
 
 
 @Repository

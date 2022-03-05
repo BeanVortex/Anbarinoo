@@ -1,12 +1,10 @@
 package ir.darkdeveloper.anbarinoo.dto;
 
-import ir.darkdeveloper.anbarinoo.config.StartupConfig;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
+import ir.darkdeveloper.anbarinoo.config.StartupConfig;
 
 public record FinancialDto(BigDecimal costs, BigDecimal incomes,
                            BigDecimal profit, BigDecimal loss,

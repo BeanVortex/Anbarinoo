@@ -1,9 +1,6 @@
 package ir.darkdeveloper.anbarinoo.dto;
 
-import ir.darkdeveloper.anbarinoo.model.CategoryModel;
-
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public record ProductDto(Long id, Boolean canUpdate, String name, String description,
