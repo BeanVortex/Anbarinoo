@@ -63,8 +63,8 @@ public record CategoryControllerTest(UserService userService,
 
     @BeforeAll
     static void setUp() {
-        Authentication authentication = Mockito.mock(Authentication.class);
-        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        var authentication = Mockito.mock(Authentication.class);
+        var securityContext = Mockito.mock(SecurityContext.class);
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         request = mock(HttpServletRequest.class);
@@ -82,7 +82,7 @@ public record CategoryControllerTest(UserService userService,
     @Order(1)
     @WithMockUser(username = "anonymousUser")
     void saveUser()  {
-        HttpServletResponse response = mock(HttpServletResponse.class);
+        var response = mock(HttpServletResponse.class);
         var user = UserModel.builder()
                 .email("email@mail.com")
                 .address("address")

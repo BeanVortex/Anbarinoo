@@ -9,7 +9,6 @@ import ir.darkdeveloper.anbarinoo.service.Financial.BuyService;
 import ir.darkdeveloper.anbarinoo.util.IOUtils;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.ProductUtils;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.exception.DataException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -107,12 +105,7 @@ public class ProductService {
     public Page<ProductModel> findByNameContains(String name, Pageable pageable, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
-            var foundData = repo
-                    .findByNameContainsAndCategoryUserId(name, userId, pageable);
-            foundData.map(Page::getContent)
-                    .map(list -> list.isEmpty() ? null : list.get(0))
-                    .orElseThrow(() -> new NoContentException("This product does not exist"));
-            return foundData.get();
+            return repo.findByNameContainsAndUserId(name, userId, pageable);
         });
     }
 
@@ -129,7 +122,7 @@ public class ProductService {
     public Page<ProductModel> getAllProducts(Pageable pageable, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
-            return repo.findAllByCategoryUserId(userId, pageable);
+            return repo.findAllByUserId(userId, pageable);
         });
     }
 

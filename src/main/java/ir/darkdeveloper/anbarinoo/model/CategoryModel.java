@@ -14,24 +14,30 @@ import java.util.List;
 @Table(name = "categories")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@ToString
 public class CategoryModel {
 
     @Id
     @GeneratedValue
+    @ToString.Include
     private Long id;
 
     @Column(nullable = false)
+    @ToString.Include
     private String name;
-
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
 //    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 //    @JsonIdentityReference(alwaysAsId = true)
+    @ToString.Include
     private UserModel user;
+
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_id")
+    @ToString.Exclude
     private CategoryModel parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE)

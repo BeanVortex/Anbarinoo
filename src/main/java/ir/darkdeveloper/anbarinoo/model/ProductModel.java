@@ -63,8 +63,8 @@ public class ProductModel implements UpdateModel<ProductModel> {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cat_id")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+//    @ToString.Exclude
+//    @EqualsAndHashCode.Exclude
     private CategoryModel category;
 
 
