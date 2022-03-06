@@ -26,6 +26,7 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel> {
 
     @Id

@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -104,17 +106,16 @@ public class UserService implements UserDetailsService {
     }
 
     public Page<UserModel> allUsers(Pageable pageable) {
-        return repo.findAll(pageable);
+        return repo.getAll(pageable);
     }
 
     @Transactional
     public UserModel loginUser(LoginDto loginDto, HttpServletResponse response) {
         return exceptionHandlers(() -> {
             if (loginDto.username().equals(adminUser.getUsername()))
-                userAuthUtils.authenticateUser(loginDto, null, null, response);
+                userAuthUtils.authenticateUser(loginDto, null, response);
             else
-                userAuthUtils.authenticateUser(loginDto, userAuthUtils.getUserIdByUsernameOrEmail(loginDto.username()), null,
-                        response);
+                userAuthUtils.authenticateUser(loginDto, null, response);
             return repo.findByEmailOrUsername(loginDto.username())
                     .orElseThrow(() -> new NoContentException("User does not exist"));
         });
@@ -132,7 +133,7 @@ public class UserService implements UserDetailsService {
 
     public UserModel getUserInfo(Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
-            var user = repo.findUserById(id).orElseThrow(() -> new NoContentException("User does not exist"));
+            var user = repo.findById(id).orElseThrow(() -> new NoContentException("User does not exist"));
             checkUserIsSameUserForRequest(id, req, "fetch");
             return user;
         });
@@ -155,7 +156,7 @@ public class UserService implements UserDetailsService {
         var model = verificationService.findByToken(token).orElseThrow(() -> new InternalServerException("Link does not exists"));
         if (model.getExpiresAt().isAfter(LocalDateTime.now())) {
             model.setVerifiedAt(LocalDateTime.now());
-            repo.trueEnabledById(model.getUser().getId());
+            repo.updateEnabledById(model.getUser().getId(), true);
             verificationService.saveToken(model);
             return new ResponseEntity<>("Email Successfully verified", HttpStatus.OK);
         } else

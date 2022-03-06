@@ -57,7 +57,7 @@ public class Operations {
             user.get().setProfileImage(null);
             user.get().setShopImage(null);
         }
-        var foundUser = repo.findUserById(id).orElseThrow(() -> new NoContentException("User not found"));
+        var foundUser = repo.findById(id).orElseThrow(() -> new NoContentException("User not found"));
         passwordUtils.updatePasswordUsingPrevious(user, foundUser);
         foundUser.update(user.get());
         return foundUser;
@@ -65,7 +65,7 @@ public class Operations {
 
     public UserModel updateUserImages(Optional<UserModel> user, Long id) {
         user.orElseThrow(() -> new BadRequestException("User can't be null"));
-        var foundUser = repo.findUserById(id).orElseThrow(() -> new NoContentException("User not found"));
+        var foundUser = repo.findById(id).orElseThrow(() -> new NoContentException("User not found"));
         try {
             ioUtils.updateUserImages(user, foundUser);
         } catch (IOException e) {
@@ -77,7 +77,7 @@ public class Operations {
     }
 
     public UserModel updateDeleteUserImages(Optional<UserModel> user, Long id) {
-        var foundUser = repo.findUserById(id)
+        var foundUser = repo.findById(id)
                 .orElseThrow(() -> new NoContentException("User not found"));
         try {
             ioUtils.updateDeleteUserImages(user, foundUser);

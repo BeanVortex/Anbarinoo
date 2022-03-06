@@ -70,16 +70,15 @@ public class UserAuthUtils {
         if (!user.getEnabled())
             operations.sendEmail(user);
         else
-            authenticateUser(new LoginDto(user.getEmail(), rawPass), user.getId(), rawPass, response);
+            authenticateUser(new LoginDto(user.getEmail(), rawPass), rawPass, response);
 
     }
 
     /**
      * @param loginDto has username and password (LoginDto)
-     * @param userId   for super admin, pass null
      * @param rawPass  for super admin, pass null
      */
-    public void authenticateUser(LoginDto loginDto, Long userId, String rawPass, HttpServletResponse response) {
+    public void authenticateUser(LoginDto loginDto, String rawPass, HttpServletResponse response) {
         var username = loginDto.username();
         var password = loginDto.password();
 
@@ -110,8 +109,8 @@ public class UserAuthUtils {
             rModel.setUserId(adminUser.getId());
             rModel.setId(refreshService.getIdByUserId(adminUser.getId()));
         } else {
-            rModel.setId(refreshService.getIdByUserId(userId));
-            rModel.setUserId(getUserIdByUsernameOrEmail(username));
+            rModel.setId(refreshService.getIdByUserId(user.getId()));
+            rModel.setUserId(user.getId());
         }
 
         var accessToken = jwtUtils.generateAccessToken(username);
@@ -134,9 +133,6 @@ public class UserAuthUtils {
 //        response.addHeader("access_expiration", accessDate);
     }
 
-    public Long getUserIdByUsernameOrEmail(String username) {
-        return repo.findUserIdByUsername(username);
-    }
 
     public Optional<? extends UserDetails> loadUserByUsername(String username) {
         if (username.equals(adminUser.getUsername())) {
