@@ -6,15 +6,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Setter
 @ToString
 @Entity
 @Table(name = "tokens")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class RefreshModel {
 
     @Id
@@ -25,5 +26,4 @@ public class RefreshModel {
     private Long userId;
 
     private String accessToken;
-
 }

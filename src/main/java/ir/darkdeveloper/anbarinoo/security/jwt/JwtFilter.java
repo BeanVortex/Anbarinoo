@@ -66,19 +66,18 @@ public class JwtFilter extends OncePerRequestFilter {
     private void setUpHeader(HttpServletResponse response, String accessToken, String username,
                              Long userId) {
 
-        String newAccessToken;
 
         // if this didn't execute, it means the access token is still valid
         if (jwtUtils.isTokenExpired(accessToken)) {
             //db query
-            var storedAccessToken = refreshService.getRefreshByUserId(userId).getAccessToken();
+            var storedRefreshModel = refreshService.getRefreshByUserId(userId);
+            var storedAccessToken = storedRefreshModel.getAccessToken();
             if (accessToken.equals(storedAccessToken)) {
-                newAccessToken = jwtUtils.generateAccessToken(username);
+                var newAccessToken = jwtUtils.generateAccessToken(username);
                 var refreshModel = new RefreshModel();
                 refreshModel.setAccessToken(newAccessToken);
                 refreshModel.setUserId(userId);
-                //db query
-                refreshModel.setId(refreshService.getIdByUserId(userId));
+                refreshModel.setId(storedRefreshModel.getId());
                 // db query
                 refreshService.saveToken(refreshModel);
                 response.addHeader("access_token", newAccessToken);

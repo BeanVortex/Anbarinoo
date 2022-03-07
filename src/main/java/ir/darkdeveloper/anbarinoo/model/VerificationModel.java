@@ -39,11 +39,8 @@ public class VerificationModel {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    // Format that js Date object understand
-    @JsonFormat(pattern = "EE MMM dd yyyy HH:mm:ss")
     private LocalDateTime expiresAt;
 
-    @JsonFormat(pattern = "EE MMM dd yyyy HH:mm:ss")
     private LocalDateTime verifiedAt;
 
     public VerificationModel(String token, UserModel user, LocalDateTime expiresAt) {
