@@ -3,11 +3,12 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
     id 'war'
-//    id 'org.springframework.experimental.aot' version '0.11.1'
+    id 'org.springframework.experimental.aot' version '0.11.3'
 }
 
 group = 'ir.darkdeveloper'
 version = '0.0.2'
+sourceCompatibility='17.0.2'
 
 
 configurations {
@@ -78,7 +79,7 @@ test {
     useJUnitPlatform()
 }
 
-//bootBuildImage {
-//    builder = 'paketobuildpacks/builder:tiny'
-//    environment = ['BP_NATIVE_IMAGE': 'true']
-//}
+bootBuildImage {
+    builder = 'paketobuildpacks/builder:tiny'
+    environment = ['BP_NATIVE_IMAGE': 'true']
+}
