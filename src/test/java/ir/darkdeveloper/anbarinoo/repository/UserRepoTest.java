@@ -1,10 +1,12 @@
 package ir.darkdeveloper.anbarinoo.repository;
 
+import ir.darkdeveloper.anbarinoo.extentions.DatabaseSetup;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
@@ -18,8 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-@ActiveProfiles("h2")
 @DirtiesContext
+@ExtendWith(DatabaseSetup.class)
 class UserRepoTest {
 
     private final UserRepo repo;

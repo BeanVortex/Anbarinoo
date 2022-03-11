@@ -1,10 +1,12 @@
 package ir.darkdeveloper.anbarinoo.security;
 
+import ir.darkdeveloper.anbarinoo.extentions.DatabaseSetup;
 import ir.darkdeveloper.anbarinoo.security.jwt.JwtFilter;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import org.assertj.core.data.Percentage;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext
+@ExtendWith(DatabaseSetup.class)
 public record JwtTest(WebApplicationContext webApplicationContext, JwtUtils jwtUtils, JwtFilter filter) {
 
     // a simple test class based on user controller test

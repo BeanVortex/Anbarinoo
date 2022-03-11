@@ -2,12 +2,14 @@ package ir.darkdeveloper.anbarinoo.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ir.darkdeveloper.anbarinoo.extentions.DatabaseSetup;
 import ir.darkdeveloper.anbarinoo.model.Auth.Authority;
 import ir.darkdeveloper.anbarinoo.model.UserRole;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureRestDocs(outputDir = "rest_apis_docs/user_roles")
 @DirtiesContext
+@ExtendWith(DatabaseSetup.class)
 public record UserRolesControllerTest(UserService userService,
                                       WebApplicationContext webApplicationContext,
                                       RestDocumentationContextProvider restDocumentation,

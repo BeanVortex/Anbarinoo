@@ -8,7 +8,6 @@ plugins {
 
 group = 'ir.darkdeveloper'
 version = '0.0.2'
-sourceCompatibility='17.0.2'
 
 
 configurations {
@@ -36,12 +35,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-configuration-processor'
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4'
-    implementation 'org.springframework.security:spring-security-oauth2-jose:5.5.1'
-    implementation 'org.springframework.security:spring-security-oauth2-client:5.5.1'
+    implementation 'org.springframework.security:spring-security-oauth2-jose:5.6.2'
+    implementation 'org.springframework.security:spring-security-oauth2-client:5.6.2'
     implementation "org.springframework.boot:spring-boot-starter-mail"
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.1'
-    implementation 'org.apache.poi:poi:5.0.0'
-    implementation 'org.apache.poi:poi-ooxml:5.0.0'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.2'
+    implementation 'org.apache.poi:poi:5.2.0'
+    implementation 'org.apache.poi:poi-ooxml:5.2.0'
 
     implementation 'org.mapstruct:mapstruct:1.4.2.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
@@ -69,7 +68,7 @@ dependencies {
         implementation("org.apache.logging.log4j:log4j-core") {
             version {
                 strictly("[2.17.2, 3[")
-                prefer("2.17.2")
+                prefer("2.17.3")
             }
         }
     }

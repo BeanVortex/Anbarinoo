@@ -1,4 +1,4 @@
-package ir.darkdeveloper.anbarinoo.testContainers;
+package ir.darkdeveloper.anbarinoo.extentions;
 
 import org.junit.jupiter.api.extension.*;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -32,7 +32,7 @@ public class DatabaseSetup  implements BeforeAllCallback {
     }
 
     @Override
-    public void beforeAll(ExtensionContext context) throws Exception {
+    public void beforeAll(ExtensionContext context) {
         container.start();
     }
 

@@ -1,33 +1,34 @@
 package ir.darkdeveloper.anbarinoo.service;
 
+import ir.darkdeveloper.anbarinoo.TestUtils;
+import ir.darkdeveloper.anbarinoo.extentions.DatabaseSetup;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
-import org.junit.jupiter.api.*;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext
+@ExtendWith(DatabaseSetup.class)
 public record CategoryServiceTest(JwtUtils jwtUtils,
                                   UserService userService,
-                                  CategoryService categoryService) {
+                                  CategoryService categoryService,
+                                  TestUtils testUtils) {
 
     private static HttpServletRequest request;
     private static CategoryModel electronics;
@@ -35,15 +36,6 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
 
     @Autowired
     public CategoryServiceTest {
-    }
-
-    @BeforeAll
-    static void setUp() {
-        Authentication authentication = Mockito.mock(Authentication.class);
-        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        request = mock(HttpServletRequest.class);
     }
 
     @Test
@@ -62,7 +54,7 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
                 .build();
         userService.signUpUser(user, response);
         userId = user.getId();
-        request = setUpHeader(user.getEmail(), userId);
+        request = testUtils.setUpHeaderAndGetReq(user.getEmail(), userId);
     }
 
     @Test
@@ -123,30 +115,6 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
     void getUserAfterCatDelete() {
         var fetchedUser = userService.getUserInfo(userId, request);
         assertThat(fetchedUser).isNotNull();
-    }
-
-    //should return the object; data is being removed
-    private HttpServletRequest setUpHeader(String email, Long userId) {
-
-        var headers = new HashMap<String, String>();
-        headers.put(null, "HTTP/1.1 200 OK");
-        headers.put("Content-Type", "text/html");
-
-        var refresh = jwtUtils.generateRefreshToken(email, userId);
-        var access = jwtUtils.generateAccessToken(email);
-        var refreshDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refresh));
-        var accessDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(access));
-        headers.put("refresh_token", refresh);
-        headers.put("access_token", access);
-        headers.put("refresh_expiration", refreshDate);
-        headers.put("access_expiration", accessDate);
-
-
-        var request = mock(HttpServletRequest.class);
-        for (var key : headers.keySet())
-            when(request.getHeader(key)).thenReturn(headers.get(key));
-
-        return request;
     }
 
 }

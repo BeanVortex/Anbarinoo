@@ -2,6 +2,7 @@ package ir.darkdeveloper.anbarinoo.controller.Financial;
 
 import ir.darkdeveloper.anbarinoo.TestUtils;
 import ir.darkdeveloper.anbarinoo.dto.FinancialDto;
+import ir.darkdeveloper.anbarinoo.extentions.DatabaseSetup;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
@@ -46,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
+@ExtendWith(DatabaseSetup.class)
 @AutoConfigureRestDocs(outputDir = "rest_apis_docs/buy_product")
 @DirtiesContext
 public record BuyControllerTest(UserService userService,

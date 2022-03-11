@@ -43,7 +43,8 @@ public class CategoryModel {
     @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @ToString.Exclude
-    private List<CategoryModel> children;
+    @Builder.Default
+    private List<CategoryModel> children = new LinkedList<>();
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -64,6 +65,8 @@ public class CategoryModel {
     }
 
     public void addChild(CategoryModel children) {
+        if (this.children == null)
+            this.children = new LinkedList<>();
         this.children.add(children);
     }
 

@@ -1,32 +1,29 @@
 package ir.darkdeveloper.anbarinoo.service;
 
+import ir.darkdeveloper.anbarinoo.TestUtils;
 import ir.darkdeveloper.anbarinoo.exception.DataExistsException;
 import ir.darkdeveloper.anbarinoo.model.Auth.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
-import org.junit.jupiter.api.*;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -34,7 +31,8 @@ import static org.mockito.Mockito.when;
 public record UserServiceTest(UserService service,
                               JwtUtils jwtUtils,
                               PasswordEncoder encoder,
-                              UserRolesService rolesService) {
+                              UserRolesService rolesService,
+                              TestUtils testUtils) {
 
     private static HttpServletRequest request;
     private static Long userId;
@@ -42,15 +40,6 @@ public record UserServiceTest(UserService service,
 
     @Autowired
     public UserServiceTest {
-    }
-
-    @BeforeAll
-    static void setUp() {
-        var authentication = Mockito.mock(Authentication.class);
-        var securityContext = Mockito.mock(SecurityContext.class);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        request = mock(HttpServletRequest.class);
     }
 
     @Test
@@ -69,8 +58,8 @@ public record UserServiceTest(UserService service,
                 .passwordRepeat("pass12B~")
                 .build();
         service.signUpUser(user, response);
-        request = setUpHeader(user);
         userId = user.getId();
+        request = testUtils.setUpHeaderAndGetReq(user.getEmail(), userId);
     }
 
     @Test
@@ -97,8 +86,8 @@ public record UserServiceTest(UserService service,
                 .build();
         assertThrows(DataExistsException.class, () -> {
             service.signUpUser(user, response);
-            request = setUpHeader(user);
             userId = user.getId();
+            request = testUtils.setUpHeaderAndGetReq(user.getEmail(), userId);
         });
     }
 
@@ -215,30 +204,6 @@ public record UserServiceTest(UserService service,
     @Test
     @Order(10)
     void verifyUserEmail() {
-    }
-
-    //should return the object; data is being removed
-    private HttpServletRequest setUpHeader(UserModel user) {
-
-        var headers = new HashMap<String, String>();
-        headers.put(null, "HTTP/1.1 200 OK");
-        headers.put("Content-Type", "text/html");
-
-        var refreshToken = jwtUtils.generateRefreshToken(user.getEmail(), user.getId());
-        var accessToken = jwtUtils.generateAccessToken(user.getEmail());
-        var refreshDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
-        var accessDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
-        headers.put("refresh_token", refreshToken);
-        headers.put("access_token", accessToken);
-        headers.put("refresh_expiration", refreshDate);
-        headers.put("access_expiration", accessDate);
-
-
-        var request = mock(HttpServletRequest.class);
-        for (var key : headers.keySet())
-            when(request.getHeader(key)).thenReturn(headers.get(key));
-
-        return request;
     }
 
 }

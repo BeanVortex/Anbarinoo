@@ -1,5 +1,6 @@
 package ir.darkdeveloper.anbarinoo.service.Financial;
 
+import ir.darkdeveloper.anbarinoo.TestUtils;
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
@@ -10,29 +11,22 @@ import ir.darkdeveloper.anbarinoo.service.CategoryService;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import org.junit.jupiter.api.*;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -41,7 +35,8 @@ public record SellServiceTest(UserService userService,
                               JwtUtils jwtUtils,
                               ProductService productService,
                               SellService sellService,
-                              CategoryService categoryService) {
+                              CategoryService categoryService,
+                              TestUtils testUtils) {
 
     private static HttpServletRequest request;
     private static Long userId;
@@ -57,11 +52,6 @@ public record SellServiceTest(UserService userService,
 
     @BeforeAll
     static void setUp() {
-        var authentication = Mockito.mock(Authentication.class);
-        var securityContext = Mockito.mock(SecurityContext.class);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        request = mock(HttpServletRequest.class);
         pageable = PageRequest.of(0, 8);
     }
 
@@ -69,7 +59,7 @@ public record SellServiceTest(UserService userService,
     @Test
     @Order(1)
     @WithMockUser(username = "anonymousUser")
-    void saveUser() throws Exception {
+    void saveUser() {
         var response = mock(HttpServletResponse.class);
         var user = UserModel.builder()
                 .email("email@mail.com")
@@ -82,7 +72,7 @@ public record SellServiceTest(UserService userService,
                 .build();
         userService.signUpUser(user, response);
         userId = user.getId();
-        request = setUpHeader(user.getEmail(), userId);
+        request = testUtils.setUpHeaderAndGetReq(user.getEmail(), userId);
     }
 
     @Test
@@ -185,31 +175,6 @@ public record SellServiceTest(UserService userService,
         assertThrows(NoContentException.class, () -> sellService.getSell(sellId, request));
         var product = productService.getProduct(productId, request);
         assertThat(product.getId()).isEqualTo(productId);
-    }
-
-
-    //should return the object; data is being removed
-    private HttpServletRequest setUpHeader(String email, Long userId) {
-
-        var headers = new HashMap<String, String>();
-        headers.put(null, "HTTP/1.1 200 OK");
-        headers.put("Content-Type", "text/html");
-
-        var refreshToken = jwtUtils.generateRefreshToken(email, userId);
-        var accessToken = jwtUtils.generateAccessToken(email);
-        var refreshDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refreshToken));
-        var accessDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
-        headers.put("refresh_token", refreshToken);
-        headers.put("access_token", accessToken);
-        headers.put("refresh_expiration", refreshDate);
-        headers.put("access_expiration", accessDate);
-
-
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        for (String key : headers.keySet())
-            when(request.getHeader(key)).thenReturn(headers.get(key));
-
-        return request;
     }
 
 
