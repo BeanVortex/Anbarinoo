@@ -1,22 +1,18 @@
 package ir.darkdeveloper.anbarinoo.controller.Financial;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import ir.darkdeveloper.anbarinoo.TestUtils;
 import ir.darkdeveloper.anbarinoo.model.Financial.DebtOrDemandModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import static ir.darkdeveloper.anbarinoo.TestUtils.mapToJson;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
@@ -44,29 +41,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
                                          UserService userService,
                                          RestDocumentationContextProvider restDocumentation,
-                                         WebApplicationContext webApplicationContext) {
+                                         WebApplicationContext webApplicationContext,
+                                         TestUtils testUtils) {
 
 
     private static Long userId;
     private static Long dodId;
-    private static String refresh;
-    private static String access;
+    private static HttpHeaders authHeaders;
     private static MockMvc mockMvc;
 
     @Autowired
     public DebtOrDemandControllerTest {
     }
 
-    @BeforeAll
-    static void setUp() {
-        Authentication authentication = Mockito.mock(Authentication.class);
-        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-    }
-
     @BeforeEach
-    void setUp2() {
+    void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .apply(documentationConfiguration(restDocumentation))
                 .alwaysDo(document("{method-name}"))
@@ -77,7 +66,7 @@ public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
     @Order(1)
     @WithMockUser(username = "anonymousUser")
     void saveUser() {
-        HttpServletResponse response = mock(HttpServletResponse.class);
+        var response = mock(HttpServletResponse.class);
         var user = UserModel.builder()
                 .email("email@mail.com")
                 .address("address")
@@ -87,8 +76,9 @@ public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
                 .passwordRepeat("pass12P+")
                 .build();
         userService.signUpUser(user, response);
+        var userEmail = user.getEmail();
         userId = user.getId();
-        setUpHeader(user.getEmail(), userId);
+        authHeaders = testUtils.getAuthHeaders(userEmail, userId);
     }
 
 
@@ -107,8 +97,7 @@ public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
         mockMvc.perform(post("/api/user/financial/debt-demand/save/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("refresh_token", refresh)
-                        .header("access_token", access)
+                        .headers(authHeaders)
                         .content(mapToJson(dod))
                 )
                 .andDo(print())
@@ -136,8 +125,7 @@ public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
         mockMvc.perform(put("/api/user/financial/debt-demand/update/{id}/", dodId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("refresh_token", refresh)
-                        .header("access_token", access)
+                        .headers(authHeaders)
                         .content(mapToJson(dod))
                 )
                 .andDo(print())
@@ -157,8 +145,7 @@ public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
 
         mockMvc.perform(get("/api/user/financial/debt-demand/get-by-user/{id}/", userId)
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("refresh_token", refresh)
-                        .header("access_token", access)
+                        .headers(authHeaders)
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -176,8 +163,7 @@ public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
     void getDOD() throws Exception {
         mockMvc.perform(get("/api/user/financial/debt-demand/{id}/", dodId)
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("refresh_token", refresh)
-                        .header("access_token", access)
+                        .headers(authHeaders)
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -192,21 +178,12 @@ public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
     void deleteDOD() throws Exception {
         mockMvc.perform(delete("/api/user/financial/debt-demand/{id}/", dodId)
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("refresh_token", refresh)
-                        .header("access_token", access)
+                        .headers(authHeaders)
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
         ;
     }
 
-    private String mapToJson(Object obj) throws JsonProcessingException {
-        return new ObjectMapper().findAndRegisterModules().writeValueAsString(obj);
-    }
 
-    //should return the object; data is being removed
-    private void setUpHeader(String email, Long userId) {
-        refresh = jwtUtils.generateRefreshToken(email, userId);
-        access = jwtUtils.generateAccessToken(email);
-    }
 }

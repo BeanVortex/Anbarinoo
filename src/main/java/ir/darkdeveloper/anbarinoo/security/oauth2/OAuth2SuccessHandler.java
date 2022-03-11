@@ -78,7 +78,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
         super.clearAuthenticationAttributes(request);
-        oAuth2RequestRepo.removeAuthorizationRequestCookies(request, response);
+        oAuth2RequestRepo.removeAuthorizationRequest(request, response);
     }
 
     private boolean isAuthorizedRedirectUri(String uri) {

@@ -35,7 +35,7 @@ public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler 
         targetUrl = UriComponentsBuilder.fromUriString(targetUrl).queryParam("error", exception.getLocalizedMessage())
                 .build().toUriString();
 
-        oAuth2RequestRepo.removeAuthorizationRequestCookies(request, response);
+        oAuth2RequestRepo.removeAuthorizationRequest(request, response);
 
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }

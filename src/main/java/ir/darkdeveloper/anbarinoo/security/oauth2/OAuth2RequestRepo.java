@@ -34,7 +34,7 @@ public class OAuth2RequestRepo implements AuthorizationRequestRepository<OAuth2A
             HttpServletResponse res) {
 
         if (oauth2Req == null) {
-            removeAuthorizationRequestCookies(req, res);
+            removeAuthorizationRequest(req, res);
             return;
         }
 
@@ -47,9 +47,12 @@ public class OAuth2RequestRepo implements AuthorizationRequestRepository<OAuth2A
 
     }
 
-    public void removeAuthorizationRequestCookies(HttpServletRequest request, HttpServletResponse response) {
+    @Override
+    public OAuth2AuthorizationRequest removeAuthorizationRequest(HttpServletRequest request, HttpServletResponse response) {
         CookieUtils.deleteCookie(request, response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
         CookieUtils.deleteCookie(request, response, REDIRECT_URI_PARAM_COOKIE_NAME);
+        return AuthorizationRequestRepository.super.removeAuthorizationRequest(request, response);
     }
+
 
 }

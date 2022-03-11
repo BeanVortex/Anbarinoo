@@ -1,7 +1,6 @@
 package ir.darkdeveloper.anbarinoo.controller.Financial;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import ir.darkdeveloper.anbarinoo.TestUtils;
 import ir.darkdeveloper.anbarinoo.dto.FinancialDto;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
@@ -12,20 +11,16 @@ import ir.darkdeveloper.anbarinoo.service.Financial.FinancialService;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -37,12 +32,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Optional;
 
+import static ir.darkdeveloper.anbarinoo.TestUtils.mapToJson;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -61,33 +55,25 @@ public record BuyControllerTest(UserService userService,
                                 CategoryService categoryService,
                                 FinancialService financialService,
                                 RestDocumentationContextProvider restDocumentation,
-                                WebApplicationContext webApplicationContext) {
+                                WebApplicationContext webApplicationContext,
+                                TestUtils testUtils) {
 
     private static Long userId;
-    private static String refresh;
-    private static String access;
+    private static HttpHeaders authHeaders;
+    private static HttpServletRequest request;
     private static Long productId;
     private static Long buyId;
     private static Long catId;
     private static LocalDateTime from, to;
-    private static HttpServletRequest request;
     private static MockMvc mockMvc;
 
     @Autowired
     public BuyControllerTest {
     }
 
-    @BeforeAll
-    static void setUp() {
-        var authentication = Mockito.mock(Authentication.class);
-        var securityContext = Mockito.mock(SecurityContext.class);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        request = mock(HttpServletRequest.class);
-    }
 
     @BeforeEach
-    void setUp2() {
+    void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .apply(documentationConfiguration(restDocumentation))
                 .alwaysDo(document("{method-name}"))
@@ -110,7 +96,9 @@ public record BuyControllerTest(UserService userService,
                 .build();
         userService.signUpUser(user, response);
         userId = user.getId();
-        request = setUpHeader(user.getEmail(), userId);
+        var userEmail = user.getEmail();
+        authHeaders = testUtils.getAuthHeaders(userEmail, userId);
+        request = testUtils.setUpHeaderAndGetReq(userEmail, userId);
     }
 
     @Test
@@ -151,8 +139,7 @@ public record BuyControllerTest(UserService userService,
                 .build();
         from = LocalDateTime.now().minusHours(1);
         mockMvc.perform(post("/api/category/products/buy/save/")
-                        .header("refresh_token", refresh)
-                        .header("access_token", access)
+                        .headers(authHeaders)
                         .content(mapToJson(buy))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -177,8 +164,7 @@ public record BuyControllerTest(UserService userService,
         buy.setPrice(BigDecimal.valueOf(9000.568));
         buy.setCount(BigDecimal.valueOf(60.2));
         mockMvc.perform(put("/api/category/products/buy/update/{id}/", buyId)
-                        .header("refresh_token", refresh)
-                        .header("access_token", access)
+                        .headers(authHeaders)
                         .content(mapToJson(buy))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -197,8 +183,7 @@ public record BuyControllerTest(UserService userService,
 
         mockMvc.perform(get("/api/category/products/buy/get-by-product/{id}/?page={page}&size={size}",
                         productId, 0, 2)
-                        .header("refresh_token", refresh)
-                        .header("access_token", access)
+                        .headers(authHeaders)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -216,8 +201,7 @@ public record BuyControllerTest(UserService userService,
     void getAllBuyRecordsOfUser() throws Exception {
         mockMvc.perform(get("/api/category/products/buy/get-by-user/{id}/?page={page}&size={size}",
                         userId, 0, 2)
-                        .header("refresh_token", refresh)
-                        .header("access_token", access)
+                        .headers(authHeaders)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -238,8 +222,7 @@ public record BuyControllerTest(UserService userService,
         var financial = new FinancialDto(from, to);
         mockMvc.perform(post("/api/category/products/buy/get-by-product/date/{id}/",
                         productId)
-                        .header("refresh_token", refresh)
-                        .header("access_token", access)
+                        .headers(authHeaders)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(mapToJson(financial)))
@@ -261,8 +244,7 @@ public record BuyControllerTest(UserService userService,
 
         mockMvc.perform(post("/api/category/products/buy/get-by-user/date/{id}/",
                         userId)
-                        .header("refresh_token", refresh)
-                        .header("access_token", access)
+                        .headers(authHeaders)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(mapToJson(financial)))
@@ -282,8 +264,7 @@ public record BuyControllerTest(UserService userService,
     void getBuy() throws Exception {
         mockMvc.perform(get("/api/category/products/buy/{id}/",
                         buyId)
-                        .header("refresh_token", refresh)
-                        .header("access_token", access)
+                        .headers(authHeaders)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -300,8 +281,7 @@ public record BuyControllerTest(UserService userService,
     void deleteBuy() throws Exception {
 
         mockMvc.perform(delete("/api/category/products/buy/{id}/", buyId)
-                        .header("refresh_token", refresh)
-                        .header("access_token", access)
+                        .headers(authHeaders)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -315,8 +295,7 @@ public record BuyControllerTest(UserService userService,
 
         mockMvc.perform(get("/api/category/products/buy/get-by-product/{id}/?page={page}&size={size}",
                         productId, 0, 2)
-                        .header("refresh_token", refresh)
-                        .header("access_token", access)
+                        .headers(authHeaders)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -338,38 +317,12 @@ public record BuyControllerTest(UserService userService,
 
         mockMvc.perform(get("/api/category/products/buy/{id}/",
                         firstBuyId)
-                        .header("refresh_token", refresh)
-                        .header("access_token", access)
+                        .headers(authHeaders)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andDo(print());
     }
 
-    private String mapToJson(Object obj) throws JsonProcessingException {
-        return new ObjectMapper().findAndRegisterModules().writeValueAsString(obj);
-    }
 
-    //should return the object; data is being removed
-    private HttpServletRequest setUpHeader(String email, Long userId) {
-
-        var headers = new HashMap<String, String>();
-        headers.put(null, "HTTP/1.1 200 OK");
-        headers.put("Content-Type", "text/html");
-
-        refresh = jwtUtils.generateRefreshToken(email, userId);
-        access = jwtUtils.generateAccessToken(email);
-        var refreshDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refresh));
-        var accessDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(access));
-        headers.put("refresh_token", refresh);
-        headers.put("access_token", access);
-        headers.put("refresh_expiration", refreshDate);
-        headers.put("access_expiration", accessDate);
-
-        var request = mock(HttpServletRequest.class);
-        for (var key : headers.keySet())
-            when(request.getHeader(key)).thenReturn(headers.get(key));
-
-        return request;
-    }
 }

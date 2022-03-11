@@ -43,7 +43,7 @@ public class CategoryModel {
     @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @ToString.Exclude
-    private List<CategoryModel> children = new LinkedList<>();
+    private List<CategoryModel> children;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)

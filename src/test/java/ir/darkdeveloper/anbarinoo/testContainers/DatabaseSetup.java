@@ -6,8 +6,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 //@Testcontainers
-public class DatabaseSetup  implements
-        BeforeAllCallback, AfterAllCallback, BeforeEachCallback, AfterEachCallback {
+public class DatabaseSetup  implements BeforeAllCallback {
 
     // static keyword makes container for all tests, if not provided, everytime for each test, a container will be created
     // and then deleted
@@ -33,22 +32,8 @@ public class DatabaseSetup  implements
     }
 
     @Override
-    public void afterAll(ExtensionContext context) {
-
-    }
-
-    @Override
-    public void afterEach(ExtensionContext context) {
-
-    }
-
-    @Override
     public void beforeAll(ExtensionContext context) throws Exception {
         container.start();
     }
 
-    @Override
-    public void beforeEach(ExtensionContext context) throws Exception {
-
-    }
 }

@@ -1,7 +1,6 @@
 package ir.darkdeveloper.anbarinoo.controller.Financial;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import ir.darkdeveloper.anbarinoo.TestUtils;
 import ir.darkdeveloper.anbarinoo.dto.FinancialDto;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
@@ -16,18 +15,14 @@ import ir.darkdeveloper.anbarinoo.service.Financial.SellService;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -39,14 +34,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Optional;
 
+import static ir.darkdeveloper.anbarinoo.TestUtils.mapToJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -66,10 +60,10 @@ public record FinancialControllerTest(UserService userService,
                                       BuyService buyService,
                                       SellService sellService,
                                       RestDocumentationContextProvider restDocumentation,
-                                      DebtOrDemandService dodService) {
+                                      DebtOrDemandService dodService,
+                                      TestUtils testUtils) {
 
-    private static String refresh;
-    private static String access;
+    private static HttpHeaders authHeaders;
     private static Long productId;
     private static Long buyId;
     private static Long sellId;
@@ -83,17 +77,8 @@ public record FinancialControllerTest(UserService userService,
     public FinancialControllerTest {
     }
 
-    @BeforeAll
-    static void setUp() {
-        Authentication authentication = Mockito.mock(Authentication.class);
-        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        request = mock(HttpServletRequest.class);
-    }
-
     @BeforeEach
-    void setUp2() {
+    void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .apply(documentationConfiguration(restDocumentation))
                 .alwaysDo(document("{method-name}"))
@@ -104,7 +89,7 @@ public record FinancialControllerTest(UserService userService,
     @Order(1)
     @WithMockUser(username = "anonymousUser")
     void saveUser() {
-        HttpServletResponse response = mock(HttpServletResponse.class);
+        var response = mock(HttpServletResponse.class);
         var user = UserModel.builder()
                 .email("email@mail.com")
                 .address("address")
@@ -115,7 +100,10 @@ public record FinancialControllerTest(UserService userService,
                 .enabled(true)
                 .build();
         userService.signUpUser(user, response);
-        request = setUpHeader(user.getEmail(), user.getId());
+        var userEmail = user.getEmail();
+        var userId = user.getId();
+        request = testUtils.setUpHeaderAndGetReq(userEmail, userId);
+        authHeaders = testUtils.getAuthHeaders(userEmail, userId);
     }
 
 
@@ -212,8 +200,7 @@ public record FinancialControllerTest(UserService userService,
         mockMvc.perform(post("/api/user/financial/costs/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("refresh_token", refresh)
-                        .header("access_token", access)
+                        .headers(authHeaders)
                         .content(mapToJson(financial))
                 )
                 .andDo(print())
@@ -237,8 +224,7 @@ public record FinancialControllerTest(UserService userService,
         mockMvc.perform(post("/api/user/financial/incomes/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("refresh_token", refresh)
-                        .header("access_token", access)
+                        .headers(authHeaders)
                         .content(mapToJson(financial))
                 )
                 .andDo(print())
@@ -329,8 +315,7 @@ public record FinancialControllerTest(UserService userService,
         mockMvc.perform(post("/api/user/financial/costs/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("refresh_token", refresh)
-                        .header("access_token", access)
+                        .headers(authHeaders)
                         .content(mapToJson(financial))
                 )
                 .andDo(print())
@@ -357,8 +342,7 @@ public record FinancialControllerTest(UserService userService,
         mockMvc.perform(post("/api/user/financial/incomes/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("refresh_token", refresh)
-                        .header("access_token", access)
+                        .headers(authHeaders)
                         .content(mapToJson(financial))
                 )
                 .andDo(print())
@@ -410,8 +394,7 @@ public record FinancialControllerTest(UserService userService,
         mockMvc.perform(post("/api/user/financial/profit-loss/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("refresh_token", refresh)
-                        .header("access_token", access)
+                        .headers(authHeaders)
                         .content(mapToJson(financial))
                 )
                 .andDo(print())
@@ -428,32 +411,4 @@ public record FinancialControllerTest(UserService userService,
         ;
     }
 
-
-    private String mapToJson(Object obj) throws JsonProcessingException {
-        return new ObjectMapper().findAndRegisterModules().writeValueAsString(obj);
-    }
-
-    //should return the object; data is being removed
-    private HttpServletRequest setUpHeader(String email, Long userId) {
-
-        var headers = new HashMap<String, String>();
-        headers.put(null, "HTTP/1.1 200 OK");
-        headers.put("Content-Type", "text/html");
-
-        refresh = jwtUtils.generateRefreshToken(email, userId);
-        access = jwtUtils.generateAccessToken(email);
-        var refreshDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refresh));
-        var accessDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(access));
-        headers.put("refresh_token", refresh);
-        headers.put("access_token", access);
-        headers.put("refresh_expiration", refreshDate);
-        headers.put("access_expiration", accessDate);
-
-
-        var request = mock(HttpServletRequest.class);
-        for (var key : headers.keySet())
-            when(request.getHeader(key)).thenReturn(headers.get(key));
-
-        return request;
-    }
 }
