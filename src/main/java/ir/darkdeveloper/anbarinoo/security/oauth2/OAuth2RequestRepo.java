@@ -25,16 +25,17 @@ public class OAuth2RequestRepo implements AuthorizationRequestRepository<OAuth2A
     }
 
     @Override
-    public OAuth2AuthorizationRequest removeAuthorizationRequest(HttpServletRequest req) {
-        return loadAuthorizationRequest(req);
+    public OAuth2AuthorizationRequest removeAuthorizationRequest(HttpServletRequest request,
+                                                                 HttpServletResponse response) {
+        return loadAuthorizationRequest(request);
     }
 
     @Override
     public void saveAuthorizationRequest(OAuth2AuthorizationRequest oauth2Req, HttpServletRequest req,
-            HttpServletResponse res) {
+                                         HttpServletResponse res) {
 
         if (oauth2Req == null) {
-            removeAuthorizationRequest(req, res);
+            removeAuthorizationRequestCookies(req, res);
             return;
         }
 
@@ -48,11 +49,14 @@ public class OAuth2RequestRepo implements AuthorizationRequestRepository<OAuth2A
     }
 
     @Override
-    public OAuth2AuthorizationRequest removeAuthorizationRequest(HttpServletRequest request, HttpServletResponse response) {
-        CookieUtils.deleteCookie(request, response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
-        CookieUtils.deleteCookie(request, response, REDIRECT_URI_PARAM_COOKIE_NAME);
-        return AuthorizationRequestRepository.super.removeAuthorizationRequest(request, response);
+    @SuppressWarnings("deprecation")
+    public OAuth2AuthorizationRequest removeAuthorizationRequest(HttpServletRequest request) {
+        return null;
     }
 
+    public void removeAuthorizationRequestCookies(HttpServletRequest request, HttpServletResponse response) {
+        CookieUtils.deleteCookie(request, response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
+        CookieUtils.deleteCookie(request, response, REDIRECT_URI_PARAM_COOKIE_NAME);
+    }
 
 }
