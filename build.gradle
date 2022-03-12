@@ -8,6 +8,7 @@ plugins {
 
 group = 'ir.darkdeveloper'
 version = '0.0.2'
+sourceCompatibility = JavaVersion.VERSION_17
 
 
 configurations {

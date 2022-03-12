@@ -14,3 +14,8 @@ spring.mail:
         connectiontimeout: 5000
         timeout: 3000
         writetimeout: 5000
+
+
+# use this docker image for mail
+#  $ docker pull djfarrelly/maildev
+#  $ docker run -d -p 1080:80 -p 1025:25 djfarrelly/maildev
