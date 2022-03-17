@@ -85,10 +85,9 @@ public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel
 
     @OneToMany(mappedBy = "user")
     @ToString.Exclude
-    private List<DebtOrDemandModel> debtOrDemand;
+    private List<DebtOrDemandModel> debtOrDemands;
 
     @OneToMany(mappedBy = "user")
-
     @ToString.Exclude
     private List<ChequeModel> cheques;
 

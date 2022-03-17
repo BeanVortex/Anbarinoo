@@ -23,7 +23,7 @@ public interface UserMapper {
             @Mapping(target = "shopFile", ignore = true),
             @Mapping(target = "profileFile", ignore = true),
             @Mapping(target = "roles", ignore = true),
-            @Mapping(target = "debtOrDemand", ignore = true),
+            @Mapping(target = "debtOrDemands", ignore = true),
             @Mapping(target = "cheques", ignore = true),
             @Mapping(target = "categories", ignore = true),
     })
