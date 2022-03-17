@@ -4,7 +4,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import ir.darkdeveloper.anbarinoo.model.ChequeModel;
-import lombok.SneakyThrows;
+
+import java.io.IOException;
 
 public class ChequeDeserializer extends StdDeserializer<ChequeModel> {
 
@@ -17,9 +18,8 @@ public class ChequeDeserializer extends StdDeserializer<ChequeModel> {
         super(t);
     }
 
-    @SneakyThrows
     @Override
-    public ChequeModel deserialize(JsonParser p, DeserializationContext context) {
+    public ChequeModel deserialize(JsonParser p, DeserializationContext context) throws IOException {
         return JsonUtils.readJson(p, ChequeModel.class);
     }
 }

@@ -98,12 +98,10 @@ public class UserAuthUtils {
             throw new BadRequestException("Bad Credentials");
         }
 
-
         var accessToken = jwtUtils.generateAccessToken(username);
         var refreshToken = jwtUtils.generateRefreshToken(username, rModel.getUserId());
 
         rModel.setAccessToken(accessToken);
-
         refreshService.saveToken(rModel);
 
         setupHeader(response, accessToken, refreshToken);
