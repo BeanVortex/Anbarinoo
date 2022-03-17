@@ -13,7 +13,7 @@ A simple warehouse and financial application to control your business and produc
 
 ### Some notes for developers:
 
-- Used testcontainers so be sure to configure it in your machine by doing these steps:
+- Used testcontainers so make sure to configure it in your machine by doing these steps:
 - [x] install docker
 - [x] pull postgres:13.1-alpine
 - [x] run this: ```$ echo testcontainers.reuse.enable=true  > ~/.testcontainers.properties```
