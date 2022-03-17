@@ -26,18 +26,19 @@ public class UserRole implements Serializable {
     @GeneratedValue
     private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String name;
 
     @ElementCollection(targetClass = Authority.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "authorities", joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    @CollectionTable(name = "authorities",
+            joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     @Enumerated(EnumType.STRING)
     private List<Authority> authorities;
 
     @ManyToMany
     @JoinTable(
             name = "users_roles",
-            joinColumns = @JoinColumn(name = "role", referencedColumnName = "name"),
+            joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
     @ToString.Exclude
     private List<UserModel> users;

@@ -1,6 +1,5 @@
 package ir.darkdeveloper.anbarinoo.json;
 
-import ir.darkdeveloper.anbarinoo.model.ChequeModel;
 import ir.darkdeveloper.anbarinoo.model.DebtOrDemandModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import org.junit.jupiter.api.Test;

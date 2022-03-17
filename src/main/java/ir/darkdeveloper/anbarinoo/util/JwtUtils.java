@@ -109,6 +109,11 @@ public class JwtUtils {
                 .toLocalDateTime();
     }
 
+    // for testing purposes
+    public void changeExpirationDate(String token, long till) {
+        Jwts.claims(getAllClaimsFromToken(token)).setExpiration(new Date(till));
+    }
+
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
         var claims = getAllClaimsFromToken(token);
         return claimsResolver.apply(claims);
