@@ -35,7 +35,9 @@ public class UserRole implements Serializable {
     private List<Authority> authorities;
 
     @ManyToMany
-    @JoinTable(joinColumns = @JoinColumn(name = "role", referencedColumnName = "name"),
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "role", referencedColumnName = "name"),
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
     @ToString.Exclude
     private List<UserModel> users;

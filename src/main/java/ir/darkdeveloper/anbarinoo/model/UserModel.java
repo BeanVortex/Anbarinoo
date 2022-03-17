@@ -66,7 +66,7 @@ public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String profileImage;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "users")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Set<UserRole> roles;
 
