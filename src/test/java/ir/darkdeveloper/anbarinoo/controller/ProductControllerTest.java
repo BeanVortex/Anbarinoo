@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static ir.darkdeveloper.anbarinoo.TestUtils.mapToJson;
 import static org.hamcrest.CoreMatchers.is;
@@ -44,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@AutoConfigureRestDocs(outputDir = "rest_apis_docs/product")
+@AutoConfigureRestDocs(outputDir = "docs/product")
 @DirtiesContext
 @ExtendWith(DatabaseSetup.class)
 public record ProductControllerTest(WebApplicationContext webApplicationContext,
@@ -88,7 +89,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
                 .password("pass12P+")
                 .passwordRepeat("pass12P+")
                 .build();
-        userService.signUpUser(user, response);
+        userService.signUpUser(Optional.of(user), response);
         userId = user.getId();
         var userEmail = user.getEmail();
         request = testUtils.setUpHeaderAndGetReq(userEmail, userId);
@@ -109,7 +110,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
                 .password("pass12P+")
                 .passwordRepeat("pass12P+")
                 .build();
-        userService.signUpUser(user, response);
+        userService.signUpUser(Optional.of(user), response);
         var userId2 = user.getId();
         var userEmail = user.getEmail();
         request = testUtils.setUpHeaderAndGetReq(userEmail, userId2);

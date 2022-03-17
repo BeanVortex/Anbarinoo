@@ -8,8 +8,6 @@ import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.*;
 
-import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
-import ir.darkdeveloper.anbarinoo.model.Financial.SellModel;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;

@@ -2,7 +2,7 @@ package ir.darkdeveloper.anbarinoo.controller.Financial;
 
 import ir.darkdeveloper.anbarinoo.TestUtils;
 import ir.darkdeveloper.anbarinoo.extentions.DatabaseSetup;
-import ir.darkdeveloper.anbarinoo.model.Financial.DebtOrDemandModel;
+import ir.darkdeveloper.anbarinoo.model.DebtOrDemandModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
@@ -24,6 +24,7 @@ import org.springframework.web.context.WebApplicationContext;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static ir.darkdeveloper.anbarinoo.TestUtils.mapToJson;
 import static org.hamcrest.Matchers.hasSize;
@@ -38,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@AutoConfigureRestDocs(outputDir = "rest_apis_docs/debt_or_demand")
+@AutoConfigureRestDocs(outputDir = "docs/debt_or_demand")
 @DirtiesContext
 @ExtendWith(DatabaseSetup.class)
 public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
@@ -78,7 +79,7 @@ public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
                 .password("pass12P+")
                 .passwordRepeat("pass12P+")
                 .build();
-        userService.signUpUser(user, response);
+        userService.signUpUser(Optional.of(user), response);
         var userEmail = user.getEmail();
         userId = user.getId();
         authHeaders = testUtils.getAuthHeaders(userEmail, userId);

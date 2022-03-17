@@ -20,7 +20,7 @@ import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
 import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
-import ir.darkdeveloper.anbarinoo.model.Financial.DebtOrDemandModel;
+import ir.darkdeveloper.anbarinoo.model.DebtOrDemandModel;
 import ir.darkdeveloper.anbarinoo.repository.Financial.DebtOrDemandRepo;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import lombok.RequiredArgsConstructor;

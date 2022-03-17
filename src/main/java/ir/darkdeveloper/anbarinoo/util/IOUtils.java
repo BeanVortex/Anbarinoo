@@ -57,21 +57,29 @@ public class IOUtils {
      *
      * @param user if images are null then the default will set
      */
-    public void saveUserImages(UserModel user) {
+    public void saveUserImages(Optional<UserModel> user) {
 
-        if (user.getShopImage() == null || user.getShopFile() == null)
-            user.setShopImage(DEFAULT_SHOP_IMAGE);
-        if (user.getProfileImage() == null || user.getProfileFile() == null)
-            user.setProfileImage(DEFAULT_PROFILE_IMAGE);
+        if (user.isPresent()) {
 
-        try {
-            var profileFileName = saveFile(user.getProfileFile(), USER_IMAGE_PATH);
-            profileFileName.ifPresent(user::setProfileImage);
+            var isShopImage = user.map(UserModel::getShopImage).isPresent();
+            var isShopFile = user.map(UserModel::getShopFile).isPresent();
+            var isProfileImage = user.map(UserModel::getProfileImage).isPresent();
+            var isProfileFile = user.map(UserModel::getProfileFile).isPresent();
 
-            var shopFileName = saveFile(user.getShopFile(), USER_IMAGE_PATH);
-            shopFileName.ifPresent(user::setShopImage);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            if (!isShopImage || !isShopFile)
+                user.get().setShopImage(DEFAULT_SHOP_IMAGE);
+            if (!isProfileImage || !isProfileFile)
+                user.get().setProfileImage(DEFAULT_PROFILE_IMAGE);
+
+            try {
+                var profileFileName = saveFile(user.get().getProfileFile(), USER_IMAGE_PATH);
+                profileFileName.ifPresent(user.get()::setProfileImage);
+
+                var shopFileName = saveFile(user.get().getShopFile(), USER_IMAGE_PATH);
+                shopFileName.ifPresent(user.get()::setShopImage);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
         }
     }
 

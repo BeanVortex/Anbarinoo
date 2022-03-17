@@ -1,11 +1,5 @@
-package ir.darkdeveloper.anbarinoo.model.Financial;
+package ir.darkdeveloper.anbarinoo.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import ir.darkdeveloper.anbarinoo.model.ProductModel;
-import ir.darkdeveloper.anbarinoo.model.UpdateModel;
-import ir.darkdeveloper.anbarinoo.model.deserializers.SellDeserializer;
-import ir.darkdeveloper.anbarinoo.model.serializers.SellSerialize;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -14,17 +8,16 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+
 @Getter
 @Setter
 @ToString
 @Entity
-@Table(name = "sells")
-@JsonDeserialize(using = SellDeserializer.class)
-@JsonSerialize(using = SellSerialize.class)
+@Table(name = "buys")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SellModel implements UpdateModel<SellModel> {
+public class BuyModel implements UpdateModel<BuyModel> {
 
     @Id
     @GeneratedValue
@@ -53,9 +46,12 @@ public class SellModel implements UpdateModel<SellModel> {
     private LocalDateTime updatedAt;
 
     @Override
-    public void update(SellModel model) {
-        count = model.count != null || count == null ? model.count : count;
+    public void update(BuyModel model) {
         price = model.price != null || price == null ? model.price : price;
+        count = model.count != null || count == null ? model.count : count;
         tax = model.tax != null || tax == null ? model.tax : tax;
     }
+
 }
+
+

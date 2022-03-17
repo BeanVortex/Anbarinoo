@@ -63,7 +63,7 @@ public record ProductServiceTest(ProductService productService,
                 .passwordRepeat("pass12P+")
                 .enabled(true)
                 .build();
-        userService.signUpUser(user, response);
+        userService.signUpUser(Optional.of(user), response);
         userId = user.getId();
         request = testUtils.setUpHeaderAndGetReq(user.getEmail(), userId);
         var user2 = UserModel.builder()
@@ -71,7 +71,7 @@ public record ProductServiceTest(ProductService productService,
                 .password("pass12P+")
                 .passwordRepeat("pass12P+")
                 .build();
-        userService.signUpUser(user2, response);
+        userService.signUpUser(Optional.of(user2), response);
 //        userId2 = user2.getId();
     }
 

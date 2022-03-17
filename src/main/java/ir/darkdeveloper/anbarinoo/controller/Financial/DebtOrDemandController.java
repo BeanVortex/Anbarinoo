@@ -2,7 +2,7 @@ package ir.darkdeveloper.anbarinoo.controller.Financial;
 
 import ir.darkdeveloper.anbarinoo.dto.DebtOrDemandDto;
 import ir.darkdeveloper.anbarinoo.dto.mapper.DebtOrDemandMapper;
-import ir.darkdeveloper.anbarinoo.model.Financial.DebtOrDemandModel;
+import ir.darkdeveloper.anbarinoo.model.DebtOrDemandModel;
 import ir.darkdeveloper.anbarinoo.service.Financial.DebtOrDemandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

@@ -2,7 +2,7 @@ package ir.darkdeveloper.anbarinoo.service;
 
 import ir.darkdeveloper.anbarinoo.exception.*;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
-import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
+import ir.darkdeveloper.anbarinoo.model.BuyModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.repository.ProductRepository;
 import ir.darkdeveloper.anbarinoo.service.Financial.BuyService;

@@ -36,8 +36,8 @@ public class PasswordUtils {
         //else keep preUser pass
     }
 
-    public void passEqualityChecker(UserModel user) {
-        if (!user.getPassword().equals(user.getPasswordRepeat()))
+    public void passEqualityChecker(Optional<UserModel> user) {
+        if (user.isPresent() && !user.get().getPassword().equals(user.get().getPasswordRepeat()))
             throw new PasswordException("Passwords do not match");
     }
 }

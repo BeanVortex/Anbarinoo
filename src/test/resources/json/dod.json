@@ -1,0 +1,14 @@
+{
+  "id": 5,
+  "nameOf": "Me",
+  "payTo": "Other",
+  "amount": 10,
+  "isDebt": true,
+  "isCheckedOut": true,
+  "user": 2,
+  "issuedAt": "2022-03-17T10:20:24.083856109",
+  "validTill": "2022-03-22T10:20:24.083884601",
+  "createdAt": "2022-03-17T10:20:24.083893093",
+  "updatedAt": "2022-03-17T10:20:29.083897826",
+  "chequeId": 16
+}

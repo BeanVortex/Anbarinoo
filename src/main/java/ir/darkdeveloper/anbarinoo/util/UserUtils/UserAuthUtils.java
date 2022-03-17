@@ -1,10 +1,7 @@
 package ir.darkdeveloper.anbarinoo.util.UserUtils;
 
-import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
-import ir.darkdeveloper.anbarinoo.exception.EmailNotValidException;
-import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
-import ir.darkdeveloper.anbarinoo.exception.NoContentException;
-import ir.darkdeveloper.anbarinoo.model.Auth.AuthProvider;
+import ir.darkdeveloper.anbarinoo.exception.*;
+import ir.darkdeveloper.anbarinoo.model.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.UserRepo;
@@ -49,69 +46,58 @@ public class UserAuthUtils {
 
 
     @Transactional
-    public void signup(UserModel user, HttpServletResponse response) {
-        if (user.getId() != null)
-            throw new ForbiddenException("You are not allowed to sign up! :|");
-
-        var rawPass = user.getPassword();
-
-        if (user.getEmail() != null)
-            if (user.getUserName() == null || user.getUserName().trim().equals(""))
-                user.setUserName(user.getEmail().split("@")[0]);
-
-        passwordUtils.passEqualityChecker(user);
-
-        user.setRoles(roleService.findAllByName("USER"));
+    public UserModel signup(Optional<UserModel> user, HttpServletResponse response) {
+        var rawPass = user.map(UserModel::getPassword)
+                .orElseThrow(() -> new PasswordException("Password is required!"));
+        validateUserData(user);
+        user.get().setRoles(roleService.findAllByName("USER"));
         ioUtils.saveUserImages(user);
-        user.setPassword(encoder.encode(user.getPassword()));
-        user.setProvider(AuthProvider.LOCAL);
-        user.setEnabled(userEnabled);
-        repo.save(user);
-        if (!user.getEnabled())
-            operations.sendEmail(user);
+        user.get().setPassword(encoder.encode(user.get().getPassword()));
+        user.get().setProvider(AuthProvider.LOCAL);
+        user.get().setEnabled(userEnabled);
+        repo.save(user.get());
+        if (userEnabled)
+            return authenticateUser(new LoginDto(user.get().getEmail(), rawPass), response);
         else
-            authenticateUser(new LoginDto(user.getEmail(), rawPass), rawPass, response);
-
+            return user.get();
     }
 
     /**
      * @param loginDto has username and password (LoginDto)
-     * @param rawPass  for super admin, pass null
      */
-    public void authenticateUser(LoginDto loginDto, String rawPass, HttpServletResponse response) {
+    public UserModel authenticateUser(LoginDto loginDto, HttpServletResponse response) {
         var username = loginDto.username();
         var password = loginDto.password();
 
-        var user = repo.findByEmailOrUsername(username)
-                .orElseThrow(() -> new NoContentException("User does not exist"));
+        var user = new UserModel();
 
-        UsernamePasswordAuthenticationToken auth;
-        if (rawPass != null)
-            auth = new UsernamePasswordAuthenticationToken(username, rawPass);
-        else
-            auth = new UsernamePasswordAuthenticationToken(username, password);
+        var rModel = new RefreshModel();
+        if (loginDto.username().equals(adminUser.username())) {
+            rModel.setUserId(adminUser.id());
+            rModel.setId(refreshService.getIdByUserId(adminUser.id()));
+            user.setEnabled(true);
+        } else {
+            user = repo.findByEmailOrUsername(username)
+                    .orElseThrow(() -> new NoContentException("User does not exist"));
+            rModel.setId(refreshService.getIdByUserId(user.getId()));
+            rModel.setUserId(user.getId());
+        }
+
+        var auth = new UsernamePasswordAuthenticationToken(username, password);
+
+        if (!user.getEnabled()) {
+            operations.sendEmail(user);
+            throw new EmailNotValidException("Email verification sent, Check your emails");
+        }
 
         try {
             authManager.authenticate(auth);
         } catch (DisabledException e) {
-            throw new BadRequestException("Email is not verified!");
+            throw new EmailNotValidException("Email is not verified!");
         } catch (Exception e) {
             throw new BadRequestException("Bad Credentials");
         }
 
-        if (!user.getEnabled()) {
-            operations.sendEmail(user);
-            throw new EmailNotValidException("Email is not verified! Check your emails");
-        }
-
-        var rModel = new RefreshModel();
-        if (loginDto.username().equals(adminUser.getUsername())) {
-            rModel.setUserId(adminUser.getId());
-            rModel.setId(refreshService.getIdByUserId(adminUser.getId()));
-        } else {
-            rModel.setId(refreshService.getIdByUserId(user.getId()));
-            rModel.setUserId(user.getId());
-        }
 
         var accessToken = jwtUtils.generateAccessToken(username);
         var refreshToken = jwtUtils.generateRefreshToken(username, rModel.getUserId());
@@ -121,6 +107,7 @@ public class UserAuthUtils {
         refreshService.saveToken(rModel);
 
         setupHeader(response, accessToken, refreshToken);
+        return user;
     }
 
     public void setupHeader(HttpServletResponse response, String accessToken, String refreshToken) {
@@ -133,16 +120,28 @@ public class UserAuthUtils {
 //        response.addHeader("access_expiration", accessDate);
     }
 
-
     public Optional<? extends UserDetails> loadUserByUsername(String username) {
-        if (username.equals(adminUser.getUsername())) {
-            var authorities = adminUser.getAuthorities();
+        if (username.equals(adminUser.username())) {
+            var authorities = adminUser.authorities();
             return Optional.of(
-                    User.builder().username(adminUser.getUsername())
-                            .password(encoder.encode(adminUser.getPassword())).authorities(authorities).build()
+                    User.builder().username(adminUser.username())
+                            .password(encoder.encode(adminUser.password())).authorities(authorities).build()
             );
         }
         return repo.findByEmailOrUsername(username);
     }
 
+    private void validateUserData(Optional<UserModel> user) {
+        user.map(UserModel::getId).ifPresent(id -> {
+            throw new ForbiddenException("You are not allowed to sign up! :|");
+        });
+
+        user.map(UserModel::getEmail)
+                .ifPresent(email -> {
+                    var username = user.map(UserModel::getUserName);
+                    if (username.isEmpty() || username.get().isBlank() || username.get().equals(adminUser.username()))
+                        user.get().setUserName(email.split("@")[0]);
+                });
+        passwordUtils.passEqualityChecker(user);
+    }
 }

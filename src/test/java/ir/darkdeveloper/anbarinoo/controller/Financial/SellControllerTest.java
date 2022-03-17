@@ -4,7 +4,7 @@ import ir.darkdeveloper.anbarinoo.TestUtils;
 import ir.darkdeveloper.anbarinoo.dto.FinancialDto;
 import ir.darkdeveloper.anbarinoo.extentions.DatabaseSetup;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
-import ir.darkdeveloper.anbarinoo.model.Financial.SellModel;
+import ir.darkdeveloper.anbarinoo.model.SellModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.CategoryService;
@@ -44,7 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@AutoConfigureRestDocs(outputDir = "rest_apis_docs/sell_product")
+@AutoConfigureRestDocs(outputDir = "docs/sell_product")
 @DirtiesContext
 @ExtendWith(DatabaseSetup.class)
 public record SellControllerTest(UserService userService,
@@ -91,7 +91,7 @@ public record SellControllerTest(UserService userService,
                 .passwordRepeat("pass12P+")
                 .enabled(true)
                 .build();
-        userService.signUpUser(user, response);
+        userService.signUpUser(Optional.of(user), response);
         var userEmail = user.getEmail();
         userId = user.getId();
         request = testUtils.setUpHeaderAndGetReq(userEmail, userId);

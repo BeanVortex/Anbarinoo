@@ -1,4 +1,4 @@
-package ir.darkdeveloper.anbarinoo.model.Auth;
+package ir.darkdeveloper.anbarinoo.model;
 
 public enum AuthProvider {
     LOCAL,

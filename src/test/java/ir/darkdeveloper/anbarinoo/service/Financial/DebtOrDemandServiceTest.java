@@ -2,7 +2,7 @@ package ir.darkdeveloper.anbarinoo.service.Financial;
 
 import ir.darkdeveloper.anbarinoo.TestUtils;
 import ir.darkdeveloper.anbarinoo.extentions.DatabaseSetup;
-import ir.darkdeveloper.anbarinoo.model.Financial.DebtOrDemandModel;
+import ir.darkdeveloper.anbarinoo.model.DebtOrDemandModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
@@ -60,7 +60,7 @@ public record DebtOrDemandServiceTest(DebtOrDemandService demandService,
                 .passwordRepeat("pass12B~")
                 .build();
         var response = mock(HttpServletResponse.class);
-        userService.signUpUser(user, response);
+        userService.signUpUser(Optional.of(user), response);
         var fetchedModel = (UserModel) userService.loadUserByUsername(user.getEmail());
         assertThat(fetchedModel.getEmail()).isEqualTo(user.getEmail());
         assertThat(fetchedModel.getEnabled()).isEqualTo(true);

@@ -1,11 +1,9 @@
-package ir.darkdeveloper.anbarinoo.model.Financial;
+package ir.darkdeveloper.anbarinoo.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import ir.darkdeveloper.anbarinoo.model.UpdateModel;
-import ir.darkdeveloper.anbarinoo.model.UserModel;
-import ir.darkdeveloper.anbarinoo.model.deserializers.ChequeDeserializer;
-import ir.darkdeveloper.anbarinoo.model.serializers.ChequeSerializer;
+import ir.darkdeveloper.anbarinoo.util.json.ChequeDeserializer;
+import ir.darkdeveloper.anbarinoo.util.json.ChequeSerializer;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;

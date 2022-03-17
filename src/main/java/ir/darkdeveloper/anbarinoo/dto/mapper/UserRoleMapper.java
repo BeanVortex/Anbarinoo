@@ -1,7 +1,7 @@
 package ir.darkdeveloper.anbarinoo.dto.mapper;
 
 import ir.darkdeveloper.anbarinoo.dto.UserRoleDto;
-import ir.darkdeveloper.anbarinoo.model.Auth.Authority;
+import ir.darkdeveloper.anbarinoo.model.Authority;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.model.UserRole;
 import org.mapstruct.Mapper;

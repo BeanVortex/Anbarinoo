@@ -2,7 +2,7 @@ package ir.darkdeveloper.anbarinoo.service;
 
 import ir.darkdeveloper.anbarinoo.TestUtils;
 import ir.darkdeveloper.anbarinoo.exception.DataExistsException;
-import ir.darkdeveloper.anbarinoo.model.Auth.AuthProvider;
+import ir.darkdeveloper.anbarinoo.model.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import org.junit.jupiter.api.MethodOrderer;
@@ -57,7 +57,7 @@ public record UserServiceTest(UserService service,
                 .password("pass12B~")
                 .passwordRepeat("pass12B~")
                 .build();
-        service.signUpUser(user, response);
+        service.signUpUser(Optional.of(user), response);
         userId = user.getId();
         request = testUtils.setUpHeaderAndGetReq(user.getEmail(), userId);
     }
@@ -85,7 +85,7 @@ public record UserServiceTest(UserService service,
                 .passwordRepeat("pass12B~")
                 .build();
         assertThrows(DataExistsException.class, () -> {
-            service.signUpUser(user, response);
+            service.signUpUser(Optional.of(user), response);
             userId = user.getId();
             request = testUtils.setUpHeaderAndGetReq(user.getEmail(), userId);
         });

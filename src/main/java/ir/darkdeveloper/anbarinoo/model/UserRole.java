@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.persistence.*;
 
-import ir.darkdeveloper.anbarinoo.model.Auth.Authority;
 import lombok.*;
 
 @Getter

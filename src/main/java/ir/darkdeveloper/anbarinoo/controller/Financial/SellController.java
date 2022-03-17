@@ -3,7 +3,7 @@ package ir.darkdeveloper.anbarinoo.controller.Financial;
 import ir.darkdeveloper.anbarinoo.dto.FinancialDto;
 import ir.darkdeveloper.anbarinoo.dto.SellDto;
 import ir.darkdeveloper.anbarinoo.dto.mapper.BuySellMapper;
-import ir.darkdeveloper.anbarinoo.model.Financial.SellModel;
+import ir.darkdeveloper.anbarinoo.model.SellModel;
 import ir.darkdeveloper.anbarinoo.service.Financial.SellService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

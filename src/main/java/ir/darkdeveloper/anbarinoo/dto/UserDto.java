@@ -1,6 +1,6 @@
 package ir.darkdeveloper.anbarinoo.dto;
 
-import ir.darkdeveloper.anbarinoo.model.Auth.AuthProvider;
+import ir.darkdeveloper.anbarinoo.model.AuthProvider;
 
 public record UserDto(Long id, String email, String userName, Boolean enabled,
                       String shopImage, String profileImage, String shopName,

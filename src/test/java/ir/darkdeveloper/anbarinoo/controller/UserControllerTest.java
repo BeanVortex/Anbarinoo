@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@AutoConfigureRestDocs(outputDir = "rest_apis_docs/user")
+@AutoConfigureRestDocs(outputDir = "docs/user")
 @DirtiesContext
 @ExtendWith(DatabaseSetup.class)
 public record UserControllerTest(UserController controller,

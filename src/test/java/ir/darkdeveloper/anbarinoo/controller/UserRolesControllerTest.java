@@ -3,7 +3,7 @@ package ir.darkdeveloper.anbarinoo.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ir.darkdeveloper.anbarinoo.extentions.DatabaseSetup;
-import ir.darkdeveloper.anbarinoo.model.Auth.Authority;
+import ir.darkdeveloper.anbarinoo.model.Authority;
 import ir.darkdeveloper.anbarinoo.model.UserRole;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@AutoConfigureRestDocs(outputDir = "rest_apis_docs/user_roles")
+@AutoConfigureRestDocs(outputDir = "docs/user_roles")
 @DirtiesContext
 @ExtendWith(DatabaseSetup.class)
 public record UserRolesControllerTest(UserService userService,

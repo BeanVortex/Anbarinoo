@@ -18,6 +18,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
@@ -52,7 +54,7 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
                 .passwordRepeat("pass12P+")
                 .enabled(true)
                 .build();
-        userService.signUpUser(user, response);
+        userService.signUpUser(Optional.of(user), response);
         userId = user.getId();
         request = testUtils.setUpHeaderAndGetReq(user.getEmail(), userId);
     }

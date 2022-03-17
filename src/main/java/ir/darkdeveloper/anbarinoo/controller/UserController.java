@@ -34,13 +34,14 @@ public class UserController {
     private final UserMapper userMapper;
 
     @PostMapping("/signup/")
-    @PreAuthorize("authentication.name.equals(@userService.getAdminUser().getUsername()) " +
+    @PreAuthorize("authentication.name.equals(@userService.getAdminUser().username()) " +
             "|| authentication.name.equals('anonymousUser')")
     public ResponseEntity<UserDto> signUpUser(@ModelAttribute @Valid UserModel user, BindingResult bindingResult,
                                               HttpServletResponse response) throws Exception {
         if (!bindingResult.hasErrors())
             return new ResponseEntity<>(
-                    userMapper.userToDto(userService.signUpUser(user, response)), HttpStatus.CREATED);
+                    userMapper.userToDto(userService.signUpUser(Optional.ofNullable(user), response)),
+                    HttpStatus.CREATED);
 
         var errors = bindingResult.getFieldErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.toList());

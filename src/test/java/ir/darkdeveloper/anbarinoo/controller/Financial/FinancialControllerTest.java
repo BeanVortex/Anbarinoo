@@ -5,8 +5,8 @@ import ir.darkdeveloper.anbarinoo.dto.FinancialDto;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.extentions.DatabaseSetup;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
-import ir.darkdeveloper.anbarinoo.model.Financial.BuyModel;
-import ir.darkdeveloper.anbarinoo.model.Financial.SellModel;
+import ir.darkdeveloper.anbarinoo.model.BuyModel;
+import ir.darkdeveloper.anbarinoo.model.SellModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.CategoryService;
@@ -52,7 +52,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@AutoConfigureRestDocs(outputDir = "rest_apis_docs/financial")
+@AutoConfigureRestDocs(outputDir = "docs/financial")
 @DirtiesContext
 @ExtendWith(DatabaseSetup.class)
 public record FinancialControllerTest(UserService userService,
@@ -102,7 +102,7 @@ public record FinancialControllerTest(UserService userService,
                 .passwordRepeat("pass12P+")
                 .enabled(true)
                 .build();
-        userService.signUpUser(user, response);
+        userService.signUpUser(Optional.of(user), response);
         var userEmail = user.getEmail();
         var userId = user.getId();
         request = testUtils.setUpHeaderAndGetReq(userEmail, userId);

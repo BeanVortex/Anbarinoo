@@ -1,0 +1,13 @@
+{
+  "id": 5,
+  "nameOf": "Me",
+  "payTo": "Other",
+  "amount": 10,
+  "isDebt": true,
+  "isCheckedOut": true,
+  "user": 2,
+  "issuedAt": "2022-03-17T09:56:18.135892362",
+  "validTill": "2022-03-22T09:56:18.135913398",
+  "createdAt": "2022-03-17T09:56:18.135921784",
+  "updatedAt": "2022-03-17T09:56:23.135926487"
+}

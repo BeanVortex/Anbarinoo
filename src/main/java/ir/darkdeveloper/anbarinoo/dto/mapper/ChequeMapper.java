@@ -2,7 +2,7 @@ package ir.darkdeveloper.anbarinoo.dto.mapper;
 
 import ir.darkdeveloper.anbarinoo.config.StartupConfig;
 import ir.darkdeveloper.anbarinoo.dto.ChequeDto;
-import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
+import ir.darkdeveloper.anbarinoo.model.ChequeModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;

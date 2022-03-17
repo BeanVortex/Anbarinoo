@@ -1,9 +1,9 @@
 package ir.darkdeveloper.anbarinoo.service;
 
+import ir.darkdeveloper.anbarinoo.dto.LoginDto;
 import ir.darkdeveloper.anbarinoo.exception.*;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.UserRepo;
-import ir.darkdeveloper.anbarinoo.dto.LoginDto;
 import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.Operations;
@@ -12,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -111,24 +109,12 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public UserModel loginUser(LoginDto loginDto, HttpServletResponse response) {
-        return exceptionHandlers(() -> {
-            if (loginDto.username().equals(adminUser.getUsername()))
-                userAuthUtils.authenticateUser(loginDto, null, response);
-            else
-                userAuthUtils.authenticateUser(loginDto, null, response);
-            return repo.findByEmailOrUsername(loginDto.username())
-                    .orElseThrow(() -> new NoContentException("User does not exist"));
-        });
+        return exceptionHandlers(() -> userAuthUtils.authenticateUser(loginDto, response));
     }
 
     @Transactional
-    public UserModel signUpUser(UserModel model, HttpServletResponse response) {
-        return exceptionHandlers(() -> {
-            userAuthUtils.signup(model, response);
-            return repo.findByEmailOrUsername(model.getUsername())
-                    .orElseThrow(() -> new NoContentException("User does not exist"));
-        });
-
+    public UserModel signUpUser(Optional<UserModel> model, HttpServletResponse response) {
+        return exceptionHandlers(() -> userAuthUtils.signup(model, response));
     }
 
     public UserModel getUserInfo(Long id, HttpServletRequest req) {

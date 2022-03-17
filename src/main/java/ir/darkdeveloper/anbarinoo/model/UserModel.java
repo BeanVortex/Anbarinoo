@@ -1,10 +1,6 @@
 package ir.darkdeveloper.anbarinoo.model;
 
 import com.fasterxml.jackson.annotation.*;
-import ir.darkdeveloper.anbarinoo.model.Auth.AuthProvider;
-import ir.darkdeveloper.anbarinoo.model.Auth.Authority;
-import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
-import ir.darkdeveloper.anbarinoo.model.Financial.DebtOrDemandModel;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -34,7 +30,7 @@ public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel
     private Long id;
 
     @Column(nullable = false, unique = true, updatable = false)
-    @NotEmpty
+    @NotEmpty(message = "Email should not be empty")
     @Email
     private String email;
 

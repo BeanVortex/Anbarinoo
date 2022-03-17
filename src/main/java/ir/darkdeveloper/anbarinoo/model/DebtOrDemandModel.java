@@ -1,4 +1,4 @@
-package ir.darkdeveloper.anbarinoo.model.Financial;
+package ir.darkdeveloper.anbarinoo.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -13,10 +13,8 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import ir.darkdeveloper.anbarinoo.model.UpdateModel;
-import ir.darkdeveloper.anbarinoo.model.UserModel;
-import ir.darkdeveloper.anbarinoo.model.deserializers.DebtOrDemandDeserializer;
-import ir.darkdeveloper.anbarinoo.model.serializers.DebtOrDemandSerializer;
+import ir.darkdeveloper.anbarinoo.util.json.DebtOrDemandDeserializer;
+import ir.darkdeveloper.anbarinoo.util.json.DebtOrDemandSerializer;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -75,8 +73,8 @@ public class DebtOrDemandModel implements UpdateModel<DebtOrDemandModel> {
 
     @Override
     public void update(DebtOrDemandModel model) {
-        id = model.id != null || id == null ? model.id : id;
         nameOf = model.nameOf != null || nameOf == null ? model.nameOf : nameOf;
+        id = model.id != null || id == null ? model.id : id;
         payTo = model.payTo != null || payTo == null ? model.payTo : payTo;
         isDebt = model.isDebt != null || isDebt == null ? model.isDebt : isDebt;
         isCheckedOut = model.isCheckedOut != null || isCheckedOut == null ? model.isCheckedOut : isCheckedOut;

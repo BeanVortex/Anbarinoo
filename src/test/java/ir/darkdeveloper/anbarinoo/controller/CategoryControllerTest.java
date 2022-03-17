@@ -24,6 +24,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Optional;
 
 import static ir.darkdeveloper.anbarinoo.TestUtils.mapToJson;
 import static org.hamcrest.Matchers.hasSize;
@@ -38,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@AutoConfigureRestDocs(outputDir = "rest_apis_docs/category")
+@AutoConfigureRestDocs(outputDir = "docs/category")
 @DirtiesContext
 @ExtendWith(DatabaseSetup.class)
 public record CategoryControllerTest(UserService userService,
@@ -80,7 +81,7 @@ public record CategoryControllerTest(UserService userService,
                 .password("pass12P+")
                 .passwordRepeat("pass12P+")
                 .build();
-        userService.signUpUser(user, response);
+        userService.signUpUser(Optional.of(user), response);
         authHeaders = testUtils.getAuthHeaders(user.getEmail(), user.getId());
     }
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ir.darkdeveloper.anbarinoo.TestUtils;
 import ir.darkdeveloper.anbarinoo.config.StartupConfig;
 import ir.darkdeveloper.anbarinoo.extentions.DatabaseSetup;
-import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
+import ir.darkdeveloper.anbarinoo.model.ChequeModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
@@ -26,6 +26,7 @@ import org.springframework.web.context.WebApplicationContext;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static ir.darkdeveloper.anbarinoo.TestUtils.mapToJson;
@@ -41,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@AutoConfigureRestDocs(outputDir = "rest_apis_docs/cheque")
+@AutoConfigureRestDocs(outputDir = "docs/cheque")
 @DirtiesContext
 @ExtendWith(DatabaseSetup.class)
 public record ChequeControllerTest(JwtUtils jwtUtils,
@@ -82,7 +83,7 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
                 .passwordRepeat("pass12P+")
                 .enabled(true)
                 .build();
-        userService.signUpUser(user, response);
+        userService.signUpUser(Optional.of(user), response);
         var userEmail = user.getEmail();
         userId = user.getId();
         authHeaders = testUtils.getAuthHeaders(userEmail, userId);

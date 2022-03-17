@@ -104,7 +104,7 @@ public record JwtTest(WebApplicationContext webApplicationContext, JwtUtils jwtU
         assertThat(jwtUtils.getExpirationDate(refreshToken).getSecond())
                 .isCloseTo(dateRefresh.getSecond(), Percentage.withPercentage(20));
         assertThat(jwtUtils.getExpirationDate(accessToken).getSecond())
-                .isCloseTo(dateAccess.getSecond(), Percentage.withPercentage(20));
+                .isCloseTo(dateAccess.getSecond(), Percentage.withPercentage(40));
     }
 
 

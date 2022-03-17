@@ -2,7 +2,7 @@ package ir.darkdeveloper.anbarinoo.controller.Financial;
 
 import ir.darkdeveloper.anbarinoo.dto.ChequeDto;
 import ir.darkdeveloper.anbarinoo.dto.mapper.ChequeMapper;
-import ir.darkdeveloper.anbarinoo.model.Financial.ChequeModel;
+import ir.darkdeveloper.anbarinoo.model.ChequeModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
