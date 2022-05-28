@@ -1,6 +1,6 @@
 # Anbarinoo
 
-A simple warehouse and financial application to control your business and products
+A simple warehouse and financial application to manage your business and products
 
 ## Features
 
