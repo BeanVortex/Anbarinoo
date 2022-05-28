@@ -37,12 +37,12 @@ public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel
     @Column(unique = true)
     private String userName;
 
-    @Pattern(regexp = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9\\s]).+", message = "Bad password")
+//    @Pattern(regexp = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9\\s]).+", message = "Bad password")
     @Size(min = 6, message = "Password length must be at least 6")
     private String password;
 
     @Transient
-    @Pattern(regexp = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9\\s]).+", message = "Bad repeat password")
+//    @Pattern(regexp = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9\\s]).+", message = "Bad repeat password")
     @Size(min = 6, message = "Password length must be at least 6")
     private String passwordRepeat;
 

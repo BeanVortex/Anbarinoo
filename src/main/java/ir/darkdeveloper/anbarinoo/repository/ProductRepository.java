@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 
+import java.util.List;
 
 
 @Repository
@@ -21,5 +22,9 @@ public interface ProductRepository extends PagingAndSortingRepository<ProductMod
     @Query("select m from ProductModel m " +
             "where m.category.user.id = :userId")
     Page<ProductModel> findAllByUserId(Long userId, Pageable pageable);
+
+    @Query("select m from ProductModel m " +
+            "where m.category.user.id = :userId")
+    List<ProductModel> findAllByUserId(Long userId);
 
 }

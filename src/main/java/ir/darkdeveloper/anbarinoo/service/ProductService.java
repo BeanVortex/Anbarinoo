@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -123,6 +124,13 @@ public class ProductService {
         return exceptionHandlers(() -> {
             var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
             return repo.findAllByUserId(userId, pageable);
+        });
+    }
+
+    public List<ProductModel> getAllProducts(HttpServletRequest req) {
+        return exceptionHandlers(() -> {
+            var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
+            return repo.findAllByUserId(userId);
         });
     }
 

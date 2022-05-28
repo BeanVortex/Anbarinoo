@@ -9,6 +9,7 @@ import ir.darkdeveloper.anbarinoo.dto.UserDto;
 import ir.darkdeveloper.anbarinoo.dto.mapper.UserMapper;
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
 
     private final UserService userService;

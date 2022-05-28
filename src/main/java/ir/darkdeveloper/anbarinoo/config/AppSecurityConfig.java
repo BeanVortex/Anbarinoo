@@ -65,6 +65,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
                                 "/js/**", "/img/**",
                                 "/api/user/signup/",
                                 "/api/user/login/",
+                                "/user/profile_images/noProfile.jpeg",
                                 "/api/post/all/",
                                 "/oauth2/**",
                                 "/api/export/excel/**",
