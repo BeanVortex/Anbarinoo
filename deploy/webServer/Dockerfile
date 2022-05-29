@@ -1,2 +1,2 @@
 FROM ubuntu:latest
-FROM nginx
+FROM nginx:1.22
