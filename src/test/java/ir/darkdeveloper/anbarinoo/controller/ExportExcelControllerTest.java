@@ -105,6 +105,7 @@ record ExportExcelControllerTest(WebApplicationContext webApplicationContext,
 
     @Test
     @Order(3)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
     void saveProduct() {
         var product = ProductModel.builder()
                 .name("name")
@@ -122,11 +123,13 @@ record ExportExcelControllerTest(WebApplicationContext webApplicationContext,
         product.setCategory(new CategoryModel(catId));
         productService.saveProduct(Optional.of(product), request);
         productId = product.getId();
+
     }
 
 
     @Test
     @Order(4)
+    @WithMockUser(authorities = "OP_ACCESS_USER")
     void getProductsExcel() throws Exception {
         mockMvc.perform(get("/api/export/excel/products")
                         .headers(authHeaders)
