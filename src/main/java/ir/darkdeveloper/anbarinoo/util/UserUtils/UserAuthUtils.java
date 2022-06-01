@@ -50,7 +50,8 @@ public class UserAuthUtils {
         var rawPass = user.map(UserModel::getPassword)
                 .orElseThrow(() -> new PasswordException("Password is required!"));
         validateUserData(user);
-        user.get().setRoles(roleService.findAllByName("USER"));
+        var role = roleService.findAllByName("USER");
+        user.get().setRoles(role);
         ioUtils.saveUserImages(user);
         user.get().setPassword(encoder.encode(user.get().getPassword()));
         user.get().setProvider(AuthProvider.LOCAL);

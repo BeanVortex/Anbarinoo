@@ -46,6 +46,7 @@ public class CategoryModel {
     @Builder.Default
     private List<CategoryModel> children = new LinkedList<>();
 
+    // bidirectional: it means that the foreign key is on the other side
     @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @ToString.Exclude

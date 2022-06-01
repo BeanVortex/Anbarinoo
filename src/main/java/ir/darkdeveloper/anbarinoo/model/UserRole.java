@@ -35,11 +35,10 @@ public class UserRole implements Serializable {
     @Enumerated(EnumType.STRING)
     private List<Authority> authorities;
 
-    @ManyToMany
-    @JoinTable(
-            name = "users_roles",
-            joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
+    // it means, users own roles
+    // other side is the owner
+    // this is the inverse side
+    @ManyToMany(mappedBy = "roles")
     @ToString.Exclude
     private List<UserModel> users;
 

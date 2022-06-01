@@ -2,7 +2,6 @@ package ir.darkdeveloper.anbarinoo.controller;
 
 import ir.darkdeveloper.anbarinoo.dto.mapper.ProductMapper;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
-import ir.darkdeveloper.anbarinoo.repository.ProductRepository;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
@@ -33,7 +32,7 @@ public class ExportExcelController {
     private final ProductMapper productMapper;
 
     @GetMapping(value = "/products")
-    @PreAuthorize("authentication.name.equals('anonymousUser')")
+    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER', 'OP_ACCESS_ADMIN')")
     public ResponseEntity<Resource> productsExcel(HttpServletRequest req) throws IOException {
 
         var workBook = new XSSFWorkbook();
