@@ -49,6 +49,7 @@ public class ProductService {
             product.map(ProductModel::getCategory).orElseThrow(() -> new BadRequestException("Product can't be null"));
             product.map(ProductModel::getCategory).map(CategoryModel::getId)
                     .orElseThrow(() -> new BadRequestException("Product category or category id can't be empty"));
+            product.get().setTax(product.map(ProductModel::getTax).orElse(9));
             var savedProduct = productUtils.saveProduct(product, req);
             var buy = BuyModel.builder()
                     .product(savedProduct).count(savedProduct.getTotalCount())
