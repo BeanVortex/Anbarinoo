@@ -30,6 +30,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.mockito.Mockito.mock;
@@ -52,10 +53,10 @@ record ExportExcelControllerTest(WebApplicationContext webApplicationContext,
 
 
     private static Long userId;
+    private static HttpServletRequest request;
     private static HttpHeaders authHeaders;
     private static Long productId;
     private static Long catId;
-    private static HttpServletRequest request;
     private static MockMvc mockMvc;
 
 
@@ -131,11 +132,13 @@ record ExportExcelControllerTest(WebApplicationContext webApplicationContext,
     @Order(4)
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getProductsExcel() throws Exception {
-        mockMvc.perform(get("/api/export/excel/products")
+        var mvcResult = mockMvc.perform(get("/api/export/excel/products")
                         .headers(authHeaders)
                         .accept(MediaType.APPLICATION_OCTET_STREAM)
                 )
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+        assertThat(mvcResult.getResponse().getContentType()).isEqualTo("application/octet-stream");
     }
 }
