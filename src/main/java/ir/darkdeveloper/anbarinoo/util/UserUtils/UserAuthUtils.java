@@ -156,7 +156,7 @@ public class UserAuthUtils {
                 // in case when attacker tried to change the userId in refreshToken
                 // db query
                 var fetchedId = refreshService.getUserIdByRefreshToken(token)
-                        .orElseThrow(() -> new ForbiddenException("dsafads"));
+                        .orElseThrow(() -> new ForbiddenException("You are logged out. Try logging in again"));
                 if (!fetchedId.equals(id))
                     throw new ForbiddenException("You don't have permission to " + operation);
             }
