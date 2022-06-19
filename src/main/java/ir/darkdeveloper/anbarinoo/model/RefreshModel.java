@@ -26,4 +26,6 @@ public class RefreshModel {
     private Long userId;
 
     private String accessToken;
+
+    private String refreshToken;
 }

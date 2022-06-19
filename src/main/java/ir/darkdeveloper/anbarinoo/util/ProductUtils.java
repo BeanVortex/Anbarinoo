@@ -1,7 +1,6 @@
 package ir.darkdeveloper.anbarinoo.util;
 
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
-import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
 import ir.darkdeveloper.anbarinoo.model.BuyModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
@@ -9,13 +8,11 @@ import ir.darkdeveloper.anbarinoo.repository.Financial.BuyRepo;
 import ir.darkdeveloper.anbarinoo.repository.ProductRepository;
 import ir.darkdeveloper.anbarinoo.service.CategoryService;
 import ir.darkdeveloper.anbarinoo.service.Financial.BuyService;
+import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.NotNull;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -25,24 +22,20 @@ public record ProductUtils(JwtUtils jwtUtils,
                            ProductRepository repo,
                            IOUtils ioUtils,
                            CategoryService categoryService,
-                           BuyRepo buyRepo) {
+                           BuyRepo buyRepo,
+                           UserAuthUtils userAuthUtils) {
 
     @Autowired
     public ProductUtils {
     }
 
-    @NotNull
     public ProductModel saveProduct(Optional<ProductModel> productOpt, HttpServletRequest req) {
         productOpt.map(ProductModel::getId).ifPresent(i -> productOpt.get().setId(null));
         var product = productOpt.orElseThrow(() -> new BadRequestException("Product can't be null"));
         var fetchedCat = categoryService.getCategoryById(product.getCategory().getId(), req);
-        checkUserIsSameUserForRequest(fetchedCat.getUser().getId(), req, "create");
+        userAuthUtils.checkUserIsSameUserForRequest(fetchedCat.getUser().getId(), req, "create");
         product.setCategory(fetchedCat);
-        try {
-            ioUtils.saveProductImages(product);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        ioUtils.saveProductImages(product);
         return repo.save(product);
     }
 
@@ -51,9 +44,10 @@ public record ProductUtils(JwtUtils jwtUtils,
         return repo.save(preProduct);
     }
 
-    public ProductModel updateProductImages(Optional<ProductModel> product, ProductModel preProduct) throws IOException {
+    public ProductModel updateProductImages(Optional<ProductModel> product, ProductModel preProduct) {
         product.map(ProductModel::getFiles)
                 .orElseThrow(() -> new BadRequestException("Image files are empty"));
+
 
         ioUtils.addProductImages(product.get(), preProduct);
         product.get().getCategory().setUser(new UserModel(preProduct.getCategory().getUser().getId()));
@@ -61,12 +55,6 @@ public record ProductUtils(JwtUtils jwtUtils,
         return repo.save(product.get());
     }
 
-    public void checkUserIsSameUserForRequest(Long userId, HttpServletRequest req, String operation) {
-
-        var id = jwtUtils.getUserId(req.getHeader("refresh_token"));
-        if (!userId.equals(id))
-            throw new ForbiddenException("You can't " + operation + " another user's products");
-    }
 
     public void updateDeleteProductImages(ProductModel product, ProductModel preProduct) {
         ioUtils.updateDeleteProductImages(product, preProduct);

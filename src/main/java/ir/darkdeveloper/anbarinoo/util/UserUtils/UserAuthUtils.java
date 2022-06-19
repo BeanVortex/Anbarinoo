@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -103,6 +104,7 @@ public class UserAuthUtils {
         var refreshToken = jwtUtils.generateRefreshToken(username, rModel.getUserId());
 
         rModel.setAccessToken(accessToken);
+        rModel.setRefreshToken(refreshToken);
         refreshService.saveToken(rModel);
 
         setupHeader(response, accessToken, refreshToken);
@@ -142,5 +144,23 @@ public class UserAuthUtils {
                         user.get().setUserName(email.split("@")[0]);
                 });
         passwordUtils.passEqualityChecker(user);
+    }
+
+    public void checkUserIsSameUserForRequest(Long userId, HttpServletRequest req, String operation) {
+        var token = req.getHeader("refresh_token");
+        if (!jwtUtils.isTokenExpired(token)) {
+            var id = jwtUtils.getUserId(token);
+            if (!id.equals(userId))
+                throw new ForbiddenException("You don't have permission to " + operation);
+            else {
+                // in case when attacker tried to change the userId in refreshToken
+                // db query
+                var fetchedId = refreshService.getUserIdByRefreshToken(token)
+                        .orElseThrow(() -> new ForbiddenException("dsafads"));
+                if (!fetchedId.equals(id))
+                    throw new ForbiddenException("You don't have permission to " + operation);
+            }
+        } else
+            throw new ForbiddenException("You are logged out. Try logging in again");
     }
 }

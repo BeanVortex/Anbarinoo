@@ -17,12 +17,15 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.function.Supplier;
 
+import static ir.darkdeveloper.anbarinoo.util.ExceptionUtils.exceptionHandlers;
+
 @Service
 @RequiredArgsConstructor
 public class CategoryService {
 
     private final CategoryRepo repo;
     private final JwtUtils jwtUtils;
+    private static final String DATA_EXISTS_MESSAGE = "Category exists!";
 
 
     /**
@@ -34,7 +37,7 @@ public class CategoryService {
             if (model.getId() != null) model.setId(null);
             model.setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
             return repo.save(model);
-        });
+        }, DATA_EXISTS_MESSAGE);
     }
 
     /**
@@ -48,14 +51,14 @@ public class CategoryService {
             model.setParent(fetchedCategory);
             fetchedCategory.addChild(model);
             return repo.save(model);
-        });
+        }, DATA_EXISTS_MESSAGE);
     }
 
     public List<CategoryModel> getCategoriesByUser(HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
             return repo.findAllByUserId(userId);
-        });
+        }, DATA_EXISTS_MESSAGE);
     }
 
     @Transactional
@@ -64,7 +67,7 @@ public class CategoryService {
             checkUserIsSameUserForRequest(categoryId, req, "delete");
             repo.deleteById(categoryId);
             return ResponseEntity.ok("Deleted the category");
-        });
+        }, DATA_EXISTS_MESSAGE);
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
@@ -72,7 +75,7 @@ public class CategoryService {
         return exceptionHandlers(() -> {
             checkUserIsSameUserForRequest(categoryId, req, "fetch");
             return repo.findById(categoryId).orElseThrow(() -> new NoContentException("Category is not found"));
-        });
+        }, DATA_EXISTS_MESSAGE);
     }
 
     private void checkUserIsSameUserForRequest(Long categoryId, HttpServletRequest req, String operation) {
@@ -84,20 +87,5 @@ public class CategoryService {
             throw new ForbiddenException("You can't " + operation + " another user's categories");
     }
 
-    private <T> T exceptionHandlers(Supplier<T> supplier) {
-        try {
-            return supplier.get();
-        } catch (DataException | BadRequestException e) {
-            throw new BadRequestException(e.getLocalizedMessage());
-        } catch (ForbiddenException e) {
-            throw new ForbiddenException(e.getLocalizedMessage());
-        } catch (NoContentException e) {
-            throw new NoContentException(e.getLocalizedMessage());
-        } catch (DataIntegrityViolationException e) {
-            throw new DataExistsException("Category exists!");
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
-    }
 
 }

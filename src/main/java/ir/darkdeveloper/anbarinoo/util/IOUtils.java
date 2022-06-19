@@ -28,15 +28,19 @@ public class IOUtils {
      * @param file MultipartFile
      * @param path after user/
      */
-    private Optional<String> saveFile(MultipartFile file, String path) throws IOException {
-        if (file != null) {
-            // first it may not upload and save file in the path. should create static/img
-            // folder in resources
-            var location = ResourceUtils.getFile(path).getAbsolutePath();
-            var bytes = file.getBytes();
-            var fileName = UUID.randomUUID() + "." + Objects.requireNonNull(file.getContentType()).split("/")[1];
-            Files.write(Paths.get(location + File.separator + fileName), bytes);
-            return Optional.of(fileName);
+    private Optional<String> saveFile(MultipartFile file, String path) {
+        try {
+            if (file != null) {
+                // first it may not upload and save file in the path. should create static/img
+                // folder in resources
+                var location = ResourceUtils.getFile(path).getAbsolutePath();
+                var bytes = file.getBytes();
+                var fileName = UUID.randomUUID() + "." + Objects.requireNonNull(file.getContentType()).split("/")[1];
+                Files.write(Paths.get(location + File.separator + fileName), bytes);
+                return Optional.of(fileName);
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
         return Optional.empty();
     }
@@ -71,19 +75,16 @@ public class IOUtils {
             if (!isProfileImage || !isProfileFile)
                 user.get().setProfileImage(DEFAULT_PROFILE_IMAGE);
 
-            try {
-                var profileFileName = saveFile(user.get().getProfileFile(), USER_IMAGE_PATH);
-                profileFileName.ifPresent(user.get()::setProfileImage);
+            var profileFileName = saveFile(user.get().getProfileFile(), USER_IMAGE_PATH);
+            profileFileName.ifPresent(user.get()::setProfileImage);
 
-                var shopFileName = saveFile(user.get().getShopFile(), USER_IMAGE_PATH);
-                shopFileName.ifPresent(user.get()::setShopImage);
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
+            var shopFileName = saveFile(user.get().getShopFile(), USER_IMAGE_PATH);
+            shopFileName.ifPresent(user.get()::setShopImage);
+
         }
     }
 
-    public void updateUserImages(Optional<UserModel> userOpt, UserModel preUser) throws IOException {
+    public void updateUserImages(Optional<UserModel> userOpt, UserModel preUser) {
 
         var user = userOpt.orElseThrow(() -> new BadRequestException("User can't be null"));
 
@@ -108,7 +109,7 @@ public class IOUtils {
     }
 
 
-    public void updateDeleteUserImages(Optional<UserModel> userOpt, UserModel preUser) throws IOException {
+    public void updateDeleteUserImages(Optional<UserModel> userOpt, UserModel preUser) {
         var user = userOpt.orElseThrow(() -> new BadRequestException("User can't be null"));
         if (user.getShopImage() != null && user.getShopImage().equals(preUser.getShopImage())) {
             deleteShopFile(preUser);
@@ -126,27 +127,36 @@ public class IOUtils {
      *
      * @param preModel: should be fetched from db
      */
-    public void deleteUserImages(UserModel preModel) throws IOException {
+    public void deleteUserImages(UserModel preModel) {
         if (!preModel.getProfileImage().equals(DEFAULT_PROFILE_IMAGE))
             deleteProfileFile(preModel);
         if (!preModel.getShopImage().equals(DEFAULT_SHOP_IMAGE))
             deleteShopFile(preModel);
     }
 
-    private void deleteProfileFile(UserModel preModel) throws IOException {
-        if (preModel != null && preModel.getId() != null && preModel.getProfileImage() != null) {
-            var imgPath = getImagePath(USER_IMAGE_PATH, preModel.getProfileImage());
-            if (imgPath != null)
-                Files.delete(Paths.get(imgPath));
+    private void deleteProfileFile(UserModel preModel) {
+        try {
+            if (preModel != null && preModel.getId() != null && preModel.getProfileImage() != null) {
+                var imgPath = getImagePath(USER_IMAGE_PATH, preModel.getProfileImage());
+                if (imgPath != null) {
+                    Files.delete(Paths.get(imgPath));
+                }
 
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 
-    private void deleteShopFile(UserModel preModel) throws IOException {
-        if (preModel != null && preModel.getId() != null && preModel.getShopImage() != null) {
-            var imgPath = getImagePath(USER_IMAGE_PATH, preModel.getShopImage());
-            if (imgPath != null)
-                Files.delete(Paths.get(imgPath));
+    private void deleteShopFile(UserModel preModel) {
+        try {
+            if (preModel != null && preModel.getId() != null && preModel.getShopImage() != null) {
+                var imgPath = getImagePath(USER_IMAGE_PATH, preModel.getShopImage());
+                if (imgPath != null)
+                    Files.delete(Paths.get(imgPath));
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -158,8 +168,7 @@ public class IOUtils {
      *
      * @param product: in this you should send new images files
      */
-    public void saveProductImages(ProductModel product)
-            throws IOException {
+    public void saveProductImages(ProductModel product) {
 
         var fileNames = new ArrayList<String>();
         var files = product.getFiles();
@@ -184,14 +193,14 @@ public class IOUtils {
      * @param product:    in this you should send new images files
      * @param preProduct: data of this object will be merged with product and adds remaining images to product
      */
-    public void addProductImages(ProductModel product, ProductModel preProduct) throws IOException {
+    public void addProductImages(ProductModel product, ProductModel preProduct) {
         var fileNames = new ArrayList<String>();
         var files = product.getFiles();
 
         if (preProduct.getImages().size() + files.size() > 5)
             throw new BadRequestException("You can't have images more than 5!");
 
-        for (MultipartFile file : files)
+        for (var file : files)
             fileNames.add(saveFile(file, PRODUCT_IMAGE_PATH).orElse(DEFAULT_PRODUCT_IMAGE));
 
         //adding remaining images name in previous product

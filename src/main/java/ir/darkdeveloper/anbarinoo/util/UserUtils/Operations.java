@@ -13,8 +13,6 @@ import ir.darkdeveloper.anbarinoo.util.email.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,12 +33,7 @@ public class Operations {
         if (!user.isEnabled())
             throw new EmailNotValidException("Email is not verified! Check your emails");
 
-        try {
-            ioUtils.deleteUserImages(user);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-
+        ioUtils.deleteUserImages(user);
         user.getCategories().forEach(cat -> ioUtils.deleteProductImagesOfUser(Optional.of(cat.getProducts())));
 
         refreshService.deleteTokenByUserId(user.getId());
@@ -66,11 +59,7 @@ public class Operations {
     public UserModel updateUserImages(Optional<UserModel> user, Long id) {
         user.orElseThrow(() -> new BadRequestException("User can't be null"));
         var foundUser = repo.findById(id).orElseThrow(() -> new NoContentException("User not found"));
-        try {
-            ioUtils.updateUserImages(user, foundUser);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        ioUtils.updateUserImages(user, foundUser);
         //changed merge to update
         foundUser.update(user.get());
         return foundUser;
@@ -79,11 +68,7 @@ public class Operations {
     public UserModel updateDeleteUserImages(Optional<UserModel> user, Long id) {
         var foundUser = repo.findById(id)
                 .orElseThrow(() -> new NoContentException("User not found"));
-        try {
-            ioUtils.updateDeleteUserImages(user, foundUser);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        ioUtils.updateDeleteUserImages(user, foundUser);
         return foundUser;
     }
 

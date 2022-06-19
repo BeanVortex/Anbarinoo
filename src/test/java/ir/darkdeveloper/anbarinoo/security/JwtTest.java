@@ -3,7 +3,6 @@ package ir.darkdeveloper.anbarinoo.security;
 import ir.darkdeveloper.anbarinoo.extentions.DatabaseSetup;
 import ir.darkdeveloper.anbarinoo.security.jwt.JwtFilter;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import org.assertj.core.data.Percentage;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +21,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.http.Part;
-import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -36,7 +34,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext
 @ExtendWith(DatabaseSetup.class)
-public record JwtTest(WebApplicationContext webApplicationContext, JwtUtils jwtUtils, JwtFilter filter) {
+public record JwtTest(WebApplicationContext webApplicationContext,
+                      JwtUtils jwtUtils,
+                      JwtFilter filter) {
 
     // a simple test class based on user controller test
 
@@ -45,8 +45,6 @@ public record JwtTest(WebApplicationContext webApplicationContext, JwtUtils jwtU
     private static MockMvc mockMvc;
     private static String refreshToken;
     private static String accessToken;
-    private static LocalDateTime dateRefresh;
-    private static LocalDateTime dateAccess;
     private static final Long accessTime = (long) (2 * 1000);
     private static final Long refreshTime = (long) (5 * 1000);
 
@@ -69,8 +67,6 @@ public record JwtTest(WebApplicationContext webApplicationContext, JwtUtils jwtU
                 .addFilter(filter).build();
         jwtUtils.setAccessExpire(accessTime);
         jwtUtils.setRefreshExpire(refreshTime);
-        dateAccess = LocalDateTime.now().plusSeconds(accessTime / 1000);
-        dateRefresh = LocalDateTime.now().plusSeconds(refreshTime / 1000);
     }
 
 
@@ -100,11 +96,6 @@ public record JwtTest(WebApplicationContext webApplicationContext, JwtUtils jwtU
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.id").isNotEmpty());
 
-        // based on system performance
-        assertThat(jwtUtils.getExpirationDate(refreshToken).getSecond())
-                .isCloseTo(dateRefresh.getSecond(), Percentage.withPercentage(20));
-        assertThat(jwtUtils.getExpirationDate(accessToken).getSecond())
-                .isCloseTo(dateAccess.getSecond(), Percentage.withPercentage(40));
     }
 
 

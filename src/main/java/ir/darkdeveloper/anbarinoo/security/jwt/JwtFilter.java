@@ -72,10 +72,12 @@ public class JwtFilter extends OncePerRequestFilter {
             //db query
             var storedRefreshModel = refreshService.getRefreshByUserId(userId);
             var storedAccessToken = storedRefreshModel.getAccessToken();
+            var storedRefreshToken = storedRefreshModel.getRefreshToken();
             if (accessToken.equals(storedAccessToken)) {
                 var newAccessToken = jwtUtils.generateAccessToken(username);
                 var refreshModel = new RefreshModel();
                 refreshModel.setAccessToken(newAccessToken);
+                refreshModel.setRefreshToken(storedRefreshToken);
                 refreshModel.setUserId(userId);
                 refreshModel.setId(storedRefreshModel.getId());
                 // db query

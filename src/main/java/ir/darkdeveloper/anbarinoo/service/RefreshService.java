@@ -2,10 +2,15 @@ package ir.darkdeveloper.anbarinoo.service;
 
 
 import javax.transaction.Transactional;
+
+import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
+import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import org.springframework.stereotype.Service;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 import ir.darkdeveloper.anbarinoo.repository.RefreshRepo;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +34,10 @@ public class RefreshService {
 
     public Long getIdByUserId(Long adminId) {
         return repo.getIdByUserId(adminId);
+    }
+
+    public Optional<Long> getUserIdByRefreshToken(String token) {
+        return repo.findUserIdByRefreshToken(token);
     }
 
 }

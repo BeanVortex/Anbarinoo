@@ -85,8 +85,8 @@ public class UserController {
 
     @DeleteMapping("/{id}/")
     @PreAuthorize("hasAnyAuthority('OP_DELETE_USER')")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id, HttpServletRequest req) {
-        return userService.deleteUser(id, req);
+    public ResponseEntity<String> deleteUser(@PathVariable Long id, HttpServletRequest req) {
+        return ResponseEntity.ok(userService.deleteUser(id, req));
     }
 
     @GetMapping("/all/")

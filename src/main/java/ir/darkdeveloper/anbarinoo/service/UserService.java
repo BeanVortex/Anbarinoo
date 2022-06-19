@@ -1,7 +1,9 @@
 package ir.darkdeveloper.anbarinoo.service;
 
 import ir.darkdeveloper.anbarinoo.dto.LoginDto;
-import ir.darkdeveloper.anbarinoo.exception.*;
+import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
+import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
+import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.UserRepo;
 import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
@@ -9,7 +11,6 @@ import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.Operations;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.function.Supplier;
+
+import static ir.darkdeveloper.anbarinoo.util.ExceptionUtils.exceptionHandlers;
 
 @Service("userService")
 @RequiredArgsConstructor
@@ -35,7 +37,9 @@ public class UserService implements UserDetailsService {
     private final Operations userOP;
     private final AdminUserProperties adminUser;
     private final VerificationService verificationService;
+    private final RefreshService refreshService;
     private final JwtUtils jwtUtils;
+    private static final String DATA_EXISTS_MESSAGE = "User exists!";
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -45,17 +49,17 @@ public class UserService implements UserDetailsService {
 
 
     /**
-     * #model.getId() == null should be null. if wasn't other users can change other users data due to
+     * #model.getId() == null should be null. if wasn't other users can change other users' data due to
      * implementation of this method!!
      */
     @Transactional
     public UserModel updateUser(Optional<UserModel> user, Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             user.map(UserModel::getId).ifPresent(i -> user.get().setId(null));
-            checkUserIsSameUserForRequest(id, req, "update");
+            userAuthUtils.checkUserIsSameUserForRequest(id, req, "update");
             var updatedUser = userOP.updateUser(user, id);
             return repo.save(updatedUser);
-        });
+        }, DATA_EXISTS_MESSAGE);
     }
 
     /**
@@ -69,11 +73,11 @@ public class UserService implements UserDetailsService {
     public UserModel updateUserImages(Optional<UserModel> user, Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             user.map(UserModel::getId).ifPresent(i -> user.get().setId(null));
-            checkUserIsSameUserForRequest(id, req, "update images");
+            userAuthUtils.checkUserIsSameUserForRequest(id, req, "update images");
             var updatedUser = userOP.updateUserImages(user, id);
             return repo.save(updatedUser);
 
-        });
+        }, DATA_EXISTS_MESSAGE);
     }
 
     /**
@@ -87,20 +91,20 @@ public class UserService implements UserDetailsService {
     public UserModel updateDeleteUserImages(Optional<UserModel> user, Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             user.map(UserModel::getId).ifPresent(i -> user.get().setId(null));
-            checkUserIsSameUserForRequest(id, req, "delete images");
+            userAuthUtils.checkUserIsSameUserForRequest(id, req, "delete images");
             var updatedUser = userOP.updateDeleteUserImages(user, id);
             return repo.save(updatedUser);
-        });
+        }, DATA_EXISTS_MESSAGE);
     }
 
     @Transactional
-    public ResponseEntity<?> deleteUser(Long id, HttpServletRequest req) {
+    public String deleteUser(Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             var user = repo.findById(id).orElseThrow(() -> new NoContentException("User does not exist"));
-            checkUserIsSameUserForRequest(user.getId(), req, "delete");
+            userAuthUtils.checkUserIsSameUserForRequest(id, req, "delete");
             userOP.deleteUser(user);
-            return new ResponseEntity<>("Deleted the user", HttpStatus.OK);
-        });
+            return "Deleted the user";
+        }, DATA_EXISTS_MESSAGE);
     }
 
     public Page<UserModel> allUsers(Pageable pageable) {
@@ -109,20 +113,19 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public UserModel loginUser(LoginDto loginDto, HttpServletResponse response) {
-        return exceptionHandlers(() -> userAuthUtils.authenticateUser(loginDto, response));
+        return exceptionHandlers(() -> userAuthUtils.authenticateUser(loginDto, response), DATA_EXISTS_MESSAGE);
     }
 
     @Transactional
     public UserModel signUpUser(Optional<UserModel> model, HttpServletResponse response) {
-        return exceptionHandlers(() -> userAuthUtils.signup(model, response));
+        return exceptionHandlers(() -> userAuthUtils.signup(model, response), DATA_EXISTS_MESSAGE);
     }
 
     public UserModel getUserInfo(Long id, HttpServletRequest req) {
         return exceptionHandlers(() -> {
-            var user = repo.findById(id).orElseThrow(() -> new NoContentException("User does not exist"));
-            checkUserIsSameUserForRequest(id, req, "fetch");
-            return user;
-        });
+            userAuthUtils.checkUserIsSameUserForRequest(id, req, "fetch");
+            return repo.findById(id).orElseThrow(() -> new NoContentException("User does not exist"));
+        }, DATA_EXISTS_MESSAGE);
     }
 
 
@@ -133,7 +136,7 @@ public class UserService implements UserDetailsService {
         return exceptionHandlers(() -> {
             var id = jwtUtils.getUserId(req.getHeader("refresh_token"));
             return repo.getSimpleUserInfo(id).orElseThrow(() -> new NoContentException("User does not exist"));
-        });
+        }, DATA_EXISTS_MESSAGE);
     }
 
 
@@ -153,31 +156,5 @@ public class UserService implements UserDetailsService {
         return adminUser;
     }
 
-    private void checkUserIsSameUserForRequest(Long userId, HttpServletRequest req, String operation) {
-        var token = req.getHeader("refresh_token");
-        if (!jwtUtils.isTokenExpired(token)) {
-            var id = jwtUtils.getUserId(token);
-            if (!userId.equals(id))
-                throw new ForbiddenException("You can't " + operation + " another user's products");
-        } else
-            throw new ForbiddenException("You are logged out. Try logging in again");
-    }
 
-    private <T> T exceptionHandlers(Supplier<T> supplier) {
-        try {
-            return supplier.get();
-        } catch (DataIntegrityViolationException e) {
-            throw new DataExistsException("User exists!");
-        } catch (EmailNotValidException e) {
-            throw new EmailNotValidException(e.getLocalizedMessage());
-        } catch (PasswordException e) {
-            throw new PasswordException(e.getLocalizedMessage());
-        } catch (ForbiddenException f) {
-            throw new ForbiddenException(f.getLocalizedMessage());
-        } catch (NoContentException e) {
-            throw new NoContentException(e.getLocalizedMessage());
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
-    }
 }
