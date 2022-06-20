@@ -115,7 +115,7 @@ public record FinancialControllerTest(UserService userService,
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void saveCategory() {
         var electronics = new CategoryModel("Electronics");
-        categoryService.saveCategory(electronics, request);
+        categoryService.saveCategory(Optional.of(electronics), request);
         catId = electronics.getId();
     }
 

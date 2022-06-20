@@ -82,7 +82,7 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
         var galaxy = new CategoryModel("Galaxy", samsung);
         galaxy.setUser(user);
         samsung.addChild(galaxy);
-        categoryService.saveCategory(electronics, request);
+        categoryService.saveCategory(Optional.of(electronics), request);
     }
 
     @Test

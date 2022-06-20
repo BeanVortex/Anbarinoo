@@ -1,21 +1,20 @@
 package ir.darkdeveloper.anbarinoo.service;
 
-import ir.darkdeveloper.anbarinoo.exception.*;
+import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
+import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.CategoryRepo;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
+import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.exception.DataException;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.Optional;
 
 import static ir.darkdeveloper.anbarinoo.util.ExceptionUtils.exceptionHandlers;
 
@@ -25,6 +24,7 @@ public class CategoryService {
 
     private final CategoryRepo repo;
     private final JwtUtils jwtUtils;
+    private final UserAuthUtils userAuthUtils;
     private static final String DATA_EXISTS_MESSAGE = "Category exists!";
 
 
@@ -32,11 +32,13 @@ public class CategoryService {
      * Only save a category. children will be ignored
      */
     @Transactional
-    public CategoryModel saveCategory(CategoryModel model, HttpServletRequest req) {
+    public CategoryModel saveCategory(Optional<CategoryModel> model, HttpServletRequest req) {
         return exceptionHandlers(() -> {
-            if (model.getId() != null) model.setId(null);
-            model.setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
-            return repo.save(model);
+            var category = model.orElseThrow(() -> new BadRequestException("Category can't be empty"));
+            model.map(CategoryModel::getId).ifPresent(id -> category.setId(null));
+            userAuthUtils.checkUserIsSameUserForRequest(null, req, "save a cat");
+            category.setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
+            return repo.save(category);
         }, DATA_EXISTS_MESSAGE);
     }
 
@@ -44,13 +46,15 @@ public class CategoryService {
      * Saves a category under a parent (children of this sub cat will be ignored)
      */
     @Transactional
-    public CategoryModel saveSubCategory(CategoryModel model, Long parentId, HttpServletRequest req) {
+    public CategoryModel saveSubCategory(Optional<CategoryModel> model, Long parentId, HttpServletRequest req) {
         return exceptionHandlers(() -> {
+            var category = model.orElseThrow(() -> new BadRequestException("Category can't be empty"));
             var fetchedCategory = getCategoryById(parentId, req);
-            model.setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
-            model.setParent(fetchedCategory);
-            fetchedCategory.addChild(model);
-            return repo.save(model);
+            userAuthUtils.checkUserIsSameUserForRequest(null, req, "save a sub cat");
+            category.setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
+            category.setParent(fetchedCategory);
+            fetchedCategory.addChild(category);
+            return repo.save(category);
         }, DATA_EXISTS_MESSAGE);
     }
 
@@ -62,29 +66,22 @@ public class CategoryService {
     }
 
     @Transactional
-    public ResponseEntity<?> deleteCategory(Long categoryId, HttpServletRequest req) {
+    public String deleteCategory(Long categoryId, HttpServletRequest req) {
         return exceptionHandlers(() -> {
-            checkUserIsSameUserForRequest(categoryId, req, "delete");
+            userAuthUtils.checkUserIsSameUserForRequest(null, req, "delete the cat");
             repo.deleteById(categoryId);
-            return ResponseEntity.ok("Deleted the category");
+            return "Deleted the category";
         }, DATA_EXISTS_MESSAGE);
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public CategoryModel getCategoryById(Long categoryId, HttpServletRequest req) {
         return exceptionHandlers(() -> {
-            checkUserIsSameUserForRequest(categoryId, req, "fetch");
-            return repo.findById(categoryId).orElseThrow(() -> new NoContentException("Category is not found"));
+            var category = repo.findById(categoryId)
+                    .orElseThrow(() -> new NoContentException("Category is not found"));
+            userAuthUtils.checkUserIsSameUserForRequest(null, req, "fetch the cat");
+            return category;
         }, DATA_EXISTS_MESSAGE);
-    }
-
-    private void checkUserIsSameUserForRequest(Long categoryId, HttpServletRequest req, String operation) {
-        var foundCategory = repo.findById(categoryId)
-                .orElseThrow(() -> new NoContentException("Category does not exist"));
-        var userId = foundCategory.getUser().getId();
-        var id = jwtUtils.getUserId(req.getHeader("refresh_token"));
-        if (!userId.equals(id))
-            throw new ForbiddenException("You can't " + operation + " another user's categories");
     }
 
 

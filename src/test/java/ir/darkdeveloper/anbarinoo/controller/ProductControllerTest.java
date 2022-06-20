@@ -124,7 +124,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     void saveCategory() {
         var electronics = new CategoryModel("Electronics");
         request = testUtils.setUpHeaderAndGetReq("email@mail.com", userId);
-        categoryService.saveCategory(electronics, request);
+        categoryService.saveCategory(Optional.of(electronics), request);
         catId = electronics.getId();
     }
 

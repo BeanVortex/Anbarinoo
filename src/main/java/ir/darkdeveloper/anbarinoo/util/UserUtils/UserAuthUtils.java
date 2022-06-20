@@ -146,11 +146,14 @@ public class UserAuthUtils {
         passwordUtils.passEqualityChecker(user);
     }
 
+    /**
+     * @param userId if it is null, then it compares id in jwt token and id mapped to this token in database
+     */
     public void checkUserIsSameUserForRequest(Long userId, HttpServletRequest req, String operation) {
         var token = req.getHeader("refresh_token");
         if (!jwtUtils.isTokenExpired(token)) {
             var id = jwtUtils.getUserId(token);
-            if (!id.equals(userId))
+            if (userId != null && !id.equals(userId))
                 throw new ForbiddenException("You don't have permission to " + operation);
             else {
                 // in case when attacker tried to change the userId in refreshToken

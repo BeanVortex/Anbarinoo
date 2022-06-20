@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import ir.darkdeveloper.anbarinoo.dto.CategoryDto;
 import ir.darkdeveloper.anbarinoo.dto.mapper.CategoryMapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.sl.draw.geom.GuideIf;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,6 +21,7 @@ import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.service.CategoryService;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/category")
@@ -34,14 +36,17 @@ public class CategoryController {
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
     public ResponseEntity<CategoryDto> saveCategory(@RequestBody CategoryModel model,
                                                     HttpServletRequest request) {
-        return new ResponseEntity<>(mapper.categoryToDto(service.saveCategory(model, request)), HttpStatus.CREATED);
+        var savedCat = service.saveCategory(Optional.ofNullable(model), request);
+        return new ResponseEntity<>(mapper.categoryToDto(savedCat), HttpStatus.CREATED);
     }
 
     @PostMapping("/sub-category/save/{parentId}/")
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
     public ResponseEntity<CategoryDto> saveSubCategory(@RequestBody CategoryModel model,
-                                                       @PathVariable Long parentId, HttpServletRequest request) {
-        return ResponseEntity.ok(mapper.categoryToDto(service.saveSubCategory(model, parentId, request)));
+                                                       @PathVariable Long parentId,
+                                                       HttpServletRequest request) {
+        var savedSubCat = service.saveSubCategory(Optional.ofNullable(model), parentId, request);
+        return ResponseEntity.ok(mapper.categoryToDto(savedSubCat));
     }
 
     record CategoriesDto(List<CategoryDto> categories) {
@@ -62,8 +67,8 @@ public class CategoryController {
 
     @DeleteMapping("/{id}/")
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ResponseEntity<?> deleteCategoryById(@PathVariable Long id, HttpServletRequest request) {
-        return service.deleteCategory(id, request);
+    public ResponseEntity<String> deleteCategoryById(@PathVariable Long id, HttpServletRequest request) {
+        return ResponseEntity.ok(service.deleteCategory(id, request));
     }
 
 }

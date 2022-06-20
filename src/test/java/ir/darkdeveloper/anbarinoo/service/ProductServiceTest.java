@@ -80,7 +80,7 @@ public record ProductServiceTest(ProductService productService,
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void saveCategory() {
         var electronics = new CategoryModel("Electronics");
-        categoryService.saveCategory(electronics, request);
+        categoryService.saveCategory(Optional.of(electronics), request);
         catId = electronics.getId();
     }
 
@@ -219,8 +219,15 @@ public record ProductServiceTest(ProductService productService,
         // should delete all products and product images of this user
         // for images check build/resources/test/static/user/product_images/
         userService.deleteUser(userId, request);
-        assertThrows(NoContentException.class, () -> categoryService.getCategoryById(catId, request));
-        assertThrows(NoContentException.class, () -> productService.getProduct(productId, request));
+
+        // user is deleted so can't access to system
+        assertThrows(NoContentException.class,
+                () -> categoryService.getCategoryById(catId, request),
+                "Category is not found");
+        assertThrows(NoContentException.class,
+                () -> productService.getProduct(productId, request),
+                "This product does not exist");
+
     }
 
 }
