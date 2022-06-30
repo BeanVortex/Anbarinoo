@@ -1,7 +1,9 @@
 package ir.darkdeveloper.anbarinoo.security.jwt;
 
+import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
+import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.RefreshService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
@@ -43,28 +45,31 @@ public class JwtFilter extends OncePerRequestFilter {
             var username = jwtUtils.getUsername(refreshToken.get());
             var userId = ((Integer) jwtUtils.getAllClaimsFromToken(refreshToken.get())
                     .get("user_id")).longValue();
-            authenticateUser(username);
-            setUpHeader(response, accessToken.get(), username, userId);
+            authenticateUser(username, userId);
+            setUpHeader(response, refreshToken.get(), accessToken.get(), username, userId);
         }
         filterChain.doFilter(request, response);
     }
 
 
-    private void authenticateUser(String username) {
+    private void authenticateUser(String username, Long userId) {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (username != null && auth == null) {
             //db query
             var userDetails = userAuthUtils.loadUserByUsername(username)
                     .orElseThrow(() -> new NoContentException("User does not exist"));
+            var userModel = (UserModel) userDetails;
+            if (!userModel.getId().equals(userId))
+                throw new ForbiddenException("Do not change token. I'm watching you");
+
             var upToken = new UsernamePasswordAuthenticationToken(userDetails, null,
                     userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(upToken);
-
         }
     }
 
-    private void setUpHeader(HttpServletResponse response, String accessToken, String username,
-                             Long userId) {
+    private void setUpHeader(HttpServletResponse response, String refreshToken,
+                             String accessToken, String username, Long userId) {
 
 
         // if this didn't execute, it means the access token is still valid
@@ -73,7 +78,7 @@ public class JwtFilter extends OncePerRequestFilter {
             var storedRefreshModel = refreshService.getRefreshByUserId(userId);
             var storedAccessToken = storedRefreshModel.getAccessToken();
             var storedRefreshToken = storedRefreshModel.getRefreshToken();
-            if (accessToken.equals(storedAccessToken)) {
+            if (accessToken.equals(storedAccessToken) && storedRefreshToken.equals(refreshToken)) {
                 var newAccessToken = jwtUtils.generateAccessToken(username);
                 var refreshModel = new RefreshModel();
                 refreshModel.setAccessToken(newAccessToken);
