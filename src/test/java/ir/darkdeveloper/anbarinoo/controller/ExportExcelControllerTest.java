@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -25,13 +26,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -51,10 +50,8 @@ record ExportExcelControllerTest(WebApplicationContext webApplicationContext,
                                  JwtUtils jwtUtils, TestUtils testUtils) {
 
 
-    private static Long userId;
     private static HttpServletRequest request;
     private static HttpHeaders authHeaders;
-    private static Long productId;
     private static Long catId;
     private static MockMvc mockMvc;
 
@@ -76,7 +73,7 @@ record ExportExcelControllerTest(WebApplicationContext webApplicationContext,
     @Order(1)
     @WithMockUser(username = "anonymousUser")
     void saveUser() {
-        var response = mock(HttpServletResponse.class);
+        var response = new MockHttpServletResponse();
         var user = UserModel.builder()
                 .email("email@mail.com")
                 .address("address")
@@ -86,10 +83,8 @@ record ExportExcelControllerTest(WebApplicationContext webApplicationContext,
                 .passwordRepeat("pass12P+")
                 .build();
         userService.signUpUser(Optional.of(user), response);
-        userId = user.getId();
-        var userEmail = user.getEmail();
-        request = testUtils.setUpHeaderAndGetReq(userEmail, userId);
-        authHeaders = testUtils.getAuthHeaders(userEmail, userId);
+        request = testUtils.setUpHeaderAndGetReqWithRes(response);
+        authHeaders = testUtils.getAuthHeaders(response);
     }
 
 
@@ -97,7 +92,6 @@ record ExportExcelControllerTest(WebApplicationContext webApplicationContext,
     @Order(2)
     void saveCategory() {
         var electronics = new CategoryModel("Electronics");
-        request = testUtils.setUpHeaderAndGetReq("email@mail.com", userId);
         categoryService.saveCategory(Optional.of(electronics), request);
         catId = electronics.getId();
     }
@@ -122,7 +116,7 @@ record ExportExcelControllerTest(WebApplicationContext webApplicationContext,
         product.setFiles(Arrays.asList(file3, file4));
         product.setCategory(new CategoryModel(catId));
         productService.saveProduct(Optional.of(product), request);
-        productId = product.getId();
+        Long productId = product.getId();
 
     }
 

@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockPart;
 import org.springframework.restdocs.RestDocumentationContextProvider;
@@ -26,7 +27,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,6 @@ import java.util.Optional;
 import static ir.darkdeveloper.anbarinoo.TestUtils.mapToJson;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Mockito.mock;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -55,7 +54,6 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
                                     JwtUtils jwtUtils, TestUtils testUtils) {
 
 
-    private static Long userId;
     private static HttpHeaders authHeaders1;
     private static HttpHeaders authHeaders2;
     private static Long productId;
@@ -80,7 +78,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     @Order(1)
     @WithMockUser(username = "anonymousUser")
     void saveUser() {
-        var response = mock(HttpServletResponse.class);
+        var response = new MockHttpServletResponse();
         var user = UserModel.builder()
                 .email("email@mail.com")
                 .address("address")
@@ -90,18 +88,15 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
                 .passwordRepeat("pass12P+")
                 .build();
         userService.signUpUser(Optional.of(user), response);
-        userId = user.getId();
-        var userEmail = user.getEmail();
-        request = testUtils.setUpHeaderAndGetReq(userEmail, userId);
-        authHeaders1 = testUtils.getAuthHeaders(userEmail, userId);
-        System.out.println(jwtUtils.getUserId(authHeaders1.getFirst("refresh_token")));
+        request = testUtils.setUpHeaderAndGetReqWithRes(response);
+        authHeaders1 = testUtils.getAuthHeaders(response);
     }
 
     @Test
     @Order(2)
     @WithMockUser(username = "anonymousUser")
     void saveUser2() {
-        HttpServletResponse response = mock(HttpServletResponse.class);
+        var response = new MockHttpServletResponse();
         var user = UserModel.builder()
                 .email("email2@mail.com")
                 .address("address")
@@ -111,11 +106,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
                 .passwordRepeat("pass12P+")
                 .build();
         userService.signUpUser(Optional.of(user), response);
-        var userId2 = user.getId();
-        var userEmail = user.getEmail();
-        request = testUtils.setUpHeaderAndGetReq(userEmail, userId2);
-        authHeaders2 = testUtils.getAuthHeaders(userEmail, userId2);
-        System.out.println(jwtUtils.getUserId(authHeaders1.getFirst("refresh_token")));
+        authHeaders2 = testUtils.getAuthHeaders(response);
     }
 
     @Test
@@ -123,7 +114,6 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void saveCategory() {
         var electronics = new CategoryModel("Electronics");
-        request = testUtils.setUpHeaderAndGetReq("email@mail.com", userId);
         categoryService.saveCategory(Optional.of(electronics), request);
         catId = electronics.getId();
     }

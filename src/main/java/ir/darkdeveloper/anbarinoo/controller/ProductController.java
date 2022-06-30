@@ -40,7 +40,8 @@ public class ProductController {
 
     @PutMapping("/update/{id}/")
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ResponseEntity<ProductDto> updateProduct(@RequestBody ProductModel product, @PathVariable("id") Long productId,
+    public ResponseEntity<ProductDto> updateProduct(@RequestBody ProductModel product,
+                                                    @PathVariable("id") Long productId,
                                                     HttpServletRequest request) {
         return ResponseEntity.ok(mapper.productToDto(
                 service.updateProduct(Optional.ofNullable(product), productId, request)
@@ -49,7 +50,8 @@ public class ProductController {
 
     @PutMapping("/update/images/{id}/")
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ResponseEntity<ProductDto> updateProductImages(@ModelAttribute ProductModel product, @PathVariable("id") Long productId,
+    public ResponseEntity<ProductDto> updateProductImages(@ModelAttribute ProductModel product,
+                                                          @PathVariable("id") Long productId,
                                                           HttpServletRequest request) {
         return ResponseEntity.ok(mapper.productToDto(
                 service.updateProductImages(Optional.ofNullable(product), productId, request)));
@@ -57,9 +59,11 @@ public class ProductController {
 
     @PutMapping("/update/delete-images/{id}/")
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ResponseEntity<?> updateDeleteProductImages(@RequestBody ProductModel product, @PathVariable("id") Long productId,
-                                                       HttpServletRequest request) {
-        return service.updateDeleteProductImages(Optional.ofNullable(product), productId, request);
+    public ResponseEntity<String> updateDeleteProductImages(@RequestBody ProductModel product,
+                                                            @PathVariable("id") Long productId,
+                                                            HttpServletRequest request) {
+        var message = service.updateDeleteProductImages(Optional.ofNullable(product), productId, request);
+        return ResponseEntity.ok(message);
     }
 
     @GetMapping("/{id}/")
@@ -76,8 +80,8 @@ public class ProductController {
 
     @DeleteMapping("/{id}/")
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ResponseEntity<?> deleteProduct(@PathVariable Long id, HttpServletRequest request) {
-        return service.deleteProduct(id, request);
+    public ResponseEntity<String> deleteProduct(@PathVariable Long id, HttpServletRequest request) {
+        return ResponseEntity.ok(service.deleteProduct(id, request));
     }
 
 

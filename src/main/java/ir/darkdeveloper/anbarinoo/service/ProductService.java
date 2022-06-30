@@ -14,8 +14,6 @@ import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +22,6 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-import static ir.darkdeveloper.anbarinoo.util.ExceptionUtils.exceptionHandlers;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +32,6 @@ public class ProductService {
     private final BuyService buyService;
     private final UserAuthUtils userAuthUtils;
     private final JwtUtils jwtUtils;
-    private static final String DATA_EXISTS_MESSAGE = "Product exists!";
 
     /**
      * saves a new product to the user id of refresh token
@@ -47,19 +43,18 @@ public class ProductService {
      */
     @Transactional
     public ProductModel saveProduct(Optional<ProductModel> product, HttpServletRequest req) {
-        return exceptionHandlers(() -> {
-            product.map(ProductModel::getCategory).orElseThrow(() -> new BadRequestException("Product can't be null"));
-            product.map(ProductModel::getCategory).map(CategoryModel::getId)
-                    .orElseThrow(() -> new BadRequestException("Product category or category id can't be empty"));
-            product.get().setTax(product.map(ProductModel::getTax).orElse(9));
-            var savedProduct = productUtils.saveProduct(product, req);
-            var buy = BuyModel.builder()
-                    .product(savedProduct).count(savedProduct.getTotalCount())
-                    .price(savedProduct.getPrice()).tax(savedProduct.getTax()).build();
-            buyService.saveBuy(Optional.of(buy), true, req);
-            savedProduct.setFirstBuyId(buy.getId());
-            return repo.save(savedProduct);
-        }, DATA_EXISTS_MESSAGE);
+        product.map(ProductModel::getCategory).orElseThrow(() -> new BadRequestException("Product can't be null"));
+        product.map(ProductModel::getCategory).map(CategoryModel::getId)
+                .orElseThrow(() -> new BadRequestException("Product category or category id can't be empty"));
+        product.get().setTax(product.map(ProductModel::getTax).orElse(9));
+        var savedProduct = productUtils.saveProduct(product, req);
+        var buy = BuyModel.builder()
+                .product(savedProduct).count(savedProduct.getTotalCount())
+                .price(savedProduct.getPrice()).tax(savedProduct.getTax()).build();
+        buyService.saveBuy(Optional.of(buy), true, req);
+        savedProduct.setFirstBuyId(buy.getId());
+        return repo.save(savedProduct);
+
     }
 
     /**
@@ -74,21 +69,19 @@ public class ProductService {
      */
     @Transactional
     public ProductModel updateProduct(Optional<ProductModel> product, Long productId, HttpServletRequest req) {
-        return exceptionHandlers(() -> {
-            product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
+        product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
 
-            var foundProduct = repo.findById(productId)
-                    .orElseThrow(() -> new NoContentException("This product does not exist"));
-            userAuthUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(),
-                    req, "update");
+        var foundProduct = repo.findById(productId)
+                .orElseThrow(() -> new NoContentException("This product does not exist"));
+        userAuthUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(),
+                req, "update");
 
-            if (product.map(ProductModel::getPrice).isPresent()
-                    || product.map(ProductModel::getTotalCount).isPresent())
-                productUtils.updateBuyWithProductUpdate(product, foundProduct, buyService, req);
+        if (product.map(ProductModel::getPrice).isPresent()
+                || product.map(ProductModel::getTotalCount).isPresent())
+            productUtils.updateBuyWithProductUpdate(product, foundProduct, buyService, req);
 
-            product.orElseThrow(() -> new BadRequestException("Product can't be null"));
-            return productUtils.updateProduct(product.get(), foundProduct);
-        }, DATA_EXISTS_MESSAGE);
+        product.orElseThrow(() -> new BadRequestException("Product can't be null"));
+        return productUtils.updateProduct(product.get(), foundProduct);
     }
 
     /**
@@ -96,49 +89,37 @@ public class ProductService {
      */
     @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public void updateProductFromBuyOrSell(Optional<ProductModel> product,
-                                           ProductModel preProduct,
+    public void updateProductFromBuyOrSell(Optional<ProductModel> product, ProductModel preProduct,
                                            HttpServletRequest req) {
-        exceptionHandlers(() -> {
-            product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
-            userAuthUtils.checkUserIsSameUserForRequest(preProduct.getCategory().getUser().getId(),
-                    req, "update");
-            product.orElseThrow(() -> new BadRequestException("Product can't be null"));
-            productUtils.updateProduct(product.get(), preProduct);
-            return null;
-        }, DATA_EXISTS_MESSAGE);
+        product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
+        userAuthUtils.checkUserIsSameUserForRequest(preProduct.getCategory().getUser().getId(),
+                req, "update");
+        product.orElseThrow(() -> new BadRequestException("Product can't be null"));
+        productUtils.updateProduct(product.get(), preProduct);
     }
 
     public Page<ProductModel> findByNameContains(String name, Pageable pageable, HttpServletRequest req) {
-        return exceptionHandlers(() -> {
-            var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
-            return repo.findByNameContainsAndUserId(name, userId, pageable);
-        }, DATA_EXISTS_MESSAGE);
+        var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
+        return repo.findByNameContainsAndUserId(name, userId, pageable);
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ProductModel getProduct(Long productId, HttpServletRequest req) {
-        return exceptionHandlers(() -> {
-            var foundProduct = repo.findById(productId)
-                    .orElseThrow(() -> new NoContentException("This product does not exist"));
-            userAuthUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(),
-                    req, "fetch");
-            return foundProduct;
-        }, DATA_EXISTS_MESSAGE);
+        var foundProduct = repo.findById(productId)
+                .orElseThrow(() -> new NoContentException("This product does not exist"));
+        userAuthUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(),
+                req, "fetch");
+        return foundProduct;
     }
 
     public Page<ProductModel> getAllProducts(Pageable pageable, HttpServletRequest req) {
-        return exceptionHandlers(() -> {
-            var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
-            return repo.findAllByUserId(userId, pageable);
-        }, DATA_EXISTS_MESSAGE);
+        var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
+        return repo.findAllByUserId(userId, pageable);
     }
 
     public List<ProductModel> getAllProducts(HttpServletRequest req) {
-        return exceptionHandlers(() -> {
-            var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
-            return repo.findAllByUserId(userId);
-        }, DATA_EXISTS_MESSAGE);
+        var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
+        return repo.findAllByUserId(userId);
     }
 
     /**
@@ -152,15 +133,13 @@ public class ProductService {
     @Transactional
     public ProductModel updateProductImages(Optional<ProductModel> product,
                                             Long productId, HttpServletRequest req) {
-        return exceptionHandlers(() -> {
-            product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
-            var foundProduct = repo.findById(productId)
-                    .orElseThrow(() -> new NoContentException("This product does not exist"));
+        product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
+        var foundProduct = repo.findById(productId)
+                .orElseThrow(() -> new NoContentException("This product does not exist"));
 
-            userAuthUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(),
-                    req, "update");
-            return productUtils.updateProductImages(product, foundProduct);
-        }, DATA_EXISTS_MESSAGE);
+        userAuthUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(),
+                req, "update");
+        return productUtils.updateProductImages(product, foundProduct);
     }
 
     /**
@@ -171,31 +150,27 @@ public class ProductService {
      * @param req       should contain refresh token
      */
     @Transactional
-    public ResponseEntity<?> updateDeleteProductImages(Optional<ProductModel> product, Long productId,
+    public String updateDeleteProductImages(Optional<ProductModel> product, Long productId,
                                                        HttpServletRequest req) {
-        return exceptionHandlers(() -> {
-            product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
-            var foundProduct = repo.findById(productId)
-                    .orElseThrow(() -> new NoContentException("This product does not exist"));
-            userAuthUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(),
-                    req, "delete images of another user's product");
-            product.orElseThrow(() -> new BadRequestException("Product can't be null"));
-            productUtils.updateDeleteProductImages(product.get(), foundProduct);
-            return new ResponseEntity<>(HttpStatus.OK);
-        }, DATA_EXISTS_MESSAGE);
+        product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
+        var foundProduct = repo.findById(productId)
+                .orElseThrow(() -> new NoContentException("This product does not exist"));
+        userAuthUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(),
+                req, "delete images of another user's product");
+        product.orElseThrow(() -> new BadRequestException("Product can't be null"));
+        productUtils.updateDeleteProductImages(product.get(), foundProduct);
+        return "deleted product images";
     }
 
     @Transactional
-    public ResponseEntity<?> deleteProduct(Long id, HttpServletRequest req) {
-        return exceptionHandlers(() -> {
-            var foundProduct = repo.findById(id)
-                    .orElseThrow(() -> new NoContentException("This product does not exist"));
-            userAuthUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(),
-                    req, "delete");
-            repo.deleteById(id);
-            ioUtils.deleteProductFiles(foundProduct);
-            return ResponseEntity.ok("Deleted the product");
-        }, DATA_EXISTS_MESSAGE);
+    public String deleteProduct(Long id, HttpServletRequest req) {
+        var foundProduct = repo.findById(id)
+                .orElseThrow(() -> new NoContentException("This product does not exist"));
+        userAuthUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(),
+                req, "delete");
+        repo.deleteById(id);
+        ioUtils.deleteProductFiles(foundProduct);
+        return "Deleted the product";
     }
 
 }

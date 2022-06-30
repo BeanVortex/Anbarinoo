@@ -2,6 +2,7 @@ package ir.darkdeveloper.anbarinoo.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,8 +30,8 @@ public class UserRolesController {
 
     @PostMapping("/")
     @PreAuthorize("hasAuthority('OP_ADD_ROLE')")
-    public ResponseEntity<?> saveRole(@RequestBody UserRole role) {
-        return service.saveRole(role);
+    public ResponseEntity<String> saveRole(@RequestBody UserRole role) {
+        return new ResponseEntity<>(service.saveRole(role), HttpStatus.CREATED);
     }
 
     record UserRoleDtos(List<UserRoleDto> userRoles) {
@@ -45,7 +46,7 @@ public class UserRolesController {
 
     @DeleteMapping("/{id}/")
     @PreAuthorize("hasAuthority('OP_DELETE_ROLE')")
-    public ResponseEntity<?> deleteRole(@PathVariable("id") Long id) {
-        return service.deleteRole(id);
+    public ResponseEntity<String> deleteRole(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(service.deleteRole(id));
     }
 }

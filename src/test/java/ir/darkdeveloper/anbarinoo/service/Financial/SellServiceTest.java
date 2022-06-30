@@ -4,8 +4,8 @@ import ir.darkdeveloper.anbarinoo.TestUtils;
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
-import ir.darkdeveloper.anbarinoo.model.SellModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
+import ir.darkdeveloper.anbarinoo.model.SellModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.CategoryService;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
@@ -16,17 +16,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -60,7 +59,7 @@ public record SellServiceTest(UserService userService,
     @Order(1)
     @WithMockUser(username = "anonymousUser")
     void saveUser() {
-        var response = mock(HttpServletResponse.class);
+        var response = new MockHttpServletResponse();
         var user = UserModel.builder()
                 .email("email@mail.com")
                 .address("address")
@@ -72,7 +71,7 @@ public record SellServiceTest(UserService userService,
                 .build();
         userService.signUpUser(Optional.of(user), response);
         userId = user.getId();
-        request = testUtils.setUpHeaderAndGetReq(user.getEmail(), userId);
+        request = testUtils.setUpHeaderAndGetReqWithRes(response);
     }
 
     @Test

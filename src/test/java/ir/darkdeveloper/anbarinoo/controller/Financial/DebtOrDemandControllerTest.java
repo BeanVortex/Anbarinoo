@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
@@ -21,7 +22,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -29,7 +29,6 @@ import java.util.Optional;
 import static ir.darkdeveloper.anbarinoo.TestUtils.mapToJson;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -70,7 +69,7 @@ public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
     @Order(1)
     @WithMockUser(username = "anonymousUser")
     void saveUser() {
-        var response = mock(HttpServletResponse.class);
+        var response = new MockHttpServletResponse();
         var user = UserModel.builder()
                 .email("email@mail.com")
                 .address("address")
@@ -82,7 +81,7 @@ public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
         userService.signUpUser(Optional.of(user), response);
         var userEmail = user.getEmail();
         userId = user.getId();
-        authHeaders = testUtils.getAuthHeaders(userEmail, userId);
+        authHeaders = testUtils.getAuthHeaders(response);
     }
 
 

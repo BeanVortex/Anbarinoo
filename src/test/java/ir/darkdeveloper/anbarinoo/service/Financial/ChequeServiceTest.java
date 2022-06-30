@@ -13,17 +13,16 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 
 @SpringBootTest
@@ -47,6 +46,7 @@ public record ChequeServiceTest(ChequeService chequeService,
     @Order(1)
     @WithMockUser(username = "anonymousUser")
     void saveUser() {
+        var response = new MockHttpServletResponse();
         var user = UserModel.builder()
                 .email("email@mail.com")
                 .address("address")
@@ -55,14 +55,13 @@ public record ChequeServiceTest(ChequeService chequeService,
                 .password("pass12B~")
                 .passwordRepeat("pass12B~")
                 .build();
-        var response = mock(HttpServletResponse.class);
         userService.signUpUser(Optional.of(user), response);
         var fetchedModel = (UserModel) userService.loadUserByUsername(user.getEmail());
         assertThat(fetchedModel.getEmail()).isEqualTo(user.getEmail());
         assertThat(fetchedModel.getEnabled()).isEqualTo(true);
         assertThat(fetchedModel.getUserName()).isEqualTo("email");
         userId = fetchedModel.getId();
-        request = testUtils.setUpHeaderAndGetReq(user.getEmail(), userId);
+        request = testUtils.setUpHeaderAndGetReqWithRes(response);
     }
 
     @Test

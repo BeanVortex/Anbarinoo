@@ -4,11 +4,7 @@ import ir.darkdeveloper.anbarinoo.TestUtils;
 import ir.darkdeveloper.anbarinoo.dto.FinancialDto;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.extentions.DatabaseSetup;
-import ir.darkdeveloper.anbarinoo.model.CategoryModel;
-import ir.darkdeveloper.anbarinoo.model.BuyModel;
-import ir.darkdeveloper.anbarinoo.model.SellModel;
-import ir.darkdeveloper.anbarinoo.model.ProductModel;
-import ir.darkdeveloper.anbarinoo.model.UserModel;
+import ir.darkdeveloper.anbarinoo.model.*;
 import ir.darkdeveloper.anbarinoo.service.CategoryService;
 import ir.darkdeveloper.anbarinoo.service.Financial.BuyService;
 import ir.darkdeveloper.anbarinoo.service.Financial.DebtOrDemandService;
@@ -24,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
@@ -32,7 +29,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -42,7 +38,6 @@ import static ir.darkdeveloper.anbarinoo.TestUtils.mapToJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -92,7 +87,7 @@ public record FinancialControllerTest(UserService userService,
     @Order(1)
     @WithMockUser(username = "anonymousUser")
     void saveUser() {
-        var response = mock(HttpServletResponse.class);
+        var response = new MockHttpServletResponse();
         var user = UserModel.builder()
                 .email("email@mail.com")
                 .address("address")
@@ -105,8 +100,8 @@ public record FinancialControllerTest(UserService userService,
         userService.signUpUser(Optional.of(user), response);
         var userEmail = user.getEmail();
         var userId = user.getId();
-        request = testUtils.setUpHeaderAndGetReq(userEmail, userId);
-        authHeaders = testUtils.getAuthHeaders(userEmail, userId);
+        request = testUtils.setUpHeaderAndGetReqWithRes(response);
+        authHeaders = testUtils.getAuthHeaders(response);
     }
 
 

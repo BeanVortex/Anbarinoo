@@ -16,7 +16,6 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-import static ir.darkdeveloper.anbarinoo.util.ExceptionUtils.exceptionHandlers;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +24,6 @@ public class CategoryService {
     private final CategoryRepo repo;
     private final JwtUtils jwtUtils;
     private final UserAuthUtils userAuthUtils;
-    private static final String DATA_EXISTS_MESSAGE = "Category exists!";
 
 
     /**
@@ -33,13 +31,11 @@ public class CategoryService {
      */
     @Transactional
     public CategoryModel saveCategory(Optional<CategoryModel> model, HttpServletRequest req) {
-        return exceptionHandlers(() -> {
-            var category = model.orElseThrow(() -> new BadRequestException("Category can't be empty"));
-            model.map(CategoryModel::getId).ifPresent(id -> category.setId(null));
-            userAuthUtils.checkUserIsSameUserForRequest(null, req, "save a cat");
-            category.setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
-            return repo.save(category);
-        }, DATA_EXISTS_MESSAGE);
+        var category = model.orElseThrow(() -> new BadRequestException("Category can't be empty"));
+        model.map(CategoryModel::getId).ifPresent(id -> category.setId(null));
+        userAuthUtils.checkUserIsSameUserForRequest(null, req, "save a cat");
+        category.setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
+        return repo.save(category);
     }
 
     /**
@@ -47,41 +43,33 @@ public class CategoryService {
      */
     @Transactional
     public CategoryModel saveSubCategory(Optional<CategoryModel> model, Long parentId, HttpServletRequest req) {
-        return exceptionHandlers(() -> {
-            var category = model.orElseThrow(() -> new BadRequestException("Category can't be empty"));
-            var fetchedCategory = getCategoryById(parentId, req);
-            userAuthUtils.checkUserIsSameUserForRequest(null, req, "save a sub cat");
-            category.setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
-            category.setParent(fetchedCategory);
-            fetchedCategory.addChild(category);
-            return repo.save(category);
-        }, DATA_EXISTS_MESSAGE);
+        var category = model.orElseThrow(() -> new BadRequestException("Category can't be empty"));
+        var fetchedCategory = getCategoryById(parentId, req);
+        userAuthUtils.checkUserIsSameUserForRequest(null, req, "save a sub cat");
+        category.setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
+        category.setParent(fetchedCategory);
+        fetchedCategory.addChild(category);
+        return repo.save(category);
     }
 
     public List<CategoryModel> getCategoriesByUser(HttpServletRequest req) {
-        return exceptionHandlers(() -> {
-            var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
-            return repo.findAllByUserId(userId);
-        }, DATA_EXISTS_MESSAGE);
+        var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
+        return repo.findAllByUserId(userId);
     }
 
     @Transactional
     public String deleteCategory(Long categoryId, HttpServletRequest req) {
-        return exceptionHandlers(() -> {
-            userAuthUtils.checkUserIsSameUserForRequest(null, req, "delete the cat");
-            repo.deleteById(categoryId);
-            return "Deleted the category";
-        }, DATA_EXISTS_MESSAGE);
+        userAuthUtils.checkUserIsSameUserForRequest(null, req, "delete the cat");
+        repo.deleteById(categoryId);
+        return "Deleted the category";
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public CategoryModel getCategoryById(Long categoryId, HttpServletRequest req) {
-        return exceptionHandlers(() -> {
-            var category = repo.findById(categoryId)
-                    .orElseThrow(() -> new NoContentException("Category is not found"));
-            userAuthUtils.checkUserIsSameUserForRequest(null, req, "fetch the cat");
-            return category;
-        }, DATA_EXISTS_MESSAGE);
+        var category = repo.findById(categoryId)
+                .orElseThrow(() -> new NoContentException("Category is not found"));
+        userAuthUtils.checkUserIsSameUserForRequest(null, req, "fetch the cat");
+        return category;
     }
 
 

@@ -56,8 +56,8 @@ public class UserController {
     }
 
     @GetMapping("/verify/")
-    public ResponseEntity<?> verifyUserEmail(@RequestParam("t") String token) {
-        return userService.verifyUserEmail(token);
+    public ResponseEntity<String> verifyUserEmail(@RequestParam("t") String token) {
+        return ResponseEntity.ok(userService.verifyUserEmail(token));
     }
 
     @PutMapping("/update/{id}/")

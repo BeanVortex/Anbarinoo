@@ -1,7 +1,6 @@
 package ir.darkdeveloper.anbarinoo.service;
 
 import ir.darkdeveloper.anbarinoo.TestUtils;
-import ir.darkdeveloper.anbarinoo.exception.DataExistsException;
 import ir.darkdeveloper.anbarinoo.model.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
@@ -11,19 +10,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -47,7 +46,7 @@ public record UserServiceTest(UserService service,
     @WithMockUser(username = "anonymousUser")
 //    @Disabled
     void signUpWithoutImage() {
-        var response = mock(HttpServletResponse.class);
+        var response = new MockHttpServletResponse();
         var user = UserModel.builder()
                 .email("email@mail.com")
                 .address("address")
@@ -59,14 +58,14 @@ public record UserServiceTest(UserService service,
                 .build();
         service.signUpUser(Optional.of(user), response);
         userId = user.getId();
-        request = testUtils.setUpHeaderAndGetReq(user.getEmail(), userId);
+        request = testUtils.setUpHeaderAndGetReqWithRes(response);
     }
 
     @Test
     @Order(1)
 //    @WithMockUser(username = "anonymousUser")
     void signUpWithImage() {
-        var response = mock(HttpServletResponse.class);
+        var response = new MockHttpServletResponse();
 
         var file1 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
                 "Hello, World!".getBytes());
@@ -84,10 +83,10 @@ public record UserServiceTest(UserService service,
                 .password("pass12B~")
                 .passwordRepeat("pass12B~")
                 .build();
-        assertThrows(DataExistsException.class, () -> {
+        assertThrows(DataIntegrityViolationException.class, () -> {
             service.signUpUser(Optional.of(user), response);
             userId = user.getId();
-            request = testUtils.setUpHeaderAndGetReq(user.getEmail(), userId);
+            request = testUtils.setUpHeaderAndGetReqWithRes(response);
         });
     }
 

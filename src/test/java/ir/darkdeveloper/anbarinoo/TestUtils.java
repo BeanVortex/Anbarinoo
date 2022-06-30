@@ -2,13 +2,11 @@ package ir.darkdeveloper.anbarinoo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 
 import static org.mockito.Mockito.mock;
@@ -17,28 +15,15 @@ import static org.mockito.Mockito.when;
 @Component
 public class TestUtils {
 
-    private final JwtUtils jwtUtils;
 
-    @Autowired
-    public TestUtils(JwtUtils jwtUtils) {
-        this.jwtUtils = jwtUtils;
-    }
-
-    //should return the object; data is being removed
-    public HttpServletRequest setUpHeaderAndGetReq(String email, Long userId) {
+    public HttpServletRequest setUpHeaderAndGetReqWithRes(HttpServletResponse res) {
 
         var headers = new HashMap<String, String>();
         headers.put(null, "HTTP/1.1 200 OK");
         headers.put("Content-Type", "text/html");
 
-        var refresh = jwtUtils.generateRefreshToken(email, userId);
-        var access = jwtUtils.generateAccessToken(email);
-        var refreshDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(refresh));
-        var accessDate = UserAuthUtils.TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(access));
-        headers.put("refresh_token", refresh);
-        headers.put("access_token", access);
-        headers.put("refresh_expiration", refreshDate);
-        headers.put("access_expiration", accessDate);
+        headers.put("refresh_token", res.getHeader("refresh_token"));
+        headers.put("access_token", res.getHeader("access_token"));
 
         var request = mock(HttpServletRequest.class);
         for (var key : headers.keySet())
@@ -63,8 +48,8 @@ public class TestUtils {
         return new ObjectMapper().writeValueAsString(obj);
     }
 
-    public HttpHeaders getAuthHeaders(String email, Long userId) {
-        var req = setUpHeaderAndGetReq(email, userId);
+    public HttpHeaders getAuthHeaders(HttpServletResponse response) {
+        var req = setUpHeaderAndGetReqWithRes(response);
         var headers = new HttpHeaders();
         headers.add("refresh_token", getRefreshToken(req));
         headers.add("access_token", getAccessToken(req));

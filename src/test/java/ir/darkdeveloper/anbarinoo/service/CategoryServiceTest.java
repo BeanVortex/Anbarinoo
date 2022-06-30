@@ -12,16 +12,14 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -44,7 +42,7 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
     @Order(1)
     @WithMockUser(username = "anonymousUser")
     void saveUser() {
-        var response = mock(HttpServletResponse.class);
+        var response = new MockHttpServletResponse();
         var user = UserModel.builder()
                 .email("email4@mail.com")
                 .address("address")
@@ -56,7 +54,7 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
                 .build();
         userService.signUpUser(Optional.of(user), response);
         userId = user.getId();
-        request = testUtils.setUpHeaderAndGetReq(user.getEmail(), userId);
+        request = testUtils.setUpHeaderAndGetReqWithRes(response);
     }
 
     @Test
