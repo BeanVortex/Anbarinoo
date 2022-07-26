@@ -1,19 +1,16 @@
 package ir.darkdeveloper.anbarinoo;
 
+import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
-public class AnbarinooApplication extends SpringBootServletInitializer {
+@EnableConfigurationProperties(AdminUserProperties.class)
+public class AnbarinooApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(AnbarinooApplication.class, args);
     }
 
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-        return builder.sources(AnbarinooApplication.class);
-    }
 }

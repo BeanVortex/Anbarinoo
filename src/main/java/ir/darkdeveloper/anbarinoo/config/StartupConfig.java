@@ -6,11 +6,13 @@ import java.util.List;
 
 import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.event.EventListener;
 
 import ir.darkdeveloper.anbarinoo.model.Authority;
@@ -19,7 +21,7 @@ import ir.darkdeveloper.anbarinoo.service.UserRolesService;
 
 @Configuration
 @RequiredArgsConstructor
-@EnableConfigurationProperties(AdminUserProperties.class)
+@Slf4j
 public class StartupConfig {
 
     private final UserRolesService rolesService;
@@ -46,7 +48,13 @@ public class StartupConfig {
 
     private void createDefaultRole() {
         if (!rolesService.exists("USER")) {
-            List<Authority> authorities = new ArrayList<>(List.of(Authority.OP_EDIT_USER, Authority.OP_ACCESS_USER, Authority.OP_DELETE_USER));
+            var authorities = List.of(
+                    Authority.OP_EDIT_USER,
+                    Authority.OP_ACCESS_USER,
+                    Authority.OP_DELETE_USER,
+                    Authority.OP_ADD_PRODUCT,
+                    Authority.OP_EDIT_PRODUCT,
+                    Authority.OP_DELETE_PRODUCT);
             rolesService.saveRole(new UserRole(1L, "USER", authorities));
         }
     }
@@ -54,5 +62,6 @@ public class StartupConfig {
     @EventListener(ApplicationReadyEvent.class)
     public void doSomethingAfterStartup() {
         createDefaultRole();
+        log.info("Inserted the Default Role");
     }
 }

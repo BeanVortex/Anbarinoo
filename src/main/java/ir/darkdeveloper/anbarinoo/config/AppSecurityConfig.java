@@ -31,7 +31,7 @@ import ir.darkdeveloper.anbarinoo.service.UserService;
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
-    
+
 
     private final UserService userService;
     private final JwtFilter jwtFilter;
@@ -42,8 +42,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
 
     @Autowired
     public AppSecurityConfig(@Lazy UserService userService, JwtFilter jwtFilter,
-                         OAuth2UserService oAuth2UserService, OAuth2SuccessHandler oAuth2SuccessHandler,
-                         OAuth2RequestRepo  oAuth2RequestRepo, OAuth2FailureHandler oAuth2FailureHandler) {
+                             OAuth2UserService oAuth2UserService, OAuth2SuccessHandler oAuth2SuccessHandler,
+                             OAuth2RequestRepo  oAuth2RequestRepo, OAuth2FailureHandler oAuth2FailureHandler) {
         this.userService = userService;
         this.jwtFilter = jwtFilter;
         this.oAuth2UserService = oAuth2UserService;
@@ -60,45 +60,45 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
         http.csrf()
                 .disable()
                 .authorizeRequests()
-                    .antMatchers("/", "/info", "/css/**",
-                                "/fonts/**", 
-                                "/js/**", "/img/**",
-                                "/api/user/signup/",
-                                "/api/user/login/",
-                                "/user/profile_images/noProfile.jpeg",
-                                "/api/post/all/",
-                                "/oauth2/**",
-                                "/api/export/excel/**",
-                                "/api/user/verify/**",
-                                "/webjars/**",
-                                "/forbidden")
-                        .permitAll()
-                    .anyRequest()
-                        .authenticated()
+                .antMatchers("/", "/info", "/css/**",
+                        "/fonts/**",
+                        "/js/**", "/img/**",
+                        "/api/user/signup/",
+                        "/api/user/login/",
+                        "/user/profile_images/noProfile.jpeg",
+                        "/api/post/all/",
+                        "/oauth2/**",
+                        "/api/export/excel/**",
+                        "/api/user/verify/**",
+                        "/webjars/**",
+                        "/forbidden")
+                .permitAll()
+                .anyRequest()
+                .authenticated()
                 .and()
                 .exceptionHandling()
-                    .authenticationEntryPoint(new RestAuthenticationEntryPoint())
+                .authenticationEntryPoint(new RestAuthenticationEntryPoint())
                 .and()
                 .formLogin()
-                    .disable()
+                .disable()
                 .oauth2Login()
-                    .authorizationEndpoint()
-                        .baseUri("/login/oauth2")
-                        .authorizationRequestRepository(oAuth2RequestRepo)
-                        .and()
-                    .redirectionEndpoint()
-                        .baseUri("/login/callback")
-                    .and()
-                    .userInfoEndpoint()
-                        .userService(oAuth2UserService)
-                    .and()
-                        .successHandler(oAuth2SuccessHandler)
-                        .failureHandler(oAuth2FailureHandler)
+                .authorizationEndpoint()
+                .baseUri("/login/oauth2")
+                .authorizationRequestRepository(oAuth2RequestRepo)
+                .and()
+                .redirectionEndpoint()
+                .baseUri("/login/callback")
+                .and()
+                .userInfoEndpoint()
+                .userService(oAuth2UserService)
+                .and()
+                .successHandler(oAuth2SuccessHandler)
+                .failureHandler(oAuth2FailureHandler)
                 .and()
                 .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                    .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override
@@ -131,6 +131,3 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter{
     }
 
 }
-
-
-
