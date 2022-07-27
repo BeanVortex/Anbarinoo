@@ -5,11 +5,11 @@ import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.UserRepo;
-import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.Operations;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,13 +25,13 @@ import java.util.Optional;
 
 
 @Service("userService")
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Lazy))
 public class UserService implements UserDetailsService {
 
     private final UserRepo repo;
+    @Lazy
     private final UserAuthUtils userAuthUtils;
     private final Operations userOP;
-    private final AdminUserProperties adminUser;
     private final VerificationService verificationService;
     private final RefreshService refreshService;
     private final JwtUtils jwtUtils;
@@ -43,10 +43,6 @@ public class UserService implements UserDetailsService {
     }
 
 
-    /**
-     * #model.getId() == null should be null. if wasn't other users can change other users' data due to
-     * implementation of this method!!
-     */
     @Transactional
     public UserModel updateUser(Optional<UserModel> user, Long id, HttpServletRequest req) {
         user.map(UserModel::getId).ifPresent(i -> user.get().setId(null));
@@ -134,10 +130,5 @@ public class UserService implements UserDetailsService {
         } else
             throw new BadRequestException("Link is expired. try logging in again");
     }
-
-    public AdminUserProperties getAdminUser() {
-        return adminUser;
-    }
-
 
 }

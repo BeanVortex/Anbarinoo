@@ -46,7 +46,15 @@ public class StartupConfig {
 
     private void createDefaultRole() {
         if (!rolesService.exists("USER")) {
-            List<Authority> authorities = new ArrayList<>(List.of(Authority.OP_EDIT_USER, Authority.OP_ACCESS_USER, Authority.OP_DELETE_USER));
+            List<Authority> authorities = List.of(
+                    Authority.OP_EDIT_USER,
+                    Authority.OP_ACCESS_USER,
+                    Authority.OP_DELETE_USER,
+                    Authority.OP_ADD_PRODUCT,
+                    Authority.OP_ACCESS_PRODUCT,
+                    Authority.OP_EDIT_PRODUCT,
+                    Authority.OP_DELETE_PRODUCT
+            );
             rolesService.saveRole(new UserRole(1L, "USER", authorities));
         }
     }
