@@ -12,6 +12,7 @@ import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
 import ir.darkdeveloper.anbarinoo.util.IOUtils;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,7 +28,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Component
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Lazy))
 public class UserAuthUtils {
 
     private final AuthenticationManager authManager;
@@ -35,6 +36,7 @@ public class UserAuthUtils {
     private final RefreshService refreshService;
     private final UserRepo repo;
     private final PasswordEncoder encoder;
+    @Lazy
     private final AdminUserProperties adminUser;
     private final IOUtils ioUtils;
     private final UserRolesService roleService;
