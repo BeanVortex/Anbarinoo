@@ -28,7 +28,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Component
-@RequiredArgsConstructor(onConstructor = @__(@Lazy))
+@RequiredArgsConstructor
 public class UserAuthUtils {
 
     private final AuthenticationManager authManager;
@@ -36,7 +36,6 @@ public class UserAuthUtils {
     private final RefreshService refreshService;
     private final UserRepo repo;
     private final PasswordEncoder encoder;
-    @Lazy
     private final AdminUserProperties adminUser;
     private final IOUtils ioUtils;
     private final UserRolesService roleService;

@@ -46,7 +46,7 @@ public class StartupConfig {
 
     private void createDefaultRole() {
         if (!rolesService.exists("USER")) {
-            List<Authority> authorities = List.of(
+            var authorities = List.of(
                     Authority.OP_EDIT_USER,
                     Authority.OP_ACCESS_USER,
                     Authority.OP_DELETE_USER,
