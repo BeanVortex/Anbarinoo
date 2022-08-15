@@ -12,7 +12,7 @@ public class DatabaseSetup  implements BeforeAllCallback {
     // and then deleted
 //    @Container
     private static final PostgreSQLContainer container =
-            (PostgreSQLContainer) new PostgreSQLContainer("postgres:13.1-alpine")
+            (PostgreSQLContainer) new PostgreSQLContainer("postgres:14.5-alpine")
                     .withReuse(true);
     // statically setting properties to the spring context
 //            .withDatabaseName("db")

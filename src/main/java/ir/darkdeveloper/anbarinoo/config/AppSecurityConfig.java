@@ -13,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,60 +29,64 @@ import java.util.Collections;
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
+@EnableWebSecurity
 public class AppSecurityConfig {
-    
+
 
     private final JwtFilter jwtFilter;
     private final OAuth2UserService oAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
-    private final OAuth2RequestRepo  oAuth2RequestRepo;
+    private final OAuth2RequestRepo oAuth2RequestRepo;
     private final OAuth2FailureHandler oAuth2FailureHandler;
 
-   @Bean
-           public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors();
         http.csrf()
                 .disable()
                 .authorizeRequests()
-                    .antMatchers("/", "/info", "/css/**",
-                                "/fonts/**", 
-                                "/js/**", "/img/**",
-                                "/api/user/signup/",
-                                "/api/user/login/",
-                                "/user/profile_images/noProfile.jpeg",
-                                "/api/post/all/",
-                                "/oauth2/**",
-                                "/api/export/excel/**",
-                                "/api/user/verify/**",
-                                "/webjars/**",
-                                "/forbidden")
-                        .permitAll()
-                    .anyRequest()
-                        .authenticated()
+                .antMatchers(
+                        "/info", "/css/**",
+                        "/**",
+                        "/fonts/**",
+                        "/js/**", "/img/**",
+                        "/api/user/signup/",
+                        "/api/user/login/",
+                        "/user/profile_images/noProfile.jpeg",
+                        "/api/post/all/",
+                        "/oauth2/**",
+                        "/demo/data",
+                        "/api/export/excel/**",
+                        "/api/user/verify/**",
+                        "/webjars/**",
+                        "/forbidden")
+                .permitAll()
+                .anyRequest()
+                .authenticated()
                 .and()
                 .exceptionHandling()
-                    .authenticationEntryPoint(new RestAuthenticationEntryPoint())
+                .authenticationEntryPoint(new RestAuthenticationEntryPoint())
                 .and()
                 .formLogin()
-                    .disable()
+                .disable()
                 .oauth2Login()
-                    .authorizationEndpoint()
-                        .baseUri("/login/oauth2")
-                        .authorizationRequestRepository(oAuth2RequestRepo)
-                        .and()
-                    .redirectionEndpoint()
-                        .baseUri("/login/callback")
-                    .and()
-                    .userInfoEndpoint()
-                        .userService(oAuth2UserService)
-                    .and()
-                        .successHandler(oAuth2SuccessHandler)
-                        .failureHandler(oAuth2FailureHandler)
+                .authorizationEndpoint()
+                .baseUri("/login/oauth2")
+                .authorizationRequestRepository(oAuth2RequestRepo)
+                .and()
+                .redirectionEndpoint()
+                .baseUri("/login/callback")
+                .and()
+                .userInfoEndpoint()
+                .userService(oAuth2UserService)
+                .and()
+                .successHandler(oAuth2SuccessHandler)
+                .failureHandler(oAuth2FailureHandler)
                 .and()
                 .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                    .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
@@ -98,7 +103,7 @@ public class AppSecurityConfig {
     }
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource() {
         var configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Collections.singletonList("*"));
         configuration.addExposedHeader("refresh_token, access_token, access_expiration, refresh_expiration");
