@@ -62,7 +62,8 @@ public class UserController {
 
     @PutMapping("/update/{id}/")
     @PreAuthorize("hasAnyAuthority('OP_EDIT_USER')")
-    public ResponseEntity<UserDto> updateUser(@ModelAttribute UserModel user, @PathVariable Long id, HttpServletRequest req) {
+    public ResponseEntity<UserDto> updateUser(@ModelAttribute UserModel user, @PathVariable Long id,
+                                              HttpServletRequest req) {
         return ResponseEntity.ok(
                 userMapper.userToDto(userService.updateUser(Optional.ofNullable(user), id, req)));
     }

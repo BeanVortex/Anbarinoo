@@ -5,6 +5,7 @@ import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.UserRepo;
+import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.Operations;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
@@ -25,16 +26,25 @@ import java.util.Optional;
 
 
 @Service("userService")
-@RequiredArgsConstructor(onConstructor = @__(@Lazy))
 public class UserService implements UserDetailsService {
 
     private final UserRepo repo;
-    @Lazy
     private final UserAuthUtils userAuthUtils;
     private final Operations userOP;
     private final VerificationService verificationService;
-    private final RefreshService refreshService;
+    private final AdminUserProperties adminUser;
     private final JwtUtils jwtUtils;
+
+    public UserService(UserRepo repo, @Lazy UserAuthUtils userAuthUtils, Operations userOP,
+                       VerificationService verificationService, AdminUserProperties adminUser,
+                       JwtUtils jwtUtils) {
+        this.repo = repo;
+        this.userAuthUtils = userAuthUtils;
+        this.userOP = userOP;
+        this.verificationService = verificationService;
+        this.adminUser = adminUser;
+        this.jwtUtils = jwtUtils;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -131,4 +141,8 @@ public class UserService implements UserDetailsService {
             throw new BadRequestException("Link is expired. try logging in again");
     }
 
+
+    public AdminUserProperties getAdminUser() {
+        return adminUser;
+    }
 }

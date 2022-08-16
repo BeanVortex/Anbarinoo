@@ -1,18 +1,17 @@
 package ir.darkdeveloper.anbarinoo.util.UserUtils;
 
+import ir.darkdeveloper.anbarinoo.dto.LoginDto;
 import ir.darkdeveloper.anbarinoo.exception.*;
 import ir.darkdeveloper.anbarinoo.model.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.UserRepo;
-import ir.darkdeveloper.anbarinoo.dto.LoginDto;
 import ir.darkdeveloper.anbarinoo.service.RefreshService;
 import ir.darkdeveloper.anbarinoo.service.UserRolesService;
 import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
 import ir.darkdeveloper.anbarinoo.util.IOUtils;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -82,7 +81,9 @@ public class UserAuthUtils {
         } else {
             user = repo.findByEmailOrUsername(username)
                     .orElseThrow(() -> new NoContentException("User does not exist"));
-            rModel.setId(refreshService.getIdByUserId(user.getId()));
+            //TODO extra query if user is signing up
+            var id = refreshService.getIdByUserId(user.getId());
+            rModel.setId(id);
             rModel.setUserId(user.getId());
         }
 
@@ -153,17 +154,21 @@ public class UserAuthUtils {
     public void checkUserIsSameUserForRequest(Long userId, HttpServletRequest req, String operation) {
         var token = req.getHeader("refresh_token");
         if (!jwtUtils.isTokenExpired(token)) {
+
             var id = jwtUtils.getUserId(token);
             if (userId != null && !id.equals(userId))
                 throw new ForbiddenException("You don't have permission to " + operation);
             else {
                 // in case when attacker tried to change the userId in refreshToken
                 // db query
-                var fetchedId = refreshService.getUserIdByRefreshToken(token)
-                        .orElseThrow(() -> new ForbiddenException("You are logged out. Try logging in again"));
-                if (!fetchedId.equals(id))
-                    throw new ForbiddenException("You don't have permission to " + operation);
+                if (!id.equals(userId)) {
+                    var fetchedId = refreshService.getUserIdByRefreshToken(token)
+                            .orElseThrow(() -> new ForbiddenException("You are logged out. Try logging in again"));
+                    if (!fetchedId.equals(id))
+                        throw new ForbiddenException("You don't have permission to " + operation);
+                }
             }
+
         } else
             throw new ForbiddenException("You are logged out. Try logging in again");
     }

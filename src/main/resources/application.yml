@@ -15,7 +15,7 @@ jasypt:
     iv-generator-classname: org.jasypt.iv.NoIvGenerator
 spring:
   jpa:
-    show-sql: true
+#    show-sql: true
     hibernate:
       ddl-auto: update
       naming:
@@ -24,7 +24,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
+#        format_sql: true
   config:
     use-legacy-processing: true
     activate:

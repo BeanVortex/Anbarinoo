@@ -1,6 +1,7 @@
 package ir.darkdeveloper.anbarinoo.service;
 
 import ir.darkdeveloper.anbarinoo.TestUtils;
+import ir.darkdeveloper.anbarinoo.dto.LoginDto;
 import ir.darkdeveloper.anbarinoo.extentions.DatabaseSetup;
 import ir.darkdeveloper.anbarinoo.model.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
@@ -47,7 +48,6 @@ public record UserServiceTest(UserService service,
     @Test
     @Order(1)
     @WithMockUser(username = "anonymousUser")
-//    @Disabled
     void signUpWithoutImage() {
         var response = new MockHttpServletResponse();
         var user = UserModel.builder()
@@ -65,8 +65,17 @@ public record UserServiceTest(UserService service,
     }
 
     @Test
-    @Order(1)
-//    @WithMockUser(username = "anonymousUser")
+    @Order(2)
+    @WithMockUser(username = "anonymousUser")
+    void loginUser() {
+        var response = new MockHttpServletResponse();
+        var loginDto = new LoginDto("user n", "pass12B~");
+        service.loginUser(loginDto, response);
+        request = testUtils.setUpHeaderAndGetReqWithRes(response);
+    }
+
+    @Test
+    @Order(3)
     void signUpWithImage() {
         var response = new MockHttpServletResponse();
 
@@ -94,8 +103,7 @@ public record UserServiceTest(UserService service,
     }
 
     @Test
-    @Order(2)
-//    @WithMockUser(username = "email@mail.com", authorities = {"OP_EDIT_USER", "OP_ACCESS_USER"})
+    @Order(4)
     void updateUserWithKeepImagesAndNullPasswords() {
         var fetchedUser = service.getUserInfo(userId, request);
         var user = new UserModel();
@@ -109,7 +117,7 @@ public record UserServiceTest(UserService service,
     }
 
     @Test
-    @Order(3)
+    @Order(5)
     void updateUserWithKeepImagesAndNewPasswords() {
         var fetchedUser = service.getUserInfo(userId, request);
         var user = new UserModel();
@@ -124,7 +132,7 @@ public record UserServiceTest(UserService service,
     }
 
     @Test
-    @Order(4)
+    @Order(6)
     void updateUserWithNewImages() {
         var user = new UserModel();
         user.setDescription("dex");
@@ -144,7 +152,7 @@ public record UserServiceTest(UserService service,
     }
 
     @Test
-    @Order(5)
+    @Order(7)
     void updateDeleteUserImages() {
         var user = new UserModel();
         user.setDescription("dexfd");
@@ -161,7 +169,7 @@ public record UserServiceTest(UserService service,
     }
 
     @Test
-    @Order(6)
+    @Order(8)
     void getUserInfo() {
         var model = service.getUserInfo(userId, request);
         assertThat(encoder.matches("pass4321B~", model.getPassword())).isTrue();
@@ -171,8 +179,8 @@ public record UserServiceTest(UserService service,
     }
 
     @Test
-    @Order(7)
-    void getCurrentUserInfo() {
+    @Order(9)
+    void getSimpleCurrentUserInfo() {
         var model = service.getSimpleCurrentUserInfo(request);
         assertThat(model.getId()).isNotNull();
         assertThat(model.getUserName()).isEqualTo("user n");
@@ -189,23 +197,23 @@ public record UserServiceTest(UserService service,
         System.out.println(model);
     }
 
-
     @Test
-    @Order(8)
+    @Order(10)
     void deleteUser() {
         service.deleteUser(userId, request);
     }
 
     @Test
-    @Order(9)
+    @Order(11)
     void getRoles() {
         var roles = rolesService.getAllRoles();
         assertThat(roles.size()).isNotEqualTo(0);
     }
 
     @Test
-    @Order(10)
+    @Order(12)
     void verifyUserEmail() {
+        rolesService.exists("USER");
     }
 
 }

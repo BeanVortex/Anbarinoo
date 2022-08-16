@@ -25,6 +25,9 @@ public class CookieUtils {
         return foundCookie.get();
     }
 
+    /**
+    * @param maxAge is in seconds
+    * */
     public static void addCookie(HttpServletResponse res, String name, String value, int maxAge) {
         var cookie = new Cookie(name, value);
         cookie.setPath("/");

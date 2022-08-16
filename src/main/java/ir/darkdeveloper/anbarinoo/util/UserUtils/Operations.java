@@ -34,7 +34,8 @@ public class Operations {
             throw new EmailNotValidException("Email is not verified! Check your emails");
 
         ioUtils.deleteUserImages(user);
-        user.getCategories().forEach(cat -> ioUtils.deleteProductImagesOfUser(Optional.of(cat.getProducts())));
+        user.getCategories()
+                .forEach(cat -> ioUtils.deleteProductImagesOfUser(Optional.of(cat.getProducts())));
 
         refreshService.deleteTokenByUserId(user.getId());
         repo.deleteById(user.getId());
