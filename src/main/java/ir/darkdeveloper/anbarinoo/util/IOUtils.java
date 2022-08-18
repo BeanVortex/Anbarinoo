@@ -190,10 +190,10 @@ public class IOUtils {
     /**
      * Adding new images to the product
      *
-     * @param product:    in this you should send new images files
-     * @param preProduct: data of this object will be merged with product and adds remaining images to product
+     * @param product       Contains only new image files, rest will be ignored
+     * @param preProduct    Data of this object will be merged with product and adds remaining images to product
      */
-    public void addProductImages(ProductModel product, ProductModel preProduct) {
+    public void addMoreProductImages(ProductModel product, ProductModel preProduct) {
         var fileNames = new ArrayList<String>();
         var files = product.getFiles();
 
@@ -204,19 +204,18 @@ public class IOUtils {
             fileNames.add(saveFile(file, PRODUCT_IMAGE_PATH).orElse(DEFAULT_PRODUCT_IMAGE));
 
         //adding remaining images name in previous product
-        product.update(preProduct);
         fileNames.addAll(preProduct.getImages());
         if (!fileNames.isEmpty())
             product.setImages(fileNames);
     }
 
     /**
-     * Deleting a product's to update it
+     * Deleting a product's images
      *
-     * @param product:    in this you should specify which image is going to delete
-     * @param preProduct: will iterate in this product images and find the one which is going to delete and deletes it
+     * @param product       Contains images names
+     * @param preProduct    Deletes an image which is provided in product
      */
-    public void updateDeleteProductImages(ProductModel product, ProductModel preProduct) {
+    public void deleteProductImages(ProductModel product, ProductModel preProduct) {
         product.getImages().forEach(oldImg -> {
             if (preProduct.getImages().contains(oldImg)) {
                 try {
@@ -232,6 +231,7 @@ public class IOUtils {
         if (preProduct.getImages().size() == 0)
             preProduct.getImages().add(DEFAULT_PRODUCT_IMAGE);
     }
+
 
     /**
      * When deleting user is useful: it deletes any image own by a user's product
@@ -256,22 +256,5 @@ public class IOUtils {
         );
     }
 
-    /**
-     * When deleting a product is useful: it deletes any image own by this product
-     *
-     * @param product: delete files of a product
-     */
-    public void deleteProductFiles(ProductModel product) {
-        var names = product.getImages();
-        try {
-            for (var name : names) {
-                var imgPath = getImagePath(PRODUCT_IMAGE_PATH, name);
-                if (!name.equals(DEFAULT_PRODUCT_IMAGE) && imgPath != null)
-                    Files.delete(Paths.get(imgPath));
-            }
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
 
 }

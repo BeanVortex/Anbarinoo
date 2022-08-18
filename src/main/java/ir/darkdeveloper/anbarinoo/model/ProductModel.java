@@ -1,17 +1,16 @@
 package ir.darkdeveloper.anbarinoo.model;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.*;
-
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -29,9 +28,6 @@ public class ProductModel implements UpdateModel<ProductModel> {
     private Long id;
 
     private Long firstBuyId;
-
-    @Builder.Default
-    private Boolean canUpdate = true;
 
     @Column(length = 50, nullable = false)
     private String name;
@@ -61,8 +57,6 @@ public class ProductModel implements UpdateModel<ProductModel> {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cat_id")
-//    @ToString.Exclude
-//    @EqualsAndHashCode.Exclude
     private CategoryModel category;
 
 

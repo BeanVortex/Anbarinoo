@@ -3,7 +3,6 @@ package ir.darkdeveloper.anbarinoo.service;
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.BuyModel;
-import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.repository.ProductRepository;
 import ir.darkdeveloper.anbarinoo.service.Financial.BuyService;
@@ -31,71 +30,62 @@ public class ProductService {
     private final ProductUtils productUtils;
     private final BuyService buyService;
     private final UserAuthUtils userAuthUtils;
+    private final CategoryService categoryService;
     private final JwtUtils jwtUtils;
 
     /**
-     * saves a new product to the user id of refresh token
+     * saves a new product for the user with userId provided in refresh token
      * if image files are null, then sets a default image
      * if not, saves files and sets images
-     *
-     * @param product id should be null
-     * @param req     should contain refresh token
      */
     @Transactional
-    public ProductModel saveProduct(Optional<ProductModel> product, HttpServletRequest req) {
-        product.map(ProductModel::getCategory).orElseThrow(() -> new BadRequestException("Product can't be null"));
-        product.map(ProductModel::getCategory).map(CategoryModel::getId)
-                .orElseThrow(() -> new BadRequestException("Product category or category id can't be empty"));
-        product.get().setTax(product.map(ProductModel::getTax).orElse(9));
-        var savedProduct = productUtils.saveProduct(product, req);
+    public ProductModel saveProduct(Optional<ProductModel> productOpt, HttpServletRequest req) {
+
+        var product = productUtils.validateAndGetProduct(productOpt);
+
+        productOpt.map(ProductModel::getId).ifPresent(i -> productOpt.get().setId(null));
+        var fetchedCat = categoryService.getCategoryById(product.getCategory().getId(), req);
+        userAuthUtils.checkUserIsSameUserForRequest(fetchedCat.getUser().getId(), req, "create");
+        product.setCategory(fetchedCat);
+        ioUtils.saveProductImages(product);
+        repo.save(product);
+
         var buy = BuyModel.builder()
-                .product(savedProduct).count(savedProduct.getTotalCount())
-                .price(savedProduct.getPrice()).tax(savedProduct.getTax()).build();
+                .product(product).count(product.getTotalCount())
+                .price(product.getPrice()).tax(product.getTax()).build();
         buyService.saveBuy(Optional.of(buy), true, req);
-        savedProduct.setFirstBuyId(buy.getId());
-        return repo.save(savedProduct);
+        product.setFirstBuyId(buy.getId());
+        return product;
 
     }
 
     /**
-     * For regular update with no images: another users can't update, not users who owned products
-     * If images and files and id provided, then they will be ignored
-     * If price or count value is going to update, it will also update the first buy record of product
+     * For regular update with no images:
+     * If images and files and id provided, they will be ignored
      *
-     * @param product   should files and id and user be null
-     * @param productId should not to be null
-     * @param req       should contain refresh token
-     * @return updated product with kept images
+     * @param product Contains any data except for id, image files, unless will be ignored
+     * @return updated product with images kept
      */
-    @Transactional
+//    @Transactional
     public ProductModel updateProduct(Optional<ProductModel> product, Long productId, HttpServletRequest req) {
-        product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
 
-        var foundProduct = repo.findById(productId)
+        var preProduct = repo.findById(productId)
                 .orElseThrow(() -> new NoContentException("This product does not exist"));
-        userAuthUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(),
-                req, "update");
-
-        if (product.map(ProductModel::getPrice).isPresent()
-                || product.map(ProductModel::getTotalCount).isPresent())
-            productUtils.updateBuyWithProductUpdate(product, foundProduct, buyService, req);
-
-        product.orElseThrow(() -> new BadRequestException("Product can't be null"));
-        return productUtils.updateProduct(product.get(), foundProduct);
+        var userId = preProduct.getCategory().getUser().getId();
+        userAuthUtils.checkUserIsSameUserForRequest(userId, req, "update");
+        productUtils.validateAndUpdateProduct(product, preProduct);
+        return repo.save(preProduct);
     }
 
     /**
-     * If a sell or buy record gets updated, product model of that will be updated to
+     * If a sell or buy record gets updated, product model of that will be updated too.
+     * because when you buy or sell any product in your warehouse, total number of that product changes
      */
-    @Transactional
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public void updateProductFromBuyOrSell(Optional<ProductModel> product, ProductModel preProduct,
                                            HttpServletRequest req) {
-        product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
-        userAuthUtils.checkUserIsSameUserForRequest(preProduct.getCategory().getUser().getId(),
-                req, "update");
-        product.orElseThrow(() -> new BadRequestException("Product can't be null"));
-        productUtils.updateProduct(product.get(), preProduct);
+        productUtils.validateAndUpdateProduct(product, preProduct);
+        repo.save(preProduct);
     }
 
     public Page<ProductModel> findByNameContains(String name, Pageable pageable, HttpServletRequest req) {
@@ -107,8 +97,8 @@ public class ProductService {
     public ProductModel getProduct(Long productId, HttpServletRequest req) {
         var foundProduct = repo.findById(productId)
                 .orElseThrow(() -> new NoContentException("This product does not exist"));
-        userAuthUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(),
-                req, "fetch");
+        var userId = foundProduct.getCategory().getUser().getId();
+        userAuthUtils.checkUserIsSameUserForRequest(userId, req, "fetch");
         return foundProduct;
     }
 
@@ -123,53 +113,50 @@ public class ProductService {
     }
 
     /**
-     * For Images update only: another users can't, update not owned products
+     * For adding more images
      *
-     * @param product   should files and id and images not to be null and user be null
-     * @param productId should not to be null
-     * @param req       should contain refresh token
+     * @param product Contains images files, id
      * @return updated product with new images
      */
     @Transactional
-    public ProductModel updateProductImages(Optional<ProductModel> product,
+    public ProductModel addNewProductImages(Optional<ProductModel> product,
                                             Long productId, HttpServletRequest req) {
         product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
-        var foundProduct = repo.findById(productId)
+        var preProduct = repo.findById(productId)
                 .orElseThrow(() -> new NoContentException("This product does not exist"));
 
-        userAuthUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(),
+        userAuthUtils.checkUserIsSameUserForRequest(preProduct.getCategory().getUser().getId(),
                 req, "update");
-        return productUtils.updateProductImages(product, foundProduct);
+        return productUtils.updateProductImages(product, preProduct);
     }
 
     /**
-     * For Images delete only: another users can't update, not owned products
+     * For Images delete only
      *
-     * @param product   should images name not to be null and user and id be null, image names are going to delete
-     * @param productId should not to be null
-     * @param req       should contain refresh token
+     * @param product Contains images names that are going to be deleted
      */
     @Transactional
-    public String updateDeleteProductImages(Optional<ProductModel> product, Long productId,
-                                                       HttpServletRequest req) {
+    public String deleteProductImages(Optional<ProductModel> product, Long productId,
+                                      HttpServletRequest req) {
         product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
-        var foundProduct = repo.findById(productId)
+        var preProduct = repo.findById(productId)
                 .orElseThrow(() -> new NoContentException("This product does not exist"));
-        userAuthUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(),
+        userAuthUtils.checkUserIsSameUserForRequest(preProduct.getCategory().getUser().getId(),
                 req, "delete images of another user's product");
         product.orElseThrow(() -> new BadRequestException("Product can't be null"));
-        productUtils.updateDeleteProductImages(product.get(), foundProduct);
+        ioUtils.deleteProductImages(product.get(), preProduct);
+        repo.save(preProduct);
         return "deleted product images";
     }
 
     @Transactional
     public String deleteProduct(Long id, HttpServletRequest req) {
-        var foundProduct = repo.findById(id)
+        var preProduct = repo.findById(id)
                 .orElseThrow(() -> new NoContentException("This product does not exist"));
-        userAuthUtils.checkUserIsSameUserForRequest(foundProduct.getCategory().getUser().getId(),
+        userAuthUtils.checkUserIsSameUserForRequest(preProduct.getCategory().getUser().getId(),
                 req, "delete");
         repo.deleteById(id);
-        ioUtils.deleteProductFiles(foundProduct);
+        ioUtils.deleteProductImages(preProduct, preProduct);
         return "Deleted the product";
     }
 

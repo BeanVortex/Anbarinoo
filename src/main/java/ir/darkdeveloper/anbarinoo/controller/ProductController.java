@@ -50,19 +50,19 @@ public class ProductController {
 
     @PutMapping("/update/images/{id}/")
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ResponseEntity<ProductDto> updateProductImages(@ModelAttribute ProductModel product,
+    public ResponseEntity<ProductDto> addNewProductImages(@ModelAttribute ProductModel product,
                                                           @PathVariable("id") Long productId,
                                                           HttpServletRequest request) {
         return ResponseEntity.ok(mapper.productToDto(
-                service.updateProductImages(Optional.ofNullable(product), productId, request)));
+                service.addNewProductImages(Optional.ofNullable(product), productId, request)));
     }
 
     @PutMapping("/update/delete-images/{id}/")
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ResponseEntity<String> updateDeleteProductImages(@RequestBody ProductModel product,
+    public ResponseEntity<String> deleteProductImages(@RequestBody ProductModel product,
                                                             @PathVariable("id") Long productId,
                                                             HttpServletRequest request) {
-        var message = service.updateDeleteProductImages(Optional.ofNullable(product), productId, request);
+        var message = service.deleteProductImages(Optional.ofNullable(product), productId, request);
         return ResponseEntity.ok(message);
     }
 

@@ -77,24 +77,20 @@ public class BuyService {
     }
 
     public BuyModel getBuy(Long buyId, HttpServletRequest req) {
-        return exceptionHandlers(() -> {
-            var foundBuyRecord = repo.findById(buyId)
-                    .orElseThrow(() -> new NoContentException("Buy record doesn't exist"));
-            checkUserIsSameUserForRequest(foundBuyRecord.getProduct(), null, req, "fetch");
-            return foundBuyRecord;
-        });
+        var foundBuyRecord = repo.findById(buyId)
+                .orElseThrow(() -> new NoContentException("Buy record doesn't exist"));
+        checkUserIsSameUserForRequest(foundBuyRecord.getProduct(), null, req, "fetch");
+        return foundBuyRecord;
     }
 
     @Transactional
     public ResponseEntity<String> deleteBuy(Long buyId, HttpServletRequest req) {
-        return exceptionHandlers(() -> {
-            var buy = repo.findById(buyId)
-                    .orElseThrow(() -> new NoContentException("Buy record doesn't exist"));
-            checkUserIsSameUserForRequest(buy.getProduct(), null, req, "delete buy record of");
-            repo.deleteById(buyId);
-            deleteProductCount(buy, req);
-            return ResponseEntity.ok("Deleted the buy record");
-        });
+        var buy = repo.findById(buyId)
+                .orElseThrow(() -> new NoContentException("Buy record doesn't exist"));
+        checkUserIsSameUserForRequest(buy.getProduct(), null, req, "delete buy record of");
+        repo.deleteById(buyId);
+        deleteProductCount(buy, req);
+        return ResponseEntity.ok("Deleted the buy record");
     }
 
     @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
@@ -138,7 +134,6 @@ public class BuyService {
         checkUserIsSameUserForRequest(preProduct, null, req, "save buy record of");
         var product = ProductModel.builder()
                 .totalCount(preProduct.getTotalCount().add(buy.getCount()))
-                .canUpdate(false)
                 .build();
         productService.updateProductFromBuyOrSell(Optional.of(product), preProduct, req);
 

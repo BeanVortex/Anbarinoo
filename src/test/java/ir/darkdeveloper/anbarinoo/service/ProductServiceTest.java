@@ -70,7 +70,7 @@ public record ProductServiceTest(ProductService productService,
                 .password("pass12P+")
                 .passwordRepeat("pass12P+")
                 .build();
-        userService.signUpUser(Optional.of(user2), response);
+//        userService.signUpUser(Optional.of(user2), response);
 //        userId2 = user2.getId();
     }
 
@@ -135,7 +135,7 @@ public record ProductServiceTest(ProductService productService,
     @Test
     @Order(6)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
-    void updateProductImages() {
+    void addNewProductImages() {
         var product = new ProductModel();
 
         var file3 = new MockMultipartFile("file", "hello.jpg", MediaType.IMAGE_JPEG_VALUE,
@@ -147,7 +147,7 @@ public record ProductServiceTest(ProductService productService,
 
         product.setFiles(Arrays.asList(file3, file4, file5));
 
-        productService.updateProductImages(Optional.of(product), productId, request);
+        productService.addNewProductImages(Optional.of(product), productId, request);
 
         var fetchedProduct = productService.getProduct(productId, request);
         assertThat(fetchedProduct.getImages().size()).isNotEqualTo(0);
@@ -158,7 +158,7 @@ public record ProductServiceTest(ProductService productService,
     @Test
     @Order(7)
     @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
-    void delete3UpdateProductImages() {
+    void deleteProductImages() {
         var product = new ProductModel();
         var fetchedProduct = productService.getProduct(productId, request);
         var fileNames = fetchedProduct.getImages();
@@ -166,7 +166,7 @@ public record ProductServiceTest(ProductService productService,
         fileNames.remove(1);
         product.setImages(fileNames);
 
-        productService.updateDeleteProductImages(Optional.of(product), productId, request);
+        productService.deleteProductImages(Optional.of(product), productId, request);
 
         var fetchedProduct2 = productService.getProduct(productId, request);
         assertThat(fetchedProduct2.getImages().size()).isEqualTo(2);
@@ -183,7 +183,7 @@ public record ProductServiceTest(ProductService productService,
         var fetchedProduct = productService.getProduct(productId, request);
         product.setImages(fetchedProduct.getImages());
 
-        productService.updateDeleteProductImages(Optional.of(product), productId, request);
+        productService.deleteProductImages(Optional.of(product), productId, request);
 
         var fetchedProduct2 = productService.getProduct(productId, request);
         assertThat(fetchedProduct2.getImages().size()).isNotEqualTo(0);

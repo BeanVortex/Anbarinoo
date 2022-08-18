@@ -138,7 +138,6 @@ public class SellService {
         checkUserIsSameUserForRequest(preProduct, null, req, "save buy record of");
         if (preProduct.getTotalCount().compareTo(sell.getCount()) >= 0) {
             product.setTotalCount(preProduct.getTotalCount().subtract(sell.getCount()));
-            preProduct.setCanUpdate(false);
             productService.updateProductFromBuyOrSell(Optional.of(product), preProduct, req);
         } else throw new BadRequestException("Not enough product left in stuck to sell!");
     }
