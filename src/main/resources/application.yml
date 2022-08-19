@@ -2,9 +2,9 @@ spring:
   profiles:
     active: dev
     include:
-    - user
-    - email
-    - server
+      - user
+      - email
+      - server
 ---
 jwt:
   secretKey: RandomSecret
@@ -15,7 +15,7 @@ jasypt:
     iv-generator-classname: org.jasypt.iv.NoIvGenerator
 spring:
   jpa:
-#    show-sql: true
+    #    show-sql: true
     hibernate:
       ddl-auto: update
       naming:
@@ -24,7 +24,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-#        format_sql: true
+  #        format_sql: true
   config:
     use-legacy-processing: true
     activate:
@@ -45,11 +45,11 @@ spring:
             - profile
           redirect-uri: http://localhost:8080/login/callback
   banner:
-#    location: classpath:banners/banner4
-    # width:
-    # height:
-    # margin:
-    # invert:
+  #    location: classpath:banners/banner4
+  # width:
+  # height:
+  # margin:
+  # invert:
 
 
 oauth2:
