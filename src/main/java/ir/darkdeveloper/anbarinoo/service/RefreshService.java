@@ -21,7 +21,6 @@ public class RefreshService {
         repo.save(model);
     }
 
-    @Transactional
     public void deleteTokenByUserId(Long id) {
         repo.deleteTokenByUserId(id);
     }

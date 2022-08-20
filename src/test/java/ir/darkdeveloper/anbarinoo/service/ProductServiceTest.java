@@ -217,7 +217,6 @@ public record ProductServiceTest(ProductService productService,
     void deleteUser() {
         // should delete all products and product images of this user
         // for images check build/resources/test/static/user/product_images/
-        var userInfo = userService.getUserInfo(userId, request);
         userService.deleteUser(userId, request);
 
         // user is deleted so can't access to system
