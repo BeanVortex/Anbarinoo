@@ -116,20 +116,20 @@ public class UserAuthUtils {
     public void setupHeader(HttpServletResponse response, String accessToken, String refreshToken) {
         var date = jwtUtils.getExpirationDate(refreshToken);
         var refreshDate = TOKEN_EXPIRATION_FORMAT.format(date);
-//        var accessDate = TOKEN_EXPIRATION_FORMAT.format(jwtUtils.getExpirationDate(accessToken));
         response.addHeader("refresh_token", refreshToken);
         response.addHeader("access_token", accessToken);
         response.addHeader("refresh_expiration", refreshDate);
-//        response.addHeader("access_expiration", accessDate);
     }
 
     public Optional<? extends UserDetails> loadUserByUsername(String username) {
         if (username.equals(adminUser.username())) {
             var authorities = adminUser.authorities();
-            return Optional.of(
-                    User.builder().username(adminUser.username())
-                            .password(encoder.encode(adminUser.password())).authorities(authorities).build()
-            );
+            var superAdmin = User.builder()
+                    .username(adminUser.username())
+                    .password(encoder.encode(adminUser.password()))
+                    .authorities(authorities)
+                    .build();
+            return Optional.of(superAdmin);
         }
         return repo.findByEmailOrUsername(username);
     }

@@ -13,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +32,7 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
     private static HttpServletRequest request;
     private static CategoryModel electronics;
     private static Long userId;
+    private static Long catId;
 
     @Autowired
     public CategoryServiceTest {
@@ -40,7 +40,6 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
 
     @Test
     @Order(1)
-    @WithMockUser(username = "anonymousUser")
     void saveUser() {
         var response = new MockHttpServletResponse();
         var user = UserModel.builder()
@@ -59,59 +58,47 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
 
     @Test
     @Order(2)
-    @WithMockUser(username = "email4@mail.com", authorities = {"OP_ACCESS_USER"})
     void saveCategory() {
-
         var user = new UserModel(userId);
         electronics = new CategoryModel("Electronics");
         electronics.setUser(user);
-        var mobilePhones = new CategoryModel("Mobile phones", electronics);
-        mobilePhones.setUser(user);
-        var washingMachines = new CategoryModel("Washing machines", electronics);
-        washingMachines.setUser(user);
-        electronics.addChild(mobilePhones);
-        electronics.addChild(washingMachines);
-        var iPhone = new CategoryModel("iPhone", mobilePhones);
-        iPhone.setUser(user);
-        var samsung = new CategoryModel("Samsung", mobilePhones);
-        samsung.setUser(user);
-        mobilePhones.addChild(iPhone);
-        mobilePhones.addChild(samsung);
-        var galaxy = new CategoryModel("Galaxy", samsung);
-        galaxy.setUser(user);
-        samsung.addChild(galaxy);
         categoryService.saveCategory(Optional.of(electronics), request);
+        catId = electronics.getId();
     }
 
     @Test
     @Order(3)
-    @WithMockUser(username = "email4@mail.com", authorities = {"OP_ACCESS_USER"})
     void getCategoriesByUser() {
-        var categories = categoryService.getCategoriesByUser(request);
+        var categories = categoryService.getCategoriesByUser(request, userId);
         assertThat(categories.size()).isNotEqualTo(0);
     }
 
     @Test
     @Order(4)
-    @WithMockUser(username = "email4@mail.com", authorities = {"OP_ACCESS_USER"})
     void getParentCategoryById() {
-        /* var parentCat =  */
-        categoryService.getCategoryById(electronics.getId(), request);
-        // tested in postman and was ok
-        // could not test here because of lazy initialization
-        //        assertThat(parentCat.getChildren().isEmpty()).isTrue();
+        var categoryById = categoryService.getCategoryById(electronics.getId(), request);
+        assertThat(categoryById.getId()).isEqualTo(catId);
+        assertThat(categoryById.getUser().getId()).isEqualTo(userId);
     }
 
     @Test
     @Order(5)
-    @WithMockUser(username = "email4@mail.com", authorities = {"OP_ACCESS_USER"})
+    void addChildren() {
+        var galaxy = new CategoryModel("Galaxy");
+        var subCategory = categoryService.saveSubCategory(Optional.of(galaxy), catId, request);
+
+        assertThat(subCategory.getName()).isEqualTo("Galaxy");
+        assertThat(subCategory.getParent().getId()).isEqualTo(catId);
+    }
+
+    @Test
+    @Order(6)
     void deleteCategory() {
         categoryService.deleteCategory(electronics.getId(), request);
     }
 
     @Test
-    @Order(6)
-    @WithMockUser(username = "email4@mail.com", authorities = {"OP_ACCESS_USER"})
+    @Order(7)
     void getUserAfterCatDelete() {
         var fetchedUser = userService.getUserInfo(userId, request);
         assertThat(fetchedUser).isNotNull();

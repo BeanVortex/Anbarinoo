@@ -37,11 +37,10 @@ public class BuyService {
     private final FinancialUtils fUtils;
 
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
-    public BuyModel saveBuy(Optional<BuyModel> buy, Boolean isSaveProduct, HttpServletRequest req) {
+    public BuyModel saveBuy(Optional<BuyModel> buy, Boolean isFromSaveProduct, HttpServletRequest req) {
         return exceptionHandlers(() -> {
             checkBuyData(buy, Optional.empty());
-            if (!isSaveProduct)
+            if (!isFromSaveProduct)
                 saveProductCount(buy.orElseThrow(), req);
             // checked buy data validity in checkBuyData, so it is safe to use orElseThrow
             return repo.save(buy.orElseThrow());

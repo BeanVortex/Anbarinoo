@@ -49,6 +49,7 @@ public record CategoryControllerTest(UserService userService,
                                      TestUtils testUtils) {
 
     private static Long catId;
+    private static Long userId;
     private static HttpHeaders authHeaders;
     private static Long subCatId;
     private static MockMvc mockMvc;
@@ -81,15 +82,19 @@ public record CategoryControllerTest(UserService userService,
                 .passwordRepeat("pass12P+")
                 .build();
         userService.signUpUser(Optional.of(user), response);
+        userId = user.getId();
         authHeaders = testUtils.getAuthHeaders(response);
     }
 
 
     @Test
     @Order(2)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(authorities = "OP_ADD_PRODUCT")
     void saveCategory() throws Exception {
         var electronics = new CategoryModel("Electronics");
+        var user = new UserModel(userId);
+        user.setEnabled(true);
+        electronics.setUser(user);
         System.out.println(mapToJson(electronics));
         mockMvc.perform(post("/api/category/save/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -108,10 +113,13 @@ public record CategoryControllerTest(UserService userService,
     // should not save product
     @Test
     @Order(3)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(authorities = "OP_ADD_PRODUCT")
     void saveCategoryWithProduct() throws Exception {
         var electronics = new CategoryModel("Electronics");
         electronics.setProducts(List.of(new ProductModel(5L)));
+        var user = new UserModel(userId);
+        user.setEnabled(true);
+        electronics.setUser(user);
         System.out.println(mapToJson(electronics));
         mockMvc.perform(post("/api/category/save/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -126,7 +134,7 @@ public record CategoryControllerTest(UserService userService,
 
     @Test
     @Order(4)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
+    @WithMockUser(authorities = "OP_ADD_PRODUCT")
     void saveASubCategory() throws Exception {
         var subCat = new CategoryModel("Mobiles");
         System.out.println(mapToJson(subCat));
@@ -147,7 +155,7 @@ public record CategoryControllerTest(UserService userService,
 
     @Test
     @Order(5)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
+    @WithMockUser(authorities = "OP_ACCESS_PRODUCT")
     void getParentCategoryById() throws Exception {
         mockMvc.perform(get("/api/category/{id}/", catId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -164,9 +172,9 @@ public record CategoryControllerTest(UserService userService,
 
     @Test
     @Order(6)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
+    @WithMockUser(authorities = "OP_ACCESS_PRODUCT")
     void getCategoriesByUser() throws Exception {
-        mockMvc.perform(get("/api/category/user/")
+        mockMvc.perform(get("/api/category/user/{id}/", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .headers(authHeaders)
@@ -180,7 +188,7 @@ public record CategoryControllerTest(UserService userService,
 
     @Test
     @Order(7)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
+    @WithMockUser(authorities = "OP_DELETE_PRODUCT")
     void deleteCategoryById() throws Exception {
         mockMvc.perform(delete("/api/category/{id}/", catId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -193,7 +201,7 @@ public record CategoryControllerTest(UserService userService,
 
     @Test
     @Order(8)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
+    @WithMockUser(authorities = "OP_ACCESS_PRODUCT")
     void getSubCategoryByIdAfterParentDelete() throws Exception {
         mockMvc.perform(get("/api/category/{id}/", subCatId)
                         .contentType(MediaType.APPLICATION_JSON)

@@ -190,8 +190,8 @@ public class IOUtils {
     /**
      * Adding new images to the product
      *
-     * @param product       Contains only new image files, rest will be ignored
-     * @param preProduct    Data of this object will be merged with product and adds remaining images to product
+     * @param product    Contains only new image files, rest will be ignored
+     * @param preProduct Data of this object will be merged with product and adds remaining images to product
      */
     public void addMoreProductImages(ProductModel product, ProductModel preProduct) {
         var fileNames = new ArrayList<String>();
@@ -212,22 +212,27 @@ public class IOUtils {
     /**
      * Deleting a product's images
      *
-     * @param product       Contains images names
-     * @param preProduct    Deletes an image which is provided in product
+     * @param product    Contains images names
+     * @param preProduct Deletes an image which is provided in product
      */
     public void deleteProductImages(ProductModel product, ProductModel preProduct) {
+        var imageNamesToRemove = new ArrayList<String>();
         product.getImages().forEach(oldImg -> {
-            if (preProduct.getImages().contains(oldImg)) {
-                try {
-                    var imgPath = getImagePath(PRODUCT_IMAGE_PATH, oldImg);
-                    if (!oldImg.equals(DEFAULT_PRODUCT_IMAGE) && imgPath != null)
-                        Files.delete(Paths.get(imgPath));
-                    preProduct.getImages().remove(oldImg);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
+            if (preProduct.getImages().contains(oldImg))
+                    imageNamesToRemove.add(oldImg);
+        });
+
+        imageNamesToRemove.forEach(s -> {
+            try {
+                var imgPath = getImagePath(PRODUCT_IMAGE_PATH, s);
+                if (!s.equals(DEFAULT_PRODUCT_IMAGE) && imgPath != null)
+                    Files.delete(Paths.get(imgPath));
+                preProduct.getImages().remove(s);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
+
         if (preProduct.getImages().size() == 0)
             preProduct.getImages().add(DEFAULT_PRODUCT_IMAGE);
     }

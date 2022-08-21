@@ -38,7 +38,7 @@ public class ProductService {
      * if image files are null, then sets a default image
      * if not, saves files and sets images
      */
-    @Transactional
+//    @Transactional
     public ProductModel saveProduct(Optional<ProductModel> productOpt, HttpServletRequest req) {
 
         var product = productUtils.validateAndGetProduct(productOpt);
@@ -66,7 +66,6 @@ public class ProductService {
      * @param product Contains any data except for id, image files, unless will be ignored
      * @return updated product with images kept
      */
-//    @Transactional
     public ProductModel updateProduct(Optional<ProductModel> product, Long productId, HttpServletRequest req) {
 
         var preProduct = repo.findById(productId)
@@ -81,7 +80,6 @@ public class ProductService {
      * If a sell or buy record gets updated, product model of that will be updated too.
      * because when you buy or sell any product in your warehouse, total number of that product changes
      */
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public void updateProductFromBuyOrSell(Optional<ProductModel> product, ProductModel preProduct,
                                            HttpServletRequest req) {
         productUtils.validateAndUpdateProduct(product, preProduct);
@@ -93,7 +91,6 @@ public class ProductService {
         return repo.findByNameContainsAndUserId(name, userId, pageable);
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
     public ProductModel getProduct(Long productId, HttpServletRequest req) {
         var foundProduct = repo.findById(productId)
                 .orElseThrow(() -> new NoContentException("This product does not exist"));
@@ -102,7 +99,7 @@ public class ProductService {
         return foundProduct;
     }
 
-    public Page<ProductModel> getAllProducts(Pageable pageable, HttpServletRequest req) {
+    public Page<ProductModel> getAllProductsOfUser(Pageable pageable, HttpServletRequest req) {
         var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
         return repo.findAllByUserId(userId, pageable);
     }

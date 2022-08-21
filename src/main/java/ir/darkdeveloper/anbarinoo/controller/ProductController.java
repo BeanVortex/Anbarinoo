@@ -23,63 +23,62 @@ public class ProductController {
     private final ProductMapper mapper;
 
     @PostMapping("/save/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ResponseEntity<ProductDto> saveProduct(@ModelAttribute ProductModel product,
-                                                  HttpServletRequest request) {
-        return new ResponseEntity<>(
-                mapper.productToDto(service.saveProduct(Optional.ofNullable(product), request)),
-                HttpStatus.CREATED);
+    @PreAuthorize("hasAuthority('OP_ADD_PRODUCT')")
+    public ResponseEntity<ProductDto> saveProduct(@ModelAttribute ProductModel product, HttpServletRequest request) {
+        var savedProduct = service.saveProduct(Optional.ofNullable(product), request);
+        return new ResponseEntity<>(mapper.productToDto(savedProduct), HttpStatus.CREATED);
     }
 
     @GetMapping("/search/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_ACCESS_PRODUCT')")
     public ResponseEntity<Page<ProductDto>> findByNameContains(@RequestParam String name, Pageable pageable,
                                                                HttpServletRequest request) {
-        return ResponseEntity.ok(service.findByNameContains(name, pageable, request).map(mapper::productToDto));
+        var products = service.findByNameContains(name, pageable, request);
+        return ResponseEntity.ok(products.map(mapper::productToDto));
     }
 
     @PutMapping("/update/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_EDIT_PRODUCT')")
     public ResponseEntity<ProductDto> updateProduct(@RequestBody ProductModel product,
                                                     @PathVariable("id") Long productId,
                                                     HttpServletRequest request) {
-        return ResponseEntity.ok(mapper.productToDto(
-                service.updateProduct(Optional.ofNullable(product), productId, request)
-        ));
+        var updateProduct = service.updateProduct(Optional.ofNullable(product), productId, request);
+        return ResponseEntity.ok(mapper.productToDto(updateProduct));
     }
 
     @PutMapping("/update/images/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_EDIT_PRODUCT')")
     public ResponseEntity<ProductDto> addNewProductImages(@ModelAttribute ProductModel product,
                                                           @PathVariable("id") Long productId,
                                                           HttpServletRequest request) {
-        return ResponseEntity.ok(mapper.productToDto(
-                service.addNewProductImages(Optional.ofNullable(product), productId, request)));
+        var updatedProduct = service.addNewProductImages(Optional.ofNullable(product), productId, request);
+        return ResponseEntity.ok(mapper.productToDto(updatedProduct));
     }
 
     @PutMapping("/update/delete-images/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_EDIT_PRODUCT')")
     public ResponseEntity<String> deleteProductImages(@RequestBody ProductModel product,
-                                                            @PathVariable("id") Long productId,
-                                                            HttpServletRequest request) {
+                                                      @PathVariable("id") Long productId,
+                                                      HttpServletRequest request) {
         var message = service.deleteProductImages(Optional.ofNullable(product), productId, request);
         return ResponseEntity.ok(message);
     }
 
     @GetMapping("/{id}/")
+    @PreAuthorize("hasAuthority('OP_ACCESS_PRODUCT')")
     public ResponseEntity<ProductDto> getProduct(@PathVariable Long id, HttpServletRequest request) {
         return ResponseEntity.ok(mapper.productToDto(service.getProduct(id, request)));
     }
 
     @GetMapping("/user/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ResponseEntity<Page<ProductDto>> getAllProducts(Pageable pageable,
-                                                           HttpServletRequest request) {
-        return ResponseEntity.ok(service.getAllProducts(pageable, request).map(mapper::productToDto));
+    @PreAuthorize("hasAuthority('OP_ACCESS_PRODUCT')")
+    public ResponseEntity<Page<ProductDto>> getAllProductsOfUser(Pageable pageable,
+                                                                 HttpServletRequest request) {
+        return ResponseEntity.ok(service.getAllProductsOfUser(pageable, request).map(mapper::productToDto));
     }
 
     @DeleteMapping("/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_DELETE_PRODUCT')")
     public ResponseEntity<String> deleteProduct(@PathVariable Long id, HttpServletRequest request) {
         return ResponseEntity.ok(service.deleteProduct(id, request));
     }

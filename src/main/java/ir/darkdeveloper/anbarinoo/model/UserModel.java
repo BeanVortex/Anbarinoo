@@ -97,7 +97,6 @@ public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel
     @ToString.Exclude
     private List<CategoryModel> categories;
 
-    // For saving products I need it
     public UserModel(Long id) {
         this.id = id;
     }

@@ -33,7 +33,7 @@ public class CategoryController {
 
 
     @PostMapping("/save/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_ADD_PRODUCT')")
     public ResponseEntity<CategoryDto> saveCategory(@RequestBody CategoryModel model,
                                                     HttpServletRequest request) {
         var savedCat = service.saveCategory(Optional.ofNullable(model), request);
@@ -41,7 +41,7 @@ public class CategoryController {
     }
 
     @PostMapping("/sub-category/save/{parentId}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN', 'OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_ADD_PRODUCT')")
     public ResponseEntity<CategoryDto> saveSubCategory(@RequestBody CategoryModel model,
                                                        @PathVariable Long parentId,
                                                        HttpServletRequest request) {
@@ -52,21 +52,22 @@ public class CategoryController {
     record CategoriesDto(List<CategoryDto> categories) {
     }
 
-    @GetMapping("/user/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
-    public ResponseEntity<CategoriesDto> getCategoriesByUserId(HttpServletRequest request) {
+    @GetMapping("/user/{userId}/")
+    @PreAuthorize("hasAuthority('OP_ACCESS_PRODUCT')")
+    public ResponseEntity<CategoriesDto> getCategoriesByUserId(HttpServletRequest req, @PathVariable Long userId) {
         return ResponseEntity.ok(new CategoriesDto(
-                service.getCategoriesByUser(request).stream().map(mapper::categoryToDto).toList()
+                service.getCategoriesByUser(req, userId).stream().map(mapper::categoryToDto).toList()
         ));
     }
 
     @GetMapping("/{id}/")
+    @PreAuthorize("hasAuthority('OP_ACCESS_PRODUCT')")
     public ResponseEntity<CategoryDto> getCategoryById(@PathVariable Long id, HttpServletRequest request) {
         return ResponseEntity.ok(mapper.categoryToDto(service.getCategoryById(id, request)));
     }
 
     @DeleteMapping("/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_DELETE_PRODUCT')")
     public ResponseEntity<String> deleteCategoryById(@PathVariable Long id, HttpServletRequest request) {
         return ResponseEntity.ok(service.deleteCategory(id, request));
     }

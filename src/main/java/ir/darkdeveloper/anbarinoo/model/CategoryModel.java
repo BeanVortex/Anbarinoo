@@ -29,8 +29,6 @@ public class CategoryModel {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-//    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-//    @JsonIdentityReference(alwaysAsId = true)
     @ToString.Include
     private UserModel user;
 
@@ -63,12 +61,6 @@ public class CategoryModel {
     public CategoryModel(String name, CategoryModel parent) {
         this.name = name;
         this.parent = parent;
-    }
-
-    public void addChild(CategoryModel children) {
-        if (this.children == null)
-            this.children = new LinkedList<>();
-        this.children.add(children);
     }
 
     public CategoryModel(Long id, String name, UserModel user, CategoryModel parent) {
