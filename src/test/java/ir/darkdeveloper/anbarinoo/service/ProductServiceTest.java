@@ -1,23 +1,23 @@
 package ir.darkdeveloper.anbarinoo.service;
 
 import ir.darkdeveloper.anbarinoo.TestUtils;
-import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.extentions.DatabaseSetup;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,12 +28,11 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext
-//@ExtendWith(DatabaseSetup.class)
+@ExtendWith(DatabaseSetup.class)
 public record ProductServiceTest(ProductService productService,
                                  JwtUtils jwtUtils,
                                  UserService userService,
@@ -195,29 +194,19 @@ public record ProductServiceTest(ProductService productService,
     @Test
     @Order(10)
     void deleteProduct() {
-        productService.deleteProduct(productId, request);
         productImages.stream()
                 .map(image ->
-                        new ClassPathResource("/resources/test/static/user/product_images/" + image)
+                        new ClassPathResource("/static/user/product_images/" + image)
+                ).forEach(resource -> assertThat(resource.exists()).isTrue());
+
+
+        productService.deleteProduct(productId, request);
+
+        productImages.stream()
+                .map(image ->
+                        new ClassPathResource("/static/user/product_images/" + image)
                 )
                 .forEach(resource -> assertThat(resource.exists()).isFalse());
     }
-
-//    @Test
-//    @Order(11)
-//    void deleteUser() {
-//        // should delete all products and product images of this user
-//        // for images check build/resources/test/static/user/product_images/
-//        userService.deleteUser(userId, request);
-//
-//        // user is deleted so can't access to system
-//        assertThrows(NoContentException.class,
-//                () -> categoryService.getCategoryById(catId, request),
-//                "Category is not found");
-//        assertThrows(NoContentException.class,
-//                () -> productService.getProduct(productId, request),
-//                "This product does not exist");
-//
-//    }
 
 }
