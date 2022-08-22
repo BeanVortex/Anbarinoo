@@ -58,6 +58,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     private static HttpHeaders authHeaders2;
     private static Long productId;
     private static Long catId;
+    private static Long userId;
     private static HttpServletRequest request;
     private static MockMvc mockMvc;
 
@@ -105,6 +106,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
                 .passwordRepeat("pass12P+")
                 .build();
         userService.signUpUser(Optional.of(user), response);
+        userId = user.getId();
         authHeaders2 = testUtils.getAuthHeaders(response);
     }
 
@@ -113,6 +115,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
     @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void saveCategory() {
         var electronics = new CategoryModel("Electronics");
+        electronics.setUser(new UserModel(userId));
         categoryService.saveCategory(Optional.of(electronics), request);
         catId = electronics.getId();
     }

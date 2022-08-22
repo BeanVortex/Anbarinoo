@@ -100,9 +100,10 @@ public record SellControllerTest(UserService userService,
 
     @Test
     @Order(2)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(authorities = "OP_ADD_PRODUCT")
     void saveCategory() {
         var electronics = new CategoryModel("Electronics");
+        electronics.setUser(new UserModel(userId));
         categoryService.saveCategory(Optional.of(electronics), request);
         catId = electronics.getId();
     }

@@ -27,14 +27,12 @@ public class ProductModel implements UpdateModel<ProductModel> {
     @GeneratedValue
     private Long id;
 
-    private Long firstBuyId;
-
     @Column(length = 50, nullable = false)
     private String name;
 
     private String description;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection
     @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"))
     private List<String> images;
 

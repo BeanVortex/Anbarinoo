@@ -3,8 +3,10 @@ package ir.darkdeveloper.anbarinoo.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
@@ -29,6 +31,7 @@ public interface ProductRepository extends PagingAndSortingRepository<ProductMod
             "where m.category.user.id = :userId")
     List<ProductModel> findAllByUserId(Long userId);
 
-    @EntityGraph(attributePaths = {"category.user.id", "images"})
+    @EntityGraph(attributePaths = {"category.user", "images"})
     Optional<ProductModel> findById(Long id);
+
 }

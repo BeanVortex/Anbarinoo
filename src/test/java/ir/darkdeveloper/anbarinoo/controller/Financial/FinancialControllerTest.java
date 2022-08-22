@@ -66,6 +66,7 @@ public record FinancialControllerTest(UserService userService,
     private static Long buyId;
     private static Long sellId;
     private static Long catId;
+    private static Long userId;
     private static HttpServletRequest request;
     private static MockMvc mockMvc;
     private static LocalDateTime fromDate = null;
@@ -98,8 +99,7 @@ public record FinancialControllerTest(UserService userService,
                 .enabled(true)
                 .build();
         userService.signUpUser(Optional.of(user), response);
-        var userEmail = user.getEmail();
-        var userId = user.getId();
+        userId = user.getId();
         request = testUtils.setUpHeaderAndGetReqWithRes(response);
         authHeaders = testUtils.getAuthHeaders(response);
     }
@@ -107,9 +107,10 @@ public record FinancialControllerTest(UserService userService,
 
     @Test
     @Order(2)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(authorities = "OP_ADD_PRODUCT")
     void saveCategory() {
         var electronics = new CategoryModel("Electronics");
+        electronics.setUser(new UserModel(userId));
         categoryService.saveCategory(Optional.of(electronics), request);
         catId = electronics.getId();
     }

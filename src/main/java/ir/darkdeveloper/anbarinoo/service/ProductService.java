@@ -13,11 +13,10 @@ import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +37,7 @@ public class ProductService {
      * if image files are null, then sets a default image
      * if not, saves files and sets images
      */
-//    @Transactional
+    @Transactional
     public ProductModel saveProduct(Optional<ProductModel> productOpt, HttpServletRequest req) {
 
         var product = productUtils.validateAndGetProduct(productOpt);
@@ -54,7 +53,6 @@ public class ProductService {
                 .product(product).count(product.getTotalCount())
                 .price(product.getPrice()).tax(product.getTax()).build();
         buyService.saveBuy(Optional.of(buy), true, req);
-        product.setFirstBuyId(buy.getId());
         return product;
 
     }
@@ -115,15 +113,15 @@ public class ProductService {
      * @param product Contains images files, id
      * @return updated product with new images
      */
-    @Transactional
+//    @Transactional
     public ProductModel addNewProductImages(Optional<ProductModel> product,
                                             Long productId, HttpServletRequest req) {
         product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
         var preProduct = repo.findById(productId)
                 .orElseThrow(() -> new NoContentException("This product does not exist"));
 
-        userAuthUtils.checkUserIsSameUserForRequest(preProduct.getCategory().getUser().getId(),
-                req, "update");
+        var userId = preProduct.getCategory().getUser().getId();
+        userAuthUtils.checkUserIsSameUserForRequest(userId, req, "update");
         return productUtils.updateProductImages(product, preProduct);
     }
 

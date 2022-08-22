@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext
-@ExtendWith(DatabaseSetup.class)
+//@ExtendWith(DatabaseSetup.class)
 public record ProductServiceTest(ProductService productService,
                                  JwtUtils jwtUtils,
                                  UserService userService,
@@ -40,7 +40,6 @@ public record ProductServiceTest(ProductService productService,
     private static HttpServletRequest request;
     private static Long catId;
     private static Long userId;
-    //    private static Long userId2;
     private static Long productId;
 
     @Autowired
@@ -50,7 +49,6 @@ public record ProductServiceTest(ProductService productService,
 
     @Test
     @Order(1)
-    @WithMockUser(username = "anonymousUser")
     void saveUser() {
         var response = new MockHttpServletResponse();
         var user = UserModel.builder()
@@ -65,27 +63,19 @@ public record ProductServiceTest(ProductService productService,
         userService.signUpUser(Optional.of(user), response);
         userId = user.getId();
         request = testUtils.setUpHeaderAndGetReqWithRes(response);
-        var user2 = UserModel.builder()
-                .email("email2@mail.com")
-                .password("pass12P+")
-                .passwordRepeat("pass12P+")
-                .build();
-//        userService.signUpUser(Optional.of(user2), response);
-//        userId2 = user2.getId();
     }
 
     @Test
     @Order(2)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void saveCategory() {
         var electronics = new CategoryModel("Electronics");
+        electronics.setUser(new UserModel(userId));
         categoryService.saveCategory(Optional.of(electronics), request);
         catId = electronics.getId();
     }
 
     @Test
     @Order(3)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void saveProduct() {
         var product = ProductModel.builder()
                 .name("name")
@@ -107,7 +97,6 @@ public record ProductServiceTest(ProductService productService,
 
     @Test
     @Order(4)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void getProduct() {
         var fetchedProduct = productService.getProduct(productId, request);
         assertThat(fetchedProduct.getCategory().getUser().getId()).isEqualTo(userId);
@@ -115,7 +104,6 @@ public record ProductServiceTest(ProductService productService,
 
     @Test
     @Order(5)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void updateProduct() {
         var product = ProductModel.builder()
                 .name("updatedName")
@@ -134,7 +122,6 @@ public record ProductServiceTest(ProductService productService,
 
     @Test
     @Order(6)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void addNewProductImages() {
         var product = new ProductModel();
 

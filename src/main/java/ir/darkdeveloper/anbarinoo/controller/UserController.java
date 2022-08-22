@@ -46,7 +46,7 @@ public class UserController {
                     HttpStatus.CREATED);
 
         var errors = bindingResult.getFieldErrors().stream()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.toList());
+                .map(DefaultMessageSourceResolvable::getDefaultMessage).toList();
         throw new BadRequestException(errors.toString());
     }
 

@@ -88,7 +88,7 @@ public record UserRolesControllerTest(UserService userService,
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.userRoles").isArray())
                 .andExpect(jsonPath("$.userRoles", hasSize(2)))
-                .andExpect(jsonPath("$.userRoles[1].name").value("USER"))
+                .andExpect(jsonPath("$.userRoles[0].name").value("USER"))
                 .andDo(result -> {
                     var obj = new JSONObject(result.getResponse().getContentAsString());
                     var arr = obj.getJSONArray("userRoles");
@@ -121,7 +121,7 @@ public record UserRolesControllerTest(UserService userService,
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.userRoles").isArray())
                 .andExpect(jsonPath("$.userRoles", hasSize(1)))
-                .andExpect(jsonPath("$.userRoles[0].name").value("USER"));
+                .andExpect(jsonPath("$.userRoles[0].name").value("AdminOfUsers"));
     }
 
 

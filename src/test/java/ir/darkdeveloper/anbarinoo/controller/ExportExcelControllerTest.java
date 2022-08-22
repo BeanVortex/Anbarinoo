@@ -53,6 +53,7 @@ record ExportExcelControllerTest(WebApplicationContext webApplicationContext,
     private static HttpServletRequest request;
     private static HttpHeaders authHeaders;
     private static Long catId;
+    private static Long userId;
     private static MockMvc mockMvc;
 
 
@@ -83,6 +84,7 @@ record ExportExcelControllerTest(WebApplicationContext webApplicationContext,
                 .passwordRepeat("pass12P+")
                 .build();
         userService.signUpUser(Optional.of(user), response);
+        userId = user.getId();
         request = testUtils.setUpHeaderAndGetReqWithRes(response);
         authHeaders = testUtils.getAuthHeaders(response);
     }
@@ -92,6 +94,7 @@ record ExportExcelControllerTest(WebApplicationContext webApplicationContext,
     @Order(2)
     void saveCategory() {
         var electronics = new CategoryModel("Electronics");
+        electronics.setUser(new UserModel(userId));
         categoryService.saveCategory(Optional.of(electronics), request);
         catId = electronics.getId();
     }
