@@ -53,8 +53,9 @@ public class ProductModel implements UpdateModel<ProductModel> {
     @ToString.Exclude
     private List<BuyModel> buys;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cat_id")
+    @ToString.Exclude
     private CategoryModel category;
 
 

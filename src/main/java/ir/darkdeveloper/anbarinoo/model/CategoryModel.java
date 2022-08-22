@@ -20,20 +20,18 @@ public class CategoryModel {
 
     @Id
     @GeneratedValue
-    @ToString.Include
     private Long id;
 
     @Column(nullable = false)
-    @ToString.Include
     private String name;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    @ToString.Include
+    @ToString.Exclude
     private UserModel user;
 
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "parent_id")
     @ToString.Exclude
     private CategoryModel parent;

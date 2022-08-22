@@ -138,7 +138,7 @@ public class SellService {
         checkUserIsSameUserForRequest(preProduct, null, req, "save buy record of");
         if (preProduct.getTotalCount().compareTo(sell.getCount()) >= 0) {
             product.setTotalCount(preProduct.getTotalCount().subtract(sell.getCount()));
-            productService.updateProductFromBuyOrSell(Optional.of(product), preProduct, req);
+            productService.updateProductFromBuyOrSell(Optional.of(product), preProduct);
         } else throw new BadRequestException("Not enough product left in stuck to sell!");
     }
 
@@ -157,7 +157,7 @@ public class SellService {
                 difference = preSell.getCount().subtract(sell.getCount());
                 product.setTotalCount(preProduct.getTotalCount().add(difference));
             }
-            productService.updateProductFromBuyOrSell(Optional.of(product), preProduct, req);
+            productService.updateProductFromBuyOrSell(Optional.of(product), preProduct);
         } else throw new BadRequestException("Not enough product left in stuck to sell!");
     }
 
@@ -165,7 +165,7 @@ public class SellService {
         var preProduct = productService.getProduct(sell.getProduct().getId(), req);
         var product = new ProductModel();
         product.setTotalCount(preProduct.getTotalCount().subtract(sell.getCount()));
-        productService.updateProductFromBuyOrSell(Optional.of(product), preProduct, req);
+        productService.updateProductFromBuyOrSell(Optional.of(product), preProduct);
     }
 
 

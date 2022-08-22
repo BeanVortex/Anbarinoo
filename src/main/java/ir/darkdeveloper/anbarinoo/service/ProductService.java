@@ -64,6 +64,7 @@ public class ProductService {
      * @param product Contains any data except for id, image files, unless will be ignored
      * @return updated product with images kept
      */
+    @Transactional
     public ProductModel updateProduct(Optional<ProductModel> product, Long productId, HttpServletRequest req) {
 
         var preProduct = repo.findById(productId)
@@ -78,8 +79,7 @@ public class ProductService {
      * If a sell or buy record gets updated, product model of that will be updated too.
      * because when you buy or sell any product in your warehouse, total number of that product changes
      */
-    public void updateProductFromBuyOrSell(Optional<ProductModel> product, ProductModel preProduct,
-                                           HttpServletRequest req) {
+    public void updateProductFromBuyOrSell(Optional<ProductModel> product, ProductModel preProduct) {
         productUtils.validateAndUpdateProduct(product, preProduct);
         repo.save(preProduct);
     }
@@ -113,7 +113,7 @@ public class ProductService {
      * @param product Contains images files, id
      * @return updated product with new images
      */
-//    @Transactional
+    @Transactional
     public ProductModel addNewProductImages(Optional<ProductModel> product,
                                             Long productId, HttpServletRequest req) {
         product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));

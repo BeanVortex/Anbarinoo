@@ -134,7 +134,7 @@ public class BuyService {
         var product = ProductModel.builder()
                 .totalCount(preProduct.getTotalCount().add(buy.getCount()))
                 .build();
-        productService.updateProductFromBuyOrSell(Optional.of(product), preProduct, req);
+        productService.updateProductFromBuyOrSell(Optional.of(product), preProduct);
 
     }
 
@@ -151,7 +151,7 @@ public class BuyService {
             difference = preBuy.getCount().subtract(buy.getCount());
             product.setTotalCount(preProduct.getTotalCount().subtract(difference));
         }
-        productService.updateProductFromBuyOrSell(Optional.of(product), preProduct, req);
+        productService.updateProductFromBuyOrSell(Optional.of(product), preProduct);
     }
 
     private void deleteProductCount(BuyModel buy, HttpServletRequest req) {
@@ -159,7 +159,7 @@ public class BuyService {
         var product = ProductModel.builder()
                 .totalCount(preProduct.getTotalCount().subtract(buy.getCount()))
                 .build();
-        productService.updateProductFromBuyOrSell(Optional.of(product), preProduct, req);
+        productService.updateProductFromBuyOrSell(Optional.of(product), preProduct);
     }
 
 

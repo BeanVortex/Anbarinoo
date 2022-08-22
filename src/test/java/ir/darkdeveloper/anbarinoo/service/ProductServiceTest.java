@@ -11,6 +11,8 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -20,7 +22,9 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,6 +45,7 @@ public record ProductServiceTest(ProductService productService,
     private static Long catId;
     private static Long userId;
     private static Long productId;
+    private static final List<String> productImages = new ArrayList<>();
 
     @Autowired
     public ProductServiceTest {
@@ -122,6 +127,21 @@ public record ProductServiceTest(ProductService productService,
 
     @Test
     @Order(6)
+    void deleteAllProductImages() {
+        var product = new ProductModel();
+        var fetchedProduct = productService.getProduct(productId, request);
+        product.setImages(fetchedProduct.getImages());
+
+        productService.deleteProductImages(Optional.of(product), productId, request);
+
+        var fetchedProduct2 = productService.getProduct(productId, request);
+        assertThat(fetchedProduct2.getImages().size()).isNotEqualTo(0);
+        for (var image : fetchedProduct2.getImages())
+            assertThat(image).isEqualTo("noImage.png");
+    }
+
+    @Test
+    @Order(7)
     void addNewProductImages() {
         var product = new ProductModel();
 
@@ -143,8 +163,7 @@ public record ProductServiceTest(ProductService productService,
     }
 
     @Test
-    @Order(7)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
+    @Order(8)
     void deleteProductImages() {
         var product = new ProductModel();
         var fetchedProduct = productService.getProduct(productId, request);
@@ -159,29 +178,12 @@ public record ProductServiceTest(ProductService productService,
         assertThat(fetchedProduct2.getImages().size()).isEqualTo(2);
         for (var image : fetchedProduct2.getImages())
             assertThat(image).isNotEqualTo("noImage.png");
-    }
-
-    @Test
-    @Order(8)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
-    @Disabled
-    void deleteAllUpdateProductImages() {
-        var product = new ProductModel();
-        var fetchedProduct = productService.getProduct(productId, request);
-        product.setImages(fetchedProduct.getImages());
-
-        productService.deleteProductImages(Optional.of(product), productId, request);
-
-        var fetchedProduct2 = productService.getProduct(productId, request);
-        assertThat(fetchedProduct2.getImages().size()).isNotEqualTo(0);
-        for (var image : fetchedProduct2.getImages())
-            assertThat(image).isEqualTo("noImage.png");
+        productImages.addAll(fetchedProduct2.getImages());
     }
 
 
     @Test
     @Order(9)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void findByNameContains() {
         var pageable = PageRequest.of(0, 8);
         var product = new ProductModel();
@@ -192,28 +194,30 @@ public record ProductServiceTest(ProductService productService,
 
     @Test
     @Order(10)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
-    @Disabled
     void deleteProduct() {
         productService.deleteProduct(productId, request);
+        productImages.stream()
+                .map(image ->
+                        new ClassPathResource("/resources/test/static/user/product_images/" + image)
+                )
+                .forEach(resource -> assertThat(resource.exists()).isFalse());
     }
 
-    @Test
-    @Order(11)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER", "OP_DELETE_USER"})
-    void deleteUser() {
-        // should delete all products and product images of this user
-        // for images check build/resources/test/static/user/product_images/
-        userService.deleteUser(userId, request);
-
-        // user is deleted so can't access to system
-        assertThrows(NoContentException.class,
-                () -> categoryService.getCategoryById(catId, request),
-                "Category is not found");
-        assertThrows(NoContentException.class,
-                () -> productService.getProduct(productId, request),
-                "This product does not exist");
-
-    }
+//    @Test
+//    @Order(11)
+//    void deleteUser() {
+//        // should delete all products and product images of this user
+//        // for images check build/resources/test/static/user/product_images/
+//        userService.deleteUser(userId, request);
+//
+//        // user is deleted so can't access to system
+//        assertThrows(NoContentException.class,
+//                () -> categoryService.getCategoryById(catId, request),
+//                "Category is not found");
+//        assertThrows(NoContentException.class,
+//                () -> productService.getProduct(productId, request),
+//                "This product does not exist");
+//
+//    }
 
 }

@@ -197,13 +197,25 @@ public class IOUtils {
         var fileNames = new ArrayList<String>();
         var files = product.getFiles();
 
-        if (preProduct.getImages().size() + files.size() > 5)
+        if (preProduct.getImages().size() != 0
+                && !preProduct.getImages().get(0).equals(DEFAULT_PRODUCT_IMAGE)
+                && preProduct.getImages().size() + files.size() > 5)
             throw new BadRequestException("You can't have images more than 5!");
 
+        if (files.size() > 5)
+            throw new BadRequestException("You can't have images more than 5!");
+
+        // saving files and adding the names to fileNames
         for (var file : files)
             fileNames.add(saveFile(file, PRODUCT_IMAGE_PATH).orElse(DEFAULT_PRODUCT_IMAGE));
 
-        //adding remaining images name in previous product
+
+        // before adding remaining images, delete noImage if exists in preProduct
+        if (preProduct.getImages().size() == 1
+                && preProduct.getImages().get(0).equals(DEFAULT_PRODUCT_IMAGE))
+            preProduct.getImages().remove(DEFAULT_PRODUCT_IMAGE);
+
+        // adding remaining images name in previous product
         fileNames.addAll(preProduct.getImages());
         if (!fileNames.isEmpty())
             product.setImages(fileNames);
@@ -219,7 +231,7 @@ public class IOUtils {
         var imageNamesToRemove = new ArrayList<String>();
         product.getImages().forEach(oldImg -> {
             if (preProduct.getImages().contains(oldImg))
-                    imageNamesToRemove.add(oldImg);
+                imageNamesToRemove.add(oldImg);
         });
 
         imageNamesToRemove.forEach(s -> {
