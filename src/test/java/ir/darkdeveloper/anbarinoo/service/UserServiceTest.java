@@ -47,7 +47,6 @@ public record UserServiceTest(UserService service,
 
     @Test
     @Order(1)
-    @WithMockUser(username = "anonymousUser")
     void signUpWithoutImage() {
         var response = new MockHttpServletResponse();
         var user = UserModel.builder()
@@ -66,7 +65,6 @@ public record UserServiceTest(UserService service,
 
     @Test
     @Order(2)
-    @WithMockUser(username = "anonymousUser")
     void loginUser() {
         var response = new MockHttpServletResponse();
         var loginDto = new LoginDto("user n", "pass12B~");

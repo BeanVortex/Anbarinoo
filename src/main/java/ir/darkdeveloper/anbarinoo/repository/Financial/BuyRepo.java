@@ -14,8 +14,10 @@ import java.util.Optional;
 public interface BuyRepo extends JpaRepository<BuyModel, Long> {
 
 
-    Page<BuyModel> findAllByProductId(Long userId, Pageable pageable);
+    @EntityGraph(attributePaths = "product")
+    Page<BuyModel> findAllByProductId(Long productId, Pageable pageable);
 
+    @EntityGraph(attributePaths = "product")
     Page<BuyModel> findAllByProductCategoryUserId(Long userId, Pageable pageable);
 
     Page<BuyModel> findAllByProductCategoryUserIdAndCreatedAtAfterAndCreatedAtBefore(

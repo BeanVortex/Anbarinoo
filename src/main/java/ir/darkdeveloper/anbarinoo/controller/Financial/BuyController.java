@@ -25,6 +25,7 @@ public class BuyController {
     private final BuySellMapper mapper;
 
     @PostMapping("/save/")
+    @PreAuthorize("hasAuthority('OP_ADD_PRODUCT')")
     public ResponseEntity<BuyDto> saveBuy(@RequestBody BuyModel buy, HttpServletRequest req) {
         return new ResponseEntity<>(
                 mapper.buyToDto(service.saveBuy(Optional.ofNullable(buy), false, req)),
@@ -32,50 +33,57 @@ public class BuyController {
     }
 
     @PutMapping("/update/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_EDIT_PRODUCT')")
     public ResponseEntity<BuyDto> updateBuy(@RequestBody BuyModel buy, @PathVariable Long id, HttpServletRequest req) {
         return ResponseEntity.ok(mapper.buyToDto(service.updateBuy(Optional.ofNullable(buy), id, req)));
     }
 
     @GetMapping("/get-by-product/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
-    public ResponseEntity<Page<BuyDto>> getAllBuyRecordsOfProduct(@PathVariable("id") Long productId,
-                                                                  HttpServletRequest req, Pageable pageable) {
+    @PreAuthorize("hasAuthority('OP_ACCESS_PRODUCT')")
+    public ResponseEntity<Page<BuyDto>> getAllBuyRecordsOfProduct(
+            @PathVariable("id") Long productId,
+            HttpServletRequest req, Pageable pageable) {
         return ResponseEntity.ok(service.getAllBuyRecordsOfProduct(productId, req, pageable).map(mapper::buyToDto));
     }
 
     @GetMapping("/get-by-user/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
-    public ResponseEntity<Page<BuyDto>> getAllBuyRecordsOfUser(@PathVariable("id") Long userId, HttpServletRequest req,
-                                                               Pageable pageable) {
+    @PreAuthorize("hasAuthority('OP_ACCESS_PRODUCT')")
+    public ResponseEntity<Page<BuyDto>> getAllBuyRecordsOfUser(
+            @PathVariable("id") Long userId, HttpServletRequest req,
+            Pageable pageable) {
         return ResponseEntity.ok(service.getAllBuyRecordsOfUser(userId, req, pageable).map(mapper::buyToDto));
     }
 
     @PostMapping("/get-by-product/date/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
-    public ResponseEntity<Page<BuyDto>> getAllBuyRecordsOfProductFromDateTo(@PathVariable("id") Long productId,
-                                                                            @RequestBody FinancialDto financial,
-                                                                            HttpServletRequest req, Pageable pageable) {
-        return ResponseEntity.ok(service.getAllBuyRecordsOfProductFromDateTo(productId, Optional.ofNullable(financial),
-                req, pageable).map(mapper::buyToDto));
+    @PreAuthorize("hasAuthority('OP_ACCESS_PRODUCT')")
+    public ResponseEntity<Page<BuyDto>> getAllBuyRecordsOfProductFromDateTo(
+            @PathVariable("id") Long productId,
+            @RequestBody FinancialDto financial,
+            HttpServletRequest req, Pageable pageable) {
+        var buys = service.getAllBuyRecordsOfProductFromDateTo(productId, Optional.ofNullable(financial),
+                req, pageable).map(mapper::buyToDto);
+        return ResponseEntity.ok(buys);
     }
 
     @PostMapping("/get-by-user/date/{id}/")
-    public ResponseEntity<Page<BuyDto>> getAllBuyRecordsOfUserFromDateTo(@PathVariable("id") Long userId,
-                                                                         @RequestBody FinancialDto financial,
-                                                                         HttpServletRequest req, Pageable pageable) {
-        return ResponseEntity.ok(service.getAllBuyRecordsOfUserFromDateTo(userId, Optional.ofNullable(financial),
-                req, pageable).map(mapper::buyToDto));
+    @PreAuthorize("hasAuthority('OP_ACCESS_PRODUCT')")
+    public ResponseEntity<Page<BuyDto>> getAllBuyRecordsOfUserFromDateTo(
+            @PathVariable("id") Long userId,
+            @RequestBody FinancialDto financial,
+            HttpServletRequest req, Pageable pageable) {
+        var buys = service.getAllBuyRecordsOfUserFromDateTo(userId, Optional.ofNullable(financial),
+                req, pageable).map(mapper::buyToDto);
+        return ResponseEntity.ok(buys);
     }
 
     @GetMapping("/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_ACCESS_PRODUCT')")
     public ResponseEntity<BuyDto> getBuy(@PathVariable("id") Long buyId, HttpServletRequest req) {
         return ResponseEntity.ok(mapper.buyToDto(service.getBuy(buyId, req)));
     }
 
     @DeleteMapping("/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_DELETE_PRODUCT')")
     public ResponseEntity<String> deleteBuy(@PathVariable("id") Long buyId, HttpServletRequest req) {
         return service.deleteBuy(buyId, req);
     }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,4 +35,7 @@ public interface ProductRepository extends PagingAndSortingRepository<ProductMod
     @EntityGraph(attributePaths = {"category.user", "images"})
     Optional<ProductModel> findById(Long id);
 
+    @Modifying
+    @Query("UPDATE ProductModel p set p.totalCount = ?1 where p.id = ?2")
+    void totalCount(BigDecimal totalCount, Long productId);
 }

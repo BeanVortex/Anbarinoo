@@ -4,28 +4,20 @@ import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.repository.ProductRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Component
-public record ProductUtils(ProductRepository repo,
-                           IOUtils ioUtils) {
+@RequiredArgsConstructor
+public class ProductUtils {
 
-    @Autowired
-    public ProductUtils {
-    }
+    private final ProductRepository repo;
+    private final IOUtils ioUtils;
 
-
-    /**
-     * preProduct will be updated
-    * */
-    public void validateAndUpdateProduct(Optional<ProductModel> product, ProductModel preProduct) {
-        product.orElseThrow(() -> new BadRequestException("Product can't be null"));
-        product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
-        preProduct.update(product.get());
-    }
 
     /**
      * product will be updated

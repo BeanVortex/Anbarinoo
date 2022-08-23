@@ -67,11 +67,15 @@ public class ProductService {
     @Transactional
     public ProductModel updateProduct(Optional<ProductModel> product, Long productId, HttpServletRequest req) {
 
+        product.orElseThrow(() -> new BadRequestException("Product can't be null"));
         var preProduct = repo.findById(productId)
                 .orElseThrow(() -> new NoContentException("This product does not exist"));
+        product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
+
         var userId = preProduct.getCategory().getUser().getId();
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "update");
-        productUtils.validateAndUpdateProduct(product, preProduct);
+
+        preProduct.update(product.get());
         return repo.save(preProduct);
     }
 
@@ -80,8 +84,10 @@ public class ProductService {
      * because when you buy or sell any product in your warehouse, total number of that product changes
      */
     public void updateProductFromBuyOrSell(Optional<ProductModel> product, ProductModel preProduct) {
-        productUtils.validateAndUpdateProduct(product, preProduct);
-        repo.save(preProduct);
+        product.orElseThrow(() -> new BadRequestException("Product can't be null"));
+        product.map(ProductModel::getTotalCount)
+                .orElseThrow(() -> new BadRequestException("You can't perform buy action with no total count"));
+        repo.totalCount(product.get().getTotalCount(), preProduct.getId());
     }
 
     public Page<ProductModel> findByNameContains(String name, Pageable pageable, HttpServletRequest req) {

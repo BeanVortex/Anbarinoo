@@ -19,7 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,7 +58,6 @@ public record BuyServiceTest(UserService userService,
 
     @Test
     @Order(1)
-    @WithMockUser(username = "anonymousUser")
     void saveUser() {
         var response = new MockHttpServletResponse();
         var user = UserModel.builder()
@@ -78,16 +76,15 @@ public record BuyServiceTest(UserService userService,
 
     @Test
     @Order(2)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void saveCategory() {
         var electronics = new CategoryModel("Electronics");
+        electronics.setUser(new UserModel(userId));
         categoryService.saveCategory(Optional.of(electronics), request);
         catId = electronics.getId();
     }
 
     @Test
     @Order(3)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void saveProduct() {
         var product = ProductModel.builder()
                 .name("name")
@@ -104,7 +101,6 @@ public record BuyServiceTest(UserService userService,
 
     @Test
     @Order(4)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void saveBuy() {
         var buyRecord = BuyModel.builder()
                 .product(new ProductModel(productId))
@@ -121,24 +117,20 @@ public record BuyServiceTest(UserService userService,
 
     @Test
     @Order(5)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void updateBuyWithNullUpdatableValues() {
         var buyRecord = BuyModel.builder()
                 .product(new ProductModel(productId))
                 .price(null)
                 .count(null)
                 .build();
-        assertThrows(BadRequestException.class, () -> {
-            buyService.updateBuy(Optional.of(buyRecord), buyId, request);
-            var fetchedBuy = buyService.getBuy(buyId, request);
-            assertThat(fetchedBuy.getCount()).isEqualTo(BigDecimal.valueOf(200000, 4));
-            assertThat(fetchedBuy.getPrice()).isEqualTo(BigDecimal.valueOf(500000, 4));
-        });
+        assertThrows(BadRequestException.class, () -> buyService.updateBuy(Optional.of(buyRecord), buyId, request));
+        var fetchedBuy = buyService.getBuy(buyId, request);
+        assertThat(fetchedBuy.getCount()).isEqualTo(BigDecimal.valueOf(200000, 4));
+        assertThat(fetchedBuy.getPrice()).isEqualTo(BigDecimal.valueOf(500000, 4));
     }
 
     @Test
     @Order(6)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void updateBuy() {
         var buyRecord = BuyModel.builder()
                 .product(new ProductModel(productId))
@@ -153,7 +145,6 @@ public record BuyServiceTest(UserService userService,
 
     @Test
     @Order(7)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void getAllBuyRecordsOfProduct() {
         var fetchedRecords = buyService.getAllBuyRecordsOfProduct(productId, request, pageable);
         assertThat(fetchedRecords.getContent().get(0).getId()).isNotEqualTo(buyId);
@@ -164,7 +155,6 @@ public record BuyServiceTest(UserService userService,
 
     @Test
     @Order(8)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void getAllBuyRecordsOfUser() {
         var fetchedRecords = buyService.getAllBuyRecordsOfUser(userId, request, pageable);
         assertThat(fetchedRecords.getContent().get(0).getId()).isNotEqualTo(buyId);
@@ -175,7 +165,6 @@ public record BuyServiceTest(UserService userService,
 
     @Test
     @Order(9)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void deleteBuy() {
         buyService.deleteBuy(buyId, request);
         assertThrows(NoContentException.class, () -> buyService.getBuy(buyId, request));
