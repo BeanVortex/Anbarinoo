@@ -1,12 +1,12 @@
 package ir.darkdeveloper.anbarinoo.service;
 
 
-import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 import ir.darkdeveloper.anbarinoo.repository.RefreshRepo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 

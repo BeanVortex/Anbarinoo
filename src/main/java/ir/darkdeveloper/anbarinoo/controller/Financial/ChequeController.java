@@ -24,21 +24,21 @@ public class ChequeController {
     private final ChequeMapper mapper;
 
     @PostMapping("/save/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_ACCESS_USER')")
     public ResponseEntity<ChequeDto> saveCheque(@RequestBody ChequeModel cheque, HttpServletRequest req) {
         return new ResponseEntity<>(mapper.chequeToDto(service.saveCheque(Optional.ofNullable(cheque), req)),
                 HttpStatus.CREATED);
     }
 
     @PostMapping("/update/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_ACCESS_USER')")
     public ResponseEntity<ChequeDto> updateCheque(@RequestBody ChequeModel cheque, @PathVariable Long id,
                                                   HttpServletRequest req) {
         return ResponseEntity.ok(mapper.chequeToDto(service.updateCheque(Optional.ofNullable(cheque), id, req)));
     }
 
     @GetMapping("/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_ACCESS_USER')")
     public ResponseEntity<ChequeDto> getCheque(@PathVariable Long id, HttpServletRequest req) {
         return ResponseEntity.ok(mapper.chequeToDto(service.getCheque(id, req)));
     }
@@ -47,7 +47,7 @@ public class ChequeController {
     }
 
     @GetMapping("/user/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_ACCESS_USER')")
     public ResponseEntity<ChequesList> getChequesByUserId(@PathVariable Long id, HttpServletRequest req) {
         return ResponseEntity.ok(new ChequesList(
                 service.getChequesByUserId(id, req).stream().map(mapper::chequeToDto).toList()
@@ -55,7 +55,7 @@ public class ChequeController {
     }
 
     @GetMapping("/search/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_ACCESS_USER')")
     public ResponseEntity<ChequesList> findByPayToContains(@RequestParam String payTo, HttpServletRequest request) {
         return ResponseEntity.ok(new ChequesList(
                 service.findByPayToContains(payTo, request).stream().map(mapper::chequeToDto).toList()
@@ -63,7 +63,7 @@ public class ChequeController {
     }
 
     @DeleteMapping("/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_ADMIN','OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_ACCESS_USER')")
     public ResponseEntity<?> deleteCheque(@PathVariable Long id, HttpServletRequest req) {
         return service.deleteCheque(id, req);
     }

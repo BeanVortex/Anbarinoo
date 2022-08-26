@@ -48,7 +48,6 @@ public record DebtOrDemandServiceTest(DebtOrDemandService demandService,
 
     @Test
     @Order(1)
-    @WithMockUser(username = "anonymousUser")
     void saveUser() {
         var response = new MockHttpServletResponse();
         var user = UserModel.builder()
@@ -71,7 +70,6 @@ public record DebtOrDemandServiceTest(DebtOrDemandService demandService,
 
     @Test
     @Order(2)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
     void saveDOD() {
         var dod = DebtOrDemandModel.builder()
                 .amount(BigDecimal.valueOf(115.56))
@@ -87,7 +85,6 @@ public record DebtOrDemandServiceTest(DebtOrDemandService demandService,
 
     @Test
     @Order(3)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
     void updateDOD() {
         var dod = DebtOrDemandModel.builder()
                 //should ignore id
@@ -98,14 +95,13 @@ public record DebtOrDemandServiceTest(DebtOrDemandService demandService,
                 .nameOf("Other")
                 .payTo("Me")
                 .build();
-        demandService.updateDOD(Optional.of(dod), dodId, request);
+        demandService.updateDOD(Optional.of(dod), dodId, false, request);
         var fetchedDod = demandService.getDOD(dodId, request);
         assertThat(fetchedDod.getId()).isEqualTo(dodId);
     }
 
     @Test
     @Order(4)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
     void getAllDODRecordsOfUser() {
         var pageable = PageRequest.of(0, 8);
         var fetchedDods = demandService.getAllDODRecordsOfUser(userId, request, pageable);
@@ -116,7 +112,6 @@ public record DebtOrDemandServiceTest(DebtOrDemandService demandService,
 
     @Test
     @Order(5)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
     void getDOD() {
         var fetchedDod = demandService.getDOD(dodId, request);
         assertThat(fetchedDod.getPayTo()).isEqualTo("Me");
@@ -125,10 +120,9 @@ public record DebtOrDemandServiceTest(DebtOrDemandService demandService,
 
     @Test
     @Order(6)
-    @WithMockUser(authorities = "OP_ACCESS_USER")
     void deleteDOD() {
         var deleteRes = demandService.deleteDOD(dodId, request);
-        assertThat(deleteRes.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(deleteRes).isEqualTo("Debt or Demand deleted");
     }
 
 }

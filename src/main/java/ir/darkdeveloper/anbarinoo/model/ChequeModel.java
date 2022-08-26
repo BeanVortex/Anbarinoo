@@ -38,12 +38,10 @@ public class ChequeModel implements UpdateModel<ChequeModel> {
     private BigDecimal amount;
 
     @Column(nullable = false)
-    @Builder.Default
-    private Boolean isDebt = false;
+    private Boolean isDebt;
 
     @Column(nullable = false)
-    @Builder.Default
-    private Boolean isCheckedOut = false;
+    private Boolean isCheckedOut;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

@@ -24,21 +24,22 @@ public class DebtOrDemandController {
     private final DebtOrDemandMapper mapper;
 
     @PostMapping("/save/")
+    @PreAuthorize("hasAuthority('OP_ACCESS_USER')")
     public ResponseEntity<DebtOrDemandDto> saveDOD(@RequestBody DebtOrDemandModel dod, HttpServletRequest req) {
         return new ResponseEntity<>(mapper.dodToDto(service.saveDOD(Optional.ofNullable(dod), req)),
                 HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_ACCESS_USER')")
     public ResponseEntity<DebtOrDemandDto> updateDOD(
             @RequestBody DebtOrDemandModel dod, @PathVariable Long id,
             HttpServletRequest req) {
-        return ResponseEntity.ok(mapper.dodToDto(service.updateDOD(Optional.of(dod), id, req)));
+        return ResponseEntity.ok(mapper.dodToDto(service.updateDOD(Optional.of(dod), id, false, req)));
     }
 
     @GetMapping("/get-by-user/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_ACCESS_USER')")
     public ResponseEntity<Page<DebtOrDemandDto>> getAllDODRecordsOfUser(
             @PathVariable("id") Long userId, HttpServletRequest request,
             Pageable pageable) {
@@ -46,15 +47,15 @@ public class DebtOrDemandController {
     }
 
     @GetMapping("/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_ACCESS_USER')")
     public ResponseEntity<DebtOrDemandDto> getDOD(@PathVariable("id") Long dodId, HttpServletRequest request) {
         return ResponseEntity.ok(mapper.dodToDto(service.getDOD(dodId, request)));
     }
 
     @DeleteMapping("/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_ACCESS_USER')")
     public ResponseEntity<?> deleteDOD(@PathVariable("id") Long dodId, HttpServletRequest request) {
-        return service.deleteDOD(dodId, request);
+        return ResponseEntity.ok(service.deleteDOD(dodId, request));
     }
 
 

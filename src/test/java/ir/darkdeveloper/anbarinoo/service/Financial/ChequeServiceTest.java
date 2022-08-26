@@ -44,7 +44,6 @@ public record ChequeServiceTest(ChequeService chequeService,
 
     @Test
     @Order(1)
-    @WithMockUser(username = "anonymousUser")
     void saveUser() {
         var response = new MockHttpServletResponse();
         var user = UserModel.builder()
@@ -66,7 +65,6 @@ public record ChequeServiceTest(ChequeService chequeService,
 
     @Test
     @Order(2)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void saveCheque() {
         var cheque = ChequeModel.builder()
                 .amount(new BigDecimal("554.55"))
@@ -74,7 +72,7 @@ public record ChequeServiceTest(ChequeService chequeService,
                 .payTo("GG")
                 .issuedAt(LocalDateTime.now())
                 .validTill(LocalDateTime.now().plusDays(5))
-//                .isCheckedOut(true)
+                .isCheckedOut(false)
                 .isDebt(true)
                 .build();
         cheque.setUser(new UserModel(userId));
@@ -86,7 +84,6 @@ public record ChequeServiceTest(ChequeService chequeService,
 
     @Test
     @Order(3)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void getCheque() {
         var fetchedCheque = chequeService.getCheque(chequeId, request);
         assertThat(fetchedCheque).isNotNull();
@@ -94,7 +91,6 @@ public record ChequeServiceTest(ChequeService chequeService,
 
     @Test
     @Order(4)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void getChequesByUserId() {
         var cheques = chequeService.getChequesByUserId(userId, request);
         assertThat(cheques.size()).isNotEqualTo(0);
@@ -105,7 +101,6 @@ public record ChequeServiceTest(ChequeService chequeService,
 
     @Test
     @Order(5)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void updateCheque() {
         var cheque = new ChequeModel();
         cheque.setIsCheckedOut(true);
@@ -115,7 +110,6 @@ public record ChequeServiceTest(ChequeService chequeService,
 
     @Test
     @Order(6)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void findByPayToContains() {
         var fetchedCheque = chequeService.getCheque(chequeId, request);
         var cheques = chequeService.findByPayToContains(fetchedCheque.getPayTo(), request);
@@ -124,7 +118,6 @@ public record ChequeServiceTest(ChequeService chequeService,
 
     @Test
     @Order(7)
-    @WithMockUser(username = "email@mail.com", authorities = {"OP_ACCESS_USER"})
     void deleteCheque() {
         chequeService.deleteCheque(chequeId, request);
     }

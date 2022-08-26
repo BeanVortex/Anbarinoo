@@ -4,8 +4,8 @@ import ir.darkdeveloper.anbarinoo.model.UserRole;
 import ir.darkdeveloper.anbarinoo.repository.UserRolesRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Set;
 
