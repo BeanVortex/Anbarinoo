@@ -1,35 +1,31 @@
 package ir.darkdeveloper.anbarinoo.service.Financial;
 
 import ir.darkdeveloper.anbarinoo.dto.FinancialDto;
-import ir.darkdeveloper.anbarinoo.exception.*;
-import ir.darkdeveloper.anbarinoo.model.SellModel;
+import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
+import ir.darkdeveloper.anbarinoo.exception.NoContentException;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
+import ir.darkdeveloper.anbarinoo.model.SellModel;
 import ir.darkdeveloper.anbarinoo.repository.Financial.SellRepo;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.util.Financial.FinancialUtils;
-import ir.darkdeveloper.anbarinoo.util.JwtUtils;
+import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.exception.DataException;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Lazy))
 public class SellService {
 
     private final SellRepo repo;
-    private final JwtUtils jwtUtils;
+    private final UserAuthUtils userAuthUtils;
     private final ProductService productService;
     @Lazy
     private final FinancialUtils fUtils;
@@ -37,105 +33,91 @@ public class SellService {
 
     @Transactional
     public SellModel saveSell(Optional<SellModel> sell, HttpServletRequest req) {
-        return exceptionHandlers(() -> {
-            checkSellData(sell, Optional.empty());
-            // checked sell data validity in checkSellData, so it is safe to use orElseThrow
-            saveProductCount(sell.orElseThrow(), req);
-            return repo.save(sell.orElseThrow());
-        });
+        checkSellData(sell, Optional.empty());
+        // checked sell data validity in checkSellData, so it is safe to use orElseThrow
+        saveProductCount(sell.orElseThrow(), req);
+        return repo.save(sell.orElseThrow());
+
     }
 
     @Transactional
     public SellModel updateSell(Optional<SellModel> sell, Long sellId, HttpServletRequest req) {
-        return exceptionHandlers(() -> {
-            checkSellData(sell, Optional.of(sellId));
-            var preSell = repo.findById(sellId)
-                    .orElseThrow(() -> new NoContentException("Sell record doesn't exist"));
-            // checked sell data validity in checkSellData, so it is safe to use orElseThrow
-            updateProductCount(sell.orElseThrow(), preSell, req);
-            preSell.update(sell.orElseThrow());
-            return repo.save(preSell);
-        });
+        checkSellData(sell, Optional.of(sellId));
+        var preSell = repo.findById(sellId)
+                .orElseThrow(() -> new NoContentException("Sell record doesn't exist"));
+        // checked sell data validity in checkSellData, so it is safe to use orElseThrow
+        updateProductCount(sell.orElseThrow(), preSell, req);
+        preSell.update(sell.orElseThrow());
+        return repo.save(preSell);
     }
 
     public Page<SellModel> getAllSellRecordsOfProduct(Long productId, HttpServletRequest req, Pageable pageable) {
-        return exceptionHandlers(() -> {
-            // checked the user is same user in this method
-            var product = productService.getProduct(productId, req);
-            return repo.findAllByProductId(product.getId(), pageable);
-        });
+        // checked the user is same user in this method
+        var sells = repo.findAllByProductId(productId, pageable);
+        if (!sells.getContent().isEmpty()) {
+            var userId = sells.getContent().get(0).getProduct().getCategory().getUser().getId();
+            userAuthUtils.checkUserIsSameUserForRequest(userId, req, "fetch sell records");
+            return sells;
+        }
+        return Page.empty();
+
     }
 
     public Page<SellModel> getAllSellRecordsOfUser(Long userId, HttpServletRequest req, Pageable pageable) {
-        return exceptionHandlers(() -> {
-            checkUserIsSameUserForRequest(null, userId, req, "fetch");
-            return repo.findAllByProductCategoryUserId(userId, pageable);
-        });
+
+        userAuthUtils.checkUserIsSameUserForRequest(userId, req, "fetch sell records");
+        return repo.findAllByProductCategoryUserId(userId, pageable);
+
     }
 
     public SellModel getSell(Long sellId, HttpServletRequest req) {
-        return exceptionHandlers(() -> {
-            var foundSellRecord = repo.findById(sellId)
-                    .orElseThrow(() -> new NoContentException("Sell record doesn't exist"));
-            checkUserIsSameUserForRequest(foundSellRecord.getProduct(), null, req, "fetch");
-            return foundSellRecord;
-        });
+
+        var foundSellRecord = repo.findById(sellId)
+                .orElseThrow(() -> new NoContentException("Sell record doesn't exist"));
+        var userId = foundSellRecord.getProduct().getCategory().getUser().getId();
+        userAuthUtils.checkUserIsSameUserForRequest(userId, req, "fetch sell records");
+        return foundSellRecord;
+
     }
 
     @Transactional
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
-    public ResponseEntity<?> deleteSell(Long sellId, HttpServletRequest req) {
-        return exceptionHandlers(() -> {
-            var sell = repo.findById(sellId)
-                    .orElseThrow(() -> new NoContentException("Sell record doesn't exist"));
-            checkUserIsSameUserForRequest(sell.getProduct(), null, req, "delete sell record of");
-            repo.deleteById(sellId);
-            deleteProductCount(sell, req);
-            return ResponseEntity.ok("Sell record Deleted");
-        });
+    public String deleteSell(Long sellId, HttpServletRequest req) {
+        var foundSellRecord = repo.findById(sellId)
+                .orElseThrow(() -> new NoContentException("Sell record doesn't exist"));
+        var userId = foundSellRecord.getProduct().getCategory().getUser().getId();
+        userAuthUtils.checkUserIsSameUserForRequest(userId, req, "delete sell record");
+        repo.deleteById(sellId);
+        deleteProductCount(foundSellRecord, req);
+        return "Sell record Deleted";
+
     }
 
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public Page<SellModel> getAllSellRecordsOfUserFromDateTo(Long userId, Optional<FinancialDto> financial,
                                                              HttpServletRequest req, Pageable pageable) {
-        return exceptionHandlers(() -> {
-            var from = fUtils.getFromDate(financial);
-            var to = fUtils.getToDate(financial);
-            checkUserIsSameUserForRequest(null, userId, req, "fetch");
-            return repo.findAllByProductCategoryUserIdAndCreatedAtAfterAndCreatedAtBefore(userId, from, to, pageable);
-        });
+        var from = fUtils.getFromDate(financial);
+        var to = fUtils.getToDate(financial);
+        userAuthUtils.checkUserIsSameUserForRequest(userId, req, "fetch sell records");
+        return repo.findAllByProductCategoryUserIdAndCreatedAtAfterAndCreatedAtBefore(userId, from, to, pageable);
     }
 
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
     public Page<SellModel> getAllSellRecordsOfProductFromDateTo(Long productId, Optional<FinancialDto> financial,
                                                                 HttpServletRequest req, Pageable pageable) {
-        return exceptionHandlers(() -> {
-            var from = fUtils.getFromDate(financial);
-            var to = fUtils.getToDate(financial);
-            var product = productService.getProduct(productId, req);
-            checkUserIsSameUserForRequest(product, null, req, "fetch");
-            return repo.findAllByProductIdAndCreatedAtAfterAndCreatedAtBefore(productId, from, to, pageable);
-        });
-    }
-
-
-    private void checkUserIsSameUserForRequest(ProductModel product, Long userId, HttpServletRequest req,
-                                               String operation) {
-        var id = jwtUtils.getUserId(req.getHeader("refresh_token"));
-        if (userId == null) {
-            if (!product.getCategory().getUser().getId().equals(id))
-                throw new ForbiddenException("You can't " + operation + " another user's products");
-
-        } else if (!userId.equals(id))
-            throw new ForbiddenException("You can't " + operation + " another user's products");
+        var from = fUtils.getFromDate(financial);
+        var to = fUtils.getToDate(financial);
+        var userId = productService.getProduct(productId, req).getCategory().getUser().getId();
+        userAuthUtils.checkUserIsSameUserForRequest(userId, req, "fetch sell records");
+        return repo.findAllByProductIdAndCreatedAtAfterAndCreatedAtBefore(productId, from, to, pageable);
 
     }
+
 
     private void saveProductCount(SellModel sell, HttpServletRequest req) {
         var preProduct = productService.getProduct(sell.getProduct().getId(), req);
         var product = new ProductModel();
-        checkUserIsSameUserForRequest(preProduct, null, req, "save buy record of");
+        var userId = preProduct.getCategory().getUser().getId();
+        userAuthUtils.checkUserIsSameUserForRequest(userId, req, "save sell records");
+
         if (preProduct.getTotalCount().compareTo(sell.getCount()) >= 0) {
             product.setTotalCount(preProduct.getTotalCount().subtract(sell.getCount()));
             productService.updateProductFromBuyOrSell(Optional.of(product), preProduct);
@@ -145,8 +127,10 @@ public class SellService {
     private void updateProductCount(SellModel sell, SellModel preSell, HttpServletRequest req) {
         var preProduct = productService.getProduct(sell.getProduct().getId(), req);
         var product = new ProductModel();
-        checkUserIsSameUserForRequest(preProduct, null, req, "save buy record of");
-        var difference = (BigDecimal) null;
+        var userId = preProduct.getCategory().getUser().getId();
+        userAuthUtils.checkUserIsSameUserForRequest(userId, req, "update buy a record");
+
+        BigDecimal difference;
         product.setPrice(sell.getPrice());
         if (preProduct.getTotalCount().compareTo(sell.getCount()) >= 0) {
 
@@ -183,23 +167,6 @@ public class SellService {
         sell.map(SellModel::getPrice)
                 .filter(c -> c.compareTo(BigDecimal.ZERO) > 0)
                 .orElseThrow(() -> new BadRequestException("Price of buy can't be null or zero"));
-    }
-
-
-    private <T> T exceptionHandlers(Supplier<T> supplier) {
-        try {
-            return supplier.get();
-        } catch (DataException | BadRequestException e) {
-            throw new BadRequestException(e.getLocalizedMessage());
-        } catch (ForbiddenException e) {
-            throw new ForbiddenException(e.getLocalizedMessage());
-        } catch (NoContentException e) {
-            throw new NoContentException(e.getLocalizedMessage());
-        } catch (DataIntegrityViolationException e) {
-            throw new DataExistsException("Sell record exists!");
-        } catch (Exception e) {
-            throw new InternalServerException(e.getLocalizedMessage());
-        }
     }
 
 

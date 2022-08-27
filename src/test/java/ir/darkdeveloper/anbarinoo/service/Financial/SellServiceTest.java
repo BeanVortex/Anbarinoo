@@ -3,6 +3,7 @@ package ir.darkdeveloper.anbarinoo.service.Financial;
 import ir.darkdeveloper.anbarinoo.TestUtils;
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.NoContentException;
+import ir.darkdeveloper.anbarinoo.extentions.DatabaseSetup;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.SellModel;
@@ -12,6 +13,7 @@ import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext
+@ExtendWith(DatabaseSetup.class)
 public record SellServiceTest(UserService userService,
                               JwtUtils jwtUtils,
                               ProductService productService,
@@ -57,7 +60,6 @@ public record SellServiceTest(UserService userService,
 
     @Test
     @Order(1)
-    @WithMockUser(username = "anonymousUser")
     void saveUser() {
         var response = new MockHttpServletResponse();
         var user = UserModel.builder()
@@ -76,16 +78,15 @@ public record SellServiceTest(UserService userService,
 
     @Test
     @Order(2)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void saveCategory() {
         var electronics = new CategoryModel("Electronics");
+        electronics.setUser(new UserModel(userId));
         categoryService.saveCategory(Optional.of(electronics), request);
         catId = electronics.getId();
     }
 
     @Test
     @Order(3)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void saveProduct() {
         var product = ProductModel.builder()
                 .name("name")
@@ -101,7 +102,6 @@ public record SellServiceTest(UserService userService,
 
     @Test
     @Order(4)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void saveSell() {
         var sellRecord = SellModel.builder()
                 .product(new ProductModel(productId))
@@ -118,24 +118,21 @@ public record SellServiceTest(UserService userService,
 
     @Test
     @Order(5)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void updateSellWithNullUpdatableValues() {
         var sellRecord = SellModel.builder()
                 .product(new ProductModel(productId))
                 .price(null)
                 .count(null)
                 .build();
-        assertThrows(BadRequestException.class, () -> {
-            sellService.updateSell(Optional.of(sellRecord), sellId, request);
-            var fetchedSell = sellService.getSell(sellId, request);
-            assertThat(fetchedSell.getCount()).isEqualTo(BigDecimal.valueOf(200000, 4));
-            assertThat(fetchedSell.getPrice()).isEqualTo(BigDecimal.valueOf(500000, 4));
-        });
+        assertThrows(BadRequestException.class, () -> sellService.updateSell(Optional.of(sellRecord), sellId, request));
+
+        var fetchedSell = sellService.getSell(sellId, request);
+        assertThat(fetchedSell.getCount()).isEqualTo(BigDecimal.valueOf(200000, 4));
+        assertThat(fetchedSell.getPrice()).isEqualTo(BigDecimal.valueOf(500000, 4));
     }
 
     @Test
     @Order(6)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void updateSell() {
         var sellRecord = SellModel.builder()
                 .product(new ProductModel(productId))
@@ -150,7 +147,6 @@ public record SellServiceTest(UserService userService,
 
     @Test
     @Order(7)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void getAllSellRecordsOfProduct() {
         var fetchedRecords = sellService.getAllSellRecordsOfProduct(productId, request, pageable);
         assertThat(fetchedRecords.getContent().get(0).getId()).isEqualTo(sellId);
@@ -159,7 +155,6 @@ public record SellServiceTest(UserService userService,
 
     @Test
     @Order(8)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void getAllSellRecordsOfUser() {
         var fetchedRecords = sellService.getAllSellRecordsOfUser(userId, request, pageable);
         assertThat(fetchedRecords.getContent().get(0).getId()).isEqualTo(sellId);
@@ -168,7 +163,6 @@ public record SellServiceTest(UserService userService,
 
     @Test
     @Order(9)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
     void deleteSell() {
         sellService.deleteSell(sellId, request);
         assertThrows(NoContentException.class, () -> sellService.getSell(sellId, request));

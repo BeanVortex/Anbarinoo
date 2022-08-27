@@ -25,30 +25,32 @@ public class SellController {
     private final BuySellMapper mapper;
 
     @PostMapping("/save/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_SAVE_PRODUCT')")
     public ResponseEntity<SellDto> saveSell(@RequestBody SellModel sell, HttpServletRequest request) {
-        return new ResponseEntity<>(mapper.sellToDto(service.saveSell(Optional.ofNullable(sell), request)),
-                HttpStatus.CREATED);
+        var savedSell = service.saveSell(Optional.ofNullable(sell), request);
+        return new ResponseEntity<>(mapper.sellToDto(savedSell), HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
-    public ResponseEntity<SellDto> updateSell(@RequestBody SellModel sell, @PathVariable Long id,
+    @PreAuthorize("hasAuthority('OP_EDIT_PRODUCT')")
+    public ResponseEntity<SellDto> updateSell(@RequestBody SellModel sell,
+                                              @PathVariable Long id,
                                               HttpServletRequest request) {
-        return ResponseEntity.ok(mapper.sellToDto(service.updateSell(Optional.ofNullable(sell), id, request)));
+        var updatedSell = service.updateSell(Optional.ofNullable(sell), id, request);
+        return ResponseEntity.ok(mapper.sellToDto(updatedSell));
     }
 
     @GetMapping("/get-by-product/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_ACCESS_PRODUCT')")
     public ResponseEntity<Page<SellDto>> getAllSellRecordsOfProduct(
             @PathVariable("id") Long productId,
             HttpServletRequest request, Pageable pageable) {
-        return ResponseEntity.ok(service.getAllSellRecordsOfProduct(productId, request, pageable)
-                .map(mapper::sellToDto));
+        var fetchedSells = service.getAllSellRecordsOfProduct(productId, request, pageable);
+        return ResponseEntity.ok(fetchedSells.map(mapper::sellToDto));
     }
 
     @GetMapping("/get-by-user/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_ACCESS_PRODUCT')")
     public ResponseEntity<Page<SellDto>> getAllSellRecordsOfUser(
             @PathVariable("id") Long userId, HttpServletRequest request,
             Pageable pageable) {
@@ -57,34 +59,38 @@ public class SellController {
     }
 
     @PostMapping("/get-by-product/date/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_ACCESS_PRODUCT')")
     public ResponseEntity<Page<SellDto>> getAllSellRecordsOfProductFromDateTo(
             @PathVariable("id") Long productId,
             @RequestBody FinancialDto financial,
             HttpServletRequest req, Pageable pageable) {
-        return ResponseEntity.ok(service.getAllSellRecordsOfProductFromDateTo(productId,
-                Optional.ofNullable(financial), req, pageable).map(mapper::sellToDto));
+        var fetchedSells = service.getAllSellRecordsOfProductFromDateTo(productId,
+                Optional.ofNullable(financial), req, pageable);
+        return ResponseEntity.ok(fetchedSells.map(mapper::sellToDto));
     }
 
     @PostMapping("/get-by-user/date/{id}/")
+    @PreAuthorize("hasAuthority('OP_ACCESS_PRODUCT')")
     public ResponseEntity<Page<SellDto>> getAllSellRecordsOfUserFromDateTo(
             @PathVariable("id") Long userId,
             @RequestBody FinancialDto financial,
             HttpServletRequest req, Pageable pageable) {
-        return ResponseEntity.ok(service.getAllSellRecordsOfUserFromDateTo(userId,
-                Optional.ofNullable(financial), req, pageable).map(mapper::sellToDto));
+        var fetchedSells = service.getAllSellRecordsOfUserFromDateTo(userId,
+                Optional.ofNullable(financial), req, pageable);
+        return ResponseEntity.ok(fetchedSells.map(mapper::sellToDto));
     }
 
 
     @GetMapping("/{id}/")
-    @PreAuthorize("hasAnyAuthority('OP_ACCESS_USER')")
+    @PreAuthorize("hasAuthority('OP_ACCESS_PRODUCT')")
     public ResponseEntity<SellDto> getSell(@PathVariable("id") Long sellId, HttpServletRequest request) {
         return ResponseEntity.ok(mapper.sellToDto(service.getSell(sellId, request)));
     }
 
     @DeleteMapping("/{id}/")
+    @PreAuthorize("hasAuthority('OP_DELETE_PRODUCT')")
     public ResponseEntity<?> deleteSell(@PathVariable("id") Long sellId, HttpServletRequest request) {
-        return service.deleteSell(sellId, request);
+        return ResponseEntity.ok(service.deleteSell(sellId, request));
     }
 
 }
