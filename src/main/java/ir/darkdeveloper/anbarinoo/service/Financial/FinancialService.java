@@ -38,10 +38,10 @@ public class FinancialService {
     public FinancialDto getIncomes(Optional<FinancialDto> financial, HttpServletRequest req, Pageable pageable) {
         var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
 
-        var from = fUtils.getFromDate(financial);
         var to = fUtils.getToDate(financial);
+        var from = fUtils.getFromDate(financial);
 
-        var sellIncomes = fUtils.getSellIncomes(financial, req, pageable, userId);
+        var sellIncomes = fUtils.getSellIncomes(financial, pageable, userId, req);
         var dodIncomes = fUtils.getDodIncomes(req, pageable, userId, from, to);
 
         return new FinancialDto(null, sellIncomes.get().add(dodIncomes.get()), from, to);
@@ -53,7 +53,7 @@ public class FinancialService {
         var from = fUtils.getFromDate(financial);
         var to = fUtils.getToDate(financial);
 
-        var sellIncomes = fUtils.getSellIncomes(financial, req, pageable, userId);
+        var sellIncomes = fUtils.getSellIncomes(financial, pageable, userId, req);
         var dodIncomes = fUtils.getDodIncomes(req, pageable, userId, from, to);
         var buyCosts = fUtils.getBuyCosts(financial, req, pageable, userId);
         var dodCosts = fUtils.getDodCosts(req, pageable, userId, from, to);

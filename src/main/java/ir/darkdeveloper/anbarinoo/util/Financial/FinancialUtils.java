@@ -69,8 +69,8 @@ public class FinancialUtils {
     }
 
     @NotNull
-    public AtomicReference<BigDecimal> getSellIncomes(Optional<FinancialDto> financial, HttpServletRequest req,
-                                                      Pageable pageable, Long userId) {
+    public AtomicReference<BigDecimal> getSellIncomes(Optional<FinancialDto> financial, Pageable pageable,
+                                                      Long userId, HttpServletRequest req) {
         var sells = sellService.getAllSellRecordsOfUserFromDateTo(userId, financial,
                 req, pageable).getContent();
 

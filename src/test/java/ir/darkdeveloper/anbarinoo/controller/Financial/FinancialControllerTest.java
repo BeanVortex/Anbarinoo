@@ -49,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureRestDocs(outputDir = "docs/financial")
 @DirtiesContext
-@ExtendWith(DatabaseSetup.class)
+//@ExtendWith(DatabaseSetup.class)
 public record FinancialControllerTest(UserService userService,
                                       ProductService productService,
                                       JwtUtils jwtUtils,
