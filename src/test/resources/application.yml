@@ -31,6 +31,8 @@ spring:
             - profile
           redirect-uri: http://localhost:8080/login/callback
 
+logging.level.net.ttddyy.dsproxy.listener.logging.SLF4JQueryLoggingListener: debug
+
 user:
   admin:
     id: -1

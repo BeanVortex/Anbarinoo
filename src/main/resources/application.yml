@@ -44,7 +44,7 @@ spring:
             - email
             - profile
           redirect-uri: http://localhost:8080/login/callback
-  banner:
+  #banner:
   #    location: classpath:banners/banner4
   # width:
   # height:

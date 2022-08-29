@@ -34,8 +34,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-configuration-processor'
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4'
-    implementation 'org.springframework.security:spring-security-oauth2-jose:5.7.2'
-    implementation 'org.springframework.security:spring-security-oauth2-client:5.7.2'
+    implementation 'org.springframework.security:spring-security-oauth2-jose:5.7.3'
+    implementation 'org.springframework.security:spring-security-oauth2-client:5.7.3'
     implementation "org.springframework.boot:spring-boot-starter-mail"
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.3'
     implementation 'org.apache.poi:poi:5.2.2'
@@ -50,7 +50,7 @@ dependencies {
 
     // won't let native image to compile
     //developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'org.postgresql:postgresql:42.3.6'
+    runtimeOnly 'org.postgresql:postgresql:42.5.0'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
     testImplementation 'org.testcontainers:postgresql:1.17.3'
@@ -59,9 +59,10 @@ dependencies {
 
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc:2.0.6.RELEASE'
     testImplementation 'com.h2database:h2:2.1.214'
+    testImplementation 'com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:1.8.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test:5.7.2'
+    testImplementation 'org.springframework.security:spring-security-test:5.7.3'
 
 //    constraints {
 //        implementation("org.apache.logging.log4j:log4j-core") {
