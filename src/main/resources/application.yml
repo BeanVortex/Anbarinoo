@@ -6,14 +6,11 @@ spring:
       - email
       - server
 ---
-jwt:
-  secretKey: RandomSecret
-jasypt:
-  encryptor:
-    password: ChangeMe
-    algorithm: PBEWithMD5AndDES
-    iv-generator-classname: org.jasypt.iv.NoIvGenerator
 spring:
+  config:
+    use-legacy-processing: true
+    activate:
+      on-profile: dev
   jpa:
     #    show-sql: true
     hibernate:
@@ -25,10 +22,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   #        format_sql: true
-  config:
-    use-legacy-processing: true
-    activate:
-      on-profile: dev
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/anbarinoo
@@ -51,6 +44,13 @@ spring:
   # margin:
   # invert:
 
+jwt:
+  secretKey: RandomSecret
+jasypt:
+  encryptor:
+    password: ChangeMe
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator
 
 oauth2:
   authorizedRedirectUris:

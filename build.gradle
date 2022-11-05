@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '2.7.3'
+    id 'org.springframework.boot' version '2.7.5'
     id 'io.spring.dependency-management' version '1.0.12.RELEASE'
     id 'java'
 //    id 'org.springframework.experimental.aot' version '0.11.3'
@@ -37,12 +37,12 @@ dependencies {
     implementation 'org.springframework.security:spring-security-oauth2-jose:5.7.3'
     implementation 'org.springframework.security:spring-security-oauth2-client:5.7.3'
     implementation "org.springframework.boot:spring-boot-starter-mail"
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.3'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.4'
     implementation 'org.apache.poi:poi:5.2.2'
     implementation 'org.apache.poi:poi-ooxml:5.2.2'
 
-    implementation 'org.mapstruct:mapstruct:1.5.2.Final'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.2.Final'
+    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
     implementation 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
@@ -53,13 +53,13 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql:42.5.0'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
-    testImplementation 'org.testcontainers:postgresql:1.17.3'
-    testImplementation 'org.testcontainers:testcontainers:1.17.3'
-    testImplementation 'org.testcontainers:junit-jupiter:1.17.3'
+    testImplementation 'org.testcontainers:postgresql:1.17.4'
+    testImplementation 'org.testcontainers:testcontainers:1.17.4'
+    testImplementation 'org.testcontainers:junit-jupiter:1.17.4'
 
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc:2.0.6.RELEASE'
     testImplementation 'com.h2database:h2:2.1.214'
-    testImplementation 'com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:1.8.0'
+    testImplementation 'com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:1.8.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test:5.7.3'
