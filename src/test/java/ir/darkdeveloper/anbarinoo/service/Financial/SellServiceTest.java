@@ -12,6 +12,7 @@ import ir.darkdeveloper.anbarinoo.service.CategoryService;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +20,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 
-import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Optional;
 

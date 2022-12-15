@@ -1,5 +1,6 @@
 package ir.darkdeveloper.anbarinoo.util;
 
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 class CookieUtilsTest {
     private static MockHttpServletRequest req;
     private static MockHttpServletResponse res;
-    private static javax.servlet.http.Cookie cookie;
+    private static Cookie cookie;
 
     @Test
     @Order(1)
