@@ -1,7 +1,7 @@
 package ir.darkdeveloper.anbarinoo.security.oauth2;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.nimbusds.oauth2.sdk.util.StringUtils;
 
@@ -46,12 +46,6 @@ public class OAuth2RequestRepo implements AuthorizationRequestRepository<OAuth2A
         if (StringUtils.isNotBlank(redirectUriAfterLogin))
             CookieUtils.addCookie(res, REDIRECT_URI_PARAM_COOKIE_NAME, redirectUriAfterLogin, cookieExpireSeconds);
 
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public OAuth2AuthorizationRequest removeAuthorizationRequest(HttpServletRequest request) {
-        return null;
     }
 
     public void removeAuthorizationRequestCookies(HttpServletRequest request, HttpServletResponse response) {

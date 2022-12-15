@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 @Repository
 public interface CategoryRepo extends JpaRepository<CategoryModel, Long> {

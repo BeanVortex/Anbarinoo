@@ -6,13 +6,14 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import ir.darkdeveloper.anbarinoo.model.SellModel;
 
 @Repository
-public interface SellRepo extends PagingAndSortingRepository<SellModel, Long> {
+public interface SellRepo extends PagingAndSortingRepository<SellModel, Long>, ListCrudRepository<SellModel, Long> {
 
     @EntityGraph(attributePaths = "product.category.user")
     Page<SellModel> findAllByProductId(Long productId, Pageable pageable);

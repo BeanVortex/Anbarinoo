@@ -1,8 +1,8 @@
 plugins {
-    id 'org.springframework.boot' version '2.7.5'
-    id 'io.spring.dependency-management' version '1.0.12.RELEASE'
     id 'java'
-//    id 'org.springframework.experimental.aot' version '0.11.3'
+    id 'org.springframework.boot' version '3.0.0'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id 'org.graalvm.buildtools.native' version '0.9.18'
 }
 
 group = 'ir.darkdeveloper'
@@ -27,6 +27,7 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.data:spring-data-rest-hal-explorer'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -34,10 +35,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-configuration-processor'
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4'
-    implementation 'org.springframework.security:spring-security-oauth2-jose:5.7.3'
-    implementation 'org.springframework.security:spring-security-oauth2-client:5.7.3'
+    implementation 'org.springframework.security:spring-security-oauth2-jose'
+    implementation 'org.springframework.security:spring-security-oauth2-client'
     implementation "org.springframework.boot:spring-boot-starter-mail"
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.4'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.0'
     implementation 'org.apache.poi:poi:5.2.2'
     implementation 'org.apache.poi:poi-ooxml:5.2.2'
 
@@ -50,19 +51,19 @@ dependencies {
 
     // won't let native image to compile
     //developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'org.postgresql:postgresql:42.5.0'
+    runtimeOnly 'org.postgresql:postgresql:42.5.1'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
-    testImplementation 'org.testcontainers:postgresql:1.17.4'
-    testImplementation 'org.testcontainers:testcontainers:1.17.4'
-    testImplementation 'org.testcontainers:junit-jupiter:1.17.4'
+    testImplementation 'org.testcontainers:postgresql:1.17.6'
+    testImplementation 'org.testcontainers:testcontainers:1.17.6'
+    testImplementation 'org.testcontainers:junit-jupiter:1.17.6'
 
-    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc:2.0.6.RELEASE'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testImplementation 'com.h2database:h2:2.1.214'
     testImplementation 'com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:1.8.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test:5.7.3'
+    testImplementation 'org.springframework.security:spring-security-test'
 
 //    constraints {
 //        implementation("org.apache.logging.log4j:log4j-core") {

@@ -3,7 +3,7 @@ package ir.darkdeveloper.anbarinoo.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -51,6 +51,7 @@ public class DebtOrDemandModel implements UpdateModel<DebtOrDemandModel> {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @ToString.Exclude
     private UserModel user;
 
     @Column(nullable = false)

@@ -1,6 +1,6 @@
 package ir.darkdeveloper.anbarinoo.controller;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import ir.darkdeveloper.anbarinoo.dto.CategoryDto;
 import ir.darkdeveloper.anbarinoo.dto.mapper.CategoryMapper;

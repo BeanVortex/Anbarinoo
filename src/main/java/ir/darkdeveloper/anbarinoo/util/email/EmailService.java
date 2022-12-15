@@ -1,6 +1,6 @@
 package ir.darkdeveloper.anbarinoo.util.email;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

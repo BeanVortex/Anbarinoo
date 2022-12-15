@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 
 @Repository
-public interface UserRepo extends PagingAndSortingRepository<UserModel, Long> {
+public interface UserRepo extends PagingAndSortingRepository<UserModel, Long>, ListCrudRepository<UserModel, Long> {
 
     @Query("select model from UserModel model where model.email = :username or model.userName = :username")
     Optional<UserModel> findByEmailOrUsername(@Param("username") String username);

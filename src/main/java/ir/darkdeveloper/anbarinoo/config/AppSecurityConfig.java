@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class AppSecurityConfig {
@@ -44,26 +44,24 @@ public class AppSecurityConfig {
         http.cors();
         http.csrf()
                 .disable()
-                .authorizeRequests()
-                .antMatchers(
-                        "/info", "/css/**",
-                        "/**",
-                        "/fonts/**",
-                        "/js/**", "/img/**",
-                        "/api/user/signup/",
-                        "/api/user/login/",
-                        "/user/profile_images/noProfile.jpeg",
-                        "/api/post/all/",
-                        "/oauth2/**",
-                        "/demo/data",
-                        "/api/export/excel/**",
-                        "/api/user/verify/**",
-                        "/webjars/**",
-                        "/forbidden")
-                .permitAll()
-                .anyRequest()
-                .authenticated()
-                .and()
+                .authorizeHttpRequests(authorize -> authorize.requestMatchers(
+                                        "/info", "/css/**",
+                                        "/**",
+                                        "/fonts/**",
+                                        "/js/**", "/img/**",
+                                        "/api/user/signup/",
+                                        "/api/user/login/",
+                                        "/user/profile_images/noProfile.jpeg",
+                                        "/api/post/all/",
+                                        "/oauth2/**",
+                                        "/demo/data",
+                                        "/api/export/excel/**",
+                                        "/api/user/verify/**",
+                                        "/webjars/**",
+                                        "/forbidden"
+                                ).permitAll()
+                                .anyRequest().authenticated()
+                )
                 .exceptionHandling()
                 .authenticationEntryPoint(new RestAuthenticationEntryPoint())
                 .and()

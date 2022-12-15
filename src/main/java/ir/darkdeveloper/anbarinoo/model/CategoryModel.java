@@ -4,7 +4,7 @@ package ir.darkdeveloper.anbarinoo.model;
 import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.LinkedList;
 import java.util.List;
 

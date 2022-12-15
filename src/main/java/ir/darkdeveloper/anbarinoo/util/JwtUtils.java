@@ -5,7 +5,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.function.Function;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import lombok.Getter;
 import lombok.Setter;
