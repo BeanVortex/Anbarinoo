@@ -44,8 +44,6 @@ spring:
   # margin:
   # invert:
 
-jwt:
-  secretKey: RandomSecret
 jasypt:
   encryptor:
     password: ChangeMe

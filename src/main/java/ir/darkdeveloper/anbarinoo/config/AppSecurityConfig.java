@@ -9,6 +9,7 @@ import ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -28,11 +29,11 @@ import java.util.Collections;
 
 @Configuration
 @EnableMethodSecurity
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Lazy))
 @EnableWebSecurity
 public class AppSecurityConfig {
 
-
+    @Lazy
     private final JwtFilter jwtFilter;
     private final OAuth2UserService oAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
@@ -54,7 +55,6 @@ public class AppSecurityConfig {
                                         "/user/profile_images/noProfile.jpeg",
                                         "/api/post/all/",
                                         "/oauth2/**",
-                                        "/demo/data",
                                         "/api/export/excel/**",
                                         "/api/user/verify/**",
                                         "/webjars/**",
@@ -90,8 +90,8 @@ public class AppSecurityConfig {
 
 
     @Bean
-    public AuthenticationManager authManager(AuthenticationConfiguration auth) throws Exception {
-        return auth.getAuthenticationManager();
+    public AuthenticationManager authManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 
 

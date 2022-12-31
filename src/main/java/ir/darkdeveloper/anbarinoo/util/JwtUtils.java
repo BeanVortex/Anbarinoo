@@ -1,57 +1,41 @@
 package ir.darkdeveloper.anbarinoo.util;
 
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
+import jakarta.annotation.PostConstruct;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.function.Function;
 
-import jakarta.annotation.PostConstruct;
-
-import lombok.Getter;
-import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.UnsupportedJwtException;
-
 @Service
 @Getter
 @Setter
+@Slf4j
 public class JwtUtils {
 
-    // defined in application.properties or application.yml
-    @Value("${jwt.secretKey}")
-    private String secret;
-
-    private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
-
-    private final PasswordEncoder encoder;
     private Long refreshExpire;
     private Long accessExpire;
+    private SecretKey key;
+    private JwtParser parser;
 
-    @Autowired
-    public JwtUtils(PasswordEncoder encoder) {
-        this.encoder = encoder;
+    public JwtUtils() {
         refreshExpire = (long) (60 * 60 * 24 * 7 * 3 * 1000);
         accessExpire = (long) (60 * 1000);
     }
 
     @PostConstruct
     public void initSecret() {
-        // encodes the jwt secret
         // note that previous token after restarting application won't work
-        secret = encoder.encode(secret);
+        key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        parser = Jwts.parserBuilder().setSigningKey(key).build();
     }
 
     // generates a unique jwt token
@@ -59,7 +43,7 @@ public class JwtUtils {
         // expires in 21 days
         var date = new Date(System.currentTimeMillis() + refreshExpire);
         return Jwts.builder()
-                .signWith(SignatureAlgorithm.HS256, secret)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .setIssuedAt(new Date())
                 .setSubject(username)
                 .claim("user_id", userId).setExpiration(date).compact();
@@ -68,37 +52,40 @@ public class JwtUtils {
     // Generates access token
     public String generateAccessToken(String username) {
         var date = new Date(System.currentTimeMillis() + accessExpire);
-        return Jwts.builder().signWith(SignatureAlgorithm.HS256, secret).setSubject(username)
+        return Jwts.builder()
+                .setSubject(username)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .setIssuedAt(new Date())
                 .setExpiration(date).compact();
     }
 
     public String getUsername(String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
+        return parser.parseClaimsJws(token).getBody().getSubject();
     }
 
     public Long getUserId(String refreshToken) {
-        return ((Integer) getAllClaimsFromToken(refreshToken).get("user_id")).longValue();
+        return getAllClaimsFromToken(refreshToken).get("user_id", Double.class).longValue();
     }
 
     public Claims getAllClaimsFromToken(String token) throws JwtException {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        return parser.parseClaimsJws(token).getBody();
     }
 
+    // Todo: handle token exceptions
     public Boolean isTokenExpired(String token) {
         try {
-            Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
+            parser.parseClaimsJws(token);
             return false;
         } catch (SignatureException e) {
-            logger.error("Invalid JWT signature: {}", e.getMessage());
+            log.error("Invalid JWT signature : {}", e.getMessage());
         } catch (MalformedJwtException e) {
-            logger.error("Invalid JWT token: {}", e.getMessage());
+            log.error("Invalid JWT token: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
-            logger.error("JWT token is expired: {}", e.getMessage());
+            log.error("JWT token is expired: {}", e.getMessage());
         } catch (UnsupportedJwtException e) {
-            logger.error("JWT token is unsupported: {}", e.getMessage());
+            log.error("JWT token is unsupported: {}", e.getMessage());
         } catch (IllegalArgumentException e) {
-            logger.error("JWT claims string is empty: {}", e.getMessage());
+            log.error("JWT claims string is empty: {}", e.getMessage());
         }
         return true;
     }

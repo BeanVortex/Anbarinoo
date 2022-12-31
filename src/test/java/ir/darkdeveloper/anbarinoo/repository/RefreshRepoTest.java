@@ -11,9 +11,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,11 +32,10 @@ class RefreshRepoTest {
     private static Long refreshId;
 
     @Autowired
-    RefreshRepoTest(UserRepo userRepo, RefreshRepo refreshRepo) {
+    RefreshRepoTest(UserRepo userRepo, RefreshRepo refreshRepo, JwtUtils jwtUtils) {
         this.userRepo = userRepo;
         this.refreshRepo = refreshRepo;
-        jwtUtils = new JwtUtils(new BCryptPasswordEncoder(12));
-        jwtUtils.setSecret("SOME SECRET");
+        this.jwtUtils = jwtUtils;
     }
 
     @Test
