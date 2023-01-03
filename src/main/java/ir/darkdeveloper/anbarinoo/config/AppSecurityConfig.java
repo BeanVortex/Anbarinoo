@@ -6,16 +6,21 @@ import ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2FailureHandler;
 import ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2RequestRepo;
 import ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2SuccessHandler;
 import ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2UserService;
+import ir.darkdeveloper.anbarinoo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -28,9 +33,8 @@ import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
-@EnableMethodSecurity
-@RequiredArgsConstructor(onConstructor = @__(@Lazy))
 @EnableWebSecurity
+@RequiredArgsConstructor(onConstructor = @__(@Lazy))
 public class AppSecurityConfig {
 
     @Lazy
@@ -39,6 +43,26 @@ public class AppSecurityConfig {
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2RequestRepo oAuth2RequestRepo;
     private final OAuth2FailureHandler oAuth2FailureHandler;
+    private final UserService userService;
+
+
+//    @Bean
+//    public AuthenticationProvider authenticationProvider(){
+//        var daoProvider = new DaoAuthenticationProvider();
+//        daoProvider.setUserDetailsService(userService);
+//        daoProvider.setPasswordEncoder(passEncode());
+//        return daoProvider;
+//    }
+
+    @Bean
+    public PasswordEncoder passEncode() {
+        return new BCryptPasswordEncoder(12);
+    }
+
+    @Bean
+    public AuthenticationManager authManager(AuthenticationConfiguration c) throws Exception{
+        return c.getAuthenticationManager();
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -84,21 +108,12 @@ public class AppSecurityConfig {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+//                .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
 
-    @Bean
-    public AuthenticationManager authManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
-    }
-
-
-    @Bean
-    public PasswordEncoder passEncode() {
-        return new BCryptPasswordEncoder(12);
-    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
