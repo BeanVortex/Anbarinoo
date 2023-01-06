@@ -43,9 +43,10 @@ public class AppSecurityConfig {
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2RequestRepo oAuth2RequestRepo;
     private final OAuth2FailureHandler oAuth2FailureHandler;
-    private final UserService userService;
 
 
+    // It is used throughout the framework as a user DAO and is the strategy used by the DaoAuthenticationProvider.
+//    private final UserService userService;
 //    @Bean
 //    public AuthenticationProvider authenticationProvider(){
 //        var daoProvider = new DaoAuthenticationProvider();

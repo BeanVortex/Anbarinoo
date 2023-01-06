@@ -83,7 +83,6 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
                 .enabled(true)
                 .build();
         userService.signUpUser(Optional.of(user), response);
-        var userEmail = user.getEmail();
         userId = user.getId();
         authHeaders = testUtils.getAuthHeaders(response);
     }
@@ -98,8 +97,8 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
                 .payTo("Other")
                 .issuedAt(LocalDateTime.now())
                 .validTill(LocalDateTime.now().plusDays(5))
-//                .isCheckedOut(false)
-//                .isDebt(false)
+                .isCheckedOut(false)
+                .isDebt(true)
                 .build();
 
         mockMvc.perform(post("/api/user/financial/cheque/save/")
@@ -111,7 +110,7 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.isCheckedOut").value(false))
-                .andExpect(jsonPath("$.isDebt").value(false))
+                .andExpect(jsonPath("$.isDebt").value(true))
                 .andDo(result -> {
                     var jsonObject = new JSONObject(result.getResponse().getContentAsString());
                     chequeId = jsonObject.getLong("id");

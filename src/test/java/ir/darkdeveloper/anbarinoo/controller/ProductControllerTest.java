@@ -46,7 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureRestDocs(outputDir = "docs/product")
 @DirtiesContext
-//@ExtendWith(DatabaseSetup.class)
+@ExtendWith(DatabaseSetup.class)
 public record ProductControllerTest(WebApplicationContext webApplicationContext,
                                     CategoryService categoryService,
                                     UserService userService,
@@ -89,6 +89,7 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
                 .build();
         userService.signUpUser(Optional.of(user), response);
         request = testUtils.setUpHeaderAndGetReqWithRes(response);
+        userId = user.getId();
         authHeaders1 = testUtils.getAuthHeaders(response);
     }
 
@@ -106,13 +107,12 @@ public record ProductControllerTest(WebApplicationContext webApplicationContext,
                 .passwordRepeat("pass12P+")
                 .build();
         userService.signUpUser(Optional.of(user), response);
-        userId = user.getId();
         authHeaders2 = testUtils.getAuthHeaders(response);
     }
 
     @Test
     @Order(3)
-    @WithMockUser(authorities = {"OP_ACCESS_USER"})
+    @WithMockUser(authorities = "OP_ACCESS_USER")
     void saveCategory() {
         var electronics = new CategoryModel("Electronics");
         electronics.setUser(new UserModel(userId));
