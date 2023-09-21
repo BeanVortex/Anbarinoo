@@ -9,7 +9,7 @@ import ir.darkdeveloper.anbarinoo.repository.Financial.BuyRepo;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.util.Financial.FinancialUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
-import lombok.RequiredArgsConstructor;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,21 +17,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Optional;
 
 
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Lazy))
 public class BuyService {
 
     private final BuyRepo repo;
-    @Lazy
     private final ProductService productService;
-    @Lazy
     private final FinancialUtils fUtils;
     private final UserAuthUtils userAuthUtils;
+
+    public BuyService(BuyRepo repo, @Lazy ProductService productService,
+                      @Lazy FinancialUtils fUtils, UserAuthUtils userAuthUtils) {
+        this.repo = repo;
+        this.productService = productService;
+        this.fUtils = fUtils;
+        this.userAuthUtils = userAuthUtils;
+    }
 
     @Transactional
     public BuyModel saveBuy(Optional<BuyModel> buy, Boolean isFromSaveProduct, HttpServletRequest req) {

@@ -6,15 +6,14 @@ import ir.darkdeveloper.anbarinoo.service.UserService;
 import ir.darkdeveloper.anbarinoo.util.CookieUtils;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
-import lombok.AllArgsConstructor;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
@@ -22,17 +21,23 @@ import java.util.Optional;
 import static ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2RequestRepo.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Component
-@AllArgsConstructor(onConstructor = @__(@Lazy))
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    @Lazy
     private final JwtUtils jwtUtils;
-    @Lazy
     private final UserService userService;
-    @Lazy
     private final UserAuthUtils userAuthUtils;
     private final OAuth2Properties oAuth2Properties;
     private final OAuth2RequestRepo oAuth2RequestRepo;
+
+    public OAuth2SuccessHandler(@Lazy JwtUtils jwtUtils, @Lazy UserService userService,
+                                @Lazy UserAuthUtils userAuthUtils, OAuth2Properties oAuth2Properties,
+                                OAuth2RequestRepo oAuth2RequestRepo) {
+        this.jwtUtils = jwtUtils;
+        this.userService = userService;
+        this.userAuthUtils = userAuthUtils;
+        this.oAuth2Properties = oAuth2Properties;
+        this.oAuth2RequestRepo = oAuth2RequestRepo;
+    }
 
 
     @Override

@@ -6,7 +6,6 @@ import ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2FailureHandler;
 import ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2RequestRepo;
 import ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2SuccessHandler;
 import ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2UserService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -15,6 +14,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,23 +29,32 @@ import java.util.Collections;
 
 @Configuration
 @EnableMethodSecurity
-@RequiredArgsConstructor(onConstructor = @__(@Lazy))
 @EnableWebSecurity
 public class AppSecurityConfig {
 
-    @Lazy
     private final JwtFilter jwtFilter;
     private final OAuth2UserService oAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2RequestRepo oAuth2RequestRepo;
     private final OAuth2FailureHandler oAuth2FailureHandler;
 
+    public AppSecurityConfig(@Lazy JwtFilter jwtFilter, OAuth2UserService oAuth2UserService,
+                             OAuth2SuccessHandler oAuth2SuccessHandler, OAuth2RequestRepo oAuth2RequestRepo,
+                             OAuth2FailureHandler oAuth2FailureHandler) {
+        this.jwtFilter = jwtFilter;
+        this.oAuth2UserService = oAuth2UserService;
+        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
+        this.oAuth2RequestRepo = oAuth2RequestRepo;
+        this.oAuth2FailureHandler = oAuth2FailureHandler;
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors();
-        http.csrf()
-                .disable()
-                .authorizeHttpRequests(authorize -> authorize.requestMatchers(
+        http.cors(c -> {
+        });
+        http.csrf(AbstractHttpConfigurer::disable);
+
+        http.authorizeHttpRequests(authorize -> authorize.requestMatchers(
                                         "/info", "/css/**",
                                         "/**",
                                         "/fonts/**",
@@ -62,29 +71,19 @@ public class AppSecurityConfig {
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 )
-                .exceptionHandling()
-                .authenticationEntryPoint(new RestAuthenticationEntryPoint())
-                .and()
-                .formLogin()
-                .disable()
-                .oauth2Login()
-                .authorizationEndpoint()
-                .baseUri("/login/oauth2")
-                .authorizationRequestRepository(oAuth2RequestRepo)
-                .and()
-                .redirectionEndpoint()
-                .baseUri("/login/callback")
-                .and()
-                .userInfoEndpoint()
-                .userService(oAuth2UserService)
-                .and()
-                .successHandler(oAuth2SuccessHandler)
-                .failureHandler(oAuth2FailureHandler)
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .exceptionHandling(e -> e.authenticationEntryPoint(new RestAuthenticationEntryPoint()));
+        http.formLogin(AbstractHttpConfigurer::disable);
+        http.oauth2Login(o -> {
+            o.authorizationEndpoint(a ->
+                    a.baseUri("/login/oauth2")
+                            .authorizationRequestRepository(oAuth2RequestRepo));
+            o.redirectionEndpoint(r -> r.baseUri("/login/callback"));
+            o.userInfoEndpoint(u -> u.userService(oAuth2UserService));
+            o.successHandler(oAuth2SuccessHandler);
+            o.failureHandler(oAuth2FailureHandler);
+        });
+        http.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

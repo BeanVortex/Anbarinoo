@@ -9,26 +9,31 @@ import ir.darkdeveloper.anbarinoo.repository.Financial.SellRepo;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.util.Financial.FinancialUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
-import lombok.RequiredArgsConstructor;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Lazy))
 public class SellService {
 
     private final SellRepo repo;
     private final UserAuthUtils userAuthUtils;
     private final ProductService productService;
-    @Lazy
     private final FinancialUtils fUtils;
+
+    public SellService(SellRepo repo, UserAuthUtils userAuthUtils,
+                       ProductService productService, @Lazy FinancialUtils fUtils) {
+        this.repo = repo;
+        this.userAuthUtils = userAuthUtils;
+        this.productService = productService;
+        this.fUtils = fUtils;
+    }
 
 
     @Transactional
