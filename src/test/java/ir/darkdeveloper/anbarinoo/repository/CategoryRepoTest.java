@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +28,6 @@ class CategoryRepoTest {
     private static Long catId;
     private static Long userId;
 
-    @Autowired
     CategoryRepoTest(UserRepo userRepo, CategoryRepo categoryRepo) {
         this.userRepo = userRepo;
         this.categoryRepo = categoryRepo;

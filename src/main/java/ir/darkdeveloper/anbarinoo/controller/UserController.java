@@ -1,13 +1,15 @@
 package ir.darkdeveloper.anbarinoo.controller;
 
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
-
+import ir.darkdeveloper.anbarinoo.dto.LoginDto;
 import ir.darkdeveloper.anbarinoo.dto.UserDto;
 import ir.darkdeveloper.anbarinoo.dto.mapper.UserMapper;
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
+import ir.darkdeveloper.anbarinoo.model.UserModel;
+import ir.darkdeveloper.anbarinoo.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -19,12 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import ir.darkdeveloper.anbarinoo.model.UserModel;
-import ir.darkdeveloper.anbarinoo.dto.LoginDto;
-import ir.darkdeveloper.anbarinoo.service.UserService;
-
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/user")

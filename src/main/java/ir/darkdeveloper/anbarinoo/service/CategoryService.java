@@ -33,7 +33,7 @@ public class CategoryService {
         model.map(CategoryModel::getId).ifPresent(id -> category.setId(null));
         var userId = model.map(CategoryModel::getUser).map(UserModel::getId)
                 .orElseThrow(() -> new BadRequestException("User id can't be null in category"));
-        userAuthUtils.checkUserIsSameUserForRequest(userId, req, "save a cat");
+        userAuthUtils.checkUserIsSameUserForRequest(userId, req, "save a category");
         category.setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
         return repo.save(category);
     }
