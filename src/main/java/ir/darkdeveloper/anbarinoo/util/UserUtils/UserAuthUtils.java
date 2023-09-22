@@ -1,10 +1,7 @@
 package ir.darkdeveloper.anbarinoo.util.UserUtils;
 
 import ir.darkdeveloper.anbarinoo.dto.LoginDto;
-import ir.darkdeveloper.anbarinoo.exception.EmailNotValidException;
-import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
-import ir.darkdeveloper.anbarinoo.exception.NoContentException;
-import ir.darkdeveloper.anbarinoo.exception.PasswordException;
+import ir.darkdeveloper.anbarinoo.exception.*;
 import ir.darkdeveloper.anbarinoo.model.AuthProvider;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
@@ -17,6 +14,8 @@ import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,7 +30,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserAuthUtils {
 
-//    private final AuthenticationManager authManager;
+    private final AuthenticationManager authManager;
     private final JwtUtils jwtUtils;
     private final RefreshService refreshService;
     private final UserRepo repo;
@@ -95,13 +94,13 @@ public class UserAuthUtils {
             throw new EmailNotValidException("Email verification sent, Check your emails");
         }
 
-       /* try {
+        try {
             authManager.authenticate(auth);
         } catch (DisabledException e) {
             throw new EmailNotValidException("Email is not verified!");
         } catch (Exception e) {
             throw new BadRequestException("Bad Credentials");
-        }*/
+        }
 
         var accessToken = jwtUtils.generateAccessToken(username);
         var refreshToken = jwtUtils.generateRefreshToken(username, rModel.getUserId());
