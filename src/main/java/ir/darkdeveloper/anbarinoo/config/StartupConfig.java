@@ -1,9 +1,8 @@
 package ir.darkdeveloper.anbarinoo.config;
 
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-
+import ir.darkdeveloper.anbarinoo.model.Authority;
+import ir.darkdeveloper.anbarinoo.model.UserRole;
+import ir.darkdeveloper.anbarinoo.service.UserRolesService;
 import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,9 +12,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 
-import ir.darkdeveloper.anbarinoo.model.Authority;
-import ir.darkdeveloper.anbarinoo.model.UserRole;
-import ir.darkdeveloper.anbarinoo.service.UserRolesService;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor

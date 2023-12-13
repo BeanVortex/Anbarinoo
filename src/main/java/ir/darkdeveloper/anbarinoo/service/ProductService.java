@@ -30,7 +30,6 @@ public class ProductService {
     private final BuyService buyService;
     private final UserAuthUtils userAuthUtils;
     private final CategoryService categoryService;
-    private final JwtUtils jwtUtils;
 
     /**
      * saves a new product for the user with userId provided in refresh token
@@ -91,7 +90,7 @@ public class ProductService {
     }
 
     public Page<ProductModel> findByNameContains(String name, Pageable pageable, HttpServletRequest req) {
-        var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
+        var userId = JwtUtils.getUserId(req.getHeader("refresh_token"));
         return repo.findByNameContainsAndUserId(name, userId, pageable);
     }
 
@@ -104,12 +103,12 @@ public class ProductService {
     }
 
     public Page<ProductModel> getAllProductsOfUser(Pageable pageable, HttpServletRequest req) {
-        var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
+        var userId = JwtUtils.getUserId(req.getHeader("refresh_token"));
         return repo.findAllByUserId(userId, pageable);
     }
 
     public List<ProductModel> getAllProducts(HttpServletRequest req) {
-        var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
+        var userId = JwtUtils.getUserId(req.getHeader("refresh_token"));
         return repo.findAllByUserId(userId);
     }
 

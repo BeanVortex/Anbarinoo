@@ -9,7 +9,7 @@ import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.context.annotation.Lazy;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -21,23 +21,12 @@ import java.util.Optional;
 import static ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2RequestRepo.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Component
+@RequiredArgsConstructor
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    private final JwtUtils jwtUtils;
     private final UserService userService;
-    private final UserAuthUtils userAuthUtils;
     private final OAuth2Properties oAuth2Properties;
     private final OAuth2RequestRepo oAuth2RequestRepo;
-
-    public OAuth2SuccessHandler(@Lazy JwtUtils jwtUtils, @Lazy UserService userService,
-                                @Lazy UserAuthUtils userAuthUtils, OAuth2Properties oAuth2Properties,
-                                OAuth2RequestRepo oAuth2RequestRepo) {
-        this.jwtUtils = jwtUtils;
-        this.userService = userService;
-        this.userAuthUtils = userAuthUtils;
-        this.oAuth2Properties = oAuth2Properties;
-        this.oAuth2RequestRepo = oAuth2RequestRepo;
-    }
 
 
     @Override
@@ -75,10 +64,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private void headerSetup(HttpServletResponse response, Authentication authentication) {
         var user = (UserModel) userService.loadUserByUsername(authentication.getName());
-        var refreshToken = jwtUtils.generateRefreshToken(user.getEmail(), user.getId());
-        var accessToken = jwtUtils.generateAccessToken(user.getEmail());
+        var refreshToken = JwtUtils.generateRefreshToken(user.getEmail(), user.getId());
+        var accessToken = JwtUtils.generateAccessToken(user.getEmail());
 
-        userAuthUtils.setupHeader(response, accessToken, refreshToken);
+        UserAuthUtils.setupHeader(response, accessToken, refreshToken);
     }
 
     private void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {

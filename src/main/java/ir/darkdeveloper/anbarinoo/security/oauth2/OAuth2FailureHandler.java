@@ -1,30 +1,24 @@
 package ir.darkdeveloper.anbarinoo.security.oauth2;
 
-import static ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2RequestRepo.REDIRECT_URI_PARAM_COOKIE_NAME;
-
-import java.io.IOException;
-
+import ir.darkdeveloper.anbarinoo.util.CookieUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import ir.darkdeveloper.anbarinoo.util.CookieUtils;
+import java.io.IOException;
+
+import static ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2RequestRepo.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Component
+@RequiredArgsConstructor
 public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
     private final OAuth2RequestRepo oAuth2RequestRepo;
-
-    @Autowired
-    public OAuth2FailureHandler(OAuth2RequestRepo oAuth2RequestRepo) {
-        this.oAuth2RequestRepo = oAuth2RequestRepo;
-    }
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,

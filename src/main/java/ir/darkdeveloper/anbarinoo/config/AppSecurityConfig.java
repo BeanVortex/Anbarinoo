@@ -2,6 +2,7 @@ package ir.darkdeveloper.anbarinoo.config;
 
 import ir.darkdeveloper.anbarinoo.security.exception.RestAuthenticationEntryPoint;
 import ir.darkdeveloper.anbarinoo.security.jwt.JwtFilter;
+import ir.darkdeveloper.anbarinoo.security.jwt.dsa;
 import ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2FailureHandler;
 import ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2RequestRepo;
 import ir.darkdeveloper.anbarinoo.security.oauth2.OAuth2SuccessHandler;
@@ -32,20 +33,23 @@ import java.util.Collections;
 @EnableWebSecurity
 public class AppSecurityConfig {
 
+
     private final JwtFilter jwtFilter;
     private final OAuth2UserService oAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2RequestRepo oAuth2RequestRepo;
     private final OAuth2FailureHandler oAuth2FailureHandler;
+    private final dsa d;
 
     public AppSecurityConfig(@Lazy JwtFilter jwtFilter, OAuth2UserService oAuth2UserService,
                              OAuth2SuccessHandler oAuth2SuccessHandler, OAuth2RequestRepo oAuth2RequestRepo,
-                             OAuth2FailureHandler oAuth2FailureHandler) {
+                             OAuth2FailureHandler oAuth2FailureHandler,@Lazy dsa d) {
         this.jwtFilter = jwtFilter;
         this.oAuth2UserService = oAuth2UserService;
         this.oAuth2SuccessHandler = oAuth2SuccessHandler;
         this.oAuth2RequestRepo = oAuth2RequestRepo;
         this.oAuth2FailureHandler = oAuth2FailureHandler;
+        this.d = d;
     }
 
     @Bean

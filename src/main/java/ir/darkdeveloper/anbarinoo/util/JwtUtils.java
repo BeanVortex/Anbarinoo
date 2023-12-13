@@ -4,10 +4,8 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
@@ -15,16 +13,14 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.function.Function;
 
-@Service
-@Getter
-@Setter
 @Slf4j
+@Component
 public class JwtUtils {
 
-    private Long refreshExpire;
-    private Long accessExpire;
-    private SecretKey key;
-    private JwtParser parser;
+    public static Long refreshExpire;
+    public static Long accessExpire;
+    public static SecretKey key;
+    public static JwtParser parser;
 
     public JwtUtils() {
         refreshExpire = (long) (60 * 60 * 24 * 7 * 3 * 1000);
@@ -39,7 +35,7 @@ public class JwtUtils {
     }
 
     // generates a unique jwt token
-    public String generateRefreshToken(String username, Long userId) {
+    public static String generateRefreshToken(String username, Long userId) {
         // expires in 21 days
         var date = new Date(System.currentTimeMillis() + refreshExpire);
         return Jwts.builder()
@@ -50,7 +46,7 @@ public class JwtUtils {
     }
 
     // Generates access token
-    public String generateAccessToken(String username) {
+    public static String generateAccessToken(String username) {
         var date = new Date(System.currentTimeMillis() + accessExpire);
         return Jwts.builder()
                 .setSubject(username)
@@ -59,20 +55,20 @@ public class JwtUtils {
                 .setExpiration(date).compact();
     }
 
-    public String getUsername(String token) {
+    public static String getUsername(String token) {
         return parser.parseClaimsJws(token).getBody().getSubject();
     }
 
-    public Long getUserId(String refreshToken) {
+    public static Long getUserId(String refreshToken) {
         return getAllClaimsFromToken(refreshToken).get("user_id", Double.class).longValue();
     }
 
-    public Claims getAllClaimsFromToken(String token) throws JwtException {
+    public static Claims getAllClaimsFromToken(String token) throws JwtException {
         return parser.parseClaimsJws(token).getBody();
     }
 
     // Todo: handle token exceptions
-    public Boolean isTokenExpired(String token) {
+    public static Boolean isTokenExpired(String token) {
         try {
             parser.parseClaimsJws(token);
             return false;
@@ -90,7 +86,7 @@ public class JwtUtils {
         return true;
     }
 
-    public LocalDateTime getExpirationDate(String token) throws JwtException {
+    public static LocalDateTime getExpirationDate(String token) throws JwtException {
         return getClaimFromToken(token, Claims::getExpiration)
                 .toInstant().atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
@@ -101,7 +97,7 @@ public class JwtUtils {
         Jwts.claims(getAllClaimsFromToken(token)).setExpiration(new Date(till));
     }
 
-    public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
+    public static  <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
         var claims = getAllClaimsFromToken(token);
         return claimsResolver.apply(claims);
     }

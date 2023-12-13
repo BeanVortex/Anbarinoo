@@ -7,48 +7,46 @@ import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.RefreshService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
+import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class JwtFilter extends OncePerRequestFilter {
+public class JwtFilter implements Filter {
 
-    private final JwtUtils jwtUtils;
     private final UserAuthUtils userAuthUtils;
     private final RefreshService refreshService;
 
-
     @Override
-    protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
 
-        var refreshToken = Optional.ofNullable(request.getHeader("refresh_token"));
-        var accessToken = Optional.ofNullable(request.getHeader("access_token"));
+        if (!((request instanceof HttpServletRequest httpRequest) && (response instanceof HttpServletResponse httpResponse))) {
+            throw new ServletException("only HTTP requests supported");
+        }
+
+        var refreshToken = Optional.ofNullable(httpRequest.getHeader("refresh_token"));
+        var accessToken = Optional.ofNullable(httpRequest.getHeader("access_token"));
 
         if (refreshToken.isPresent() && accessToken.isPresent()
-                && !jwtUtils.isTokenExpired(refreshToken.get())) {
+                && !JwtUtils.isTokenExpired(refreshToken.get())) {
 
-            var username = jwtUtils.getUsername(refreshToken.get());
-            var userId = jwtUtils.getAllClaimsFromToken(refreshToken.get())
+            var username = JwtUtils.getUsername(refreshToken.get());
+            var userId = JwtUtils.getAllClaimsFromToken(refreshToken.get())
                     .get("user_id", Double.class);
             authenticateUser(username, userId.longValue());
-            setUpHeader(response, refreshToken.get(), accessToken.get(), username, userId.longValue());
+            setUpHeader(httpResponse, refreshToken.get(), accessToken.get(), username, userId.longValue());
         }
-        filterChain.doFilter(request, response);
+        chain.doFilter(httpRequest, httpResponse);
     }
-
 
     private void authenticateUser(String username, Long userId) {
         var auth = SecurityContextHolder.getContext().getAuthentication();
@@ -71,13 +69,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
         // if this didn't execute, it means the access token is still valid
-        if (jwtUtils.isTokenExpired(accessToken)) {
+        if (JwtUtils.isTokenExpired(accessToken)) {
             //db query
             var storedRefreshModel = refreshService.getRefreshByUserId(userId);
             var storedAccessToken = storedRefreshModel.getAccessToken();
             var storedRefreshToken = storedRefreshModel.getRefreshToken();
             if (accessToken.equals(storedAccessToken) && storedRefreshToken.equals(refreshToken)) {
-                var newAccessToken = jwtUtils.generateAccessToken(username);
+                var newAccessToken = JwtUtils.generateAccessToken(username);
                 var refreshModel = new RefreshModel();
                 refreshModel.setAccessToken(newAccessToken);
                 refreshModel.setRefreshToken(storedRefreshToken);

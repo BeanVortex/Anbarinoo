@@ -9,6 +9,8 @@ import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.Operations;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,13 +19,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 
-@Service("userService")
+@Service
 public class UserService implements UserDetailsService {
 
     private final UserRepo repo;
@@ -31,17 +32,14 @@ public class UserService implements UserDetailsService {
     private final Operations userOP;
     private final VerificationService verificationService;
     private final AdminUserProperties adminUser;
-    private final JwtUtils jwtUtils;
 
     public UserService(UserRepo repo, @Lazy UserAuthUtils userAuthUtils, Operations userOP,
-                       VerificationService verificationService, AdminUserProperties adminUser,
-                       JwtUtils jwtUtils) {
+                       VerificationService verificationService, AdminUserProperties adminUser) {
         this.repo = repo;
         this.userAuthUtils = userAuthUtils;
         this.userOP = userOP;
         this.verificationService = verificationService;
         this.adminUser = adminUser;
-        this.jwtUtils = jwtUtils;
     }
 
     @Override
@@ -121,7 +119,7 @@ public class UserService implements UserDetailsService {
      * @return a simple user model that won't query for other data like categories, products ...
      */
     public UserModel getSimpleCurrentUserInfo(HttpServletRequest req) {
-        var id = jwtUtils.getUserId(req.getHeader("refresh_token"));
+        var id = JwtUtils.getUserId(req.getHeader("refresh_token"));
         return repo.getSimpleUserInfo(id).orElseThrow(() -> new NoContentException("User does not exist"));
     }
 

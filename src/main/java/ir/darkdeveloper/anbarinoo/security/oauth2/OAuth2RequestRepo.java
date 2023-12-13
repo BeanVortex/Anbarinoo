@@ -1,17 +1,14 @@
 package ir.darkdeveloper.anbarinoo.security.oauth2;
 
+import com.nimbusds.oauth2.sdk.util.StringUtils;
+import ir.darkdeveloper.anbarinoo.util.CookieUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import com.nimbusds.oauth2.sdk.util.StringUtils;
-
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-import ir.darkdeveloper.anbarinoo.util.CookieUtils;
-
-@Component
+@Repository
 public class OAuth2RequestRepo implements AuthorizationRequestRepository<OAuth2AuthorizationRequest> {
 
     public static final String OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME = "oauth2_auth_request";

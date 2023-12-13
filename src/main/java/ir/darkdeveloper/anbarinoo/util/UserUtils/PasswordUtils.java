@@ -2,17 +2,20 @@ package ir.darkdeveloper.anbarinoo.util.UserUtils;
 
 import ir.darkdeveloper.anbarinoo.exception.PasswordException;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Component
-@RequiredArgsConstructor
 public class PasswordUtils {
 
     private final PasswordEncoder encoder;
+
+    public PasswordUtils(@Lazy PasswordEncoder encoder) {
+        this.encoder = encoder;
+    }
 
     /**
      * updates preUser Password

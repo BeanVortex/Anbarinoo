@@ -21,7 +21,6 @@ import java.util.Optional;
 public class CategoryService {
 
     private final CategoryRepo repo;
-    private final JwtUtils jwtUtils;
     private final UserAuthUtils userAuthUtils;
 
 
@@ -34,7 +33,7 @@ public class CategoryService {
         var userId = model.map(CategoryModel::getUser).map(UserModel::getId)
                 .orElseThrow(() -> new BadRequestException("User id can't be null in category"));
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "save a category");
-        category.setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
+        category.setUser(new UserModel(JwtUtils.getUserId(req.getHeader("refresh_token"))));
         return repo.save(category);
     }
 
@@ -46,7 +45,7 @@ public class CategoryService {
         var category = model.orElseThrow(() -> new BadRequestException("Category can't be empty"));
         var fetchedCategory = getCategoryById(parentId, req);
         userAuthUtils.checkUserIsSameUserForRequest(fetchedCategory.getUser().getId(), req, "save a sub category");
-        category.setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
+        category.setUser(new UserModel(JwtUtils.getUserId(req.getHeader("refresh_token"))));
         category.setParent(fetchedCategory);
         return repo.save(category);
     }

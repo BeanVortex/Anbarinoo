@@ -34,9 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext
 @ExtendWith(DatabaseSetup.class)
-public record JwtTest(WebApplicationContext webApplicationContext,
-                      JwtUtils jwtUtils,
-                      JwtFilter filter) {
+public record JwtTest(WebApplicationContext webApplicationContext, JwtFilter filter) {
 
     // a simple test class based on user controller test
 
@@ -65,8 +63,8 @@ public record JwtTest(WebApplicationContext webApplicationContext,
     void setUp2() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .addFilter(filter).build();
-        jwtUtils.setAccessExpire(accessTime);
-        jwtUtils.setRefreshExpire(refreshTime);
+        JwtUtils.accessExpire = accessTime;
+        JwtUtils.refreshExpire = refreshTime;
     }
 
 
@@ -104,7 +102,7 @@ public record JwtTest(WebApplicationContext webApplicationContext,
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void waitAndGetUserInfo() throws Exception {
         Thread.sleep(refreshTime - 1000);
-        assertThat(jwtUtils.isTokenExpired(accessToken)).isTrue();
+        assertThat(JwtUtils.isTokenExpired(accessToken)).isTrue();
         mockMvc.perform(get("/api/user/{id}/", userId)
                         .header("refresh_token", refreshToken)
                         .header("access_token", accessToken)
@@ -123,7 +121,7 @@ public record JwtTest(WebApplicationContext webApplicationContext,
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void waitAndGetUserInfoFailing() throws Exception {
         Thread.sleep(refreshTime + 1000);
-        assertThat(jwtUtils.isTokenExpired(accessToken)).isTrue();
+        assertThat(JwtUtils.isTokenExpired(accessToken)).isTrue();
         mockMvc.perform(get("/api/user/{id}/", userId)
                         .header("refresh_token", refreshToken)
                         .header("access_token", accessToken)

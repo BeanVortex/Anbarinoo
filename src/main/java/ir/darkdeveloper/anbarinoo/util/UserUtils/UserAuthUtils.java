@@ -31,7 +31,6 @@ import java.util.Optional;
 public class UserAuthUtils {
 
     private final AuthenticationManager authManager;
-    private final JwtUtils jwtUtils;
     private final RefreshService refreshService;
     private final UserRepo repo;
     private final PasswordEncoder encoder;
@@ -102,8 +101,8 @@ public class UserAuthUtils {
             throw new BadRequestException("Bad Credentials");
         }
 
-        var accessToken = jwtUtils.generateAccessToken(username);
-        var refreshToken = jwtUtils.generateRefreshToken(username, rModel.getUserId());
+        var accessToken = JwtUtils.generateAccessToken(username);
+        var refreshToken = JwtUtils.generateRefreshToken(username, rModel.getUserId());
 
         rModel.setAccessToken(accessToken);
         rModel.setRefreshToken(refreshToken);
@@ -113,8 +112,8 @@ public class UserAuthUtils {
         return user;
     }
 
-    public void setupHeader(HttpServletResponse response, String accessToken, String refreshToken) {
-        var date = jwtUtils.getExpirationDate(refreshToken);
+    public static void setupHeader(HttpServletResponse response, String accessToken, String refreshToken) {
+        var date = JwtUtils.getExpirationDate(refreshToken);
         var refreshDate = TOKEN_EXPIRATION_FORMAT.format(date);
         response.addHeader("refresh_token", refreshToken);
         response.addHeader("access_token", accessToken);
@@ -153,9 +152,9 @@ public class UserAuthUtils {
      */
     public void checkUserIsSameUserForRequest(Long userId, HttpServletRequest req, String operation) {
         var token = req.getHeader("refresh_token");
-        if (!jwtUtils.isTokenExpired(token)) {
+        if (!JwtUtils.isTokenExpired(token)) {
 
-            var id = jwtUtils.getUserId(token);
+            var id = JwtUtils.getUserId(token);
             if (userId != null && !id.equals(userId))
                 throw new ForbiddenException("You don't have permission to " + operation);
             else {
