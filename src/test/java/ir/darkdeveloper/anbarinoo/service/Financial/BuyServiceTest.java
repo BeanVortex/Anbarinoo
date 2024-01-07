@@ -2,7 +2,7 @@ package ir.darkdeveloper.anbarinoo.service.Financial;
 
 import ir.darkdeveloper.anbarinoo.TestUtils;
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
-import ir.darkdeveloper.anbarinoo.exception.NoContentException;
+import ir.darkdeveloper.anbarinoo.exception.NotFoundException;
 import ir.darkdeveloper.anbarinoo.extentions.DatabaseSetup;
 import ir.darkdeveloper.anbarinoo.model.BuyModel;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
@@ -167,7 +167,7 @@ public record BuyServiceTest(UserService userService,
     @Order(9)
     void deleteBuy() {
         buyService.deleteBuy(buyId, request);
-        assertThrows(NoContentException.class, () -> buyService.getBuy(buyId, request));
+        assertThrows(NotFoundException.class, () -> buyService.getBuy(buyId, request));
         var product = productService.getProduct(productId, request);
         assertThat(product.getId()).isEqualTo(productId);
     }

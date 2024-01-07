@@ -2,7 +2,7 @@ package ir.darkdeveloper.anbarinoo.service.Financial;
 
 import ir.darkdeveloper.anbarinoo.dto.FinancialDto;
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
-import ir.darkdeveloper.anbarinoo.exception.NoContentException;
+import ir.darkdeveloper.anbarinoo.exception.NotFoundException;
 import ir.darkdeveloper.anbarinoo.model.BuyModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.repository.Financial.BuyRepo;
@@ -51,7 +51,7 @@ public class BuyService {
 
         checkBuyData(buy, Optional.of(buyId));
         var preBuy = repo.findById(buyId)
-                .orElseThrow(() -> new NoContentException("Buy record doesn't exist"));
+                .orElseThrow(() -> new NotFoundException("Buy record doesn't exist"));
         // checked buy data validity in checkBuyData, so it is safe to use orElseThrow
         updateProductCount(buy.orElseThrow(), preBuy, req);
         preBuy.update(buy.orElseThrow());
@@ -71,7 +71,7 @@ public class BuyService {
 
     public BuyModel getBuy(Long buyId, HttpServletRequest req) {
         var foundBuyRecord = repo.findById(buyId)
-                .orElseThrow(() -> new NoContentException("Buy record doesn't exist"));
+                .orElseThrow(() -> new NotFoundException("Buy record doesn't exist"));
         var userId = foundBuyRecord.getProduct().getCategory().getUser().getId();
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "fetch a buy");
         return foundBuyRecord;
@@ -80,7 +80,7 @@ public class BuyService {
     @Transactional
     public ResponseEntity<String> deleteBuy(Long buyId, HttpServletRequest req) {
         var foundBuyRecord = repo.findById(buyId)
-                .orElseThrow(() -> new NoContentException("Buy record doesn't exist"));
+                .orElseThrow(() -> new NotFoundException("Buy record doesn't exist"));
         var userId = foundBuyRecord.getProduct().getCategory().getUser().getId();
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "delete a buy record");
         repo.deleteById(buyId);

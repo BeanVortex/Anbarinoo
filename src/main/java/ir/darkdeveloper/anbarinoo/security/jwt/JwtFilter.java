@@ -1,41 +1,38 @@
 package ir.darkdeveloper.anbarinoo.security.jwt;
 
 import ir.darkdeveloper.anbarinoo.exception.ForbiddenException;
-import ir.darkdeveloper.anbarinoo.exception.NoContentException;
+import ir.darkdeveloper.anbarinoo.exception.NotFoundException;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.RefreshService;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
-import jakarta.servlet.*;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class JwtFilter implements Filter {
+public class JwtFilter extends OncePerRequestFilter {
 
     private final UserAuthUtils userAuthUtils;
     private final RefreshService refreshService;
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
 
-        if (!((request instanceof HttpServletRequest httpRequest) && (response instanceof HttpServletResponse httpResponse))) {
-            throw new ServletException("only HTTP requests supported");
-        }
-
-        var refreshToken = Optional.ofNullable(httpRequest.getHeader("refresh_token"));
-        var accessToken = Optional.ofNullable(httpRequest.getHeader("access_token"));
-
+        var refreshToken = Optional.ofNullable(request.getHeader("refresh_token"));
+        var accessToken = Optional.ofNullable(request.getHeader("access_token"));
         if (refreshToken.isPresent() && accessToken.isPresent()
                 && !JwtUtils.isTokenExpired(refreshToken.get())) {
 
@@ -43,9 +40,9 @@ public class JwtFilter implements Filter {
             var userId = JwtUtils.getAllClaimsFromToken(refreshToken.get())
                     .get("user_id", Double.class);
             authenticateUser(username, userId.longValue());
-            setUpHeader(httpResponse, refreshToken.get(), accessToken.get(), username, userId.longValue());
+            setUpHeader(response, refreshToken.get(), accessToken.get(), username, userId.longValue());
         }
-        chain.doFilter(httpRequest, httpResponse);
+        chain.doFilter(request, response);
     }
 
     private void authenticateUser(String username, Long userId) {
@@ -53,7 +50,7 @@ public class JwtFilter implements Filter {
         if (username != null && auth == null) {
             //db query
             var userDetails = userAuthUtils.loadUserByUsername(username)
-                    .orElseThrow(() -> new NoContentException("User does not exist"));
+                    .orElseThrow(() -> new NotFoundException("User does not exist"));
             var userModel = (UserModel) userDetails;
             if (!userModel.getId().equals(userId))
                 throw new ForbiddenException("Do not change token. I'm watching you");
@@ -85,7 +82,7 @@ public class JwtFilter implements Filter {
                 refreshService.saveToken(refreshModel);
                 response.addHeader("access_token", newAccessToken);
             } else
-                //if stored token is not equal with user send token, it will return 403
+                //if stored token is not equal with user send token, it will return 401
                 SecurityContextHolder.getContext().setAuthentication(null);
 
         }

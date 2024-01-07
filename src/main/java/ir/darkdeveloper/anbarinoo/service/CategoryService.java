@@ -1,7 +1,7 @@
 package ir.darkdeveloper.anbarinoo.service;
 
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
-import ir.darkdeveloper.anbarinoo.exception.NoContentException;
+import ir.darkdeveloper.anbarinoo.exception.NotFoundException;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.CategoryRepo;
@@ -64,7 +64,7 @@ public class CategoryService {
 
     public CategoryModel getCategoryById(Long categoryId, HttpServletRequest req) {
         var category = repo.findById(categoryId)
-                .orElseThrow(() -> new NoContentException("Category is not found"));
+                .orElseThrow(() -> new NotFoundException("Category is not found"));
         userAuthUtils.checkUserIsSameUserForRequest(category.getUser().getId(), req, "fetch the category");
         return category;
     }

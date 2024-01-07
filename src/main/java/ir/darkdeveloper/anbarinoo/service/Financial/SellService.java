@@ -2,7 +2,7 @@ package ir.darkdeveloper.anbarinoo.service.Financial;
 
 import ir.darkdeveloper.anbarinoo.dto.FinancialDto;
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
-import ir.darkdeveloper.anbarinoo.exception.NoContentException;
+import ir.darkdeveloper.anbarinoo.exception.NotFoundException;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.SellModel;
 import ir.darkdeveloper.anbarinoo.repository.Financial.SellRepo;
@@ -49,7 +49,7 @@ public class SellService {
     public SellModel updateSell(Optional<SellModel> sell, Long sellId, HttpServletRequest req) {
         checkSellData(sell, Optional.of(sellId));
         var preSell = repo.findById(sellId)
-                .orElseThrow(() -> new NoContentException("Sell record doesn't exist"));
+                .orElseThrow(() -> new NotFoundException("Sell record doesn't exist"));
         // checked sell data validity in checkSellData, so it is safe to use orElseThrow
         updateProductCount(sell.orElseThrow(), preSell, req);
         preSell.update(sell.orElseThrow());
@@ -78,7 +78,7 @@ public class SellService {
     public SellModel getSell(Long sellId, HttpServletRequest req) {
 
         var foundSellRecord = repo.findById(sellId)
-                .orElseThrow(() -> new NoContentException("Sell record doesn't exist"));
+                .orElseThrow(() -> new NotFoundException("Sell record doesn't exist"));
         var userId = foundSellRecord.getProduct().getCategory().getUser().getId();
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "fetch sell records");
         return foundSellRecord;
@@ -88,7 +88,7 @@ public class SellService {
     @Transactional
     public String deleteSell(Long sellId, HttpServletRequest req) {
         var foundSellRecord = repo.findById(sellId)
-                .orElseThrow(() -> new NoContentException("Sell record doesn't exist"));
+                .orElseThrow(() -> new NotFoundException("Sell record doesn't exist"));
         var userId = foundSellRecord.getProduct().getCategory().getUser().getId();
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "delete sell record");
         repo.deleteById(sellId);

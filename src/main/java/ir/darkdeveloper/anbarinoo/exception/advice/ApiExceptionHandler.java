@@ -1,8 +1,6 @@
 package ir.darkdeveloper.anbarinoo.exception.advice;
 
-import java.io.UncheckedIOException;
-import java.time.LocalDateTime;
-
+import ir.darkdeveloper.anbarinoo.dto.ExceptionDto;
 import ir.darkdeveloper.anbarinoo.exception.*;
 import org.hibernate.exception.DataException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -10,9 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import ir.darkdeveloper.anbarinoo.dto.ExceptionDto;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.io.UncheckedIOException;
+import java.time.LocalDateTime;
 
 @ControllerAdvice
 public class ApiExceptionHandler {
@@ -49,10 +48,10 @@ public class ApiExceptionHandler {
     }
 
 
-    @ExceptionHandler(NoContentException.class)
-    public ResponseEntity<ExceptionDto> handleNoContent(NoContentException e) {
-        var ed = new ExceptionDto(e.getLocalizedMessage(), HttpStatus.NO_CONTENT, LocalDateTime.now());
-        return new ResponseEntity<>(ed, HttpStatus.NO_CONTENT);
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ExceptionDto> handleNoContent(NotFoundException e) {
+        var ed = new ExceptionDto(e.getLocalizedMessage(), HttpStatus.NOT_FOUND, LocalDateTime.now());
+        return new ResponseEntity<>(ed, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)

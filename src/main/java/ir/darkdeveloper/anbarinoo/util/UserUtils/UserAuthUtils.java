@@ -73,13 +73,13 @@ public class UserAuthUtils {
         var user = new UserModel();
 
         var rModel = new RefreshModel();
-        if (loginDto.username().equals(adminUser.username())) {
+        if (username.equals(adminUser.username())) {
             rModel.setUserId(adminUser.id());
             rModel.setId(refreshService.getIdByUserId(adminUser.id()));
             user.setEnabled(true);
         } else {
             user = repo.findByEmailOrUsername(username)
-                    .orElseThrow(() -> new NoContentException("User does not exist"));
+                    .orElseThrow(() -> new NotFoundException("User does not exist"));
             //TODO extra query if user is signing up
             var id = refreshService.getIdByUserId(user.getId());
             rModel.setId(id);

@@ -2,7 +2,7 @@ package ir.darkdeveloper.anbarinoo.controller.Financial;
 
 import ir.darkdeveloper.anbarinoo.TestUtils;
 import ir.darkdeveloper.anbarinoo.dto.FinancialDto;
-import ir.darkdeveloper.anbarinoo.exception.NoContentException;
+import ir.darkdeveloper.anbarinoo.exception.NotFoundException;
 import ir.darkdeveloper.anbarinoo.model.*;
 import ir.darkdeveloper.anbarinoo.service.CategoryService;
 import ir.darkdeveloper.anbarinoo.service.Financial.BuyService;
@@ -167,7 +167,7 @@ public record FinancialControllerTest(UserService userService,
         var product = new ProductModel();
         product.setTotalCount(BigDecimal.valueOf(9850));
         product.setPrice(BigDecimal.valueOf(564));
-        assertThrows(NoContentException.class,
+        assertThrows(NotFoundException.class,
                 () -> productService.updateProduct(Optional.of(product), 13L, request));
     }
 

@@ -2,7 +2,7 @@ package ir.darkdeveloper.anbarinoo.service;
 
 import ir.darkdeveloper.anbarinoo.dto.LoginDto;
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
-import ir.darkdeveloper.anbarinoo.exception.NoContentException;
+import ir.darkdeveloper.anbarinoo.exception.NotFoundException;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.UserRepo;
 import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
@@ -45,7 +45,7 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userAuthUtils.loadUserByUsername(username)
-                .orElseThrow(() -> new NoContentException("User does not exist"));
+                .orElseThrow(() -> new NotFoundException("User does not exist"));
     }
 
 
@@ -89,7 +89,7 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public String deleteUser(Long id, HttpServletRequest req) {
-        var user = repo.findById(id).orElseThrow(() -> new NoContentException("User does not exist"));
+        var user = repo.findById(id).orElseThrow(() -> new NotFoundException("User does not exist"));
         userAuthUtils.checkUserIsSameUserForRequest(id, req, "delete");
         userOP.deleteUser(user);
         return "Deleted the user";
@@ -111,7 +111,7 @@ public class UserService implements UserDetailsService {
 
     public UserModel getUserInfo(Long id, HttpServletRequest req) {
         userAuthUtils.checkUserIsSameUserForRequest(id, req, "fetch");
-        return repo.findById(id).orElseThrow(() -> new NoContentException("User does not exist"));
+        return repo.findById(id).orElseThrow(() -> new NotFoundException("User does not exist"));
     }
 
 
@@ -120,14 +120,14 @@ public class UserService implements UserDetailsService {
      */
     public UserModel getSimpleCurrentUserInfo(HttpServletRequest req) {
         var id = JwtUtils.getUserId(req.getHeader("refresh_token"));
-        return repo.getSimpleUserInfo(id).orElseThrow(() -> new NoContentException("User does not exist"));
+        return repo.getSimpleUserInfo(id).orElseThrow(() -> new NotFoundException("User does not exist"));
     }
 
 
     @Transactional
     public String verifyUserEmail(String token) {
         var model = verificationService.findByToken(token)
-                .orElseThrow(() -> new NoContentException("Link does not exists"));
+                .orElseThrow(() -> new NotFoundException("Link does not exists"));
         if (model.getExpiresAt().isAfter(LocalDateTime.now())) {
             model.setVerifiedAt(LocalDateTime.now());
             repo.updateEnabledById(model.getUser().getId(), true);

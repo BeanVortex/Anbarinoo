@@ -1,7 +1,7 @@
 package ir.darkdeveloper.anbarinoo.service;
 
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
-import ir.darkdeveloper.anbarinoo.exception.NoContentException;
+import ir.darkdeveloper.anbarinoo.exception.NotFoundException;
 import ir.darkdeveloper.anbarinoo.model.BuyModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.repository.ProductRepository;
@@ -68,7 +68,7 @@ public class ProductService {
 
         product.orElseThrow(() -> new BadRequestException("Product can't be null"));
         var preProduct = repo.findById(productId)
-                .orElseThrow(() -> new NoContentException("This product does not exist"));
+                .orElseThrow(() -> new NotFoundException("This product does not exist"));
         product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
 
         var userId = preProduct.getCategory().getUser().getId();
@@ -96,7 +96,7 @@ public class ProductService {
 
     public ProductModel getProduct(Long productId, HttpServletRequest req) {
         var foundProduct = repo.findById(productId)
-                .orElseThrow(() -> new NoContentException("This product does not exist"));
+                .orElseThrow(() -> new NotFoundException("This product does not exist"));
         var userId = foundProduct.getCategory().getUser().getId();
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "fetch");
         return foundProduct;
@@ -123,7 +123,7 @@ public class ProductService {
                                             Long productId, HttpServletRequest req) {
         product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
         var preProduct = repo.findById(productId)
-                .orElseThrow(() -> new NoContentException("This product does not exist"));
+                .orElseThrow(() -> new NotFoundException("This product does not exist"));
 
         var userId = preProduct.getCategory().getUser().getId();
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "update");
@@ -140,7 +140,7 @@ public class ProductService {
                                       HttpServletRequest req) {
         product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
         var preProduct = repo.findById(productId)
-                .orElseThrow(() -> new NoContentException("This product does not exist"));
+                .orElseThrow(() -> new NotFoundException("This product does not exist"));
         userAuthUtils.checkUserIsSameUserForRequest(preProduct.getCategory().getUser().getId(),
                 req, "delete images of another user's product");
         product.orElseThrow(() -> new BadRequestException("Product can't be null"));
@@ -152,7 +152,7 @@ public class ProductService {
     @Transactional
     public String deleteProduct(Long id, HttpServletRequest req) {
         var preProduct = repo.findById(id)
-                .orElseThrow(() -> new NoContentException("This product does not exist"));
+                .orElseThrow(() -> new NotFoundException("This product does not exist"));
         userAuthUtils.checkUserIsSameUserForRequest(preProduct.getCategory().getUser().getId(),
                 req, "delete");
         repo.deleteById(id);

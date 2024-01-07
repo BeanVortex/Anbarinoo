@@ -2,7 +2,7 @@ package ir.darkdeveloper.anbarinoo.util.UserUtils;
 
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.EmailNotValidException;
-import ir.darkdeveloper.anbarinoo.exception.NoContentException;
+import ir.darkdeveloper.anbarinoo.exception.NotFoundException;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.model.VerificationModel;
 import ir.darkdeveloper.anbarinoo.repository.UserRepo;
@@ -51,7 +51,7 @@ public class Operations {
             user.get().setProfileImage(null);
             user.get().setShopImage(null);
         }
-        var foundUser = repo.findById(id).orElseThrow(() -> new NoContentException("User not found"));
+        var foundUser = repo.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
         passwordUtils.updatePasswordUsingPrevious(user, foundUser);
         foundUser.update(user.get());
         return foundUser;
@@ -59,7 +59,7 @@ public class Operations {
 
     public UserModel updateUserImages(Optional<UserModel> user, Long id) {
         user.orElseThrow(() -> new BadRequestException("User can't be null"));
-        var foundUser = repo.findById(id).orElseThrow(() -> new NoContentException("User not found"));
+        var foundUser = repo.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
         ioUtils.updateUserImages(user, foundUser);
         //changed merge to update
         foundUser.update(user.get());
@@ -68,7 +68,7 @@ public class Operations {
 
     public UserModel updateDeleteUserImages(Optional<UserModel> user, Long id) {
         var foundUser = repo.findById(id)
-                .orElseThrow(() -> new NoContentException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
         ioUtils.updateDeleteUserImages(user, foundUser);
         return foundUser;
     }

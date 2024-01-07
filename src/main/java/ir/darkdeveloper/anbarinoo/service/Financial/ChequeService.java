@@ -1,7 +1,7 @@
 package ir.darkdeveloper.anbarinoo.service.Financial;
 
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
-import ir.darkdeveloper.anbarinoo.exception.NoContentException;
+import ir.darkdeveloper.anbarinoo.exception.NotFoundException;
 import ir.darkdeveloper.anbarinoo.model.ChequeModel;
 import ir.darkdeveloper.anbarinoo.model.DebtOrDemandModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
@@ -22,7 +22,6 @@ import java.util.Optional;
 public class ChequeService {
 
     private final ChequeRepo repo;
-    private final JwtUtils jwtUtils;
     private final UserAuthUtils userAuthUtils;
     private final DebtOrDemandService dodService;
 
@@ -33,7 +32,7 @@ public class ChequeService {
     public ChequeModel saveCheque(Optional<ChequeModel> cheque, HttpServletRequest req) {
         cheque.orElseThrow(() -> new BadRequestException("Cheque can't be null"));
         checkId(cheque);
-        cheque.get().setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
+        cheque.get().setUser(new UserModel(JwtUtils.getUserId(req.getHeader("refresh_token"))));
         var savedCheque = repo.save(cheque.get());
         var dod = createDodFromCheque(savedCheque);
         dodService.saveDOD(Optional.of(dod), req);
@@ -49,7 +48,7 @@ public class ChequeService {
         cheque.orElseThrow(() -> new BadRequestException("Cheque can't be null"));
         checkId(cheque);
         var foundCheque = repo.findById(id)
-                .orElseThrow(() -> new NoContentException("Cheque does not exist"));
+                .orElseThrow(() -> new NotFoundException("Cheque does not exist"));
         userAuthUtils.checkUserIsSameUserForRequest(foundCheque.getUser().getId(), req, "update");
         foundCheque.update(cheque.get());
         var savedCheque = repo.save(foundCheque);
@@ -66,7 +65,7 @@ public class ChequeService {
 
     public ChequeModel getCheque(Long id, HttpServletRequest req) {
         var cheque = repo.findById(id)
-                .orElseThrow(() -> new NoContentException("Cheque does not exist"));
+                .orElseThrow(() -> new NotFoundException("Cheque does not exist"));
         userAuthUtils.checkUserIsSameUserForRequest(cheque.getUser().getId(), req, "fetch");
         return cheque;
     }
@@ -84,7 +83,7 @@ public class ChequeService {
     @Transactional
     public ResponseEntity<?> deleteCheque(Long id, HttpServletRequest req) {
         var foundCheque = repo.findById(id)
-                .orElseThrow(() -> new NoContentException("Cheque does not exist"));
+                .orElseThrow(() -> new NotFoundException("Cheque does not exist"));
         userAuthUtils.checkUserIsSameUserForRequest(foundCheque.getUser().getId(), req, "delete");
         repo.deleteById(id);
         var res = dodService.deleteDODByChequeId(id, req);

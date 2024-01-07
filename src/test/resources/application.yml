@@ -1,9 +1,10 @@
 spring:
   profiles:
-    active: postgres
+    active: h2
   jpa:
     show-sql: true
-    properties.hibernate.format_sql: true
+    properties:
+      hibernate.format_sql: true
   mail:
     host: localhost
     username: darkd
@@ -31,7 +32,8 @@ spring:
             - profile
           redirect-uri: http://localhost:8080/login/callback
 
-logging.level.net.ttddyy.dsproxy.listener.logging.SLF4JQueryLoggingListener: debug
+logging.level.net.ttddyy.dsproxy.listener.logging:
+  SLF4JQueryLoggingListener: debug
 
 user:
   admin:
@@ -70,7 +72,8 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: create
-    properties.hibernate.format_sql: true
+    properties:
+      hibernate.format_sql: true
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:db

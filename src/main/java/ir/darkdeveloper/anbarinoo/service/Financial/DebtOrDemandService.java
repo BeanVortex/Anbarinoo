@@ -2,7 +2,7 @@ package ir.darkdeveloper.anbarinoo.service.Financial;
 
 import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.InternalServerException;
-import ir.darkdeveloper.anbarinoo.exception.NoContentException;
+import ir.darkdeveloper.anbarinoo.exception.NotFoundException;
 import ir.darkdeveloper.anbarinoo.model.DebtOrDemandModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.Financial.DebtOrDemandRepo;
@@ -22,12 +22,11 @@ import java.util.Optional;
 public class DebtOrDemandService {
 
     private final DebtOrDemandRepo repo;
-    private final JwtUtils jwtUtils;
     private final UserAuthUtils userAuthUtils;
 
     public DebtOrDemandModel saveDOD(Optional<DebtOrDemandModel> dodOpt, HttpServletRequest req) {
         var dod = checkDODAndGet(dodOpt);
-        dod.setUser(new UserModel(jwtUtils.getUserId(req.getHeader("refresh_token"))));
+        dod.setUser(new UserModel(JwtUtils.getUserId(req.getHeader("refresh_token"))));
         return repo.save(dod);
     }
 
@@ -39,10 +38,10 @@ public class DebtOrDemandService {
         DebtOrDemandModel foundDod;
         if (isFromCheque)
             foundDod = repo.findByChequeId(dod.getChequeId())
-                    .orElseThrow(() -> new NoContentException("Debt or Demand record does not exist"));
+                    .orElseThrow(() -> new NotFoundException("Debt or Demand record does not exist"));
         else
             foundDod = repo.findById(id)
-                    .orElseThrow(() -> new NoContentException("Debt or Demand record does not exist"));
+                    .orElseThrow(() -> new NotFoundException("Debt or Demand record does not exist"));
 
         userAuthUtils.checkUserIsSameUserForRequest(foundDod.getUser().getId(), req, "update Debt or Demand record");
         foundDod.update(dod);
@@ -67,14 +66,14 @@ public class DebtOrDemandService {
 
     public DebtOrDemandModel getDOD(Long dodId, HttpServletRequest req) {
         var foundDod = repo.findById(dodId)
-                .orElseThrow(() -> new NoContentException("Debt or Demand record does not exist"));
+                .orElseThrow(() -> new NotFoundException("Debt or Demand record does not exist"));
         userAuthUtils.checkUserIsSameUserForRequest(foundDod.getUser().getId(), req, "fetch Debt or Demand record");
         return foundDod;
     }
 
     public String deleteDOD(Long dodId, HttpServletRequest req) {
         var foundDod = repo.findById(dodId)
-                .orElseThrow(() -> new NoContentException("Debt or Demand record does not exist"));
+                .orElseThrow(() -> new NotFoundException("Debt or Demand record does not exist"));
         userAuthUtils.checkUserIsSameUserForRequest(foundDod.getUser().getId(), req,
                 "delete Debt or Demand record");
         repo.deleteById(dodId);
