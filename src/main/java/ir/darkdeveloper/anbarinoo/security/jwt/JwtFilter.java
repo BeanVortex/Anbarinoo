@@ -63,8 +63,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private void setUpHeader(HttpServletResponse response, String refreshToken,
                              String accessToken, String username, Long userId) {
-
-
         // if this didn't execute, it means the access token is still valid
         if (JwtUtils.isTokenExpired(accessToken)) {
             //db query
@@ -84,7 +82,6 @@ public class JwtFilter extends OncePerRequestFilter {
             } else
                 //if stored token is not equal with user send token, it will return 401
                 SecurityContextHolder.getContext().setAuthentication(null);
-
         }
     }
 
