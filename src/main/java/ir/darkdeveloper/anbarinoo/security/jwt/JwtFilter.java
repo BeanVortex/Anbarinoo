@@ -5,6 +5,7 @@ import ir.darkdeveloper.anbarinoo.exception.NotFoundException;
 import ir.darkdeveloper.anbarinoo.model.RefreshModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.service.RefreshService;
+import ir.darkdeveloper.anbarinoo.util.AdminUserProperties;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import jakarta.servlet.FilterChain;
@@ -26,6 +27,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final UserAuthUtils userAuthUtils;
     private final RefreshService refreshService;
+    private final AdminUserProperties adminUser;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -51,9 +53,11 @@ public class JwtFilter extends OncePerRequestFilter {
             //db query
             var userDetails = userAuthUtils.loadUserByUsername(username)
                     .orElseThrow(() -> new NotFoundException("User does not exist"));
-            var userModel = (UserModel) userDetails;
-            if (!userModel.getId().equals(userId))
-                throw new ForbiddenException("Do not change token. I'm watching you");
+            if (!userDetails.getUsername().equals(adminUser.username())) {
+                var userModel = (UserModel) userDetails;
+                if (!userModel.getId().equals(userId))
+                    throw new ForbiddenException("Do not change token. I'm watching you");
+            }
 
             var upToken = new UsernamePasswordAuthenticationToken(userDetails, null,
                     userDetails.getAuthorities());

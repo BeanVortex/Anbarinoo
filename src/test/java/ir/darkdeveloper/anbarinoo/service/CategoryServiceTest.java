@@ -69,7 +69,7 @@ public record CategoryServiceTest(JwtUtils jwtUtils,
     @Test
     @Order(3)
     void getCategoriesByUser() {
-        var categories = categoryService.getCategoriesByUser(request, userId);
+        var categories = categoryService.getCategoriesByUser(request);
         assertThat(categories.size()).isNotEqualTo(0);
     }
 

@@ -174,7 +174,7 @@ public record CategoryControllerTest(UserService userService,
     @Order(6)
     @WithMockUser(authorities = "OP_ACCESS_PRODUCT")
     void getCategoriesByUser() throws Exception {
-        mockMvc.perform(get("/api/category/user/{id}/", userId)
+        mockMvc.perform(get("/api/category/user/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .headers(authHeaders)

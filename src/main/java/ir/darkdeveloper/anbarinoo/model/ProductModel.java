@@ -30,7 +30,7 @@ public class ProductModel implements UpdateModel<ProductModel> {
     @Column(length = 50, nullable = false)
     private String name;
 
-    private String description;
+        private String description;
 
     @ElementCollection
     @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"))

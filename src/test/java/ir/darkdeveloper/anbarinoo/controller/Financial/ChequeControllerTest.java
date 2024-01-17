@@ -128,7 +128,7 @@ public record ChequeControllerTest(JwtUtils jwtUtils,
         cheque.setNameOf("Me2");
         cheque.setValidTill(LocalDateTime.now().plusDays(10));
 
-        mockMvc.perform(post("/api/user/financial/cheque/update/{id}/", chequeId)
+        mockMvc.perform(put("/api/user/financial/cheque/update/{id}/", chequeId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .headers(authHeaders)

@@ -38,7 +38,7 @@ public class DebtOrDemandController {
         return ResponseEntity.ok(mapper.dodToDto(service.updateDOD(Optional.of(dod), id, false, req)));
     }
 
-    @GetMapping("/get-by-user/{id}/")
+    @GetMapping("/user/{id}/")
     @PreAuthorize("hasAuthority('OP_ACCESS_USER')")
     public ResponseEntity<Page<DebtOrDemandDto>> getAllDODRecordsOfUser(
             @PathVariable("id") Long userId, HttpServletRequest request,

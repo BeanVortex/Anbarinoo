@@ -50,8 +50,10 @@ public class CategoryService {
         return repo.save(category);
     }
 
-    public List<CategoryModel> getCategoriesByUser(HttpServletRequest req, Long userId) {
-        userAuthUtils.checkUserIsSameUserForRequest(userId, req, "access the categories");
+    public List<CategoryModel> getCategoriesByUser(HttpServletRequest req) {
+        userAuthUtils.checkUserIsSameUserForRequest(null, req, "access the categories");
+        var token = req.getHeader("refresh_token");
+        var userId = JwtUtils.getUserId(token);
         return repo.findAllByUserId(userId);
     }
 

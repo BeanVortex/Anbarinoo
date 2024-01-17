@@ -146,7 +146,7 @@ public class BuyService {
     private void checkBuyData(Optional<BuyModel> buy, Optional<Long> buyId) {
         buy.map(BuyModel::getProduct)
                 .map(ProductModel::getId)
-                .orElseThrow(() -> new BadRequestException("Product id is null, Can't sell"));
+                .orElseThrow(() -> new BadRequestException("Product id is null, Can't buy"));
 
         buy.ifPresent(buyModel -> buyId.ifPresentOrElse(buyModel::setId, () -> buyModel.setId(null)));
 

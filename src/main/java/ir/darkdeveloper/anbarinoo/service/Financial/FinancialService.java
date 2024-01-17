@@ -18,12 +18,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FinancialService {
 
-    private final JwtUtils jwtUtils;
     private final FinancialUtils fUtils;
 
 
     public FinancialDto getCosts(Optional<FinancialDto> financial, HttpServletRequest req, Pageable pageable) {
-        var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
+        var userId = JwtUtils.getUserId(req.getHeader("refresh_token"));
 
         var from = fUtils.getFromDate(financial);
         var to = fUtils.getToDate(financial);
@@ -36,7 +35,7 @@ public class FinancialService {
 
 
     public FinancialDto getIncomes(Optional<FinancialDto> financial, HttpServletRequest req, Pageable pageable) {
-        var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
+        var userId = JwtUtils.getUserId(req.getHeader("refresh_token"));
 
         var to = fUtils.getToDate(financial);
         var from = fUtils.getFromDate(financial);
@@ -48,7 +47,7 @@ public class FinancialService {
     }
 
     public FinancialDto getProfitOrLoss(Optional<FinancialDto> financial, HttpServletRequest req, Pageable pageable) {
-        var userId = jwtUtils.getUserId(req.getHeader("refresh_token"));
+        var userId = JwtUtils.getUserId(req.getHeader("refresh_token"));
 
         var from = fUtils.getFromDate(financial);
         var to = fUtils.getToDate(financial);

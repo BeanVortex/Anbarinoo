@@ -146,7 +146,7 @@ public record DebtOrDemandControllerTest(JwtUtils jwtUtils,
     @WithMockUser(authorities = "OP_ACCESS_USER")
     void getAllDODRecordsOfUser() throws Exception {
 
-        mockMvc.perform(get("/api/user/financial/debt-demand/get-by-user/{id}/", userId)
+        mockMvc.perform(get("/api/user/financial/debt-demand/user/{id}/", userId)
                         .accept(MediaType.APPLICATION_JSON)
                         .headers(authHeaders)
                 )

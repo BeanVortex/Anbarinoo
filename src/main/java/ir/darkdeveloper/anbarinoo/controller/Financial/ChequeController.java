@@ -30,7 +30,7 @@ public class ChequeController {
                 HttpStatus.CREATED);
     }
 
-    @PostMapping("/update/{id}/")
+    @PutMapping("/update/{id}/")
     @PreAuthorize("hasAuthority('OP_ACCESS_USER')")
     public ResponseEntity<ChequeDto> updateCheque(@RequestBody ChequeModel cheque, @PathVariable Long id,
                                                   HttpServletRequest req) {

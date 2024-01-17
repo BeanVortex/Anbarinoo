@@ -25,7 +25,7 @@ public class SellController {
     private final BuySellMapper mapper;
 
     @PostMapping("/save/")
-    @PreAuthorize("hasAuthority('OP_SAVE_PRODUCT')")
+    @PreAuthorize("hasAuthority('OP_ADD_PRODUCT')")
     public ResponseEntity<SellDto> saveSell(@RequestBody SellModel sell, HttpServletRequest request) {
         var savedSell = service.saveSell(Optional.ofNullable(sell), request);
         return new ResponseEntity<>(mapper.sellToDto(savedSell), HttpStatus.CREATED);

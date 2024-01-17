@@ -1,12 +1,11 @@
 package ir.darkdeveloper.anbarinoo.model;
 
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
-
-import jakarta.persistence.*;
-
-import lombok.*;
 
 @Getter
 @Setter
@@ -17,7 +16,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class UserRole implements Serializable {
-
 
     @Serial
     private static final long serialVersionUID = 1L;

@@ -1,5 +1,6 @@
 package ir.darkdeveloper.anbarinoo.service;
 
+import ir.darkdeveloper.anbarinoo.exception.NotFoundException;
 import ir.darkdeveloper.anbarinoo.model.UserRole;
 import ir.darkdeveloper.anbarinoo.repository.UserRolesRepo;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +18,8 @@ public class UserRolesService {
     private final UserRolesRepo repo;
 
     @Transactional
-    public String saveRole(UserRole role) {
-        repo.save(role);
-        return "Role created";
+    public UserRole saveRole(UserRole role) {
+        return repo.save(role);
     }
 
     public List<UserRole> getAllRoles() {
@@ -32,7 +32,7 @@ public class UserRolesService {
 
     public String deleteRole(Long id) {
         repo.deleteById(id);
-        return "Role deleted";
+        return "Role deleted with id: " + id;
     }
 
     public Boolean exists(String name) {
@@ -40,4 +40,7 @@ public class UserRolesService {
     }
 
 
+    public UserRole getRole(Long id) {
+        return repo.findById(id).orElseThrow(() -> new NotFoundException("Role with id=" + id + " not found"));
+    }
 }
