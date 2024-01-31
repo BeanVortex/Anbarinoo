@@ -106,6 +106,10 @@ public class BuyService {
         return repo.findAllByProductIdAndCreatedAtAfterAndCreatedAtBefore(productId, from, to, pageable);
     }
 
+    public void updateNullProduct(ProductModel product){
+        repo.updateNullProduct(product);
+    }
+
 
     private void updateProductCount(BuyModel buy, HttpServletRequest req) {
         var preProduct = productService.getProduct(buy.getProduct().getId(), req);

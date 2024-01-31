@@ -28,7 +28,7 @@ public class SellService {
     private final FinancialUtils fUtils;
 
     public SellService(SellRepo repo, UserAuthUtils userAuthUtils,
-                       ProductService productService, @Lazy FinancialUtils fUtils) {
+                       @Lazy ProductService productService, @Lazy FinancialUtils fUtils) {
         this.repo = repo;
         this.userAuthUtils = userAuthUtils;
         this.productService = productService;
@@ -114,6 +114,10 @@ public class SellService {
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "fetch sell records");
         return repo.findAllByProductIdAndCreatedAtAfterAndCreatedAtBefore(productId, from, to, pageable);
 
+    }
+
+    public void updateNullProduct(ProductModel product){
+        repo.updateNullProduct(product);
     }
 
 

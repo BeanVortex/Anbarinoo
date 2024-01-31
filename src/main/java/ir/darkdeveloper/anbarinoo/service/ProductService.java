@@ -6,6 +6,7 @@ import ir.darkdeveloper.anbarinoo.model.BuyModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.repository.ProductRepository;
 import ir.darkdeveloper.anbarinoo.service.Financial.BuyService;
+import ir.darkdeveloper.anbarinoo.service.Financial.SellService;
 import ir.darkdeveloper.anbarinoo.util.IOUtils;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.ProductUtils;
@@ -28,6 +29,7 @@ public class ProductService {
     private final IOUtils ioUtils;
     private final ProductUtils productUtils;
     private final BuyService buyService;
+    private final SellService sellService;
     private final UserAuthUtils userAuthUtils;
     private final CategoryService categoryService;
 
@@ -151,12 +153,14 @@ public class ProductService {
 
     @Transactional
     public String deleteProduct(Long id, HttpServletRequest req) {
-        var preProduct = repo.findById(id)
+        var product = repo.findById(id)
                 .orElseThrow(() -> new NotFoundException("This product does not exist"));
-        userAuthUtils.checkUserIsSameUserForRequest(preProduct.getCategory().getUser().getId(),
+        userAuthUtils.checkUserIsSameUserForRequest(product.getCategory().getUser().getId(),
                 req, "delete");
+        buyService.updateNullProduct(product);
+        sellService.updateNullProduct(product);
         repo.deleteById(id);
-        ioUtils.deleteProductImages(preProduct, preProduct);
+        ioUtils.deleteProductImages(product, product);
         return "Deleted the product";
     }
 
