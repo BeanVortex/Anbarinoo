@@ -45,11 +45,11 @@ public class ProductModel implements UpdateModel<ProductModel> {
     @Column(nullable = false)
     private Integer tax;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
     @ToString.Exclude
     private List<SellModel> sells;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
     @ToString.Exclude
     private List<BuyModel> buys;
 
