@@ -14,6 +14,7 @@ public interface BuySellMapper {
 
     @Mappings({
             @Mapping(target = "productId", source = "model.product.id"),
+            @Mapping(target = "productName", source = "model.product.name"),
             @Mapping(target = "createdAt", dateFormat = StartupConfig.DATE_FORMAT),
             @Mapping(target = "updatedAt", dateFormat = StartupConfig.DATE_FORMAT)
     })
@@ -21,6 +22,7 @@ public interface BuySellMapper {
 
     @Mappings({
             @Mapping(target = "productId", source = "model.product.id"),
+            @Mapping(target = "productName", source = "model.product.name"),
             @Mapping(target = "createdAt", dateFormat = StartupConfig.DATE_FORMAT),
             @Mapping(target = "updatedAt", dateFormat = StartupConfig.DATE_FORMAT)
     })
