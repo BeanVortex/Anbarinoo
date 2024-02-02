@@ -5,13 +5,14 @@ import ir.darkdeveloper.anbarinoo.exception.NotFoundException;
 import ir.darkdeveloper.anbarinoo.model.CategoryModel;
 import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.CategoryRepo;
+import ir.darkdeveloper.anbarinoo.repository.ProductRepository;
 import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +22,7 @@ import java.util.Optional;
 public class CategoryService {
 
     private final CategoryRepo repo;
+    private final ProductRepository productRepository;
     private final UserAuthUtils userAuthUtils;
 
 
@@ -60,6 +62,15 @@ public class CategoryService {
     @Transactional
     public String deleteCategory(Long categoryId, HttpServletRequest req) {
         userAuthUtils.checkUserIsSameUserForRequest(null, req, "delete the category");
+//        repo.findById(categoryId)
+//                .ifPresent(category -> {
+//                    var prs = new ArrayList<ProductModel>();
+//                    category.getProducts().forEach(pr -> {
+//                        pr.setCategory(null);
+//                        prs.add(pr);
+//                    });
+//                    productRepository.saveAll(prs);
+//                });
         repo.deleteById(categoryId);
         return "Deleted the category";
     }

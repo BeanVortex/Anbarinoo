@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,10 +45,10 @@ public class CategoryModel {
     private List<CategoryModel> children = new LinkedList<>();
 
     // bidirectional: it means that the foreign key is on the other side
-    @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "category", cascade = CascadeType.PERSIST)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @ToString.Exclude
-    private List<ProductModel> products;
+    private List<ProductModel> products = new ArrayList<>();
 
     public CategoryModel(String name) {
         this.name = name;
@@ -68,6 +70,12 @@ public class CategoryModel {
         this.parent = parent;
     }
 
+
+    @PreRemove
+    private void preRemove() {
+        // persisting products, if cascade is on remove, then this will be ignored
+        products.forEach(pr -> pr.setCategory(null));
+    }
 
 }
 

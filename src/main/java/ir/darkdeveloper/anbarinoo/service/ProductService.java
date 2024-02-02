@@ -4,6 +4,8 @@ import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.NotFoundException;
 import ir.darkdeveloper.anbarinoo.model.BuyModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
+import ir.darkdeveloper.anbarinoo.model.SellModel;
+import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.ProductRepository;
 import ir.darkdeveloper.anbarinoo.service.Financial.BuyService;
 import ir.darkdeveloper.anbarinoo.service.Financial.SellService;
@@ -18,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,8 +49,10 @@ public class ProductService {
 
         productOpt.map(ProductModel::getId).ifPresent(i -> productOpt.get().setId(null));
         var fetchedCat = categoryService.getCategoryById(product.getCategory().getId(), req);
-        userAuthUtils.checkUserIsSameUserForRequest(fetchedCat.getUser().getId(), req, "create");
+        var userId = fetchedCat.getUser().getId();
+        userAuthUtils.checkUserIsSameUserForRequest(userId, req, "create");
         product.setCategory(fetchedCat);
+        product.setUser(new UserModel(userId));
         ioUtils.saveProductImages(product);
         repo.save(product);
 
@@ -55,8 +61,8 @@ public class ProductService {
                 .price(product.getPrice()).tax(product.getTax()).build();
         buyService.saveBuy(Optional.of(buy), true, req);
         return product;
-
     }
+
 
     /**
      * For regular update with no images:
@@ -67,14 +73,27 @@ public class ProductService {
      */
     @Transactional
     public ProductModel updateProduct(Optional<ProductModel> product, Long productId, HttpServletRequest req) {
-
         product.orElseThrow(() -> new BadRequestException("Product can't be null"));
         var preProduct = repo.findById(productId)
                 .orElseThrow(() -> new NotFoundException("This product does not exist"));
         product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
-
-        var userId = preProduct.getCategory().getUser().getId();
+        var userId = preProduct.getUser().getId();
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "update");
+
+        if (!product.get().getName().equals(preProduct.getName())) {
+            var updatedSells = new ArrayList<SellModel>();
+            var updatedBuys = new ArrayList<BuyModel>();
+            preProduct.getSells().forEach(s -> {
+                s.setProductName(product.get().getName());
+                updatedSells.add(s);
+            });
+            preProduct.getBuys().forEach(b -> {
+                b.setProductName(product.get().getName());
+                updatedBuys.add(b);
+            });
+            buyService.saveAll(updatedBuys);
+            sellService.saveAll(updatedSells);
+        }
 
         preProduct.update(product.get());
         return repo.save(preProduct);
@@ -99,7 +118,7 @@ public class ProductService {
     public ProductModel getProduct(Long productId, HttpServletRequest req) {
         var foundProduct = repo.findById(productId)
                 .orElseThrow(() -> new NotFoundException("This product does not exist"));
-        var userId = foundProduct.getCategory().getUser().getId();
+        var userId = foundProduct.getUser().getId();
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "fetch");
         return foundProduct;
     }
@@ -127,7 +146,7 @@ public class ProductService {
         var preProduct = repo.findById(productId)
                 .orElseThrow(() -> new NotFoundException("This product does not exist"));
 
-        var userId = preProduct.getCategory().getUser().getId();
+        var userId = preProduct.getUser().getId();
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "update");
         return productUtils.updateProductImages(product, preProduct);
     }
@@ -143,8 +162,8 @@ public class ProductService {
         product.map(ProductModel::getId).ifPresent(id -> product.get().setId(null));
         var preProduct = repo.findById(productId)
                 .orElseThrow(() -> new NotFoundException("This product does not exist"));
-        userAuthUtils.checkUserIsSameUserForRequest(preProduct.getCategory().getUser().getId(),
-                req, "delete images of another user's product");
+        var userId = preProduct.getUser().getId();
+        userAuthUtils.checkUserIsSameUserForRequest(userId, req, "delete images of another user's product");
         product.orElseThrow(() -> new BadRequestException("Product can't be null"));
         ioUtils.deleteProductImages(product.get(), preProduct);
         repo.save(preProduct);
@@ -157,8 +176,6 @@ public class ProductService {
                 .orElseThrow(() -> new NotFoundException("This product does not exist"));
         userAuthUtils.checkUserIsSameUserForRequest(product.getCategory().getUser().getId(),
                 req, "delete");
-        buyService.updateNullProduct(product);
-        sellService.updateNullProduct(product);
         repo.deleteById(id);
         ioUtils.deleteProductImages(product, product);
         return "Deleted the product";

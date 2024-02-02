@@ -21,18 +21,14 @@ public interface ProductRepository extends PagingAndSortingRepository<ProductMod
 
     @Query("select m from ProductModel m " +
             "where upper(m.name) like upper(concat('%',:name,'%')) " +
-            "and m.category.user.id = :userId")
+            "and m.user.id = :userId")
     Page<ProductModel> findByNameContainsAndUserId(String name, Long userId, Pageable pageable);
 
-    @Query("select m from ProductModel m " +
-            "where m.category.user.id = :userId")
     Page<ProductModel> findAllByUserId(Long userId, Pageable pageable);
 
-    @Query("select m from ProductModel m " +
-            "where m.category.user.id = :userId")
     List<ProductModel> findAllByUserId(Long userId);
 
-    @EntityGraph(attributePaths = {"category.user", "images"})
+    @EntityGraph(attributePaths = {"user", "images"})
     Optional<ProductModel> findById(Long id);
 
     @Modifying

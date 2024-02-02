@@ -38,6 +38,12 @@ public class SellModel implements UpdateModel<SellModel> {
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private ProductModel product;
 
+    private String productName;
+
+    @ManyToOne()
+    @JoinColumn(name = "user_id")
+    private UserModel user;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 

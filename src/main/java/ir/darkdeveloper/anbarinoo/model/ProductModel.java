@@ -8,8 +8,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -30,7 +32,7 @@ public class ProductModel implements UpdateModel<ProductModel> {
     @Column(length = 50, nullable = false)
     private String name;
 
-        private String description;
+    private String description;
 
     @ElementCollection
     @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"))
@@ -47,16 +49,20 @@ public class ProductModel implements UpdateModel<ProductModel> {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
     @ToString.Exclude
-    private List<SellModel> sells;
+    private List<SellModel> sells = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
     @ToString.Exclude
-    private List<BuyModel> buys;
+    private List<BuyModel> buys = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cat_id")
     @ToString.Exclude
     private CategoryModel category;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserModel user;
 
 
     @Column(nullable = false, precision = 19, scale = 4)
@@ -82,6 +88,12 @@ public class ProductModel implements UpdateModel<ProductModel> {
         category = model.category != null || category == null ? model.category : category;
         totalCount = model.totalCount != null || totalCount == null ? model.totalCount : totalCount;
         tax = model.tax != null || tax == null ? model.tax : tax;
+    }
+
+    @PreRemove
+    public void preRemove() {
+        buys.forEach(b -> b.setProduct(null));
+        sells.forEach(s -> s.setProduct(null));
     }
 }
 

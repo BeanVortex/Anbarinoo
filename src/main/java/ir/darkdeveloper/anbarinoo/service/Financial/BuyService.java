@@ -5,9 +5,11 @@ import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.NotFoundException;
 import ir.darkdeveloper.anbarinoo.model.BuyModel;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
+import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.Financial.BuyRepo;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.util.Financial.FinancialUtils;
+import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Lazy;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -40,11 +43,21 @@ public class BuyService {
     @Transactional
     public BuyModel saveBuy(Optional<BuyModel> buy, Boolean isFromSaveProduct, HttpServletRequest req) {
         checkBuyData(buy, Optional.empty());
+        var buyModel = buy.orElseThrow();
         if (!isFromSaveProduct)
-            updateProductCount(buy.orElseThrow(), req);
+            updateProductCount(buyModel, req);
         // checked buy data validity in checkBuyData, so it is safe to use orElseThrow
-        return repo.save(buy.orElseThrow());
+        var userId = JwtUtils.getUserId(req.getHeader("refresh_token"));
+        var product = productService.getProduct(buyModel.getProduct().getId(), req);
+        buyModel.setUser(new UserModel(userId));
+        buyModel.setProductName(product.getName());
+        return repo.save(buyModel);
     }
+
+    public void saveAll(List<BuyModel> buys){
+        repo.saveAll(buys);
+    }
+
 
     @Transactional
     public BuyModel updateBuy(Optional<BuyModel> buy, Long buyId, HttpServletRequest req) {
@@ -66,13 +79,14 @@ public class BuyService {
 
     public Page<BuyModel> getAllBuyRecordsOfUser(Long userId, HttpServletRequest req, Pageable pageable) {
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "fetch buys");
-        return repo.findAllByProductCategoryUserId(userId, pageable);
+        return repo.findAllByUserId(userId, pageable);
     }
+
 
     public BuyModel getBuy(Long buyId, HttpServletRequest req) {
         var foundBuyRecord = repo.findById(buyId)
                 .orElseThrow(() -> new NotFoundException("Buy record doesn't exist"));
-        var userId = foundBuyRecord.getProduct().getCategory().getUser().getId();
+        var userId = foundBuyRecord.getUser().getId();
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "fetch a buy");
         return foundBuyRecord;
     }
@@ -81,7 +95,7 @@ public class BuyService {
     public ResponseEntity<String> deleteBuy(Long buyId, HttpServletRequest req) {
         var foundBuyRecord = repo.findById(buyId)
                 .orElseThrow(() -> new NotFoundException("Buy record doesn't exist"));
-        var userId = foundBuyRecord.getProduct().getCategory().getUser().getId();
+        var userId = foundBuyRecord.getUser().getId();
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "delete a buy record");
         repo.deleteById(buyId);
         deleteProductCount(foundBuyRecord, req);
@@ -101,19 +115,15 @@ public class BuyService {
         var from = fUtils.getFromDate(financial);
         var to = fUtils.getToDate(financial);
         var preProduct = productService.getProduct(productId, req);
-        var userId = preProduct.getCategory().getUser().getId();
+        var userId = preProduct.getUser().getId();
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "fetch buys");
         return repo.findAllByProductIdAndCreatedAtAfterAndCreatedAtBefore(productId, from, to, pageable);
-    }
-
-    public void updateNullProduct(ProductModel product){
-        repo.updateNullProduct(product);
     }
 
 
     private void updateProductCount(BuyModel buy, HttpServletRequest req) {
         var preProduct = productService.getProduct(buy.getProduct().getId(), req);
-        var userId = preProduct.getCategory().getUser().getId();
+        var userId = preProduct.getUser().getId();
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "save a buy record");
         var product = ProductModel.builder()
                 .totalCount(preProduct.getTotalCount().add(buy.getCount()))
@@ -123,7 +133,7 @@ public class BuyService {
 
     private void updateProductCount(BuyModel buy, BuyModel preBuy, HttpServletRequest req) {
         var preProduct = productService.getProduct(buy.getProduct().getId(), req);
-        var userId = preProduct.getCategory().getUser().getId();
+        var userId = preProduct.getUser().getId();
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "save a buy record");
         var difference = (BigDecimal) null;
         var product = new ProductModel();

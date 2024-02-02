@@ -39,6 +39,12 @@ public class BuyModel implements UpdateModel<BuyModel> {
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private ProductModel product;
 
+    @ManyToOne()
+    @JoinColumn(name = "user_id")
+    private UserModel user;
+
+    private String productName;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 

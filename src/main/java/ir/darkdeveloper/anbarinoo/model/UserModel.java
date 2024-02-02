@@ -197,4 +197,10 @@ public class UserModel implements UserDetails, OAuth2User, UpdateModel<UserModel
         address = model.address != null || address == null ? model.address : address;
         description = model.description != null || description == null ? model.description : description;
     }
+
+    @PreRemove
+    public void preRemove(){
+        // we can persist or remove buy, sell, product and category records
+        // by default, product, buy, sell records will be persisted
+    }
 }

@@ -5,9 +5,11 @@ import ir.darkdeveloper.anbarinoo.exception.BadRequestException;
 import ir.darkdeveloper.anbarinoo.exception.NotFoundException;
 import ir.darkdeveloper.anbarinoo.model.ProductModel;
 import ir.darkdeveloper.anbarinoo.model.SellModel;
+import ir.darkdeveloper.anbarinoo.model.UserModel;
 import ir.darkdeveloper.anbarinoo.repository.Financial.SellRepo;
 import ir.darkdeveloper.anbarinoo.service.ProductService;
 import ir.darkdeveloper.anbarinoo.util.Financial.FinancialUtils;
+import ir.darkdeveloper.anbarinoo.util.JwtUtils;
 import ir.darkdeveloper.anbarinoo.util.UserUtils.UserAuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Lazy;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -40,8 +43,13 @@ public class SellService {
     public SellModel saveSell(Optional<SellModel> sell, HttpServletRequest req) {
         checkSellData(sell, Optional.empty());
         // checked sell data validity in checkSellData, so it is safe to use orElseThrow
-        saveProductCount(sell.orElseThrow(), req);
-        return repo.save(sell.orElseThrow());
+        var sellModel = sell.orElseThrow();
+        saveProductCount(sellModel, req);
+        var userId = JwtUtils.getUserId(req.getHeader("refresh_token"));
+        var product = productService.getProduct(sellModel.getProduct().getId(), req);
+        sellModel.setUser(new UserModel(userId));
+        sellModel.setProductName(product.getName());
+        return repo.save(sellModel);
 
     }
 
@@ -60,7 +68,7 @@ public class SellService {
         // checked the user is same user in this method
         var sells = repo.findAllByProductId(productId, pageable);
         if (!sells.getContent().isEmpty()) {
-            var userId = sells.getContent().get(0).getProduct().getCategory().getUser().getId();
+            var userId = sells.getContent().get(0).getUser().getId();
             userAuthUtils.checkUserIsSameUserForRequest(userId, req, "fetch sell records");
             return sells;
         }
@@ -71,7 +79,7 @@ public class SellService {
     public Page<SellModel> getAllSellRecordsOfUser(Long userId, HttpServletRequest req, Pageable pageable) {
 
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "fetch sell records");
-        return repo.findAllByProductCategoryUserId(userId, pageable);
+        return repo.findAllByUserId(userId, pageable);
 
     }
 
@@ -79,7 +87,7 @@ public class SellService {
 
         var foundSellRecord = repo.findById(sellId)
                 .orElseThrow(() -> new NotFoundException("Sell record doesn't exist"));
-        var userId = foundSellRecord.getProduct().getCategory().getUser().getId();
+        var userId = foundSellRecord.getUser().getId();
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "fetch sell records");
         return foundSellRecord;
 
@@ -89,7 +97,7 @@ public class SellService {
     public String deleteSell(Long sellId, HttpServletRequest req) {
         var foundSellRecord = repo.findById(sellId)
                 .orElseThrow(() -> new NotFoundException("Sell record doesn't exist"));
-        var userId = foundSellRecord.getProduct().getCategory().getUser().getId();
+        var userId = foundSellRecord.getUser().getId();
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "delete sell record");
         repo.deleteById(sellId);
         deleteProductCount(foundSellRecord, req);
@@ -110,21 +118,20 @@ public class SellService {
                                                                 HttpServletRequest req, Pageable pageable) {
         var from = fUtils.getFromDate(financial);
         var to = fUtils.getToDate(financial);
-        var userId = productService.getProduct(productId, req).getCategory().getUser().getId();
+        var userId = productService.getProduct(productId, req).getUser().getId();
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "fetch sell records");
         return repo.findAllByProductIdAndCreatedAtAfterAndCreatedAtBefore(productId, from, to, pageable);
 
     }
 
-    public void updateNullProduct(ProductModel product){
-        repo.updateNullProduct(product);
+    public void saveAll(List<SellModel> sells){
+        repo.saveAll(sells);
     }
-
 
     private void saveProductCount(SellModel sell, HttpServletRequest req) {
         var preProduct = productService.getProduct(sell.getProduct().getId(), req);
         var product = new ProductModel();
-        var userId = preProduct.getCategory().getUser().getId();
+        var userId = preProduct.getUser().getId();
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "save sell records");
 
         if (preProduct.getTotalCount().compareTo(sell.getCount()) >= 0) {
@@ -136,7 +143,7 @@ public class SellService {
     private void updateProductCount(SellModel sell, SellModel preSell, HttpServletRequest req) {
         var preProduct = productService.getProduct(sell.getProduct().getId(), req);
         var product = new ProductModel();
-        var userId = preProduct.getCategory().getUser().getId();
+        var userId = preProduct.getUser().getId();
         userAuthUtils.checkUserIsSameUserForRequest(userId, req, "update buy a record");
 
         BigDecimal difference;
