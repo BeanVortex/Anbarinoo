@@ -24,9 +24,9 @@ spring:
   #        format_sql: true
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/anbarinoo
-    username: darkdeveloper
-    password: 1234
+    url: jdbc:postgresql://localhost:5432/compose-postgres
+    username: compose-postgres
+    password: compose-postgres
   security:
     oauth2:
       client:
